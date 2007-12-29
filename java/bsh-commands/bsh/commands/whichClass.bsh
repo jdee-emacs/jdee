@@ -1,0 +1,99 @@
+import java.util.zip.ZipFile;
+import java.util.zip.ZipEntry;
+
+String whichClass(String strClass)
+{
+	String strBootCP = System.getProperty("sun.boot.class.path");
+	String strCP = System.getProperty("java.class.path");
+	if (strBootCP != null)
+	{
+		strCP = strCP + File.pathSeparator + strBootCP;
+	}
+	
+	return whichClassWithClassPath(strClass, strCP);
+}
+
+
+String whichClassWithClassPath(String strClass, String strCP)
+{
+	String convertName(String str)
+		{
+			int nLength = str.length();
+			StringBuffer strRetVal = new StringBuffer(str);
+			for (int nCount = 0; nCount < nLength; nCount++)
+			{
+				if (strRetVal.charAt(nCount) == '.')
+				{
+					strRetVal.setCharAt(nCount, File.separatorChar);
+				}
+			}
+
+			strRetVal.append(".class");
+			return strRetVal.toString();
+		}
+	
+	String convertToZipName(String str)
+		{
+			int nLength = str.length();
+			StringBuffer strRetVal = new StringBuffer(str);
+			for (int nCount = 0; nCount < nLength; nCount++)
+			{
+				if (strRetVal.charAt(nCount) == '.')
+				{
+					strRetVal.setCharAt(nCount, '/');
+				}
+			}
+
+			strRetVal.append(".class");
+			return strRetVal.toString();
+		}
+	boolean processEntry(String strFile, String strClass, String strZipName)
+		{
+			File file = new File(strFile);
+			if (file.exists())
+				if (file.isDirectory())
+				{
+					String strPath = strFile + File.separatorChar + strClass;
+					File classFile = new File(strPath);
+					return classFile.exists();
+				}
+				else
+				{
+					try
+					{				
+						ZipFile zip = new ZipFile(file);
+						ZipEntry found = zip.getEntry(strZipName);
+						return (found != null);
+					}
+					catch (Exception ex)
+					{
+						System.out.println(ex.toString());
+					}
+			
+				}
+			return false;
+		}
+	
+	String strZipName = convertToZipName(strClass);
+	String strConvertedName = convertName(strClass);
+	String token = null;
+	if (strCP == null)
+	{
+		return null;
+	}
+	
+	print("Using classpath " + strCP + "\n\n");
+	StringTokenizer tokenizer = new StringTokenizer(strCP, File.pathSeparator);
+	while (tokenizer.hasMoreElements())
+	{
+		token = tokenizer.nextToken();
+		if (processEntry(token, strConvertedName, strZipName))
+		{
+			print("Class " + strClass + " is loaded from " + token);
+			return token;
+		}	
+	}
+	print("No definition found for " + strClass);
+	return null;
+}
+

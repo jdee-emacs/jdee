@@ -1,0 +1,133 @@
+0  ; JDE Website                 ; 14 ; 3 ; http://sunsite.auc.dk/jde/   ; _top
+0 ; Introduction ; 0 ; ../html/jde-ug/jde-ug-content.html#Intro
+1 ; About the JDEE ; 3 ; ../html/jde-ug/jde-ug-content.html#AboutJDE
+1 ; JDE Requirements ; 3 ; ../html/jde-ug/jde-ug-content.html#JDERequirements
+1 ; JDEE Components ; 3 ; ../html/jde-ug/jde-ug-content.html#JDEComponents
+1 ; Latest Version ; 3 ; ../html/jde-ug/jde-ug-content.html#LatestVersion
+1 ; Installing the JDE ; 3 ; ../html/jde-ug/jde-ug-content.html#InstallingJDE
+1 ; Contacting the Author ; 3 ; ../html/jde-ug/jde-ug-content.html#ContactingAuthor
+0 ; Registering and Selecting a JDK ; 0 ; ../html/jde-ug/jde-ug-content.html#RegisterSelectJDK
+1 ; Registering a JDK ; 3 ; ../html/jde-ug/jde-ug-content.html#RegisterJDK
+1 ; Selecting a JDK ; 3 ; ../html/jde-ug/jde-ug-content.html#SelectingJDK
+0 ; Editing Java Source Files ; 0 ; ../html/jde-ug/jde-ug-content.html#EditingJavaSourceFiles
+0 ; Documenting Code ; 0 ; ../html/jde-ug/jde-ug-content.html#DocumentingCode
+1 ; Inserting Javadoc Comments ; 3 ; ../html/jde-ug/jde-ug-content.html#InsertingComments
+1 ; Generating the Documentation ; 3 ; ../html/jde-ug/jde-ug-content.html#GeneratingJavadoc
+0 ; Abbreviations ; 0 ; ../html/jde-ug/jde-ug-content.html#Abbrevs
+1 ; Keyword Abbreviations ; 3 ; ../html/jde-ug/jde-ug-content.html#KeywordAbbrevs
+1 ; Control Flow Abbreviations ; 0 ; ../html/jde-ug/jde-ug-content.html#ControlFlowAbbrevs
+2 ; Control Flow Abbreviations ; 3 ; ../html/jde-ug/jde-ug-content.html#
+2 ; Left Brace Placement ; 3 ; ../html/jde-ug/jde-ug-content.html#
+2 ; Customizing the Control Flow Templates ; 3 ; ../html/jde-ug/jde-ug-content.html#
+2 ; Adding Your Own Control Flow Templates ; 3 ; ../html/jde-ug/jde-ug-content.html#
+2 ; Enabling Variable Content ; 3 ; ../html/jde-ug/jde-ug-content.html#
+2 ; Disabling the Control Flow Abbreviations ; 3 ; ../html/jde-ug/jde-ug-content.html#
+0 ; Completing Expressions ; 0 ; ../html/jde-ug/jde-ug-content.html#CodeCompletion
+1 ; Completing Method and Field Names ; 0 ; ../html/jde-ug/jde-ug-content.html#FieldAndMethodCompletion
+2 ; Selecting a Completion Method ; 3 ; ../html/jde-ug/jde-ug-content.html#SelectStdCompletionMethod
+2 ; Using Menu-Based Completion ; 3 ; ../html/jde-ug/jde-ug-content.html#MenuCompletion
+2 ; Using In-Line Completion ; 3 ; ../html/jde-ug/jde-ug-content.html#InLineCompletion
+2 ; Speeding Up Completion ; 3 ; ../html/jde-ug/jde-ug-content.html#SpeedingUpCompletion
+1 ; Dynamic Keyword Completion ; 0 ; ../html/jde-ug/jde-ug-content.html#DynamicKeywordCompletion
+2 ; Dynamic Completion Commands ; 3 ; ../html/jde-ug/jde-ug-content.html#
+2 ; Electric Return ; 3 ; ../html/jde-ug/jde-ug-content.html#
+0 ; Generating Code ; 0 ; ../html/jde-ug/jde-ug-content.html#GeneratingCode
+1 ; Generating Import Statements ; 0 ; ../html/jde-ug/jde-ug-content.html#GeneratingImportStatements
+2 ; Importing Classes ; 3 ; ../html/jde-ug/jde-ug-content.html#ImportingClasses
+2 ; Importing All Classes ; 3 ; ../html/jde-ug/jde-ug-content.html#ImportingAllClasses
+2 ; Expanding Package Imports ; 3 ; ../html/jde-ug/jde-ug-content.html#ExpandingPackageImports
+2 ; Collapsing Class Imports ; 3 ; ../html/jde-ug/jde-ug-content.html#CollapsingClassImports
+2 ; Grouping Imports ; 3 ; ../html/jde-ug/jde-ug-content.html#GroupingImports
+2 ; Deleting Unneeded Imports ; 3 ; ../html/jde-ug/jde-ug-content.html#DeletingUnneededImports
+1 ; Code Wizards ; 0 ; ../html/jde-ug/jde-ug-content.html#CodeWizards
+2 ; Method Override Wizard ; 3 ; ../html/jde-ug/jde-ug-content.html#MethodOverrideWizard
+2 ; Interface Wizard ; 3 ; ../html/jde-ug/jde-ug-content.html#InterfaceWizard
+2 ; Delegate Wizard ; 3 ; ../html/jde-ug/jde-ug-content.html#DelegateWizard
+2 ; Get/Set Wizard ; 3 ; ../html/jde-ug/jde-ug-content.html#GetSetWizard
+1 ; Code Templates ; 0 ; ../html/jde-ug/jde-ug-content.html#CodeTemplates
+2 ; Buffer Templates ; 3 ; ../html/jde-ug/jde-ug-content.html#BufferTemplates
+2 ; Point Templates ; 3 ; ../html/jde-ug/jde-ug-content.html#PointTemplates
+2 ; Customizing Templates ; 3 ; ../html/jde-ug/jde-ug-content.html#CustomizingTemplates
+2 ; Creating Templates ; 3 ; ../html/jde-ug/jde-ug-content.html#CreatingTemplates
+0 ; Checking Coding Style ; 0 ; ../html/jde-ug/jde-ug-content.html#CheckStyle
+0 ; Compiling Java Programs ; 0 ; ../html/jde-ug/jde-ug-content.html#CompilingJavaPrograms
+1 ; Compilation Buffer ; 0 ; ../html/jde-ug/jde-ug-content.html#CompileBuffer
+2 ; Compilation Mode ; 3 ; ../html/jde-ug/jde-ug-content.html#
+1 ; Specifying a Compiler ; 3 ; ../html/jde-ug/jde-ug-content.html#SpecifyingCompiler
+1 ; Compilation Options ; 0 ; ../html/jde-ug/jde-ug-content.html#CompilationOptions
+2 ; Setting Compile Options Interactively ; 3 ; ../html/jde-ug/jde-ug-content.html#SetCompileOptionsInteractively
+2 ; Compiler Customization Variables ; 3 ; ../html/jde-ug/jde-ug-content.html#CompilerCustomizationVariables
+0 ; Building Java Applications ; 0 ; ../html/jde-ug/jde-ug-content.html#BuildingJavaApplications
+1 ; Selecting a Build Method ; 3 ; ../html/jde-ug/jde-ug-content.html#SelectBuildMethod
+1 ; Building with Make ; 0 ; ../html/jde-ug/jde-ug-content.html#BuildWithMake
+2 ; Make Options ; 3 ; ../html/jde-ug/jde-ug-content.html#MakeOptions
+2 ; Sample Makefile ; 3 ; ../html/jde-ug/jde-ug-content.html#SampleMakefile
+1 ; Building with Ant ; 3 ; ../html/jde-ug/jde-ug-content.html#BuildWithAnt
+0 ; Running Java Applications ; 0 ; ../html/jde-ug/jde-ug-content.html#RunningJavaApps
+1 ; Specifying the Application's Main Class ; 3 ; ../html/jde-ug/jde-ug-content.html#SpecifyingMainClass
+1 ; Specifying a Startup Directory ; 3 ; ../html/jde-ug/jde-ug-content.html#SpecifyingStartupDirectory
+1 ; Setting VM Command-Line Arguments ; 3 ; ../html/jde-ug/jde-ug-content.html#RunVMArgs
+1 ; Setting Command-Line Application Arguments ; 3 ; ../html/jde-ug/jde-ug-content.html#RunAppArgs
+1 ; Navigating Exception Traces ; 3 ; ../html/jde-ug/jde-ug-content.html#NavigatingExceptionTraces
+1 ; Run Customization Variables ; 3 ; ../html/jde-ug/jde-ug-content.html#RunOptions
+0 ; Working with Applets ; 0 ; ../html/jde-ug/jde-ug-content.html#WorkingWithApplets
+1 ; Running Applets ; 3 ; ../html/jde-ug/jde-ug-content.html#RunningApplets
+1 ; Debugging Applets ; 3 ; ../html/jde-ug/jde-ug-content.html#DebuggingApplets
+1 ; Applet Customization Variables ; 3 ; ../html/jde-ug/jde-ug-content.html#AppletOptions
+0 ; Debugging Applications ; 0 ; ../html/jde-ug/jde-ug-content.html#DebuggingApps
+0 ; Specifying Classpaths ; 0 ; ../html/jde-ug/jde-ug-content.html#SpecifyingClasspaths
+1 ; Setting a Classpath Variable ; 3 ; ../html/jde-ug/jde-ug-content.html#SettingClasspathVar
+1 ; Including Class Libraries ; 3 ; ../html/jde-ug/jde-ug-content.html#ClassLibraries
+0 ; Using Project Files ; 0 ; ../html/jde-ug/jde-ug-content.html#UsingProjectFiles
+1 ; How the JDE Finds Project Files ; 3 ; ../html/jde-ug/jde-ug-content.html#FindingProjectFiles
+1 ; Project File Contents ; 3 ; ../html/jde-ug/jde-ug-content.html#ProjectFileContents
+1 ; Creating a Project File ; 3 ; ../html/jde-ug/jde-ug-content.html#CreatingProjectFiles
+1 ; Creating Portable Projects ; 3 ; ../html/jde-ug/jde-ug-content.html#CreatingPortableProjects
+1 ; Disabling Context Switching ; 3 ; ../html/jde-ug/jde-ug-content.html#DisablingContextSwitching
+1 ; Project Hook Functions ; 3 ; ../html/jde-ug/jde-ug-content.html#ProjectHooks
+0 ; Displaying Java Documentation ; 0 ; ../html/jde-ug/jde-ug-content.html#DisplayingDoc
+1 ; Browsing JDK Documentation ; 3 ; ../html/jde-ug/jde-ug-content.html#BrowsingJDKDoc
+1 ; Context-Sensitive Class Help ; 3 ; ../html/jde-ug/jde-ug-content.html#ClassHelp
+1 ; Specifying a Browser ; 0 ; ../html/jde-ug/jde-ug-content.html#Specifying a Browser
+2 ; Using emacs-w3m to Browse Java Doc ; 3 ; ../html/jde-ug/jde-ug-content.html#UsingEmacs-w3m
+0 ; Browsing Source Code ; 0 ; ../html/jde-ug/jde-ug-content.html#BrowsingSourceCode
+1 ; Classes Index Menu ; 0 ; ../html/jde-ug/jde-ug-content.html#ClassesMenu
+2 ; Special Index Entries ; 3 ; ../html/jde-ug/jde-ug-content.html#SpecialIndexEntries
+2 ; Alphabetizing the Classes Menu ; 3 ; ../html/jde-ug/jde-ug-content.html#AlphabetClassesMenu
+2 ; Suppressing Method Signatures and Field Types ; 3 ; ../html/jde-ug/jde-ug-content.html#SuppressingSignatures
+2 ; Disabling the Classes Menu ; 3 ; ../html/jde-ug/jde-ug-content.html#DisablingClassesMenu
+2 ; Using the Keyboard to Navigate the Classes Menu ; 3 ; ../html/jde-ug/jde-ug-content.html#
+1 ; Using the Speedbar ; 0 ; ../html/jde-ug/jde-ug-content.html#Speedbar
+2 ; Package ; 3 ; ../html/jde-ug/jde-ug-content.html#Package
+2 ; Types ; 3 ; ../html/jde-ug/jde-ug-content.html#Types
+2 ; Dependencies ; 3 ; ../html/jde-ug/jde-ug-content.html#Dependencies
+2 ; Updating the Speedbar ; 3 ; ../html/jde-ug/jde-ug-content.html#UpdatingSpeedbar
+0 ; Searching Source Code ; 0 ; ../html/jde-ug/jde-ug-content.html#SearchSource
+1 ; Finding Expressions ; 0 ; ../html/jde-ug/jde-ug-content.html#FindExpressions
+2 ; Using the Minibuffer-Based Find (jde-find) Command ; 3 ; ../html/jde-ug/jde-ug-content.html#FindExpressionMinibuf
+2 ; Customizing the Minibuffer-Based Find Command ; 3 ; ../html/jde-ug/jde-ug-content.html#FindExpressionCustomize
+2 ; Using the Dialog-Based Find (jde-find-dlg) Command ; 3 ; ../html/jde-ug/jde-ug-content.html#FindExpressionDlg
+1 ; Finding Symbol Definitions ; 3 ; ../html/jde-ug/jde-ug-content.html#FindSymbolDef
+1 ; Finding Classes ; 3 ; ../html/jde-ug/jde-ug-content.html#FindClasses
+1 ; Cross-Referencing Classes ; 0 ; ../html/jde-ug/jde-ug-content.html#Xref
+2 ; Configuring the Cross-Referencer ; 3 ; ../html/jde-ug/jde-ug-content.html#ConfigXRef
+2 ; Building the Cross-Reference Database ; 3 ; ../html/jde-ug/jde-ug-content.html#BuildingXRefDB
+2 ; Using the Cross-Reference Database ; 3 ; ../html/jde-ug/jde-ug-content.html#UsingXRefDB
+2 ; Updating the Cross-Reference Database ; 3 ; ../html/jde-ug/jde-ug-content.html#UpdatingXRefDB
+1 ; Tags ; 0 ; ../html/jde-ug/jde-ug-content.html#Tags
+2 ; Tagging Java Source Code ; 3 ; ../html/jde-ug/jde-ug-content.html#TaggingCode
+2 ; Finding the Definition of a Symbol ; 3 ; ../html/jde-ug/jde-ug-content.html#FindingSymbols
+0 ; Customizing the JDE ; 0 ; ../html/jde-ug/jde-ug-content.html#CustomizingJDE
+1 ; Customization Variables ; 0 ; ../html/jde-ug/jde-ug-content.html#CustomizationVariables
+2 ; Setting a Customization Variable ; 3 ; ../html/jde-ug/jde-ug-content.html#SettingVariable
+2 ; Specifying Paths ; 3 ; ../html/jde-ug/jde-ug-content.html#SpecifyingPaths
+2 ; JDE Customization Groups ; 3 ; ../html/jde-ug/jde-ug-content.html#JDECustomizationGroups
+1 ; Customizing jde-mode ; 0 ; ../html/jde-ug/jde-ug-content.html#Customizingjde_mode
+2 ; Customizing Key Bindings ; 3 ; ../html/jde-ug/jde-ug-content.html#Keybindings
+0 ; Creating and Installing Plugins ; 0 ; ../html/jde-ug/jde-ug-content.html#Plugins
+1 ; Installing a Plugin ; 3 ; ../html/jde-ug/jde-ug-content.html#InstallingPlugins
+1 ; Creating a Plugin ; 0 ; ../html/jde-ug/jde-ug-content.html#CreatingPlugins
+2 ; Plugin Requirements ; 3 ; ../html/jde-ug/jde-ug-content.html#PluginRequirements
+2 ; Registering a Plugin ; 3 ; ../html/jde-ug/jde-ug-content.html#RegisteringPlugin
+2 ; Running Java Code from a Plugin ; 3 ; ../html/jde-ug/jde-ug-content.html#
+2 ; Bootstrap File Example ; 3 ; ../html/jde-ug/jde-ug-content.html#BootstrapExample

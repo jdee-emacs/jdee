@@ -1,0 +1,673 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.05 [en] (Win95; I) [Netscape]">
+   <TITLE>BeanShell User's Guide</TITLE>
+</HEAD>
+<BODY>
+
+<H1>
+BeanShell User's Guide</H1>
+
+<H2>
+<A NAME="Introduction"></A>Introduction</H2>
+This guide explains how to use the BeanShell Java interpreter with the
+Java Development Environment for Emacs. This guide contains the following
+sections:
+<BR>&nbsp;
+<BR>&nbsp;
+<TABLE BORDER=0 WIDTH="100%" >
+<TR>
+<TD><A HREF="#About">About the BeanShell</A>&nbsp;</TD>
+
+<TD>Brief overview of the BeanShell&nbsp;</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP><A HREF="#Using">Using the BeanShell</A>&nbsp;</TD>
+
+<TD>Explains how to start and shut down the BeanShell, enter statements,
+and show results.</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP><A HREF="#LanguageRef">The BeanShell Language</A>&nbsp;</TD>
+
+<TD>Describes the Java constructs and scripting extensions supported by
+the BeanShell</TD>
+</TR>
+
+<TR>
+<TD><A HREF="#CommandRef">BeanShell Commands</A>&nbsp;</TD>
+
+<TD>Describes the commands supported by the BeanShell</TD>
+</TR>
+</TABLE>
+&nbsp;
+<H2>
+<A NAME="About"></A>About the BeanShell</H2>
+The BeanShell is a Java interpreter that evaluates Java statements directly
+(without first compiling them). The&nbsp; BeanShell has been included in
+the JDE with the permission of its author,&nbsp; <A HREF="mailto:pat@pat.net">Pat
+Niemeyer</A>.
+
+<P>The BeanShell can operate as a stand-alone application or as a part
+of another application. When running as a stand-alone application, the
+interpreter accepts input from the command line of the shell in which it
+runs. The BeanShell distribution includes a shell for running the interpreter.
+It can, however, be run from other shells, such as bash or the DOS command
+window. The JDE includes a command for running the BeanShell in an Emacs
+shell (comint) buffer. This enables you to interact with the interpreter
+directly while developing Java programs.
+
+<P>The JDE also&nbsp; uses the interpreter to implement some JDE commands.
+The JDE invokes the interpreter via Lisp functions that pass Java statements
+to the interpreter via the standard input of the interpreter process and
+retrieve results via the standard output. This guide documents BeanShell
+functionality that seems relevant to JDE users.&nbsp; See the <A HREF="http://www.ooi.com/beanshell/">BeanShell
+home page</A> home page for additional information and to download the
+latest version of the BeanShell.
+<H2>
+<A NAME="Using"></A>Using the BeanShell</H2>
+
+<H3>
+<A NAME="Starting"></A>Starting the BeanShell</H3>
+To start the BeanShell, select <B><FONT SIZE=-1>Interpret</FONT></B> from
+the <B><FONT SIZE=-1>JDE</FONT></B> menu or enter the command <TT>M-x bsh</TT>.
+Emacs starts the BeanShell, if not already started, and displays its prompt
+in an Emacs shell buffer window.
+
+<P><IMG SRC="images/BeanShellBuffer.gif" HEIGHT=536 WIDTH=664>
+
+<P>The JDE allows you to run only one instance of the BeanShell at a time.
+If&nbsp; an instance is already running, the <TT>bsh</TT> command simply
+displays the buffer containing the instance, without starting another instance.
+Note that you can indirectly start a BeanShell instance when you invoke
+commands implemented as hybrid Lisp/Java scripts, such as <TT>jde-wiz-override-method</TT>.
+Such commands start a BeanShell instance if one is not already running.
+<H3>
+<A NAME="Evaluating"></A>Evaluating Statements</H3>
+To evaluate a Java statement, type it at the BeanShell prompt and press
+the <B><FONT SIZE=-1>Enter</FONT></B> key. The BeanShell evaluates the
+statement. When it is done, it redisplays the the BeanShell command prompt.
+You can then enter another statement.
+
+<P>Statements must conform to Java syntax. For example, simple statements
+must end in a semicolon. Compound statements, such as if-then constructs,
+must end in a right brace. Statements may span multiple lines. To continue
+a statement on a new line, press the <B><FONT SIZE=-1>Enter</FONT></B>
+key. The BeanShell does not evaluate the statement until you have entered
+the last line of the statement.
+
+<P><IMG SRC="images/BshMultiLineEx.gif" HEIGHT=264 WIDTH=576>
+<BR>&nbsp;
+<H3>
+<A NAME="Displaying"></A>Displaying Results</H3>
+You can display the results of evaluating Java statements via the BeanShell
+<TT>print</TT> and <TT>show</TT> commands. The print command accepts any
+Java expression as an argument and displays the result of evaluating that
+expression&nbsp; in the BeanShell window. For example,
+<BLOCKQUOTE><TT>print(2+2);</TT></BLOCKQUOTE>
+displays
+<BLOCKQUOTE><TT>4</TT></BLOCKQUOTE>
+in the BeanShell window. Note that <TT>print(expr)</TT> is equivalent to
+<TT>System.out.println(expr)</TT> and you can use either method to print
+a Java expression.
+
+<P>The <TT>show();</TT> command toggles automatic display of the results
+of evaluating statements as they are entered.
+<H3>
+<A NAME="Exiting"></A>Exiting the Shell</H3>
+To exit the BeanShell, enter
+<BLOCKQUOTE><TT>exit();</TT></BLOCKQUOTE>
+at the command prompt.
+<H2>
+<A NAME="LanguageRef"></A>The BeanShell Language</H2>
+
+<H3>
+<A NAME="JavaSupport"></A>Java Language Support</H3>
+The BeanShell language includes most of the constructs of the Java language.
+Standard Java constructs supported by the BeanShell include&nbsp; variable
+assignments, method calls, math expressions, for-loops, etc.. Here are
+some examples:
+<PRE>&nbsp;&nbsp;&nbsp; // Use a hashtable
+&nbsp;&nbsp;&nbsp; Hashtable h = new Hashtable();
+&nbsp;&nbsp;&nbsp; Date d = new Date();
+&nbsp;&nbsp;&nbsp; h.put("today", d);
+
+&nbsp;&nbsp;&nbsp; // Print the current clock value
+&nbsp;&nbsp;&nbsp; print( System.currentTimeMillis() );
+
+&nbsp;&nbsp;&nbsp; // Loop
+&nbsp;&nbsp;&nbsp; for (int i=0; i&lt;5; i++)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print(i);
+
+&nbsp;&nbsp;&nbsp; // Pop up an AWT frame with a button in it
+&nbsp;&nbsp;&nbsp; Button b = new Button("My Button");
+&nbsp;&nbsp;&nbsp; Frame f = new Frame("My Frame");
+&nbsp;&nbsp;&nbsp; f.add(b, "Center");
+&nbsp;&nbsp;&nbsp; f.pack();
+&nbsp;&nbsp;&nbsp; f.show();</PRE>
+By default, the BeanShell imports the Java core classes at startup. You
+can import additional classes, using standard Java import syntax, for example,
+<BLOCKQUOTE><TT>import mypackage.*;</TT></BLOCKQUOTE>
+or
+<PRE>&nbsp;&nbsp;&nbsp; import mypackage.MyClass;</PRE>
+
+<H3>
+<A NAME="ScriptExtensions"></A>Scripting Extensions</H3>
+The BeanShell defines a number of extensions to the Java language designed
+to facilitate creation of scripts.&nbsp; The scripting extensions include
+<UL>
+<LI>
+Script Variables</LI>
+
+<LI>
+Script Methods</LI>
+
+<LI>
+Implicit Objects</LI>
+
+<LI>
+Syntax for accessing Bean properties and Hashtable entries</LI>
+</UL>
+
+<H3>
+<A NAME="ScriptVariables"></A>Script Variables</H3>
+The BeanShell allows you to create a special type of variable named a script
+variable. Unlike a standard Java variable, which can reference objects
+only of a specified type, a script variable can be defined to reference
+any type of object, including primitive types, such as <TT>int</TT> and
+<TT>boolean</TT>. You create a script variable by declaring it with or
+without a type specifier. If you include a type specifier, the variable
+can reference only values of the specified type. If you do not specify
+a type, the variable can reference values of any type. For example, the
+following statement
+<PRE>&nbsp;&nbsp;&nbsp; foo = new Button("Another Button");</PRE>
+creates an untyped script variable named <TT>foo</TT> and assigns it a
+Button object. You are&nbsp; free to subsequently assign <TT>foo</TT> to
+any other type of object.
+<H4>
+Predefined Variables</H4>
+
+<UL>
+<LI>
+<B>$_</B> - the value of the last expression evaluated.</LI>
+
+<LI>
+<B>bsh.Console bsh.console</B> - The primary console, if one exists.</LI>
+
+<LI>
+<B>java.awt.AppletContext bsh.appletcontext</B> - the applet context, if
+one exists.</LI>
+
+<LI>
+<B>String bsh.cwd</B> - used by the cd() and dir() commands.</LI>
+
+<LI>
+<B>boolean bsh.show</B> - used by the show() command.</LI>
+
+<LI>
+<B>boolean bsh.interactive</B> - is this interpreter running in an interactive
+mode or sourcing a file?</LI>
+
+<LI>
+<B>boolean bsh.evalOnly</B> - Does this interpreter have an input stream
+or is it only serving as a bag for eval() operations.</LI>
+</UL>
+
+<H4>
+Undefined variables</H4>
+You can test to see if a variable is "undefined" with the value <TT>void</TT>,
+e.g.:
+<PRE>&nbsp;&nbsp;&nbsp; if ( foobar == void )
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // undefined</PRE>
+You can return a defined variable to the undefined state using the unset()
+command:
+<BLOCKQUOTE><TT>a == void;&nbsp; // true</TT>
+<BR><TT>a=5;</TT>
+<BR><TT>unset("a"); // note the quotes</TT>
+<BR><TT>a == void;&nbsp; // true</TT></BLOCKQUOTE>
+
+<H3>
+<A NAME="ScriptMethods"></A>Script Methods</H3>
+BeanShell lets you define and use a special type of method called a script
+method. Script methods differ from standard Java methods in the following
+ways:
+<UL>
+<LI>
+Script methods are methods of an implicit, typeless object</LI>
+
+<LI>
+Script methods can be defined to accept and return values of any type</LI>
+
+<LI>
+Script methods can define other script methods</LI>
+</UL>
+You use standard Java syntax to declare a script&nbsp; method that accepts
+and returns specific types. For example, the following code
+<PRE>&nbsp;&nbsp;&nbsp; int addTwoNumbers( int a, int b ) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return a + b;
+&nbsp;&nbsp;&nbsp; }</PRE>
+defines a BeanShell method called <TT>addTwoNumbers</TT> that accepts and
+returns values of type <TT>int</TT>. The next example
+<PRE>&nbsp;&nbsp;&nbsp; int a = addTwoNumbers( 5, 7 );</PRE>
+uses the newly defined method to add two values of type <TT>int</TT>.
+
+<P>You define an untyped script method by omitting type specifications.
+For example, the following statement
+<PRE>&nbsp;&nbsp;&nbsp; add( a, b ) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return a + b;
+&nbsp;&nbsp;&nbsp; }</PRE>
+defines a script method that accepts arguments of any type. When you invoke
+an untyped script method, BeanShell interprets the method based on the
+types of the arguments that you pass to the method. Consider, for example,
+the following invocations of the untyped add method defined in the preceding
+example:
+<PRE>&nbsp;&nbsp;&nbsp; foo = add(1, 2);
+&nbsp;&nbsp;&nbsp; print( foo ); // 3
+
+&nbsp;&nbsp;&nbsp; foo = add("Oh", " baby");
+&nbsp;&nbsp;&nbsp; print( foo ); // Oh baby</PRE>
+The first invocation returns the result of adding, the second, of concatenating
+the arguments.
+
+<P>Methods with unspecified return types may return any type of object
+or no object. A return statement is optional. If omitted, the method returns
+the value of the last statement or expression in the method body.
+<H4>
+Method Namespace</H4>
+The namespaces of script methods and variables are separate. Thus, you
+can define a method and a variable having the same name.
+<H4>
+Nested Methods</H4>
+Script methods may define methods, for example,
+<PRE>&nbsp;&nbsp;&nbsp; foo() {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bar() {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }
+&nbsp;&nbsp;&nbsp; }</PRE>
+Method may be nested in this way to an arbitrary depth. Within a nested
+method, locally declared variables and methods&nbsp; shadow identically
+named variables and methods declared in outer methods. Otherwise, variables
+and methods are visible to an arbitrary depth of scope. Outer methods can
+invoke methods defined by inner methods that return a <TT>this</TT> object,
+for example,
+<H3>
+<A NAME="ImplicitObjects"></A>Implicit Objects</H3>
+The methods and variables defined by a script method are considered to
+be methods and fields of an implicit object. The reserved identifiers,
+<TT>this</TT>, <TT>super</TT>, and <TT>global</TT>, refer, respectively,
+to the current object, the calling object, and the global object. A method
+can access any variable or method in these scopes by qualifying the variable's
+name with the name of the appropriate implicit object.
+<PRE>&nbsp;&nbsp;&nbsp; a = 42;
+&nbsp;&nbsp;&nbsp; foo() {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a = 97;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print( a );
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print( this.a );
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print( super.a );
+&nbsp;&nbsp;&nbsp; }
+
+&nbsp;&nbsp;&nbsp; foo();&nbsp; // prints 97, 97, 42</PRE>
+A script method can return its implicit object, thereby allowing the invoking
+script to access variables and methods defined by the method, using standard
+Java&nbsp; "." notation. For example,
+<PRE>&nbsp;&nbsp;&nbsp; foo() {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int a = 42;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bar() {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print("The bar is open!");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bar();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return this;
+&nbsp;&nbsp;&nbsp; }
+
+&nbsp;&nbsp;&nbsp; obj = foo();&nbsp;&nbsp;&nbsp;&nbsp; // prints "the bar is open!"
+&nbsp;&nbsp;&nbsp; print ( obj.a )&nbsp; // 42
+&nbsp;&nbsp;&nbsp; obj.bar();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // prints "the bar is open!"</PRE>
+
+<H4>
+Using Implicit Objects as AWT Event Handlers</H4>
+Implicit method objects can serve as AWT event handlers. To handle an AWT
+event, a script method defines the appropriate event-handling method and
+then registering its implicit (<TT>this</TT>) object with the object in
+which the event originates. For example, the following script
+<PRE>&nbsp;&nbsp;&nbsp; button = new java.awt.Button("foo!");
+
+&nbsp;&nbsp;&nbsp; actionPerformed( event ) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print( event );
+&nbsp;&nbsp;&nbsp; }
+
+&nbsp;&nbsp;&nbsp; button.addActionListener( this );
+&nbsp;&nbsp;&nbsp; frame( button );&nbsp; // show it</PRE>
+defines an Action event handler and registers it with a button.
+
+<P>Remember that you don't have to define all of your event handlers globally.
+You can handle events in any bsh object scope. For example, the following
+method creates a button that displays a message when pushed:
+<PRE>&nbsp;&nbsp;&nbsp; messageButton( message ) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b = new Button("Press Me");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b.addActionListener( this );
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; frame(b);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; actionPerformed( e ) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print( message );
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }
+&nbsp;&nbsp;&nbsp; }
+
+&nbsp;&nbsp;&nbsp; messageButton("Hey you!");
+&nbsp;&nbsp;&nbsp; messageButton("Another message...");</PRE>
+The above will create two buttons and each will display its own message
+when pushed. Each has a separate instance of the event handler object.
+Note too that we could return a 'this' reference from the handler method
+and use it in other contexts to register listeners...
+<H4>
+Using Implicit Objects as Threads</H4>
+'This' type references also implement the standard Runnable interface,
+so you can declare a "run()" method in your objects:
+<BLOCKQUOTE>&nbsp;<TT>&nbsp;&nbsp; foo() {</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; run() {</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// do work...</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return this;</TT>
+
+<P><TT>&nbsp;&nbsp;&nbsp; }</TT>
+<BR><TT>&nbsp;</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp; foo = foo();</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp; new Thread( foo ).start();</TT>
+<BR>&nbsp;</BLOCKQUOTE>
+
+<H4>
+Implicit Object Members</H4>
+Implicit objects have four "magic" members:
+<BLOCKQUOTE>
+<DIR>
+<LI>
+<TT>this.interpreter</TT> refers to the currently executing BeanShell Interpreter
+object.</LI>
+
+<LI>
+<TT>this.namespace</TT> refers to the BeanShell NameSpace object of the
+current context.</LI>
+
+<LI>
+<TT>this.variables</TT> refers to an array of strings listing the variables
+defined in this namespace.</LI>
+
+<LI>
+<TT>this.methods</TT> refers to an array of strings listing the methods
+defined in this namespace.</LI>
+</DIR>
+</BLOCKQUOTE>
+These are mainly for internal use by BeanShell commands. Note that there
+are certain special situations in which the <TT>this.interpreter</TT> reference
+may not be available, such as in AWT event handlers.
+<H3>
+<A NAME="PropSyntax"></A>Extended Syntax for Accessing Bean Properties
+and Hashtables Entries</H3>
+You may use the following syntax
+<BLOCKQUOTE><TT>x{name}</TT></BLOCKQUOTE>
+to access properties of Java beans and Hashtable entries, where <TT>x</TT>
+is a bean or Hashtable and <TT>name</TT> is a String that identifies a
+bean property or hashtable entry, for example:
+<PRE>&nbsp;&nbsp;&nbsp; b = new java.awt.Button();
+&nbsp;&nbsp;&nbsp; b{"label"} = "my button";
+&nbsp;&nbsp;&nbsp; // Equivalent to: b.setLabel("my button");
+
+&nbsp;&nbsp;&nbsp; h = new Hashtable();
+&nbsp;&nbsp;&nbsp; h{"foo"} = "bar";
+&nbsp;&nbsp;&nbsp; // Equivalent to: h.put("foo", "bar");</PRE>
+
+<H2>
+<A NAME="CommandRef"></A>BeanShell Commands</H2>
+The BeanShell provides a set of commands for displaying data, invoking
+system utilities, and performing various other tasks. See the BeanShell
+Command Reference for a description of the syntax and usage of each command.
+The current crop of bsh commands follow. These are, for the most part,
+just very short bsh scripts, supplied in the bsh.jar file. See <A HREF="#making">making
+bsh commands</A> below for more details on adding to the "built-in" bsh
+command set.
+<BR>&nbsp;
+<BR>
+<HR>
+<H3>
+<A NAME="bgCommand"></A>bg</H3>
+<TT>bg( String script )</TT>
+
+<P>This is like <TT>run()</TT> except that it runs the command in its own
+thread. Returns the thread object (for <TT>stop()</TT>ing, <TT>join()</TT>ing,
+etc.)
+<BR>
+<HR>
+<H3>
+<A NAME="BrowseClassCommand"></A>browseClass</H3>
+<TT>void browseClass(String classname);</TT>
+
+<P>Displays a class browser. The browser enables you to browse the contents
+of any packages packaged as <TT>jar</TT> files on the classpath defined
+by <TT>jde-global-classpath</TT>.
+<BR>&nbsp;
+<BR>
+<HR>
+<H3>
+<A NAME="catCommand"></A>cat</H3>
+<TT>void cat( String filename )</TT>
+
+<P>Print the contents of filename (like Unix cat)
+<BR>
+<HR>
+<H3>
+<A NAME="cdCommand"></A>cd</H3>
+<TT>void cd(String dirname);</TT>
+
+<P>Change working directory for the <TT>dir()</TT> command (like Unix <TT>cd</TT>).
+<BR>&nbsp;
+<BR>
+<HR>
+<H3>
+<A NAME="consoleCommand"></A>console</H3>
+<TT>bsh.Console console()</TT>
+
+<P>Create a console window attached to the current interpreter. Returns
+the console Frame.
+<BR>
+<HR>
+<H3>
+<A NAME="dirCommand"></A>dir</H3>
+<TT>void dir(String dirname)</TT>
+
+<P>Display the contets of directory dirname. The format is similar to the
+Unix ls -l command.
+<BR>
+<HR>
+<H3>
+<A NAME="debugCommand"></A>debug</H3>
+<TT>void debug()</TT>
+
+<P>Toggle on and off debug mode... Note: debug output is verbose and gross.
+<BR>
+<HR>
+<H3>
+<A NAME="EditorCommand"></A>editor</H3>
+
+<DL>
+<DT>
+<TT>Frame Frame editor();</TT></DT>
+</DL>
+
+
+<P>Create an editor window with an "eval" button. This is primarily useful
+for typing multi-line commands and experimenting with methods when running
+the BeanShell outside of the Emacs environment. Returns the editor Frame.
+<BR>
+<HR>
+<H3>
+<A NAME="evalCommand"></A>eval</H3>
+<TT>void eval( String expression )</TT>
+
+<P>Evaluate the string in the current interpreter (see <TT>source</TT>).
+<BR>
+<HR>
+<H3>
+&nbsp;<A NAME="execCommand"></A><B>exec</B></H3>
+
+<DL>
+<DT>
+<TT>exec(String process);</TT></DT>
+</DL>
+
+
+<P>Get the Java Runtime and start the external process, display any output.
+<BR>
+<HR>
+<H3>
+<A NAME="exitCommand"></A>exit</H3>
+<TT>void exit()</TT>
+
+<P>Call System.exit(0);
+<BR>
+<HR>
+<H3>
+<A NAME="FrameCommand"></A>frame</H3>
+
+<DL>
+<DT>
+<TT>Frame frame(Component component);</TT></DT>
+</DL>
+
+
+<P>Display the component, centered and packed, in a top level Frame. Returns
+the frame. Frame takes additional steps to handle the WindowClosing AWT
+event and dispose of the frame, so that you an close the window normally.
+<BR>
+<HR>
+<H3>
+&nbsp;<A NAME="getResourceCommand"></A>getResource</H3>
+<TT>URL getResource( String path )</TT>
+
+<P>The equivalent of calling getResource() on the interpreter class in
+the bsh package. Use absolute paths to get stuff in the classpath.
+<BR>
+<HR>
+<H3>
+<A NAME="LoadCommand"></A>load</H3>
+
+<DL>
+<DT>
+<TT>Object load( String filename )</TT></DT>
+</DL>
+
+
+<P>Load a serialized Java object from filename. Returns the object.
+<BR>
+<HR>
+<H3>
+<A NAME="pathToFileCommand"></A>pathToFile</H3>
+<TT>File pathToFile( String filename )</TT>
+
+<P>Create a File object corresponding to the specified file path name,
+taking into account the bsh current working directory (bsh.cwd)
+<BR>
+<HR>
+<H3>
+<A NAME="PrintCommand"></A>print</H3>
+<TT>void print(item);</TT>
+
+<P>Print the string value of the item. item may be of any type.
+<BR>
+<HR>
+<H3>
+<A NAME="pwdCommand"></A><B>pwd</B></H3>
+
+<DL>
+<DT>
+<TT>void pwd();</TT></DT>
+</DL>
+
+
+<P>Print the bsh working directory. This is the cwd obeyed by all the unix
+like bsh comands.
+<BR>
+<HR>
+<H3>
+<A NAME="rmCommand"></A>rm</H3>
+<TT>void rm( String pathname );</TT>
+
+<P>Remove the file (like Unix rm)
+<BR>
+<HR>
+<H3>
+<A NAME="runCommand"></A>run</H3>
+<TT>run( String script )</TT>
+
+<P>run() is like source() except that it runs the command in a new, subordinate
+and prune()'d namespace. So it's like "running" a command instead of "sourcing"
+it ;)
+<BR>
+<HR>
+<H3>
+<A NAME="SaveCommand"></A>save</H3>
+<TT>void save(Component component, String filename);</TT>
+
+<P>Save a serializable Java object to filename.
+
+<P>Since the AWT Button class happens to be serializable, we could test
+drive the save() command.
+<PRE>&nbsp;&nbsp;&nbsp; save(foo, "myButton.ser");</PRE>
+If we did save our button, we could revive it later with the load() command.
+<BR>&nbsp; <TT>bar = load("myButton.ser");</TT>
+<BR><TT>frame(bar);</TT>
+<BR>
+<HR>
+<H3>
+&nbsp;<A NAME="serverCommand"></A>server</H3>
+<TT>void server( int port )</TT>
+
+<P>Create a <A HREF="file:///D|/jde-dev/doc/guide.html#server">Server Mode</A>
+server attached to the current interpreter, listening on the specified
+port.
+<BR>
+<HR>
+<H3>
+&nbsp;<A NAME="setFontCommand"></A>setFont</H3>
+<TT>Font setFont( Component comp, int ptsize )</TT>
+
+<P>Change the point size of the font on the specified component, to ptsize.
+<BR>
+<HR>
+<H3>
+<A NAME="ShowCommand"></A>show</H3>
+<TT>void show();</TT>
+
+<P>Toggle on or off the display of the value of expressions evalauted on
+the command line. Show mode may be useful if you find yourself typing print()
+a lot.
+<BR>
+<HR>
+<H3>
+<A NAME="sourceCommand"></A>source</H3>
+<TT>void source( String filename )</TT>
+
+<P>Read filename into the interpreter and evaluate it in the current namespace.
+Like Bourne Shell "." command.
+<BR>
+<HR>
+<H3>
+<A NAME="unsetCommand"></A>unset</H3>
+<TT>void unset(String name);</TT>
+
+<P>"undefine" the variable specified by 'name' (So that it tests == void).
+<BR>&nbsp;
+<H2>
+<A NAME="MakeCommands"></A>Making BeanShell Commands</H2>
+Adding to the set of "prefab" commands supplied with bsh can be about as
+easy as writing any other bsh methods. You simply have to place your bsh
+scripts in a bsh/commands/ directory in the classpath (or inside the JAR
+file).
+
+<P>&nbsp;
+<BR>&nbsp;
+</BODY>
+</HTML>

@@ -1,0 +1,118 @@
+BODY	{
+	color: 		#2020AA ;
+	margin-left: 	0%;
+	margin-right: 	0%;
+	font: 9pt verdana, arial, helvetica, sans-serif; 
+	}
+
+A:visited { color: #8080A0; }
+A:link    { color: #2020A0; }
+A:hover   { color: #FF4030; }
+
+TABLE   {
+	color : #2020A0;
+	}
+
+TH	{
+	background : #2020A0;
+	color : #D0F0FF;
+	}
+
+
+.n	{
+	background : #C0C0C0;
+	}
+
+.n2	{
+	background : #FFFFFF;
+	font: 9pt verdana, arial, helvetica, sans-serif; 
+	}
+
+.about	{
+	background-image:url(../img/f_about.gif);
+	font: 10pt verdana, arial, helvetica, sans-serif; 
+	}
+
+.pre	{
+	background : #FFFFFF;
+	color      : #000000;
+        font       : 8pt "Courier New", Monospace;
+	}
+
+.p0	{
+	background : #2020A0;
+	color : #D0F0FF;
+	}
+
+.p2	{
+	color      : #2020A0;
+	background : #D0F0FF;
+	font: 9pt verdana, arial, helvetica, sans-serif;
+	letter-spacing: 0pt;
+	font-weight: bold;
+	}
+
+.tit  {
+	font: 18pt verdana, arial, helvetica, sans-serif;
+	letter-spacing: 2pt;
+	font-weight: bold;
+	text-align:center;
+	line-height:22pt;
+	font-weight: bold;
+	}
+
+
+A.a1	{
+	color: #D0F0FF;
+	}
+.a1	{
+	color: #D0F0FF;
+	background: #2020A0;
+	font: 10pt verdana, arial, helvetica, sans-serif;
+	font-weight: bold;
+	}
+A:hover.a1   {	color:#FFFFD0;	}
+A:visited.a1 {	text-decoration: none; }
+
+.p1	{
+	background-image:url(../img/cs1.gif);
+	font: 11pt verdana, arial, helvetica, sans-serif;
+	font-weight: bold;
+	}
+A:hover.p1   {	color:#FFFFD0;}
+
+.b0, b1	{
+	color      : #2020A0;
+	background : #D0F0FF;
+	font: 10pt verdana, arial, helvetica, sans-serif;
+	}
+
+.b1	{
+	font: 11pt verdana, arial, helvetica, sans-serif;
+	}
+
+UL.u1 {
+	list-style-image: url(../img/sb_2.gif) ;
+	list-style-position:  outside ;
+	margin-left: 22;
+	margin-top: 0;
+	margin-bottom: 15;
+	font: 9pt verdana, arial, helvetica, sans-serif;
+       }
+UL.u2 {
+	list-style-image: url(../img/img0.gif) ;
+	list-style-position:  outside ;
+	margin-left: 25;
+	margin-top: 10;
+	margin-bottom: 15;
+	font: 11pt verdana, arial, helvetica, sans-serif;
+	line-height:15pt;
+       }
+
+
+H3     {
+	color      : #2020A0;
+	font: 11pt verdana, arial, helvetica, sans-serif;
+	letter-spacing: 0pt;
+	font-weight: bold;
+	}

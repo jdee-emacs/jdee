@@ -1,0 +1,5 @@
+0  ;  Borland-US ; 3  ;  http://www.borland.com  ;  _top
+0  ;  Borland-Fr ; 3  ;  http://www.borland.fr  ;  _top
+0  ;  Symantec   ; 3  ;  http://www.symantec.com  ;  _top
+0  ;  MicroSoft  ; 3  ;  http://www.microsoft.com  ;  _top
+0  ;  MS France  ; 3  ;  http://www.microsoft.com/france  ;  _top

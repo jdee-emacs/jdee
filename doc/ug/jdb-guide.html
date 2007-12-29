@@ -1,0 +1,430 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<title>Debugging with jdb</title>
+
+<style TYPE="text/css">
+   h1 { font-family: sans-serif; font-size: x-large;}
+   h2 { font-family: sans-serif; font-size: large;
+        margin-top: .5in;
+        margin-left: .2in;
+	border-top-color: gray;
+	border-top-style: solid;
+        border-top-width: thin}
+   h3 { font-family: sans-serif; font-size: medium;
+        margin-left: .2in;
+	margin-top: .4in}
+   h4 { font-family: sans-serif;
+        margin-left: .2in;
+        margin-top: .3in }
+   p  { margin-left: .2in}
+   ul { margin-left: .4in}
+   ol { margin-left: .45in}
+   li { margin-bottom: 2%}
+   table { margin-left: .2in}
+</style>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+
+<h1><a name="DebuggingWithJdb"</a>Debugging with jdb</h1>
+
+<h2>Before You Begin</h2>
+
+<p>You should perform the following steps before attempting to use <code>jdb</code>.</p>
+
+<ol>
+    <li>Set the configuration variable <code>jde-db-debugger</code> 
+        to <code>jdb</code> if you are using version 1.3 (or later)
+        of the Windows or Solaris versions of the JDK or 
+        version 1.2.2 (or later) of the Linux version
+        of the JDK. Set <code>jde-db-debugger</code> to
+        <code>oldjdb</code> if you are using older versions of the
+        JDK.</li>
+    <li>Use <tt>jde-db-set-source-paths</tt> to specify the paths
+        of any source code that you expect to visit while
+        debugging your application (see <a
+        href="#SpecifyingSourceCodePaths">Specifying Source Code
+        Paths</a>). If you suspect that a problem is occurring in
+        the Java API, you should include the API source files in
+        your source path.</li>
+    <li>Compile your source files with the <tt>-g</tt> option
+        (see <a href="#CompilingJavaPrograms">Compiling Java
+        Programs</a>). This causes the compiler to insert
+        information needed by the debugger into your
+        application's class files.</li>
+    <li>Specify the app's main class either by running the <tt>jde-run-set-app</tt>
+        command (you need only do this once) or by starting the
+        debugger from the buffer that contains the source file
+        for the main class.</li>
+</ol>
+
+<h2>Starting the Debugger</h2>
+
+<p>To start the debugger, run the <tt>jde-db</tt> command (<font
+size="2"><b>JDE-&gt;Debug</b></font>, <tt>C-c C-v C-d</tt>). The
+JDE splits the Emacs window into two frames. One shows the
+debugger interaction buffer. The other frame displays your
+application's main method. An arrow (=&gt;) points to the main
+method's first line. The menu bar of the source buffer displays a
+menu (<font size="2"><b>Jdb</b></font>) of debug commands. </p>
+
+<p>&nbsp;<img src="images/debug1.gif" width="601" height="457"> </p>
+
+<h3>Setting Debugger Options Interactively</h3>
+
+<p>If you set the customization variable <tt>jde-db-read-vm-args</tt>
+to a non-<tt>nil</tt> value, the JDE compile command prompts you
+to enter debugger options in the minibuffer. It appends the
+options that you enter to the options specified via customization
+variables. The JDE saves the arguments that you enter in a
+minibuffer history list. You can recall previously entered
+options by pressing the up or down arrows on your keyboard. </p>
+
+<h3>Setting Command-Line Application Arguments Interactively</h3>
+
+<p>If you set the customization variable <tt>jde-db-read-app-args</tt>
+to a non-<tt>nil</tt> value, the JDE compile command prompts you
+to enter command-line application arguments in the minibuffer. It
+appends the options that you enter to the arguments specified via
+the customization variable <tt>jde-db-option-application-args</tt>.
+The JDE saves the arguments that you enter in a minibuffer
+history list. You can recall previously entered options by
+pressing the up or down arrows on your keyboard. </p>
+
+<h3>Entering Debugger Commands</h3>
+
+<p>The JDE lets you enter commands from either the current source
+buffer or from the debugger command-line interaction buffer. You
+can enter all debugger commands from the debugger buffer. You can
+enter only a subset of debugger commands from the current source
+buffer. </p>
+
+<h3>Entering Commands from the Current Source Buffer</h3>
+
+<p>The current source buffer is the buffer in which your program
+is currently halted (initially the buffer containing the source
+for your program's main class).To enter a debugger command from
+the current source buffer, select the command from the jdb menu
+or type the shortcut key for the command. The <font size="2"><b>jdb</b></font>
+menu lists the shortcut keys for debugger commands. </p>
+
+<h3>Entering Commands in the Debugger Interaction Window</h3>
+
+<p>To enter a command in the debugger interaction window, type
+the command at the debugger prompt and press the <tt>Enter</tt>
+key. To see a list of debugger commands, enter the command <tt>help</tt>.
+</p>
+
+<h2>Running an Application Step-by-Step</h2>
+
+<p>Set a breakpoint at the line where you want to begin stepping
+through your program (see <a href="#SettingBreakpoints">Setting
+Breakpoints</a>). Then,&nbsp; type the <tt>run</tt> command. The
+debugger runs your program, stopping at the breakpoint. At this
+point, you can step through your code by entering commands in
+either the Java source buffer or the jdb interaction buffer. </p>
+
+<ul>
+    <li>In the source buffer, choose <font size="2"><b>Jdb-&gt;Step</b></font>
+        (<tt>C-x C-a C-s</tt>) or <font size="2"><b>Jdb-&gt;Next</b></font>
+        (<tt>C-x C-a C-n</tt>) to step into or step over the
+        current line, respectively. Select <font size="2"><b>Jdb-&gt;Continue</b></font>
+        (<tt>C-x C-a C-r</tt>) to continue to the next breakpoint
+        or to the end of your program, whichever comes first.</li>
+    <li>In the jdb buffer, enter <tt>step</tt>, <tt>next</tt>, or
+        <tt>cont</tt> at the <tt>jdb</tt> command prompt.</li>
+</ul>
+
+<p>The debugger executes the current line and stops at the next
+line. If the next line is in another source file, the debugger
+opens the source file in the source buffer (replacing the
+existing file) and positions the display at the new stopping
+point. At this point, you can enter a debugger command to display
+the value of a variable, set or clear a breakpoint, or perform
+some other operation. </p>
+
+<p><b>Note</b>. A blank source buffer indicates that the debugger
+cannot find the source file into which you have stepped. You
+should check your source path setting (see <a
+href="#SpecifyingSourceCodePaths">Specifying Source Code Paths</a>)
+to ensure that it includes all source files in the execution path
+of your program. </p>
+
+<h2><a name="SettingBreakpoints"></a>Setting Breakpoints</h2>
+
+<p>You can set breakpoints in the debugger&nbsp; buffer or the
+current source buffer. When setting breakpoints from the current
+source buffer, you can set breakpoints only in the class
+displayed in the buffer. If you want to set breakpoints at other
+points in your program, you must set them from the debugger
+interaction buffer. </p>
+
+<h3>Setting Breakpoints from the Debugger Buffer</h3>
+
+<p>The <tt>stop in</tt> command sets a breakpoint in a specified
+function. For example, </p>
+
+<pre>
+     > stop in myapp.Main.main
+</pre>
+
+<p>sets a breakpoint in the main method of <tt>myapp.Main</tt>
+class. The stop at command sets a breakpoint at a particular
+line. For example, </p>
+
+<blockquote>
+    <p><tt>&gt; stop at myapp.Main:20</tt></p>
+</blockquote>
+
+<p>sets a breakpoint at line 20 of <tt>myapp.Main</tt> class. Use
+the <tt>clear</tt> command to clear a breakpoint from a specified
+line. For example, </p>
+
+<blockquote>
+    <p><tt>&gt; clear myapp.Main:20</tt></p>
+</blockquote>
+
+<p>clears the breakpoint set at line 20 of <tt>myapp.Main</tt>. </p>
+
+<h3>Setting Breakpoints in the Source Buffer</h3>
+
+<p>To set a breakpoint on any executable line in the source file
+buffer, click on the line and select <font size="2"><b>Jdb-&gt;Set
+Breakpoint</b></font> (<tt>C-x SPC</tt>). To clear a breakpoint
+from a line in the current buffer, click on the line and select <font
+size="2"><b>Jdb-&gt;Remove Breakpoint</b></font> (<tt>C-x C-a C-d</tt>).
+</p>
+
+<a name="SpecifyingSourceCodePaths">
+<h3>Specifying Source Code Paths</h3>
+</a>
+
+<p>The <tt>jde-db-source-directories</tt> variable specifies the
+directories the JDE should search for source for classes visited
+by the debugger as you step through your program. You can set the
+value of this variable in a customization buffer or in the
+minibuffer. </p>
+
+<h3>Using Customization to Set Source Paths</h3>
+
+<p>To use customization, select <font size="2"><b>JDE-&gt;Options-&gt;Project</b></font>
+and edit the <tt>jde-db-source-directories</tt> entry in the
+resulting customization buffer. To show the current value of the
+variable, select the <font size="2"><b>Show/Hide</b></font>
+button. To add a directory, click the last <font size="2"><b>INS</b></font>
+button in the list&nbsp; and enter the directory in the resulting
+edit field. When you are done adding entries, press the <font
+size="2"><b>State</b></font> button to set the variable. To save
+the setting in your project file, select <font size="2"><b>JDE-&gt;Options-&gt;Save
+Project</b></font>. The following figure shows an example of the <tt>jde-db-source-directories</tt>
+entry in a customization buffer. </p>
+
+<p><img src="images/debug2.gif" width="657" height="393"> <br>
+&nbsp; </p>
+
+<p>You must specify the paths of the top-level directories of any
+source code that you might visit while debugging your
+application. The source code directory structure must mirror your
+app's package structure. For example, suppose that your
+application includes a set of classes packaged in the <tt>myapp</tt>
+directory. Then, the source for those classes must be reside in a
+directory named <tt>myapp</tt> and you must specify the path of <tt>myapp</tt>'s
+parent directory. </p>
+
+<p><b>Tip:</b> If you want to step through the JDK source code,
+select the source code install option when you install the JDK
+and set the <tt>jde-db-source-directoiries</tt> variable
+to&nbsp; the top-level directory containing the source code. The
+JDE will use the JDK's package structure to find the source code
+in the subdirectories. </p>
+
+<p><b>Tip:</b> Save the setting of <tt>jde-db-source-directories</tt>
+in your <tt>prj.el</tt> file (see <a href="#SavingProjSettings">Saving
+Project Settings</a>) to avoid having to set them every time you
+start a session. </p>
+
+<h2>Displaying Variables</h2>
+
+<p>The debugger lets you display the value of any local variable
+currently in scope. To display a variable from the debugger
+buffer, enter <tt>print x</tt> at the debugger prompt where <tt>x</tt>
+is the name of the variable whose value you want to display. The
+debugger displays the value of the variable in the debugger
+buffer. To display a local, in-scope variable whose source is
+displayed in the debugger source buffer, put the point on the
+variable and select <font size="2"><b>Jdb-&gt;Print Expression</b></font>
+or type <tt>C-x C-a C-p</tt>. To display all variables in scope,
+enter <tt>locals</tt> at the debugger command prompt in the
+debugger buffer. </p>
+
+<p>When the debugger displays a user-defined object, it prints
+the value returned by the object's <tt>toString()</tt> method. By
+default, the <tt>toString()</tt> method returns the object's id.
+You can override the <tt>toString()</tt{> </tt></p>
+
+<h2>Debug Options</h2>
+
+<p>The JDE allows you to specify debug options by setting JDE
+configuration variables.You can use the Emacs customization
+feature to set debug variables interactively. To use the
+customization feature, select <b><tt>Options-&gt;Debug</tt></b>
+from the <b><tt>JDE</tt></b> menu. (See <a
+href="#ConfiguringJDE">Configuring the JDE</a> for
+more information on using the customization feature). In some
+cases, the JDE also provides functions for setting the
+buffer-local values of the compilation variables. To save the
+compilation settings in the project file (see <a
+href="#UsingProjectFiles">Using Project Files</a>)
+for the current source buffer, select <b><tt>Options-&gt;Update
+Project</tt></b> from the <b><tt>JDE</tt></b> menu.</p>
+
+<p>The following table lists the JDE run-time variables and
+the functions used to set them.</p>
+
+<table border="2" cellpadding="5" width="100%">
+    <tr>
+        <th><b><tt>Variable</tt></b><tt> </tt></th>
+        <th><b><tt>Group</tt></b><tt> </tt></th>
+        <th><b><tt>Usage</tt></b><tt> </tt></th>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-debugger</tt></td>
+        <td valign="top">Project&nbsp;</td>
+        <td valign="top">Specify debugger. The command <tt>jde-db-set-debugger</tt>
+        sets the buffer-local value of this variable.&nbsp;</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-source-directories</tt></td>
+        <td valign="top">Project&nbsp;</td>
+        <td valign="top">Specify location(s) of source files that
+        can be visited while stepping through a program. The
+        command <tt>jde-db-set-source-paths</tt> sets the
+        buffer-local value of this variable.&nbsp;</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-set-initial-breakpoint</tt></td>
+        <td valign="top">Project</td>
+        <td>If non-<tt>nil</tt>, causes the JDE to set an initial
+        breakpoint at the beginning of the application's main
+        method and run the application at debugger startup. This
+        variable is <tt>t</tt> by default. If you want to specify
+        an initial breakpoint, set this variable to <tt>nil</tt>.</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-mode-hook</tt></td>
+        <td valign="top">Project&nbsp;</td>
+        <td valign="top">Customization hook for jde-db inferior
+        mode.&nbsp;</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-startup-commands</tt></td>
+        <td valign="top">Project</td>
+        <td>List of commands to run at debugger startup. This
+        variable overrides <font size="2">jde-db-set-initial-breakpoint</font>.</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-marker-regexp</tt></td>
+        <td valign="top">Project</td>
+        <td>Regular expression used to recognize breakpoint
+        markers in the debugger output. This expression should
+        have two subexpressions: the first matches the name of
+        the class in which the program stopped; the second, the
+        number of the line at which the program stopped. By
+        default, this variable is set to an expression that
+        matches breakpoint markers in jdb's output.</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-global-classpath</tt></td>
+        <td valign="top">Project&nbsp;</td>
+        <td valign="top">Specify class paths for compile, run,
+        and debug commands. The command<tt>
+        jde-set-global-classpath</tt> sets the buffer-local value
+        of this variable.&nbsp;</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-read-vm-args</tt></td>
+        <td valign="top">Project</td>
+        <td>Specifies whether to read debugger VM arguments from
+        the minibuffer.</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-read-vm-args</tt></td>
+        <td valign="top">Project</td>
+        <td>Specifies whether to read command-line application
+        arguments from the minibuffer.</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-option-classpath</tt></td>
+        <td valign="top">Debug&nbsp;</td>
+        <td valign="top">Specifies the classpath for&nbsp; the
+        Java interpreter. This option overrides the
+        jde-global-classpath option.&nbsp;</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-option-verbose</tt></td>
+        <td valign="top">Debug&nbsp;</td>
+        <td valign="top">Print messages about the running
+        process.&nbsp;</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-option-properties</tt></td>
+        <td valign="top">Debug&nbsp;</td>
+        <td valign="top">Specify property values.</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-option-heap-size</tt></td>
+        <td valign="top">Debug&nbsp;</td>
+        <td valign="top">Specify the initial and maximum size of
+        the interpreter heap.&nbsp;</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-option-stack-size</tt></td>
+        <td valign="top">Debug&nbsp;</td>
+        <td valign="top">Specify size of the C and Java stacks.</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-option-garbage-</tt>&nbsp; <br>
+        <tt>collection</tt>&nbsp;</td>
+        <td valign="top">Debug</td>
+        <td valign="top">Specify garbage collection
+        options.&nbsp;</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-option-java-profile</tt></td>
+        <td valign="top">Debug&nbsp;</td>
+        <td valign="top">Enable Java profiling.</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-option-heap-profile</tt></td>
+        <td valign="top">Debug&nbsp;</td>
+        <td valign="top">Output heap profiling data.</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-option-verify</tt></td>
+        <td valign="top">Debug&nbsp;</td>
+        <td valign="top">Verify classes.</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-option-vm-args</tt></td>
+        <td valign="top">Debug&nbsp;</td>
+        <td valign="top">Specify command-line arguments to be
+        passed to the Java VM. The command <tt>jde-db-set-args</tt>
+        sets the buffer-local value of this variable.&nbsp;</td>
+    </tr>
+    <tr>
+        <td valign="top"><tt>jde-db-option-application-args</tt></td>
+        <td valign="top">Debug&nbsp;</td>
+        <td valign="top">Specify command-line arguments to pass
+        to the application. The command <tt>jde-db-set-app-args </tt>sets
+        the buffer-local value of this variable.&nbsp;</td>
+    </tr>
+</table>
+
+</body>
+
+</html>

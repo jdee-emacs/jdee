@@ -1,0 +1,22 @@
+/*
+ * Browse the specified class.
+ */
+
+import bsh.util.ClassBrowser;
+
+void exploreClass(String classname) {
+
+    if (global.classBrowser == void) {
+        global.classBrowser = new ClassBrowser();
+        global.classBrowser.init();
+        global.classBrowserFrame = new javax.swing.JFrame("BeanShell Class Browser");
+        global.classBrowser.setFrame(global.classBrowserFrame);
+        global.classBrowserFrame.getContentPane().add("Center", global.classBrowser);
+        global.classBrowserFrame.pack();
+    }
+
+    global.classBrowser.driveToClass(classname);
+    global.classBrowserFrame.show();
+    global.classBrowserFrame.toFront();
+
+}

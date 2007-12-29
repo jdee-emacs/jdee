@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ===================================================================
+
+   $Id: build.xml,v 1.2 2001/08/14 18:40:28 eric Exp $
+
+     ===================================================================== -->
+<project basedir="." default="jar" name="jde">
+
+  <!-- =================================================================== -->
+  <!--  Properties indicating where external dependencies live.            -->
+  <!--  Alas, these must appear outside of a target if they're to be       -->
+  <!--  available in the build.classpath that follows.                     -->
+  <!--  Note that they can be overridden on the command line:              -->
+  <!--  ant [ -D<property>=<value> ... ]                                   -->
+  <!-- =================================================================== -->
+
+  <!-- these are used as shipped by the vendor -->
+  <!-- none yet -->
+
+  <!-- these are used as built by us in neighboring CVS modules -->
+  <!-- (hence the output/lib) -->
+  <!-- none yet -->
+
+  <!-- =================================================================== -->
+  <!-- Set up build class path                                             -->
+  <!-- =================================================================== -->
+  <path id="build.classpath">
+    <!-- built by us -->
+
+    <!-- vendor provided -->
+  </path>
+
+  <!-- =================================================================== -->
+  <!-- Initialize the properties                                           -->
+  <!-- =================================================================== -->
+  <target description="set properties for other tasks" name="init">
+    <!-- Set up application info -->
+    <property name="app.Name" value="JDE"/>
+    <property name="app.name" value="jde"/>
+    <property name="app.version" value="2.9.0"/>
+    <property name="app.year" value="2001"/>
+
+    <!-- source code and document info -->
+    <property name="src.dir" value="./java/src"/>
+    <property name="doc.dir" value="./doc"/>
+    <property name="lib.dir" value="./lib"/>
+
+    <!-- package to be javadocs -->
+    <property name="packages" value="jde.*"/>
+
+    <!-- build info -->
+    <property name="build.dir" value="output"/>
+    <property name="build.classes" value="${build.dir}/classes"/>
+    <property name="build.lib" value="${build.dir}/lib"/>
+    <property name="build.javadocs" value="${build.dir}/javadocs"/>
+    <property name="build.tests" value="${build.dir}/tests"/>
+    <property name="build.debug" value="on"/>
+    <property name="build.deprecation" value="on"/>
+    <property name="build.compiler.emacs" value="true"/>
+    <property name="tmp.dir" value="${build.dir}/tmp"/>
+
+    <property name="dist.dir" value="./${app.name}-${app.version}"/>
+
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Prepares the build directory                                        -->
+  <!-- =================================================================== -->
+  <target depends="init" 
+          description="creates output area" 
+          name="prepare">
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${build.classes}"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Compiles the source directory                                       -->
+  <!-- =================================================================== -->
+  <target depends="prepare" 
+          description="shortest path to compiling source (incremental)" 
+          name="compile">
+
+    <javac classpathref="build.classpath" 
+           debug="${build.debug}" 
+           deprecation="${build.deprecation}" 
+           destdir="${build.classes}" 
+           srcdir="${src.dir}">
+       <patternset>
+         <include name="**/*.java"/>
+         <exclude name="**/*Tests.java"/>
+       </patternset>
+    </javac>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Copy properties, images, style sheets, etc.                         -->
+  <!-- =================================================================== -->
+  <target depends="init" 
+          description="copies support files (properties, media)" 
+          name="extra">
+    <copy todir="${build.classes}">
+      <fileset dir="${src.dir}">
+        <include name="**/*.properties"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- jar everything up                                                   -->
+  <!-- =================================================================== -->
+  <target depends="compile,extra" 
+          description="creates the application jar file" 
+          name="jar">
+    <mkdir dir="${build.lib}"/>
+    <jar basedir="${build.classes}" jarfile="${build.lib}/${app.name}.jar"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Prepare the application                                             -->
+  <!-- =================================================================== -->
+  <target depends="jar" 
+          description="installs dependencies and processes config files" 
+          name="app">
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Creates the API documentation                                       -->
+  <!-- =================================================================== -->
+  <target depends="prepare" 
+          description="creates API docs, with links to 3rd party software" 
+          name="javadocs">
+    <mkdir dir="${build.javadocs}"/>
+    <javadoc author="true" 
+             destdir="${build.javadocs}" 
+             doctitle="${app.Name}" 
+             packagenames="${packages}" 
+             private="true" 
+             sourcepath="${src.dir}" 
+             use="true" 
+             version="true" 
+             windowtitle="${app.Name} API">
+      <classpath refid="build.classpath"/>
+      <link href="http://java.sun.com/j2se/1.3/docs/api"/>
+    </javadoc>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Creates the binary distribution                                     -->
+  <!-- =================================================================== -->
+  <target depends="jar, javadocs" 
+          description="creates the distributable bundle" 
+          name="dist">
+    <mkdir dir="${dist.dir}"/>
+    <mkdir dir="${dist.dir}/docs"/>
+    <mkdir dir="${dist.dir}/docs/apiDocs"/>
+    <mkdir dir="${dist.dir}/lib"/>
+
+    <copy todir="${dist.dir}/docs/apiDocs">
+      <fileset dir="${build.javadocs}"/>
+    </copy>
+    <copy todir="${dist.dir}/lib">
+      <fileset dir="${build.lib}"/>
+    </copy>
+    <copy todir="${dist.dir}/docs">
+      <fileset dir="${doc.dir}"/>
+    </copy>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Cleans everything                                                   -->
+  <!-- =================================================================== -->
+  <target depends="init" description="removes everything we&apos;ve built" name="clean">
+    <delete dir="${build.dir}"/>
+  </target>
+
+</project>

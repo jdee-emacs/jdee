@@ -1,0 +1,934 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<title>JDEbug User's Guide</title>
+
+<style TYPE="text/css">
+   h1 { font-family: sans-serif; font-size: x-large;}
+   h2 { font-family: sans-serif; font-size: large;
+        margin-left: .2in}
+   h3 { font-family: sans-serif; font-size: medium;
+        margin-left: .2in}
+   h4 { font-family: sans-serif;
+        margin-left: .2in}
+   p  { margin-left: .2in}
+   pre {margin-left: .4in}
+   ul { margin-left: .4in}
+   ol { margin-left: .45in}
+   li { margin-bottom: 2%}
+   table { margin-left: .2in}
+</style>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+
+<h1>JDEbug User's Guide</h1>
+
+<a name="AboutJDEbug">
+<h2>About JDEbug</h2>
+</a>
+
+<p>JDEbug is a Java debugger that comes with the Java Development
+Environment for Emacs. It permits you to execute a Java program
+step-by-step and display and modify the program's internal state.
+JDEbug features include:</p>
+
+<ul>
+    <li>Source-level debugging. JDEbug maintains a source line
+        pointer that moves as you step through a program. You can
+        also set breakpoints in source buffers.<br>
+        </li>
+    <li>Automatic local variable display. JDEbug displays the
+        values of local variables as you step through source code
+        and when the target process stops at a breakpoint.<br>
+        </li>
+    <li>Object browsing. You can expand the local variable
+        display to show object fields to any depth.<br>
+        </li>
+    <li>Stack navigation. At each program step and breakpoint,
+        you can move up or down the stack with a single command.
+        The JDE moves the source cursor to the current line in
+        the current stack frame and displays the local variables
+        in that frame.<br>
+        </li>
+    <li>Multiprocess debugging. You can control execution and
+        display the internal state of multiple, independent
+        processes in the same debug session.<br>
+        </li>
+    <li>Expression evaluation. You can evaluate any expression
+        that is valid at the current suspension point.<br>
+        </li>
+    <li>Method tracing. The debugger optionally lists enties and/or
+        exits from all methods of specified classes. You can
+        define filters to eliminate unwanted traces.<br>
+        </li>
+    <li>Exception tracing. The debugger optionally lists all
+        exceptions of specified types. You can define filters to
+        eliminate unwanted traces.</li>
+</ul>
+
+<a name="JDEbugRequirements">
+<h2>JDEbug Requirements</h2>
+</a>
+
+<p>JDEBug requires a virtual machine that conforms to the
+specifications of the <a
+href="http://java.sun.com/products/jpda/" target="content">Java
+Debug Platform Architecture</a> (JPDA) defined by Sun
+Microsystems. The vm shipped with Sun's Java SDK 1.3 for Windows and Solaris conform to the JPDA specification.</p>
+
+<p>In addition, JPDA backward compatibility packages are
+available for Sun's Java SDK 1.2.2 for Windows and Linux platforms, respectively, and for the Reference Version of the SDK 1.2.2 for the Solaris platform.</p>
+
+<p><strong>Note</strong> JPDA does not work reliably with the Production Version of the SDK 1.2.2 for Solaris. For example, attempting to attach to a process on the Production Version results in the following error:</p>
+
+<p>
+<pre>
+Error [4] in accept() call!
+err:: Interrupted system call
+Socket transport failed to init.
+dt_socket transport error; accept failed, rc = -1
+</pre>
+</p>
+
+<p>If you want to use JDEbug on Solaris, you must use it with the Solaris Reference Version of SDK 1.2.2 or with the Solaris version of SDK 1.3.</p>
+
+<p>The SDK 1.2.2 for Linux includes the JPDA components. You must download the JPDA compatibility packages for the Windows and Solaris versions of SDK 1.2.2 from the JPDA website.</p>
+
+<p><strong>Note</strong> The JDE also provides a source-level
+debugging interface to <code>jdb</code>, the command-line
+debugger that comes with all version's of Sun's Java SDK. You can
+use this interface to debug applications running on Sun vm's that
+do not support the JPDA specification. See <a
+href="../../ug/jdb-guide.html" target="jdb-guide">Debugging with
+jdb</a> for more information.</p>
+
+<a name="JDEbugandHotSpot">
+<h3>JDEbug and HotSpot</h3>
+</a>
+
+<p>JPDA does not run reliably when a vm is operating in HotSpot mode. For example, JPDA sometimes fails to stop the debuggee process at breakpoints and has trouble getting the this object of the method in which the debuggee process is currently suspended.  Sun's JPDA development team is aware of this problem and is working to provide a solution. Meanwhile, you can work around the problem by running the vm in "classic" mode. See <a href="#ClassicMode">Launching an Application in Classic Mode</a> for more information.</p>
+
+
+<a name="SettingUpJDEbug">
+<h2>Setting Up JDEbug</h2>
+</a>
+
+<p>
+Setting up JDEbug entails the following tasks:
+</p>
+
+<ul>
+  <li>
+    <a href="#SelectingJDEbug">Select JDEbug as your debugger.</a>
+  </li>
+  <li>
+    <a href="#SpecifyJPDALocation">Specify the location of the JDK's JPDA libraries.</a>
+  </li>
+  <li>
+    <a href="#SpecifySourceLocation">Specify the locations of Java source files on your system.</a>
+  </li>
+</ul>
+
+<p>The following sections explain how to perform these tasks.</p>
+
+<a name="SelectingJDEbug">
+<h3>Selecting JDEbug As Your Debugger</h3>
+</a>
+
+<p>The JDE is configured by default to serve as a source-level
+debugger front-end to jdb, the command-line debugger that comes
+with Sun's Java SDK. To use JDEbug, you must set the value of the
+JDE customization variable <code>jde-db-debugger</code> to
+specify JDEBug. To do this,</p>
+
+<ol>
+ <li>Type <code>M-x customize-variable</code>.
+	
+	<p style="margin-left: 0em">
+	  Emacs isplays a customization buffer for <code>jde-db-debugger.</code>
+	</p>
+    <p style="margin-left: 0em">
+	  <img src="images/enable_jdebug.gif" width="648" height="270">
+	</p>
+ </li>
+ <li>
+   Click the radio button next to JDEbug.<br>
+ </li>
+ <li>
+   Click the <strong>State</strong> button and select <strong>Save
+   for Future Sessions</strong> if you want to enable JDEbug
+   for all projects or <strong>Set for Current Session</strong>
+   if you want to enable JDEbug only for the current project,
+   in which case you should save the setting in your project
+   file.
+ </li>
+</ol>
+
+<p>Select any Java source buffer. The JDEBug menu should appear 
+in the Emacs menubar.</p>
+
+<p>
+<img src="images/jdebug_menu.gif" width="560" height="430"></p>
+
+<a name="SpecifyingJPDALocation">
+<h3>Specifying the Location of the JPDA Libraries</h3>
+</a>
+
+<p>JDEbug uses class and native code libraries that implement the JPDA specification. You must tell JDEbug where these support libraries live. The way to do this depends on the platform and version of the Sun Java SDK you are using.</p>
+
+<a name="SDK1.3WindowsSolaris">
+<h4>Sun Java SDK 1.3 for Windows and Solaris</h4>
+</a>
+
+<p>To specify the location of the JPDA support libraries for Sun's Java SDK 1.3:</p>
+
+<ol>
+    <li>Select <strong>JDEbug-&gt;Preferences</strong> to display
+        a customization buffer for JDEbug variables.
+        </li><br><br>
+    <li>Customize the entries for the following variables (see 
+       <a href="../../ug/jde-ug-content.html#CustomizingJDE">Customizing the JDE</a>).
+    <table border="0"
+        cellpadding="5" width="100%">
+            <tr>
+                <th align="left" width="30%">Variable</th>
+                <th align="left" width="70%">Set to...</th>
+            </tr>
+            <tr>
+                <td width="30%"><code>jde-bug-vm-includes-jpda-p</code></td>
+                <td width="70%">On.</td>
+            </tr>
+            <tr>
+                <td valign="top" width="30%"><code>jde-bug-jdk-directory</code></td>
+                <td width="70%">Directory that contains the Java SDK 1.3. 
+                Suppose that the SDK is installed in the directory 
+                <code>d:\jdk-1.3</code> on your system. Then you would 
+                 set <code>jde-bug-jdk-directory</code> to <code>d:\jdk-1.3</code>.</td>
+            </tr>
+        </table>
+    </li><br>
+</ol>
+
+<a name="SDK1.2.2">
+<h4>Java SDK 1.2.2 for Windows, Linux, and Solaris</h4>
+</a>
+
+<p>To specify the location of the JPDA support libraries for Sun's Java SDK 1.2.2:</p>
+
+<ol>
+    <li>Select <strong>JDEbug-&gt;Preferences</strong> to display
+        a customization buffer for JDEbug variables. <br>
+        </li><br><br>
+    <li>Customize the entries for the following variables (see 
+       <a href="../../ug/jde-ug-content.html#CustomizingJDE">Customizing the JDE</a>). <br>
+        <table border="0" cellpadding="5" width="100%">
+            <tr>
+                <th align="left" width="30%">Variable</th>
+                <th align="left" width="70%">Set to...</th>
+            </tr>
+            <tr>
+                <td width="30%"><code>jde-bug-vm-includes-jpda-p</code></td>
+                <td width="70%">Off.</td>
+            </tr>
+            <tr>
+                <td valign="top" width="30%"><code>jde-bug-jpda-directory</code></td>
+                <td width="70%">Directory that contains the JPDA package.</td>
+            </tr>
+        </table>
+    </li><br>
+    <li>
+        Include the directory containing the JDPA native code libraries
+        (e.g., <code>jdwp.dll</code>) in your system's library load path.
+        The libraries live in different places, depending on the platform:
+	<ul><br>
+          <li>
+            On Windows, the libraries live in the JPDA backward compatibiliy package's 
+            <code>bin</code> directory. So add the <code>bin</code> directory to your 
+             system's path environment variable.
+            <p style="margin-left: 0em">
+             For example, suppose the JPDA directory resides in the directory <code>c:/jpda</code>
+             on your Windows 95 system. In this case, you would include the following line
+             in your <code>autoexec.bat</code> file:
+	     </p>
+             <p>
+               <code>set path=c:/jpda/bin;%path%</code>
+             </p>
+	  </li>
+          <li>On Solaris, the libraries live in the JPDA's <code>lib/sparc</code>
+               subdirectory. So add the <code>lib/sparc</code> subdirectory to the 
+               <code>LD_LIBRARY_PATH</code> environment variable of
+              the Emacs process. The easiest way to do this is to include the setting in
+              your <code>.bashrc</code> or <code>.cshrc</code> file.             
+              <p style="margin-left: 0em">
+                For example, suppose you install the JPDA directory at <code>/home/me/jpda</code> on 
+                your system. Then you would add the following line to your <code>.cshrc</code>
+                file:
+                <p>
+                  <code>setenv LD_LIBRARY_PATH 
+                     /home/me/jpda/lib/sparc:$LD_LIBRARY_PATH</code>
+                </p>
+           </li>
+	   <li>
+             On Linux, the JDPA libraries live in the Java SDK 1.2.2's <code>lib/sparc</code>
+             (Sun processor) or <code>lib/i386</code> (Intel processor) subdirectory. So for Linux,
+             you would add lines similar to the following to your <code>.bashrc</code> file:
+             <p>
+                  <code>LD_LIBRARY_PATH = /opt/jdk1.2.2/lib/i386:$LD_LIBRARY_PATH</code><br>
+                  <code>export LD_LIBRARY_PATH</code>
+             </p>
+	     
+	     <p>Also make sure that there are symbolic links for libjdwp.so and
+                libdt_socket.so as follows:
+
+                <p>
+                 <code>jdk1.2.2/lib/libjdwp.so</code>  -&gt; <code>jdk1.2.2/lib/i386/libjdwp.so</code><br>
+                 <code>jdk1.2.2/lib/libdt_socket.so</code> -&gt; <code>jdk1.2.2/lib/i386/libdt_socket.so</code>
+		</p> 
+	     </p>
+
+
+	  </li>
+        </ul>
+    </li><br><br>
+</ol>
+
+<a name="SpecifySourceLocation">
+<h3>Specifying the Location of Source Files</h3>
+</a>
+
+<p>
+To display the current location in the program you are debugging, JDEBug needs to be able to find the source files from which the program was compile. The JDEbug looks for the files in the source directories specified by the JDE variable <code>jde-db-source-directories</code>. Therefore, before starting a debugging session, you must ensure that this variable specifies all the source files that you may step through during the debugging session.
+</p>
+
+<p>
+To set this variable:
+</p>
+<ol>
+  <li>
+    Type <code>M-x customize-variable jde-db-source-directories</code>
+    <p style="margin-left: 0em">
+     Emacs displays the customization buffer for the variable.
+    </p>
+  </li>
+  <li>
+   Edit the buffer to reflect the location of Java source files on your system.
+   <p style="margin-left: 0em">
+     <strong>Note</strong> You should specify only the root directory of the top-level packages you 
+     may need to visit during a debugging session. For example, suppose the top-level packages for 
+     your current project reside in <code>c:/java/projects/prj1/src</code> and the Java SDK source 
+     lives in <code>c:/java/jdk1.3/src</code>. Then the customization buffer should appear as follows:
+     <p><code>jde-db-source-directories: [Hide]</code><br>
+        <code>[INS] [DEL] Path: c:/java/projects/prj1/src</code><br>
+        <code>[INS] [DEL] Path: c:/java/jdk1.3/src/</code><br>
+        <code>[INS]</code><br>
+        <code>[State]: you have edited the value as text, but you have not set the option.</code><br>
+        <code>List of source directory paths. [More]</code><br>
+        <code>Parent groups: [jde-project]</code><br>
+     </p>
+   </p>
+  </li>
+  <li>
+    Save the setting in your <code>.emacs</code> or <code>.prj</code> file
+    (see  <a href="../../ug/jde-ug-content.html#CustomizingJDE">Customizing the JDE</a>).
+</ol>
+
+
+<a name="StartingDebugger">
+<h2>Starting the Debugger</h2>
+</a>
+
+<p>To start the debugger, select <strong>Processes-&gt;Start
+Debugger</strong> from the JDEbug menu. This command simply
+starts the debugger. To debug an application, you must either</p>
+
+<ul type="disc">
+    <li>launch the application inside the debugger (see <a
+        href="#LaunchingProcess">Launching a Process</a>)</li>
+    <li>attach the debugger to the application if it was started
+        outside the debugger (see <a href="#AttachingProcess">Attaching
+        a Process</a>)</li>
+    <li>put the debugger in listen mode and start the application
+        outside the debugger (see <a href="#ListeningForProcess">Listening
+        for a Process</a>)</li>
+</ul>
+
+<a name="SetWorkingDirectory">
+<h3>
+  Setting the Debug Session Working Directory
+</h3>
+</a>
+
+<p>
+  The debugger launches all processes from the directory in which it was started.
+  This directory is known as the debug session working directory. By default, the
+  debug session working directory is the directory of the source buffer that was
+  active when you started the debugger. To specify another directory as the
+  working directory for the current debugger session, set the variable 
+  <code>jde-run-working-directory</code> to the directory's path.
+</p>
+<p>
+  <strong>Note</strong> You cannot set the working directory on a per-process basis.
+  All processes launched during the current session start in the debug session
+  working directory.
+</p>
+
+<a name="ExitingDebugger">
+<h2>
+  Exiting the Debugger
+</h2>
+</a>
+
+<p>To exit the debugger, select <strong>Exit Debugger</strong>
+from the JDEbug menu. The JDE terminates any processes (vm's)
+launched by the debugger and terminates the debugger process (vm)
+itself.</p>
+
+<p><strong>Note</strong> Exiting Emacs itself without first
+exiting the debugger orphans the debugger vm and any processes (vm's)
+launched by the debugger. Thus, it is important to exit JDEbug
+before exiting Emacs.</p>
+
+<a name="LaunchingProcess">
+<h2>Launching a Process</h2>
+</a>
+
+<p>In this guide, a process refers to a running instance of an
+application. JDEBug provides two commands for launching processes.</p>
+
+<ul type="disc">
+    <li><strong>JDEbug-&gt;Processes-&gt;Launch Process</strong> 
+	<p style="margin-left: 0em">
+	    This command launches an instance of the application whose
+        main class is specified by the variable <code>jde-run-application-class</code>,
+        or, if this variable is <code>nil</code>, the application
+        in the current Java source buffer. The debugger suspends the debuggee process
+        before it enters the application's main method.
+        At this point, you should set one or more breakpoints in the
+        application and select the Run command from the JDEbug menu.
+        The process will then run to the first breakpoint at which point you can
+        continue to the next breakpoint or single-step the process.<br>
+        </p>
+    </li>
+    <li><strong>JDE-&gt;Debug App</strong>
+	  <p style="margin-left: 0em">
+	    This command performs the following actions:<br>
+        </p>
+        <ol>
+            <li>Starts the debugger, if necessary.</li>
+            <li>Launches the application.</li>
+            <li>Sets any breakpoints you have previously
+                specified (see Setting Breakpoints).</li>
+            <li>Runs the application.</li>
+        </ol>
+        <p><strong>Note</strong> With this command, the
+        application will simply run to completion without
+        stopping, if you have not previously specified any valid
+        breakpoints for the application or none of the
+        breakpoints exist on the main execution path.</p>
+    </li>
+</ul>
+
+<p>Issuing either of these commands cause JDEBug to split your
+Emacs frame into three windows.</p>
+
+<p>.<img src="images/window_config.gif" width="498" height="395"></p>
+
+<p>The top window displays a Java source buffer. The source
+buffer displays either the source buffer where you launched the
+application or, if you used the <strong>Debug App</strong>
+command, the source buffer containing the first breakpoint hit
+after the application was launched.</p>
+
+<p>The middle window displays the application process's local
+variables buffer. The buffer displays the local variables in the
+stack frame of the initial breakpoint hit when you launched the
+application. If your application does not hit a breakpoint at
+startup, the local variables buffer displays nothing.</p>
+
+<p>The bottom window contains the debugger messages buffer for
+the process that was just launched. This buffer displays messages
+regarding the status of the process being debugged.</p>
+
+<p>At this point, if the process was launched successfully and
+did not run to completion, you can begin debugging your
+application.</p>
+
+<p><strong>See Also</strong></p>
+
+
+<p><a href="#ProcessBuffers">Working with Process Buffers</a></p>
+
+
+
+<p><a href="#DebuggingMultipleProcesses">Debugging Multiple Processes</a></p>
+
+
+<a name="ClassicMode">
+<h3>Launching an Application in Classic Mode</h3>
+</a>
+
+<p>Depending on the version of the JDK you are using, the debugger can launch a debuggee process in either of two modes:<p>
+
+<ul>
+  <li>classic
+      <p>Uses just-in-time (JIT) compilation of classes to
+         speed up execution of a program. This is the mode
+         used in early versions of the JDK. Hence its name.</p> 
+  </li>
+  <li>HotSpot
+      <p>Speeds up execution by detecting and compiling heavily used fragments 
+      of code (hot spots). Unfortunately, the JPDA does not work reliably
+      in this mode (see <a href="#JDEBUGandHotSpot">JDEbug and Hotspot</a>). 
+      Therefore, you should use classic mode to launch a debuggee application.
+      </p>
+  </li>
+</ul>
+
+<p> The debugger launches applications in HotSpot mode by default. To launch
+an application in classic mode, type <code>M-x customize-variable 
+jde-run-classic-mode-vm</code> and toggle the variable on.</p>
+
+<p><strong>Note</strong> If the JDK's Java Runtime Environment (JRE) is installed on your system, JPDA sometimes uses the vm installed in the JRE's bin directory to launch the debuggee application. (I'm not sure exactly how the JDPA determines which vm to use to launch a debuggee application. It seems to vary from system to system.) Unfortunately, on Windows, at least, the JDK installer installs only the HotSpot vm in the JRE bin directory. If you want to debug applications, you must manually install the classic mode vm in the JRE bin directory itself. To do this, simply copy the classic subdirectory from the jre subdirectory of the JDK to the bin subdirectory of the JRE. After you have done this, the JRE bin directory should look similar to the following:</p>
+
+<p>
+<pre>
+    - c:\Program Files\
+      - JavaSoft
+        - bin
+            classic
+            hotspot
+      + lib
+</pre>
+</p>
+
+<a name="ConnectingToExternalProcesses">
+<h2>Connecting to External Processes</h2>
+</a>
+
+<p>
+JDEbug supports two ways of connecting to an application that it does not itself launch: attach mode and listen mode. Each of these modes can be thought of as an interaction between a client and a server. In attach mode, the application vm is the server and JDEbug is the client. In listen mode, JDEbug is the server and the application vm is the client. The advantage of attach mode is that it allows you to connect (and reconnect) to an external process at any time. The advantage of listen mode is that it allows you to debug the startup of an external process.
+</p>
+
+<p>
+To use either of these modes, you must start the application vm with certain command line arguments and then issue a JDEbug command to establish the connection. The following sections explain the procedurs for establishing an attach-mode and listen-mode connection, respectively.
+</p>
+
+
+<a name="AttachingProcess">
+<h3>Attaching a Process</h2>
+</a>
+
+<p>
+  JDEbug allows you to attach the debugger to an existing local
+  or remote process that was launched outside the current debugger
+  session. This is useful for debugging servlets and processes that
+  were launched by another application, for example, servelets.
+</p>
+<p> 
+<strong>Note</strong>You can use <strong>JDE-&gt;Run App</strong>
+ to launch the third-party application. Use the JDE variables 
+<code>jde-run-executable</code> and <code>jde-run-executable-args</code>
+to cause the <strong>Run App</strong> command to run a non-Java app that
+launches a Java subprocess to be debugged.
+</p>
+</p>
+
+<p>
+  You can attach the debugger to an existing process via: 
+  <ul>
+   <li>
+     a socket
+   </li>
+   <li>
+     shared memory, if both processes run
+     on the same host
+   </li>
+  </ul>
+</p>
+<p>
+  The shared memory option is available only on
+  Windows. It is much faster and thus is preferable. In either case
+  the existing process must have been started with the appropriate
+  debug options.
+</p>
+
+<a name="AttachViaSocket">
+<h4>
+  Attaching via a Socket
+</h4>
+</a>
+
+<p>To attach via a socket:</p>
+
+<ol type="1" start="1">
+  <li> 
+    Launch the debuggee process with the following vm command
+    line arguments:
+
+    <ul>
+      <li><code>-Xdebug</code></li>
+      <li><code>-Xnoagent</code></li>
+      <li><code>-Djava.compiler=NONE</code></li>
+      <li><code>-Xrunjdwp:transport=dt_socket,address=NNNN,server=y,suspend=n</code>
+        <p style="margin-left: 0em">
+          where <code>NNNN</code> is any unused socket address on the host
+          processor for the debuggee process.
+        </p>
+        <p  style="margin-left: 0em">
+          See <code>jde-run-option-vm-args</code> for information on how 
+	  to specify vm arguments when launching an application from the JDE.
+        </p>
+      </li>
+    </ul>
+  </li>
+  <li>
+      Execute JDEbug-&gt;Processes-&gt;Start Debugger to start the
+      debugger (if necessary).
+  </li>
+  <li>
+    <strong>Execute JDEbug-&gt;Processes-&gt;Attach Process-&gt;Local Host</strong>
+    or <strong>Remote Host</strong> to attach the debugger to a local or remote 
+    process, respectively.
+    <p style="margin-left: 0em">
+      In the first case, the JDE prompts you to enter the socket 
+	 address that you specified in step 1. In the second case, 
+	 the JDE also prompts you to enter the name of the host on 
+	 which the remote process is running.
+    </p>
+  </li>
+</ol>
+
+<a name="AttachViaSharedMemory">
+<h4>
+  Attaching via Shared Memory
+</h4>
+</a>
+
+<p>
+  To attach via shared memory:
+</p>
+
+<ol>
+  <li>
+      Launch the debuggee process with the following vm command
+      line arguments:
+      <ul>
+        <li><code>-Xdebug</code></li>
+        <li><code>-Xnoagent</code></li>
+	<li><code>-Djava.compiler=NONE</code></li>
+        <li><code>-Xrunjdwp:transport=dt_shmem,address=NAME,server=y,suspend=n</code>
+         <p  style="margin-left: 0em">
+          where <code>NAME</code> is a string identifying the process, e.g.,
+          <code>webserver</code>.
+         </p>
+         <p style="margin-left: 0em">
+          See <code>jde-run-option-vm-args</code> for
+          information on how to specify vm arguments when launching
+          an application from the JDE.
+         </p>
+	</li>
+    </ul>
+  </li>
+  <li>
+      Execute <strong>JDEbug-&gt;Processes-&gt;Start Debugger</strong>
+      to start the debugger (if necessary).
+  </li>
+  <li>
+      Execute <strong>JDEbug-&gt;Processes-&gt;Attach Process-&gt;Via
+      Shared Memory</strong> to attach the debugger to the process
+      started in step 1.
+    <p style="margin-left: 0em">
+      The JDE prompts you to enter the <code>NAME</code>
+      you specified in step 1.
+    </p>
+  </li>
+</ol>
+
+<p><strong>Note</strong> You can attach/detach from a
+running process as many times as you want during a session.</p>
+
+<a name="ListeningForProcess">
+<h3>Listening for a Process</h3>
+</a>
+
+<p>
+JDEbug's listen mode enables a process that is launched independently of JDEbug 
+to attach itself to JDEbug when the independently launched process starts.
+Listen mode is useful for debugging the startup code of processes that JDEbug
+cannot launch itself. Examples of such processes are processes launched by other
+applications such as a web server or a hybrid C/Java application where a C 
+main program uses an embedded vm to to run Java processes.
+
+<p> 
+<strong>Note</strong>You can use <strong>JDE-&gt;Run App</strong>
+ to launch the third-party application. Use the JDE variables 
+<code>jde-run-executable</code> and <code>jde-run-executable-args</code>
+to cause the <strong>Run App</strong> command to run a non-Java app that
+launches a Java subprocess to be debugged.
+</p>
+</p>
+
+<p>
+When in listen mode, JDEbug acts as a debug server, listening for
+debug service requests from independently launched processes.  You can
+cause JDEbug to use either a socket or a shared memory channel
+(Windows only) to communicate with processes requesting debug
+services. You must use the socket option, if you want to debug a
+process running on a remote machine or you are running the debugger
+under Unix, On Windows, you can use either option to debug processes
+running on the local machine. However, the shared memory option
+typically results in faster response to debug commands.
+</p>
+
+<a name="ListenOnSocket">
+<h4>Listening on a Socket</h4>
+</a>
+
+<ol>
+  <li>
+      Execute <strong>JDEbug-&gt;Processes-&gt;Start Debugger</strong>
+      to start the debugger (if necessary).
+    
+  </li>
+  <li>
+    Select <strong>JDEbug-&gt;Processes-&gt;Listen on-&gt;Socket</strong>
+    to put JDEbug in listen mode.
+
+      <p style="margin-left: 0em">
+      This command causes the debugger to listen on the socket
+      specified by the JDE variable <code>jde-bug-server-socket</code>. The
+      default value is <code>2112</code>. You can customize this variable
+      to specify any socket address you choose or to cause JDEbug to prompt you to
+      enter an address. Whatever address you choose, you must enter the same address
+      as an argument of the command that launches the process to be debugged.
+      </p>
+  </li> 
+  <li> 
+    Launch the debuggee process with the command line arguments required
+    to attach to JDEbug.
+    <p style="margin-left: 0em">
+    See <a href="#ListenModeVMArgs">Listen Mode VM Arguments</a> for more
+    information.
+    </p>
+  </li>
+</ol>
+
+<p>
+When you launch a Java application with listen mode arguments, the vm
+halts before running the app's main method and attempts to connect
+with JDEbug. Once the connection is made, JDEbug is in
+complete control of the app. For example, the app won't run until
+the debugger issues a continue command. This means you can set
+breakpoints in the debuggee app's startup code. 
+</p>
+
+<a name="ListenOnSharedMemory">
+<h4>Listening on a Shared Memory Channel</h4>
+</a>
+
+<p><strong>Note</strong> This option is available only if both the debugger
+and the debuggee process are running under Windows on the same machine.</p>
+
+<ol>
+  <li>
+      Execute <strong>JDEbug-&gt;Processes-&gt;Start Debugger</strong>
+      to start the debugger (if necessary).
+    
+  </li>
+  <li>
+    Select <strong>JDEbug-&gt;Processes-&gt;Listen on-&gt;Shared Memory</strong>
+    to put JDEbug in listen mode.
+
+      <p style="margin-left: 0em">
+      This command causes the debugger to listen on the shared memory channel
+      specified by the JDE variable <code>jde-bug-server-shmem-name</code>. The
+      default value is <code>jdebug</code>. You can customize this variable
+      to specify any name you choose or to cause JDEbug to prompt you to
+      enter a name. Whatever name you choose, you must enter the same name
+      as an argument of the command that launches the process to be debugged.
+      </p>
+  </li> 
+  <li> 
+    Launch the debuggee process with the command line arguments required
+    to attach to JDEbug.
+    <p style="margin-left: 0em">
+    See <a href="#ListenModeVMArgs">Listen Mode VM Arguments</a> for more
+    information.
+    </p>
+  </li>
+</ol>
+
+<p>
+When you launch a Java application with listen mode arguments, the vm
+halts before running the app's main method and attempts to connect
+with JDEbug. Once the connection is made, JDEbug is in
+complete control of the app. For example, the app won't run until
+the debugger issues a continue command. This means you can set
+breakpoints in the debuggee app's startup code. 
+</p>
+
+<a name="ListenModeVMArgs">
+<h4>Listen Mode VM Arguments</h4>
+</a>
+
+<p>
+  Use the following vm arguments when launching a process to be debugged in listen mode.
+  <ul>
+    <li>
+      <code>-Xdebug</code>
+    </li>
+    <li>
+      <code>-Xnoagent</code></li>
+   <li><code>-Djava.compiler=NONE</code></li>
+   <li>
+     <code>-Xrunjdwp:transport=dt_socket,address=NNNN,server=n,suspend=y</code>
+     <p style="margin-left: 0em">
+        where <code>TRANSPORT</code> is either <code>dt_socket</code> or
+        <code>dt_shmem</code> and <code>NNNN</code> is any symbolic name you want
+        to use for the shared memory channel or any unused socket address on the host
+        processor for the debuggee process.
+     </p>
+   </li>
+   <li>
+      <code>-Xbootclasspath:JDKHOME/jre/lib/rt.jar;JDKHOME/lib/tools.jar</code>
+      <p style="margin-left: 0em">
+         where JDKHOME is the home directory for the JDK.
+      </p>
+      <p style="margin-left: 0em">
+        <strong>Note</strong> This option is necessary only if you are
+        using the JDK 1.3 vm to launch the debuggee process.
+      </p>
+    </li>
+  </ul>
+ </p>
+
+<p>
+  Here is an example of a typical command line to launch a debuggee
+  client, using JDK1.3:
+  <p>
+   <code>java -classpath d:/myapp/myapp.jar -Xdebug -Xnoagent</code><br>
+   <code>-Xrunjdwp:transport=dt_socket,address=jdebug,server=n,suspend=y</code><br>
+   <code>-Xbootclasspath:e:/jdk1.3/jre/lib/rt.jar;e:/jdk1.3/lib/tools.jar</code><br>
+   <code>com.myorg.myapp.Main</code>
+  </p>
+  </p>
+<p>
+      Use the JDE variable <code>jde-run-option-vm-args</code>
+     to specify vm arguments when launching an application from the JDE.
+</p>
+
+<a name="DebuggingMultipleProcesses">
+<h2>Debugging Multiple
+Processes</h2>
+</a>
+
+<p>
+JDEbug allows you to launch and debug multiple debuggee processes during the same debugger session. JDEbug assigns a numeric identification number to each process that it launches or attaches in either attach or listen mode. All JDEbug commands, except those that launch or attach processes, implicitly address a process called the <i>target process</i>. When you launch or attach a process, that process becomes the target process until you specify a different process as the target process.</p>
+
+<p>To specify a different process as the target process, select <strong>JDEbug-&gt;Processes-&gt;Set Target Process</strong>, then enter the ID of the target process at the prompt.
+</p>
+
+<a name="ProcessBuffers">
+<h2>Working with Process Buffers</h2>
+</a>
+
+<p>JDEbug creates a set of buffers for each process that you
+debug during a debugger session. </p>
+
+<table width=100% >
+  <colgroup span=2>
+    <col width=25% align=left valign=top></col>
+    <col width=75% align=left valign=top></col>
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Buffer</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Process</td>
+      <td>Displays status messages from the debugger.</td>
+    </tr>
+    <tr>
+      <td>Local Variables</td>
+      <td>
+          Displays the values of local variables and the
+          fields of the object on which the current method
+          was invoked (the implicit this object). 
+       </td>
+    </tr>
+    <tr>
+      <td>Command Line Interface (CLI)</td>
+      <td>
+          Allows you to interact with a process that has a command
+          line interface (CLI). The JDE sends lines that you type in this
+          buffer to the process's standard input. The process's standard
+          output also appears in this buffer. 
+       </td>
+    </tr>
+
+    <tr>
+      <td>Threads</td>
+      <td>
+          Displays the current status of all threads created by the
+          debuggee process. The <strong>JDEbug-&gt;Display-&gt;Threads</strong>
+          command creates this buffer.
+       </td>
+    </tr>
+
+    <tr>
+      <td>*JDEbug*</td>
+      <td>
+          Displays the low-level commands sent by Emacs to the Java backend
+          of JDEbug, the backend's responses to those commands, and events
+          detected by the backend. You should always include a copy of this
+          buffer in bug reports as it represents a complete record of your
+          debugs session.
+       </td>
+    </tr>
+
+
+  </tbody>
+</table>
+
+<a name="DisplayBuffers">
+<h3>Displaying the Buffers</h3>
+</a>
+
+<p>
+JDEbug displays the Process and Locals buffer in windows in the current frame when you launch or attach a process.</p>
+
+<ul>
+  <li> 
+    To replace one of these buffers with another, select the buffer from the 
+    <strong>JDEbug-&gt;Show Buffers</strong> menu.
+  </li>
+  <li>
+    To display a buffer in a separate frame, select the buffer and
+    then select <strong>Files-&gt;Make New Frame</strong>.
+  </li>
+  <li>
+    To display the startup window configuration for a process, select
+    <strong>JDEbug-&gt;Processes-&gt;Set Target Process</strong>
+     and enter the process's ID number.
+  </li>
+</ul>
+
+<a name="DeleteBuffers">
+<h3>Deleting Buffers</h3>
+</a>
+
+<p>
+JDEbug does not delete the buffers belonging to a process when it dies. To delete all the buffers created for dead processes, select 
+<strong>JDEbug-&gt;Processes-&gt;Remove Dead Processes</strong>. This command removes all traces of the dead processes from the Emacs environment.
+</p>
+
+</body>
+</html>

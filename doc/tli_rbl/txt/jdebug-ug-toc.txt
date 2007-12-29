@@ -1,0 +1,25 @@
+0  ; JDE Website                 ; 14 ; 3 ; http://sunsite.auc.dk/jde/   ; _top 
+0  ; About JDEbug                ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#AboutJDEbug	
+0  ; JDEbug Requirements         ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#JDEbugRequirements
+0  ; Setting Up JDEbug           ; 0 ; ../html/jdebug-ug/jdebug-ug-content.html#SettingUpJDEbug
+1  ; Selecting JDEbug            ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#SelectingJDEbug
+1  ; Specifying JPDA Location    ; 0 ; ../html/jdebug-ug/jdebug-ug-content.html#SpecifyingJPDALocation
+2  ; SDK 1.3 Windows/Solaris     ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#SDK1.3WindowsSolaris
+2  ; SDK 1.2.2                   ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#SDK1.2.2
+1  ; Specifying Source Location  ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#SpecifySourceLocation
+0  ; Starting the Debugger       ; 0 ; ../html/jdebug-ug/jdebug-ug-content.html#StartingDebugger
+1  ; Set Working Directory       ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#SetWorkingDirectory
+0  ; Exiting the Debugger        ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#ExitingDebugger
+0  ; Launching a Process         ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#LaunchingProcess
+0  ; Connecting to Processes     ; 0 ; ../html/jdebug-ug/jdebug-ug-content.html#ConnectingToExternalProcesses
+1  ; Attaching a Process         ; 0 ; ../html/jdebug-ug/jdebug-ug-content.html#AttachingProcess
+2  ; Via a Socket                ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#AttachViaSocket
+2  ; Via Shared Memory           ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#AttachViaSharedMemory
+1  ; Listening for a Process     ; 0 ; ../html/jdebug-ug/jdebug-ug-content.html#ListeningForProcess
+2  ; On a Socket                 ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#ListenOnSocket
+2  ; On Shared Memory              ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#ListenOnSharedMemory
+2  ; Listen Mode VM Arguments      ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#ListenModeVMArgs
+0  ; Debugging Multiple Processes  ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#DebuggingMultipleProcesses
+0  ; Process Buffers               ; 0 ; ../html/jdebug-ug/jdebug-ug-content.html#ProcessBuffers
+1  ; Displaying Buffers            ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#DisplayBuffers
+1  ; Deleteing Buffers             ; 3 ; ../html/jdebug-ug/jdebug-ug-content.html#DeleteBuffers

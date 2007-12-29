@@ -1,0 +1,35 @@
+# $Revision: 1.1 $
+# The following is a sample makefile 
+# for use with the JDE->Build command.
+#
+# Makefile for JMath project.
+#
+JDK = d:/jdk1.2/lib/classes.zip
+JMATH = d:/jmath/src
+CLASSPATH = $(JMATH);$(JDK)
+COMPILER = javac
+VM = java
+COPTIONS = -g -deprecation
+ROPTIONS = 
+
+CLASSES = Test.class \
+          JMathError.class \
+          JMathException.class \
+          LinearSystem.class
+
+.SUFFIXES: .java .class
+
+all : $(CLASSES)
+
+# Rebuild (if necessary) and run the JMath test suite.
+run: $(CLASSES)
+	$(VM) -classpath "$(CLASSPATH)" jmath.Test
+
+# Remove all class files from the project directory.
+clean:
+	rm *.class
+
+# Implicit rule for making Java class files from Java
+# source files.
+.java.class:
+	$(COMPILER) $(COPTIONS) -classpath "$(CLASSPATH)"  $?

@@ -1,0 +1,26 @@
+h1 { font-family: "Arial", Helvetica, sans-serif; 
+     font-size: 24pt;
+     color: navy}
+h2 { font-family: "Arial", Helvetica, sans-serif; 
+     font-size: 18pt;
+     margin-top: .5in;
+     color: maroon
+   }
+h3 { font-family: "New Times Roman", Times, serif; 
+     font-size: 12pt;
+     margin-top: .4in}
+h4 { font-family: "Arial", Helvetica, sans-serif;
+     font-size: 14pt;
+     margin-top: .3in; }
+h5 { font-family: "Arial", Helvetica, sans-serif;
+     font-size: 12pt;
+     margin-top: .3in }
+h6 { font-family: "Arial", Helvetica, sans-serif;
+     font-size: 10pt;
+     margin-top: .3in }
+
+body  { margin-left: .2in
+        background: white }
+ul { margin-left: .4in}
+ol { margin-left: .45in}
+li { margin-bottom: 2%}

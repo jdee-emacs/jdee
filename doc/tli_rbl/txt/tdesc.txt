@@ -1,0 +1,21 @@
+99 ;  ./img/photo.gif ;  3  ;  ./cv/rbl_cv.html               ;  ?Voir mon CV
+98 ;  .               ;  8  ;  mailto:rberthou@wanadoo.fr ; 0 ;  ?Send me a mail
+98 ;  .               ; 15  ;  ./search/                  ; 1 ;  _new    ;  ?Search on the net
+0  ; News        ; 14 ; 3 ; http://www.javaside.com/   ; _top 
+0  ; JScript\nSend JavaScript Funtion     ;  1 ; ?Send a JavaScript function with LiveConnect 
+1  ; See Date    ;  7 ; 2 ; javascript:alert('Date : ' + new Date())    ; _script  
+1  ; Alert-2     ;  7 ; javascript:alert('You click on Alert-2')    ; _script  
+1  ; User Info   ;  7 ; 2 ; javascript:alert('appName ' + navigator.appName + 'V.' + navigator.appVersion + 'UserAgent ' + navigator.userAgent )  ; _script  
+1  ; Close Window ;  7 ; javascript:window.close()    ; _script  
+0  ; tListe      ;  0 ; ./j_tli.html 	  ; _ ;	 20001210 
+1  ; Image Lib   ;  6 ; ./j_tl_img.html 
+1  ; tLi_RBL     ; 25 ; ./j_tliste0.html  ; _ ;	 19991210 
+2  ; DownLoad    ;  3 ; ./zip/java/tli_rbl.zip 
+2  ; File 0      ;  3 ; ./txt/tdesc.txt 
+1  ; tLi_MF      ;  0 ; ./j_tliste1.html 	
+2  ; DownLoad    ;  3 ; ./zip/java/tli_mf.zip 
+2  ; File 0      ;  3 ; ./txt/tliste.txt 
+2  ; File 1      ;  3 ; ./txt/tliste2.txt 
+1  ; tLi_MP      ;  0 ; ./j_tliste2.html 	
+2  ; DownLoad    ;  3 ; ./zip/java/tli_mp.zip 
+0  ; Load        ;  0 ; ./txt/editeur.txt ; _insert 	

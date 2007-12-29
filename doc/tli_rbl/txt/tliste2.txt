@@ -1,0 +1,32 @@
+99 ;  ./img/photo.gif ;   3   ;   http://www.berthou.com                ;   ?Berthou.com
+98 ;  .                ;   8   ;   mailto:rberthou@wanadoo.fr  ;  0  ;   ?Send me a mail
+98 ;  .                ;  15   ;   http://www.javaside.com/search/                   ;  1  ;   _new     ;   ?Search on the net
+98 ;  .                ;   9   ;   ./txt/tliste.txt            ;  2  ;   _reload  ;   ?Precedent
+0  ;  News      ; 14  ;  http://www.javaside.com/fr/news.html
+0  ; Recherches  ; 1 ; http://www.javaside.com/search/  ; ?Les moteurs de recherches
+1  ; Web Mondial ; 0 ; ?Moteurs Mondiaux
+2  ; Altavista   ; 3 ; http://www.altavista.com
+2  ; Apollo      ; 3 ; http://apollo.co.uk
+2  ; Blue Window ; 3 ; http://www.bluewin.ch
+2  ; HotBot	 ; 3 ; http://www.hotbot.com
+2  ; Excite      ; 3 ; http://www.excite.com
+2  ; Infoseek    ; 3 ; http://www2.infoseek.com
+2  ; Lycos       ; 3 ; http://www.lycos.com
+2  ; Open Text   ; 3 ; http://search.opentext.com
+2  ; WebCrawler  ; 3 ; http://www.webcrawler.com
+2  ; Yahoo	 ; 3 ; http://www.yahoo.com
+1  ; Web France  ; 0 ; ?Moteurs Francophones
+2  ; Voila       ; 3 ; http://www.voila.fr
+2  ; Yahoo Fr    ; 3 ; http://www.yahoo.fr
+2  ; Nomade      ; 3 ; http://www.nomade.fr
+2  ; Francite    ; 3 ; http://francite.com
+2  ; Lokace      ; 3 ; http://lokace.iplus.fr
+2  ; Carrefour   ; 3 ; http://carrefour.net
+2  ; Yeloo Web   ; 3 ; http://www.yweb.com
+2  ; Toile Qc    ; 3 ; http://www.toile.qc.ca
+2  ; Youpi       ; 3 ; http://www.wanadoo.fr/youpi/
+2  ; Eureka      ; 3 ; http://www.eureka-fr.com
+1  ; News        ; 0 ;  ?Dans les News...
+2  ; Deja News   ; 3 ; http://search.dejanews.com
+0  ; GuestBook   ; 6 ; http://services.hit-parade.com/hp_livredor.asp?s=a1361  ; ?Add a message in my guestbook
+0  ; Suite...    ; 9  ;  ./txt/tliste.txt              ;  _reload	; ?Suite...

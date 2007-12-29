@@ -1,0 +1,136 @@
+<html>
+<head><title>RBL - Java tListe treeview Applet</title>
+<LINK REL=STYLESHEET TYPE='text/css' HREF='./rbl_1.css'>
+</head>
+<body bgcolor=#FFFFFF>
+
+<TABLE CELLPADDING=3 width="100%" BGCOLOR=4040A0>
+<TR><TH class="tit">
+	<FONT SIZE="+2" class="tit" COLOR=D0F0FF>Java TreeView tliste V 6.15</FONT>
+</TH></TR></TABLE>
+<BR>
+
+<CENTER>
+
+<A NAME="_0">
+<TABLE BGCOLOR=C0E0FF><TR><TD>
+	<FONT SIZE=1>
+	[
+	<A HREF="http://www.javaside.com/j_tscrol.html" TARGET=donnee>tScroll</A> |
+	<A HREF="http://www.javaside.com/j_tonglet.html" TARGET=donnee>tOnglet</A> |
+	<A HREF="http://www.javaside.com/j_tliste.html" TARGET=donnee>tListe</A> |
+	<A HREF="http://www.javaside.com/j_tcaldate.html" TARGET=donnee>tCalDate</A> |
+	<A HREF="http://www.javaside.com/j_tcalevent.html" TARGET=donnee>tCalEvent</A> |
+	<A HREF="http://www.javaside.com/j_teurocalc.html" TARGET=donnee>tEuroCalc</A> |
+	<A HREF="http://www.javaside.com/j_tbbar.html" TARGET=donnee>tBBar</A> |
+	<A HREF="http://www.javaside.com/j_tchart.html" TARGET=donnee>tChart</A> |
+	<A HREF="http://www.javaside.com/j_tfunction.html" TARGET=donnee>tFunction</A> |
+	<A HREF="http://www.javaside.com/j_jvmine.html" TARGET=donnee>Winmine</A> |
+	<A HREF="http://www.javaside.com/j_butto.html" TARGET=donnee>tButton</A> 
+	]
+	</FONT>
+</TD></TR></TABLE>
+<TABLE><TR><TD BGCOLOR=D0F0FF>
+	<FONT SIZE=1>
+	[ <A HREF="http://www.javaside.com/search/index.html" TARGET=donnee>Search</A> 
+	| <A HREF="http://www.javaside.com" TARGET=_top>Home Page (English)</A>    
+	| <A HREF="http://www.javaside.com/fr/" TARGET=_top>Home Page (Fancais)</A>
+	]
+	</FONT>
+</TD></TR></TABLE>
+<BR>
+<HR>
+
+<CENTER>
+<TABLE class="b1" width="80%"><TR>
+<TD WIDTH=150>
+<applet codeBase="./" name="tli" archive="tli_rbl.jar" code=tli_rbl.class width=150 height=300 MAYSCRIPT>
+    <param name=file            value="./txt/tliste.txt">
+    <param name=target          value="donnee">
+    <param name=csep            value=";">
+    <param name=bImg            value="./img/icon3.gif">
+    <param name=bgcolor		value=13693183>
+    <param name=v0 		value="http://www.javaside.com">
+    <param name=v1 		value="_top">
+    <param name=font0		value="Arial, 0, 12, 0, -255">
+    <param name=font1		value="Times, 0, 12, 0, 12000">
+    <param name=font2		value="Arial, 2, 14, 255, -255">
+    <param name=font3		value="Arial, 3, 14, 55, 1255">
+</applet>
+</TD>
+<TD>
+	<B>Javascript interaction</B>
+	<UL>
+		<LI><A HREF="javascript:document.tli.b.setBgcolor(0xFFFF20);">use setBgColor</A>
+		<LI><A HREF="javascript:document.tli.b.setBgcolor(13693183);">restore BgColor</A>
+		<LI><A HREF="javascript:document.tli.b.rFile('./txt/tliste2.txt', 1);">Load file tliste2</A>
+		<LI><A HREF="javascript:document.tli.b.rFile('./txt/tliste.txt', 1);">Load file tliste</A>
+		<LI><A HREF="javascript:document.tli.b.closeAll(0);">Close All</A>
+		<LI><A HREF="javascript:document.tli.b.closeAll(1);">Open All</A>
+		<LI><A HREF="javascript:document.tli.b.change('Outils',0);">Select Outils</A>
+		<LI><A HREF="javascript:document.tli.b.change('JAVA', 0);">Select JAVA</A>
+		<LI><A HREF="javascript:document.tli.b.change('JAVA', 1);">Select JAVA</A> and open it
+		<LI><A HREF="javascript:document.tli.b.search('key4', 0);">search key4</A><BR>
+		<LI><A HREF="javascript:document.tli.b.search('key4', 1);">search key4</A> and open URL<BR>
+	</UL>
+</TD>
+</TR>
+<TR>
+<TD COLSPAN=2>
+</TD>
+</TR>
+<TR><TD COLSPAN=2>
+This is a RBL Version of tListe.<BR>
+This version use data file and can display an image bitmap in first position.<BR>
+This is the main version of tListe. I add a separator un data file to us the same file in applet 
+and ASP or PERL version. All icons images are in the same file (10*10 icons).
+<P>
+C'est la version "RBL" de tListe.<BR>
+Elle permet lit ses donnees dans un fichier et permet d'afficher une image
+en premiere position.<BR>
+C'est la version principale de tListe (la plus complete), dans un desir de compatibilite 
+avec les versions ASP et PERL, le format du fichier est legerement modifie pour gerer un separateur.<BR>
+Cette version peut egalement lire directement ces donnes dans les parametres de l'applet (sans fichier).
+
+</TD></TR>
+</TABLE>
+</CENTER>
+<P>
+<BR>
+
+
+<TABLE BGCOLOR=D0D0D0 CELLPADDING=8  class="p0">
+<TR><TH>HTML Source</TH></TR>
+<TR class="b0"><TD>
+<PRE>
+&lt;applet code=tli_rbl.class width=140 height=300&gt;
+    &lt;param name=file         value="./txt/tdesc.txt"&gt;
+    &lt;param name=target       value="donnee"&gt;
+    &lt;param name=bImg         value="./img/icon3.gif"&gt;
+    &lt;param name=bgImg        value="./img/f_2.gif"&gt;
+    &lt;param name=csep         value="§"&gt;
+    &lt;param name=bgcolor      value=50000&gt;
+    &lt;param name=v0 		value="http://www.javaside.com"&gt;
+    &lt;param name=v1 		value="_top"&gt;
+    &lt;param name=font0	value="Arial, 0, 12, 0, -255"&gt;
+    &lt;param name=font1	value="Times, 0, 12, 0, 12000"&gt;
+    &lt;param name=font2	value="Arial, 2, 14, 255, -255"&gt;
+    &lt;param name=font3	value="Arial, 3, 14, 55, 1255"&gt;
+&lt;/applet&gt;
+</PRE>
+Rem : Use "./xxx" for relative URL with (file, bImg, bgImg)
+</TD></TR>
+<TR class="b0"><TD>Download Class File (.zip)
+	<A HREF="asp/download.asp?id=131">tli_rbl.zip (49 Ko)</A>  &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="asp/download.asp?id=1131"><small>(backup)</small></A>
+</TD></TR>
+</TABLE>
+<P>
+
+<HR SIZE="3">
+<FONT SIZE=1> 
+<B> Copyright &copy 1996, <A HREF="mailto:rberthou@wanadoo.fr">R. BERTHOU.</A> Tous droits r&eacute;serv&eacute;s.</B><BR>
+<I>Derni&egrave;re modification le Samedi 06 Mars 1999 20H48</I>
+</FONT>
+</CENTER>
+</BODY>
+</HTML>

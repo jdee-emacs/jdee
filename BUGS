@@ -1,0 +1,22 @@
+Version: 1
+Unused-Bug-Id: 2
+Note: This is the header of a bugtrack file.
+Note: If you see this, it means that there are
+Note: no *known* bugs to track.
+
+Id: 1
+Summary: FEATURE: Context-sensitive help command
+Version: 2.2.8
+Created: paulk: Sun Sep 23 22:59:49 2001
+Currently handled by: 
+Severity: 5
+Priority: 5
+Difficulty: 7
+Last edit: paulk: Sun Sep 23 23:17:19 2001
+Reported by: Paul Kinnucan
+Site: n/a
+Associated mails:
+End mails.
+---
+Add command or enhance one of the jde-help commands to find help for the method or symbol at point.
+

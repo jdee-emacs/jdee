@@ -1,0 +1,1377 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.05 [en] (Win95; I) [Netscape]">
+   <TITLE>BeanShell User's Guide</TITLE>
+</HEAD>
+<BODY>
+
+<H1>BeanShell User's Guide</H1>
+
+<H2>
+<A NAME="Introduction"></A>Introduction</H2>
+This guide explains how to use version 1.2.7 of the BeanShell Java interpreter with the
+Java Development Environment for Emacs. This guide contains the following
+sections:
+<BR>&nbsp;
+<BR>&nbsp;
+<TABLE BORDER=0 WIDTH="100%" >
+<TR>
+<TD><A HREF="#About">About the BeanShell</A>&nbsp;</TD>
+
+<TD>Brief overview of the BeanShell&nbsp;</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP><A HREF="#Using">Using the BeanShell</A>&nbsp;</TD>
+
+<TD>Explains how to start and shut down the BeanShell, enter statements,
+and show results.</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP><A HREF="#LanguageRef">The BeanShell Language</A>&nbsp;</TD>
+
+<TD>Describes the Java constructs and scripting extensions supported by
+the BeanShell</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP><A HREF="#ClassPathManagement">Class Loading and Class Path Management</A></TD>
+
+<TD>Explains how to load classes and change the BeanShell class path dynamically.</TD>
+</TR>
+
+<TR>
+<TD><A HREF="#CommandRef">BeanShell Commands</A>&nbsp;</TD>
+
+<TD>Describes the commands supported by the BeanShell</TD>
+</TR>
+</TABLE>
+&nbsp;
+<H2>
+<A NAME="About"></A>About the BeanShell</H2>
+The BeanShell is a Java interpreter that evaluates Java statements directly
+(without first compiling them). The&nbsp; BeanShell has been included in
+the JDE with the permission of its author,&nbsp; <A HREF="mailto:pat@pat.net">Pat
+Niemeyer</A>.
+
+<P>The BeanShell can operate as a stand-alone application or as a part
+of another application. When running as a stand-alone application, the
+interpreter accepts input from the command line of the shell in which it
+runs. The BeanShell distribution includes a shell for running the interpreter.
+It can, however, be run from other shells, such as bash or the DOS command
+window. The JDE includes a command for running the BeanShell in an Emacs
+shell (comint) buffer. This enables you to interact with the interpreter
+directly while developing Java programs.
+
+<P>The JDE also&nbsp; uses the interpreter to implement some JDE commands.
+The JDE invokes the interpreter via Lisp functions that pass Java statements
+to the interpreter via the standard input of the interpreter process and
+retrieve results via the standard output. This guide documents BeanShell
+functionality that seems relevant to JDE users.&nbsp; See the <A HREF="http://www.ooi.com/beanshell/">BeanShell
+home page</A> home page for additional information and to download the
+latest version of the BeanShell.
+<H2>
+<A NAME="Using"></A>Using the BeanShell</H2>
+
+<H3>
+<A NAME="Starting"></A>Starting the BeanShell</H3>
+To start the BeanShell, select <B><FONT SIZE=-1>Interpret</FONT></B> from
+the <B><FONT SIZE=-1>JDE</FONT></B> menu or enter the command <TT>M-x bsh</TT>.
+Emacs starts the BeanShell, if not already started, and displays its prompt
+in an Emacs shell buffer window.
+
+<P><IMG SRC="images/BeanShellBuffer.gif" HEIGHT=536 WIDTH=664>
+
+<P>The JDE allows you to run only one instance of the BeanShell at a time.
+If&nbsp; an instance is already running, the <TT>bsh</TT> command simply
+displays the buffer containing the instance, without starting another instance.
+Note that you can indirectly start a BeanShell instance when you invoke
+commands implemented as hybrid Lisp/Java scripts, such as <TT>jde-wiz-override-method</TT>.
+Such commands start a BeanShell instance if one is not already running.
+<H3>
+<A NAME="Evaluating"></A>Evaluating Statements</H3>
+To evaluate a Java statement, type it at the BeanShell prompt and press
+the <B><FONT SIZE=-1>Enter</FONT></B> key. The BeanShell evaluates the
+statement. When it is done, it redisplays the the BeanShell command prompt.
+You can then enter another statement.
+
+<P>Statements must conform to Java syntax. For example, simple statements
+must end in a semicolon. Compound statements, such as if-then constructs,
+must end in a right brace. Statements may span multiple lines. To continue
+a statement on a new line, press the <B><FONT SIZE=-1>Enter</FONT></B>
+key. The BeanShell does not evaluate the statement until you have entered
+the last line of the statement.
+
+<P><IMG SRC="images/BshMultiLineEx.gif" HEIGHT=264 WIDTH=576>
+<BR>&nbsp;
+<H3>
+<A NAME="Displaying"></A>Displaying Results</H3>
+You can display the results of evaluating Java statements via the BeanShell
+<TT>print</TT> and <TT>show</TT> commands. The print command accepts any
+Java expression as an argument and displays the result of evaluating that
+expression&nbsp; in the BeanShell window. For example,
+<BLOCKQUOTE><TT>print(2+2);</TT></BLOCKQUOTE>
+displays
+<BLOCKQUOTE><TT>4</TT></BLOCKQUOTE>
+in the BeanShell window. Note that <TT>print(expr)</TT> is equivalent to
+<TT>System.out.println(expr)</TT> and you can use either method to print
+a Java expression.
+
+<P>The <TT>show();</TT> command toggles automatic display of the results
+of evaluating statements as they are entered.
+<H3>
+<A NAME="Exiting"></A>Exiting the Shell</H3>
+To exit the BeanShell, enter
+<BLOCKQUOTE><TT>exit();</TT></BLOCKQUOTE>
+at the command prompt.
+<H2>
+<A NAME="LanguageRef"></A>The BeanShell Language</H2>
+
+<H3>
+<A NAME="JavaSupport"></A>Java Language Support</H3>
+The BeanShell language includes most of the constructs of the Java language.
+Standard Java constructs supported by the BeanShell include&nbsp; variable
+assignments, method calls, math expressions, for-loops, etc.. Here are
+some examples:
+<PRE>&nbsp;&nbsp;&nbsp; // Use a hashtable
+&nbsp;&nbsp;&nbsp; Hashtable h = new Hashtable();
+&nbsp;&nbsp;&nbsp; Date d = new Date();
+&nbsp;&nbsp;&nbsp; h.put("today", d);
+
+&nbsp;&nbsp;&nbsp; // Print the current clock value
+&nbsp;&nbsp;&nbsp; print( System.currentTimeMillis() );
+
+&nbsp;&nbsp;&nbsp; // Loop
+&nbsp;&nbsp;&nbsp; for (int i=0; i&lt;5; i++)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print(i);
+
+&nbsp;&nbsp;&nbsp; // Pop up an AWT frame with a button in it
+&nbsp;&nbsp;&nbsp; Button b = new Button("My Button");
+&nbsp;&nbsp;&nbsp; Frame f = new Frame("My Frame");
+&nbsp;&nbsp;&nbsp; f.add(b, "Center");
+&nbsp;&nbsp;&nbsp; f.pack();
+&nbsp;&nbsp;&nbsp; f.show();</PRE>
+By default, the BeanShell imports the Java core classes at startup. You
+can import additional classes, using standard Java import syntax, for example,
+<BLOCKQUOTE><TT>import mypackage.*;</TT></BLOCKQUOTE>
+or
+<PRE>&nbsp;&nbsp;&nbsp; import mypackage.MyClass;</PRE>
+
+<H3>
+<A NAME="ScriptExtensions"></A>Scripting Extensions</H3>
+The BeanShell defines a number of extensions to the Java language designed
+to facilitate creation of scripts.&nbsp; The scripting extensions include
+<UL>
+<LI>
+Script Variables</LI>
+
+<LI>
+Script Methods</LI>
+
+<LI>
+Implicit Objects</LI>
+
+<LI>
+Syntax for accessing Bean properties and Hashtable entries</LI>
+</UL>
+
+<H3>
+<A NAME="ScriptVariables"></A>Script Variables</H3>
+The BeanShell allows you to create a special type of variable named a script
+variable. Unlike a standard Java variable, which can reference objects
+only of a specified type, a script variable can be defined to reference
+any type of object, including primitive types, such as <TT>int</TT> and
+<TT>boolean</TT>. You create a script variable by declaring it with or
+without a type specifier. If you include a type specifier, the variable
+can reference only values of the specified type. If you do not specify
+a type, the variable can reference values of any type. For example, the
+following statement
+<PRE>&nbsp;&nbsp;&nbsp; foo = new Button("Another Button");</PRE>
+creates an untyped script variable named <TT>foo</TT> and assigns it a
+Button object. You are&nbsp; free to subsequently assign <TT>foo</TT> to
+any other type of object.
+<H4>
+Predefined Variables</H4>
+
+<UL>
+<LI>
+<B>$_</B> - the value of the last expression evaluated.</LI>
+
+<LI>
+<B>bsh.Console bsh.console</B> - The primary console, if one exists.</LI>
+
+<LI>
+<B>java.awt.AppletContext bsh.appletcontext</B> - the applet context, if
+one exists.</LI>
+
+<LI>
+<B>String bsh.cwd</B> - used by the cd() and dir() commands.</LI>
+
+<LI>
+<B>boolean bsh.show</B> - used by the show() command.</LI>
+
+<LI>
+<B>boolean bsh.interactive</B> - is this interpreter running in an interactive
+mode or sourcing a file?</LI>
+
+<LI>
+<B>boolean bsh.evalOnly</B> - Does this interpreter have an input stream
+or is it only serving as a bag for eval() operations.</LI>
+</UL>
+
+<H4>
+Undefined variables</H4>
+You can test to see if a variable is "undefined" with the value <TT>void</TT>,
+e.g.:
+<PRE>&nbsp;&nbsp;&nbsp; if ( foobar == void )
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // undefined</PRE>
+You can return a defined variable to the undefined state using the unset()
+command:
+<BLOCKQUOTE><TT>a == void;&nbsp; // true</TT>
+<BR><TT>a=5;</TT>
+<BR><TT>unset("a"); // note the quotes</TT>
+<BR><TT>a == void;&nbsp; // true</TT></BLOCKQUOTE>
+
+<H3>
+<A NAME="ScriptMethods"></A>Script Methods</H3>
+BeanShell lets you define and use a special type of method called a script
+method. Script methods differ from standard Java methods in the following
+ways:
+<UL>
+<LI>
+Script methods are methods of an implicit, typeless object</LI>
+
+<LI>
+Script methods can be defined to accept and return values of any type</LI>
+
+<LI>
+Script methods can define other script methods</LI>
+</UL>
+You use standard Java syntax to declare a script&nbsp; method that accepts
+and returns specific types. For example, the following code
+<PRE>&nbsp;&nbsp;&nbsp; int addTwoNumbers( int a, int b ) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return a + b;
+&nbsp;&nbsp;&nbsp; }</PRE>
+defines a BeanShell method called <TT>addTwoNumbers</TT> that accepts and
+returns values of type <TT>int</TT>. The next example
+<PRE>&nbsp;&nbsp;&nbsp; int a = addTwoNumbers( 5, 7 );</PRE>
+uses the newly defined method to add two values of type <TT>int</TT>.
+
+<P>You define an untyped script method by omitting type specifications.
+For example, the following statement
+<PRE>&nbsp;&nbsp;&nbsp; add( a, b ) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return a + b;
+&nbsp;&nbsp;&nbsp; }</PRE>
+defines a script method that accepts arguments of any type. When you invoke
+an untyped script method, BeanShell interprets the method based on the
+types of the arguments that you pass to the method. Consider, for example,
+the following invocations of the untyped add method defined in the preceding
+example:
+<PRE>&nbsp;&nbsp;&nbsp; foo = add(1, 2);
+&nbsp;&nbsp;&nbsp; print( foo ); // 3
+
+&nbsp;&nbsp;&nbsp; foo = add("Oh", " baby");
+&nbsp;&nbsp;&nbsp; print( foo ); // Oh baby</PRE>
+The first invocation returns the result of adding, the second, of concatenating
+the arguments.
+
+<P>Methods with unspecified return types may return any type of object
+or no object. A return statement is optional. If omitted, the method returns
+the value of the last statement or expression in the method body.
+<H4>
+Method Namespace</H4>
+The namespaces of script methods and variables are separate. Thus, you
+can define a method and a variable having the same name.
+<H4>
+Nested Methods</H4>
+Script methods may define methods, for example,
+<PRE>&nbsp;&nbsp;&nbsp; foo() {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bar() {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }
+&nbsp;&nbsp;&nbsp; }</PRE>
+Method may be nested in this way to an arbitrary depth. Within a nested
+method, locally declared variables and methods&nbsp; shadow identically
+named variables and methods declared in outer methods. Otherwise, variables
+and methods are visible to an arbitrary depth of scope. Outer methods can
+invoke methods defined by inner methods that return a <TT>this</TT> object.
+
+
+<H3>
+<A NAME="ImplicitObjects"></A>Implicit Objects</H3>
+The methods and variables defined by a script method are considered to
+be methods and fields of an implicit object. The reserved identifiers,
+<TT>this</TT>, <TT>super</TT>, and <TT>global</TT>, refer, respectively,
+to the current object, the calling object, and the global object. A method
+can access any variable or method in these scopes by qualifying the variable's
+name with the name of the appropriate implicit object.
+<PRE>&nbsp;&nbsp;&nbsp; a = 42;
+&nbsp;&nbsp;&nbsp; foo() {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a = 97;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print( a );
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print( this.a );
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print( super.a );
+&nbsp;&nbsp;&nbsp; }
+
+&nbsp;&nbsp;&nbsp; foo();&nbsp; // prints 97, 97, 42</PRE>
+A script method can return its implicit object, thereby allowing the invoking
+script to access variables and methods defined by the method, using standard
+Java&nbsp; "." notation. For example,
+<PRE>&nbsp;&nbsp;&nbsp; foo() {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int a = 42;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bar() {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print("The bar is open!");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bar();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return this;
+&nbsp;&nbsp;&nbsp; }
+
+&nbsp;&nbsp;&nbsp; obj = foo();&nbsp;&nbsp;&nbsp;&nbsp; // prints "the bar is open!"
+&nbsp;&nbsp;&nbsp; print ( obj.a )&nbsp; // 42
+&nbsp;&nbsp;&nbsp; obj.bar();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // prints "the bar is open!"</PRE>
+
+<H4>
+Using Implicit Objects as AWT Event Handlers</H4>
+Implicit method objects can serve as AWT event handlers. To handle an AWT
+event, a script method defines the appropriate event-handling method and
+then registering its implicit (<TT>this</TT>) object with the object in
+which the event originates. For example, the following script
+<PRE>&nbsp;&nbsp;&nbsp; button = new java.awt.Button("foo!");
+
+&nbsp;&nbsp;&nbsp; actionPerformed( event ) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print( event );
+&nbsp;&nbsp;&nbsp; }
+
+&nbsp;&nbsp;&nbsp; button.addActionListener( this );
+&nbsp;&nbsp;&nbsp; frame( button );&nbsp; // show it</PRE>
+defines an Action event handler and registers it with a button.
+
+<P>Remember that you don't have to define all of your event handlers globally.
+You can handle events in any bsh object scope. For example, the following
+method creates a button that displays a message when pushed:
+<PRE>&nbsp;&nbsp;&nbsp; messageButton( message ) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b = new Button("Press Me");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b.addActionListener( this );
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; frame(b);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; actionPerformed( e ) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print( message );
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }
+&nbsp;&nbsp;&nbsp; }
+
+&nbsp;&nbsp;&nbsp; messageButton("Hey you!");
+&nbsp;&nbsp;&nbsp; messageButton("Another message...");</PRE>
+The above will create two buttons and each will display its own message
+when pushed. Each has a separate instance of the event handler object.
+Note too that we could return a 'this' reference from the handler method
+and use it in other contexts to register listeners...
+<H4>
+Using Implicit Objects as Threads</H4>
+'This' type references also implement the standard Runnable interface,
+so you can declare a "run()" method in your objects:
+<BLOCKQUOTE>&nbsp;<TT>&nbsp;&nbsp; foo() {</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; run() {</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// do work...</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return this;</TT>
+
+<P><TT>&nbsp;&nbsp;&nbsp; }</TT>
+<BR><TT>&nbsp;</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp; foo = foo();</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp; new Thread( foo ).start();</TT>
+<BR>&nbsp;</BLOCKQUOTE>
+
+<H4>
+Implicit Object Members</H4>
+Implicit objects have four "magic" members:
+<BLOCKQUOTE>
+<DIR>
+<LI>
+<TT>this.interpreter</TT> refers to the currently executing BeanShell Interpreter
+object.</LI>
+
+<LI>
+<TT>this.namespace</TT> refers to the BeanShell NameSpace object of the
+current context.</LI>
+
+<LI>
+<TT>this.variables</TT> refers to an array of strings listing the variables
+defined in this namespace.</LI>
+
+<LI>
+<TT>this.methods</TT> refers to an array of strings listing the methods
+defined in this namespace.</LI>
+</DIR>
+</BLOCKQUOTE>
+These are mainly for internal use by BeanShell commands. Note that there
+are certain special situations in which the <TT>this.interpreter</TT> reference
+may not be available, such as in AWT event handlers.
+<H3>
+<A NAME="PropSyntax"></A>Extended Syntax for Accessing Bean Properties
+and Hashtables Entries</H3>
+You may use the following syntax
+<BLOCKQUOTE><TT>x{name}</TT></BLOCKQUOTE>
+to access properties of Java beans and Hashtable entries, where <TT>x</TT>
+is a bean or Hashtable and <TT>name</TT> is a String that identifies a
+bean property or hashtable entry, for example:
+<PRE>&nbsp;&nbsp;&nbsp; b = new java.awt.Button();
+&nbsp;&nbsp;&nbsp; b{"label"} = "my button";
+&nbsp;&nbsp;&nbsp; // Equivalent to: b.setLabel("my button");
+
+&nbsp;&nbsp;&nbsp; h = new Hashtable();
+&nbsp;&nbsp;&nbsp; h{"foo"} = "bar";
+&nbsp;&nbsp;&nbsp; // Equivalent to: h.put("foo", "bar");</PRE>
+
+
+<h2><a name="ImplementingInterfaces">Implementing Interfaces</a></h2>
+
+<p><strong>Note</strong> Implementing arbitrary interfaces requires BeanShell be running under a Java 1.3 environment or higher.</p>
+
+<p>You can use the standard Java anonymous inner class syntax to implement an interface type with a script. For example:</p> 
+
+
+<pre>
+  ActionListener scriptedListener = new ActionListener() {
+    actionPerformed( event ) { ... }
+  }
+</pre>
+ 
+
+<p>You don't have to implement all of the methods defined by an interface.
+The calling code throws an exception if it tries to invoke a method
+that isn't defined. If you wish to override the behavior of a large
+number of methods - say to produce a "dummy" adapter for logging - you
+can implement a special method signature: <code>invoke(name, args)</code> in your
+scripted object. The <code>invoke()</code> method is called to handle any undefined
+method invocations: </p>
+
+<pre>
+  ml = new MouseListener() {
+    mousePressed( event ) { ... }
+    // handle the rest
+    invoke( name, args ) { print("Method: "+name+" invoked!");
+  }
+</pre>
+ 
+
+<h2><a name="ClassPathManagement">Class Loading and Class Path Management</a></h2>
+
+
+<p>BeanShell is capable of some very fine grained and sophisticated class 
+reloading and modifications to the class path.  BeanShell can even map
+the entire class path to allow for automatic importing of classes.</p>
+
+
+<h3><a name="Changing_the_Class_Path">Changing the Class Path</a></h3>
+
+<strong>addClassPath( URL | path )</strong>
+
+<p CLEAR="ALL"/>
+Add the specified directory or archive to the classpath.  Archives may be
+located by URL, allowing them to be loaded over the network.
+<p CLEAR="ALL"/>
+
+Examples:
+<p CLEAR="ALL"/>
+<p/><center><table border="1" cellpadding="5" width="100%"><tr><td bgcolor="#dfdfdc">
+  <pre>
+addClassPath( "/home/pat/java/classes" );
+addClassPath( "/home/pat/java/mystuff.jar" );
+addClassPath( new URL("http://myserver/~pat/somebeans.jar") );
+</pre>
+</td></tr></table></center><p/>
+
+Note that if you add class path that overlaps with the existing Java user 
+classpath then the new path will effectively reload the classes in that
+area.
+<p CLEAR="ALL"/>
+
+If you add a relative path to the classpath it is evaluated to an absolute
+path; it does not "move with you".
+
+<p/><center><table border="1" cellpadding="5" width="100%"><tr><td bgcolor="#dfdfdc"><pre>
+cd("/tmp");
+addClassPath("."); // /tmp
+</pre></td></tr></table></center><p/>
+
+<strong>setClassPath( URL [] )</strong>
+<p CLEAR="ALL"/>
+Change the entire classpath to the specified array of directories and/or 
+archives.  
+<p CLEAR="ALL"/>
+
+This command has some important side effects.  It effectively causes all
+classes to be reloaded (including any in the Java user class path at startup).
+Please see "Class Reloading" below for further details.
+<p CLEAR="ALL"/>
+
+Note: setClassPath() cannot currently be used to make the classpath smaller 
+than the Java user path at startup.
+<p CLEAR="ALL"/>
+
+
+<h3><a name="Auto-Importing_from_the_Classpath">Auto-Importing from the Classpath</a></h3>
+
+As an alternative to explicitly importing class names you may use the
+following statement to trigger automatic importing:
+
+<p/><center><table border="1" cellpadding="5" width="100%"><tr><td bgcolor="#dfdfdc"><pre>
+import *;
+</pre></td></tr></table></center><p/>
+
+There may be a significant delay while the class path is mapped.  This is why
+auto-importing is not turned on by default.  When run interactively, Bsh will 
+report the areas that it is mapping.
+<p CLEAR="ALL"/>
+
+It is only necessary to issue the auto-import command once.  Thereafter changes
+in the classpath via the addClassPath() and setClassPath() commands will
+remap as necessary.
+<p CLEAR="ALL"/>
+
+<em>
+Note: As of BeanShell 1.1alpha new class files added to the classpath 
+(from outside of BeanShell) after mapping will not be seen in imports.
+</em>
+
+
+<h3><a name="Reloading_Classes">Reloading Classes</a></h3>
+
+BeanShell provides an easy to use mechanism for reloading classes from the 
+classpath.  It is possible in BeanShell to reload arbitrary subsets of classes 
+down to a single class file.  However There are subtle issues to be understood 
+with respect to what it means to reload a class in the Java environment. 
+Please see the discussion of class loading detail below.  But in a nutshell,
+it is important that classes which work together be reloaded together at
+the same time, unless you know what you are doing.
+<p CLEAR="ALL"/>
+
+<strong>reloadClasses( [ package name ] )</strong>
+<p CLEAR="ALL"/>
+The most course level of class reloading is accomplished by issuing the 
+reloadClasses() command with no arguments.  
+
+<p/><center><table border="1" cellpadding="5" width="100%"><tr><td bgcolor="#dfdfdc"><pre>
+reloadClasses();
+</pre></td></tr></table></center><p/>
+
+This will effectively reload all
+classes in the current classpath (including any changes you have made through
+addClassPath()).
+<p CLEAR="ALL"/>
+
+<em>
+Note: that reloading the full path is actually a light weight operation that 
+simply replaces the class loader - normal style class loading is done as
+classes are subsequently referenced.
+</em>
+<p CLEAR="ALL"/>
+
+Be aware that any object instances which you have previously created may not 
+function with new objects created by the new class loader.  Please see the
+discussion of class loading details below.
+<p CLEAR="ALL"/>
+
+You can also reload all of the classes in a specified package:
+
+<p/><center><table border="1" cellpadding="5" width="100%"><tr><td bgcolor="#dfdfdc"><pre>
+reloadClasses("mypackage.*");
+</pre></td></tr></table></center><p/>
+
+This will reload only the classes in the specified package.  The classes will
+be reloaded even if they are located in different places in the classpath (e.g.
+if you have some of the package in one directory and some in another).
+<p CLEAR="ALL"/>
+
+As a special case for reloading unpackaged classes the following commands
+are equivalent:
+<p/><center><table border="1" cellpadding="5" width="100%"><tr><td bgcolor="#dfdfdc"><pre>
+reloadClasses(".*") 
+reloadClasses("&lt;unpackaged&gt;")
+</pre></td></tr></table></center><p/>
+<p CLEAR="ALL"/>
+
+You can also reload just an individual class file:
+<p/><center><table border="1" cellpadding="5" width="100%"><tr><td bgcolor="#dfdfdc"><pre>
+reloadClasses("mypackage.MyClass") 
+</pre></td></tr></table></center><p/>
+
+<em>Note: As of alpha1.1 classes contained in archives (jar files) cannot be
+reloaded. i.e. jar files cannot be swapped.</em>
+<p CLEAR="ALL"/>
+
+<h3>Mapping the path</h3>
+
+Unlike the reloadClases() command which reloads the entire class path,
+when you issue a command to reload a package or individual class name
+BeanShell must map some portions of the classpath to find the location of 
+those class files.  This operation can be time consuming, but it is only
+done once.  If running in interactive mode feedback will be given on the
+progress of the mapping.
+<p CLEAR="ALL"/>
+
+<h3><a name="Loading_Classes_Explicitly">Loading Classes Explicitly</a></h3>
+
+In order to perform an explicit class lookup by name while taking into 
+account any BeanShell class path modification you must use a replacement
+for the standard Class.forName() method.
+<p CLEAR="ALL"/>
+
+The getClass() command will load a class by name, using the BeanShell
+classpath.  Alternately, you can consult the class manager explicitly:
+
+<p/><center><table border="1" cellpadding="5" width="100%"><tr><td bgcolor="#dfdfdc"><pre>
+name="foo.bar.MyClass";
+c = getClass( name );
+c = BshClassManager.classForName( name );  // equivalent
+</pre></td></tr></table></center><p/>
+
+<h3><a name="Setting_the_Default_ClassLoader">Setting the Default ClassLoader</a></h3>
+
+The bsh.Interpeter setClassLoader() and bsh.BshClassManager.setClassLoader()
+methods can be used to set an external class loader which is consulted
+for all basic class loading in BeanShell.  
+<p CLEAR="ALL"/>
+
+BeanShell will use the specified class loader at the same point where it 
+would otherwise use the plain Class.forName().  If no explicit classpath 
+management is done from the script (addClassPath(), setClassPath(), 
+reloadClasses()) then BeanShell will only use the supplied classloader.  
+If additional classpath management is done then BeanShell will perform that 
+in addition to the supplied external classloader.  However BeanShell is not 
+currently able to reload classes supplied through the external classloader.  
+<p CLEAR="ALL"/>
+
+
+<h3><a name="Class_Loading_in_Java">Class Loading in Java</a></h3>
+
+A fundamental Java security proposition is that classes may only be loaded 
+through a class loader once and that classes loaded through different class
+loaders live in different name spaces.  By different name spaces I mean that
+they are not considered to be of the same type, even if they came from the
+very same class file.
+<p CLEAR="ALL"/>
+You can think of this in the following way:  When you load classes through
+a new class loader imagine that every class name is prefixed with the 
+identifier "FromClassLoaderXXX" and that all internal references to other
+classes loaded through that class loader are similarly rewritten.  Now if
+you attempt to pass a reference to a class instance loaded through another
+class loader to one of your newly loaded objects, it will not recognize it
+as the same type of class.
+<p CLEAR="ALL"/>
+
+BeanShell works with objects dynamically through the reflection API, so
+your scripts will not have a problem recognizing reloaded class objects.
+However any objects which have you already created might not like them.
+
+
+<h3><a name="Class_Loading_in_BeanShell">Class Loading in BeanShell</a></h3>
+
+The following is a discussion of the BeanShell class loader architecture,
+which allows both course class path extension and fine grained individual
+class reloading.
+<p CLEAR="ALL"/>
+
+<strong>Thriftiness</strong> - Abiding by the BeanShell thriftiness 
+proposition: no class loading code is exercised unless directed by a
+command.  BeanShell begins with no class loader and only adds class loading
+in layers as necessary to achieve desired effects.
+<p CLEAR="ALL"/>
+
+The following diagram illustrates the two layer class loading scheme:
+<p CLEAR="ALL"/>
+<center>
+<img src="images/bshclassloading.gif"/>
+</center>
+<p CLEAR="ALL"/>
+
+A "base" class loader is used to handle course changes to the classpath 
+including added path.  Unless directed by setClassPath() the base loader will
+only add path and will not cover existing Java user class path.  This prevents
+unnecessary class space changes for the existing classes.
+<p CLEAR="ALL"/>
+
+Packages of classes and individual classes are mapped in sets by class 
+loaders capable of handling discrete files.  A mapping of reloaded classes
+is maintained.  The discrete file class loaders will also use this mapping
+to resolve names outside there space, so when any individual class is reloaded
+it will see all previously reloaded classes as well.
+<p CLEAR="ALL"/>
+
+The BshClassManager knows about all class loader changes and broadcasts
+notification of changes to registered listeners.  BeanShell namespaces use
+this mechanism to dereference cached type information, however they do not
+remove existing object instances.
+<p CLEAR="ALL"/>
+
+Type caching is extremely important to BeanShell performance.  So changing
+the classloader, which necessitates clearing all type caches, should be 
+considered an expensive operation. 
+
+
+<H2>
+<A NAME="CommandRef"></A>BeanShell Commands</H2>
+The BeanShell provides a set of commands for displaying data, invoking
+system utilities, and performing various other tasks. See the BeanShell
+Command Reference for a description of the syntax and usage of each command.
+The current crop of bsh commands follow. These are, for the most part,
+just very short bsh scripts, supplied in the bsh.jar file. See <A HREF="#making">making
+bsh commands</A> below for more details on adding to the "built-in" bsh
+command set.
+<BR>&nbsp;
+<BR>
+<HR>
+<H3><A NAME="addClasspathCommand"></A>addClassPath</H3>
+<code>void addClassPath( string | URL )</code>
+
+
+<p>Add the specified directory or JAR file to the class path. e.g.</p> 
+
+<pre>
+    addClassPath( "/home/pat/java/classes" );
+    addClassPath( "/home/pat/java/mystuff.jar" );
+    addClassPath( new URL("http://myserver/~pat/somebeans.jar") );
+</pre>
+<BR>
+<HR>
+
+<H3><A NAME="bgCommand"></A>bg</H3>
+<TT>bg( String script )</TT>
+
+<P>This is like <TT>run()</TT> except that it runs the command in its own
+thread. Returns the thread object (for <TT>stop()</TT>ing, <TT>join()</TT>ing,
+etc.)</p>
+<BR>
+<HR>
+
+<H3><A NAME="bindCommand"></A>bind</H3>
+<code>bind ( bsh .This ths , bsh .NameSpace namespace )</code>
+
+<P>Bind a bsh object into a particular namespace and interpreter.</p>
+<BR>
+<HR>
+
+
+<H3>
+<A NAME="BrowseClassCommand"></A>browseClass</H3>
+<code>void browseClass( String | Object | Class ) </code>
+
+<p>Open the class browser to view the specified class. If the argument is a string it is considered to be a class name. If the argument is an object, the class of the object is used. If the arg is a class, the class is used. 
+Note: To browse the String class you can't supply a String. You'd have to do: </p>
+
+<pre>
+    browseClass( String.class
+</pre>
+
+<P>The browser enables you to browse the contents
+of any packages packaged as <code>jar</code> files on the classpath defined
+by <code>jde-global-classpath</code>.
+<BR>&nbsp;
+<BR>
+<HR>
+
+<H3> <A NAME="catCommand"></A>cat</H3>
+<code>cat ( String filename )</code> <br>
+<code>cat ( URL url )</code> <br>
+<code>cat ( InputStream ins )</code> <br>
+<code>cat ( Reader reader )</code> <br>
+
+<P>Print the contents of filename, URL, or stream (like Unix cat)l
+<BR>
+<HR>
+
+<H3><A NAME="cdCommand"></A>cd</H3>
+<code>void cd(String path);</code>
+
+<P>Change working directory for the <TT>dir()</TT> command (like Unix <TT>cd</TT>).</p>
+<BR>
+<BR>
+<HR>
+
+<H3><A NAME="classBrowserCommand"></A>classBrowser</H3>
+<code>void classBrowser ( )</code>
+<P>Open the class browser.</p>
+
+<BR>
+<BR>
+<HR>
+
+<H3><A NAME="clearCommand"></A>clear</H3>
+<code>clear()</code>
+
+<P>Clear all variables, methods, and imports from this namespace. If
+this namespace is the root, it will be reset to the default
+imports. See NameSpace.clear(); </p>
+<BR>
+<BR>
+<HR>
+
+
+
+<H3><A NAME="consoleCommand"></A>console</H3>
+<TT>bsh.Console console()</TT>
+
+<P>Create a console window attached to the current interpreter. Returns
+the console Frame.
+<BR>
+<HR>
+
+<H3><A NAME="dirCommand"></A>dir</H3>
+<TT>void dir(String dirname)</TT>
+
+<P>Display the contets of directory dirname. The format is similar to the
+Unix ls -l command.</p>
+<BR>
+<HR>
+
+<H3><A NAME="debugCommand"></A>debug</H3>
+<TT>void debug()</TT>
+
+<P>Toggle on and off debug mode... Note: debug output is verbose and gross.</p>
+<BR>
+<HR>
+
+<H3><A NAME="EditorCommand"></A>editor</H3>
+
+<code>Frame Frame editor()</code> 
+
+<P>Create an editor window with an "eval" button. This is primarily useful
+for typing multi-line commands and experimenting with methods when running
+the BeanShell outside of the Emacs environment. Returns the editor Frame.
+<BR>
+<HR>
+
+<H3><A NAME="errorCommand"></A>error</H3>
+
+<code>void error(item)</code> 
+
+<p>Print the item as an error to standard error.</p>
+
+<BR>
+<HR>
+
+<H3><A NAME="evalCommand"></A>eval</H3>
+<code>Object eval(String expression)</code>
+
+
+<p>Evaluate the string in the current interpreter (see source()). Returns
+the result of the evaluation or null.  Evaluate a string as if it were
+written directly in the current scope, with side effects in the
+current scope.
+</p>
+
+<p>e.g.</p>
+
+<pre>    a=5;
+    eval("b=a*2");
+    print(b); // 10
+</pre>
+
+<p><code>eval()</code> acts just like invoked text except that any
+exceptions generated by the code are captured in a <code>bsh.EvalError</code>. This
+includes <code>ParseException</code> for syntactic errors and <code>TargetError</code> for
+exceptions thrown by the evaluated code.</p>
+
+<p>e.g.</p> 
+
+<pre>
+    try {
+        eval("foo>>><>M>JK$LJLK$");
+    } catch ( EvalError e ) {
+        // ParseException caught here
+    }
+
+    try {
+        eval("(Integer)true");  // illegal cast
+    } catch ( EvalError e ) {
+        // TargetException caught here
+        print( e.getTarget() )  // prints ClassCastException
+    }
+</pre>
+
+<p>If you want <code>eval()</code> to throw target exceptions directly, without
+wrapping them, you can simply redefine own eval like so:</p>
+
+<pre>
+    myEval( String expression ) {
+        try {
+            return eval( expression );
+        } catch ( TargetError e ) {
+            throw e.getTarget();
+        }
+    }
+ </pre>
+
+<p>Returns the value of the expression.</p> 
+
+<p>Throws <code>bsh.EvalError</code> on error.</p> 
+
+<BR>
+<HR>
+
+<H3><A NAME="execCommand"></A><B>exec</B></H3>
+
+<code>exec(String process)</code>
+
+
+<p> Start an external application using the Java Runtime
+<code>exec()</code> method. Display any output to the standard
+BeanShell output using <code>print()</code> </p>
+
+<BR>
+<HR>
+
+<H3><A NAME="exitCommand"></A>exit</H3>
+<TT>void exit()</TT>
+
+
+<p>Conditionally exit the virtual machine. Call
+<code>System.exit(0)</code> unless <code>bsh.system.shutdownOnExit ==
+false</code>.</p>
+
+<BR>
+<HR>
+
+<H3><A NAME="extendCommand"></A>extend</H3>
+<TT>This extend(This object)</TT>
+
+<p>Return a new object that is a child of the specified object. </p>
+
+<p><strong>Note</strong> This command will likely change along with a
+better inheritance mechanism for bsh in a future release.,</p>
+
+<p><code>extend()</code> is like the <code>object()</code> command,
+which creates a new bsh scripted object, except that the namespace of
+the new object is a child of the parent object.</p>
+
+<p>For example:</p>
+
+<pre>
+    foo=object();
+    bar=extend(foo);
+
+    is equivalent to:
+      
+    foo() { 
+        bar() {
+            return this; 
+        }
+    }
+
+    foo=foo();
+    bar=foo.bar();
+
+    and also:
+     
+    oo=object();
+    ar=object();
+    ar.namespace.bind( foo.namespace );
+    
+</pre>
+
+<p>The last example above is exactly what the extend() command
+does. In each case the bar object inherits variables from foo in the
+usual way.</p>
+<BR>
+<HR>
+
+
+<H3><A NAME="FrameCommand"></A>frame</H3>
+
+<p><code>Frame | JFrame | JInternalFrame frame(Component component);</code></p>
+
+
+<p>Display the component, centered and packed, in a Frame, JFrame, or
+JInternalFrame. Returns the frame. If the GUI desktop is running then
+a JInternaFrame will be used and automatically added to the
+desktop. Otherwise if Swing is available a top level JFrame will be
+created. Otherwise a plain AWT Frame will be created.</p>
+
+<BR>
+<HR>
+
+<H3><A NAME="getClassCommand"></A>getClass</H3>
+<p><code>Class getClass(String name)</code></p>
+
+
+<p>Get a class through the current namespace utilizing the current
+imports, extended classloader, etc. </p>
+
+<p>This is equivalent to the standard <code>Class.forName()</code>
+method for class loading. However, it takes advantage of the BeanShell
+class manager so that added classpath will be taken into account. You
+can also use <code>Class.forName()</code>. However if you have modified the
+classpath or reloaded classes from within your script the
+modifications will only appear if you use the <code>getClass()</code> command.
+</p>
+<BR>
+<HR>
+
+
+<H3><A NAME="getClassPathCommand"></A>getClassPath</H3>
+<p><code>URL[] getClassPath()</code></p>
+
+<p>Get the current classpath including all user path, extended path,
+and the bootstrap JAR file if possible. </p>
+
+<BR>
+<HR>
+
+
+
+<H3><A NAME="getResourceCommand">getResource</A></H3>
+<p><code>URL getResource(String path)</code></p>
+
+<p>The equivalent of calling <code>getResource()</code> on the
+interpreter class in the bsh package. Use absolute paths to get stuff
+in the classpath.</p>
+<BR>
+<HR>
+
+<H3><A NAME="getSourceFileInfoCommand">getSourceFileInfo</A></H3>
+<p><code>getSourceFileInfo() </code></p>
+
+
+<p>Return the name of the file or source from which the current
+interpreter is reading. Note that if you use this within a method, the
+result will not be the file from which the method was sourced, but
+will be the file that the caller of the method is reading. Methods are
+sourced once but can be called many times. Each time the interpreter
+may be associated with a different file and it is that calling
+interpreter that you are asking for information.</p>
+
+<p><strong>Note</strong> Although it may seems like this command would
+always return the <code>getSourceFileInfo.bsh</code> file, it does not
+since it is being executed after sourcing by the caller's
+interpreter. If one wanted to know the file from which a bsh method
+was sourced one would have to either capture that info when the file
+was sourced (by saving the state of the
+<code>getSourceFileInfo()</code> in a variable outside of the method
+or more generally we could add the info to the BshMethod class so that
+bsh methods remember from what source they were created.</p>
+
+<BR>
+<HR>
+
+<H3><A NAME="javapCommand">javap</A></H3>
+
+<p><code>void javap(String | Object | Class)</code></p>
+
+<p>Print the public fields and methods of the specified class (output
+similar to the JDK javap command). </p>
+
+<p>If the argument is a string it is considered to be a class name. If
+the argument is an object, the class of the object is used. If the arg
+is a class, the class is used.</p>
+<BR>
+<HR>
+
+<H3><A NAME="LoadCommand">load</A></H3>
+
+<p><code>Object load(String filename)</code></p>
+
+<p>Load a serialized Java object from filename. Returns the object.</p>
+
+<BR>
+<HR>
+
+<H3><A NAME="MakeWorkspaceCommand">makeWorkspace</A></H3>
+
+<p><code>makeWorkspace(String name)</code></p>
+
+<p>Open a new workspace (JConsole) in the GUI desktop. </p>
+<BR>
+<HR>
+
+<h3><a  name="mvCommand">mv</a></h3>
+<p><code>mv (String fromFile, String toFile)</code></p> 
+ 
+<p>Rename a file (like Unix <code>mv</code>).</p>  
+<BR>
+<HR>
+
+<h3><a  name="objectCommand">object</a></h3>
+<p><code>This object()</code></p>
+ 
+<p>Return an "empty" BeanShell object context which can be used to hold data items. e.g.</p>
+
+<pre>
+    myStuff = object();
+    myStuff.foo = 42;
+    myStuff.bar = "blah";
+</pre>
+<BR>
+<HR>
+ 
+
+
+<H3>
+<A NAME="pathToFileCommand">pathToFile</A></H3>
+<p><code>File pathToFile(String filename)</code></p>
+
+<p>Create a File object corresponding to the specified file path name,
+taking into account the bsh current working directory (bsh.cwd)</p>
+<BR>
+<HR>
+
+<H3>
+<A NAME="PrintCommand">print</A></H3>
+<p><code>void print(item);</code></p>
+
+<p>Print the string value of the argument, which may be of any type. If beanshell is running interactively, the output will always go to the command line, otherwise it will go to System.out.</p>
+
+<p>Most often the printed value of an object will simply be the Java toString() of the object. However if the argument is an array the contents of the array will be (recursively) listed in a verbose way.</p> 
+
+<p>Note that you are always free to use <code>System.out.println()</code>
+instead of <code>print()</code>.</p> 
+
+<BR>
+<HR>
+<H3><A NAME="pwdCommand">pwd</A></H3>
+
+<DL>
+<DT>
+<TT>void pwd();</TT></DT>
+</DL>
+
+
+<P>Print the bsh working directory. This is the cwd obeyed by all the unix
+like bsh comands.
+<BR>
+<HR>
+
+<h3><a  name="reloadClassesCommand">reloadClasses</a></h3>
+<p><code>void reloadClasses([package name])</code></p> 
+ 
+<p>Reload the specified class, package name, or all classes if no name is given. e.g. 
+</p>
+<pre>
+    reloadClasses();
+    reloadClasses("mypackage.*");
+    reloadClasses(".*")  // reload unpackaged classes
+    reloadClasses("mypackage.MyClass") 
+</pre>
+
+<p>See "Class Path Management" </p>
+<BR>
+<HR>
+ 
+
+
+<H3>
+<A NAME="rmCommand">rm</A></H3>
+<p><code>void rm(String pathname);</code></p>
+
+<P>Remove the file (like Unix rm)
+<BR>
+<HR>
+
+<H3>
+<A NAME="runCommand">run</A></H3>
+<p><code>run(String filename, Object runArgument);</code></p>
+<p><code>run(String filename);</code></p> 
+
+<p>Run a command in its own private global namespace and interpeter
+context (kind of like the unix <code>chroot</code> for the namespace).
+The root bsh system object is extended (with the <code>extend()</code>
+command) and made visible here, so that system info is effectively
+inherited. Because the root bsh object is extended, it is effectively
+read / copy on write, e.g. you can change directories in the child
+context, do imports, etc. and it will not affect the calling
+context.</p>
+
+<p>Parameter <code>runArgument</code> an argument passed to the child
+context under the name runArgument, e.g. you might pass in the calling
+<code>this</code> context from which to draw variables, etc. </p>
+<BR>
+<HR>
+
+
+
+<H3><A NAME="SaveCommand">save</A></H3>
+<p><code>void save(Component component, String filename);</code></p>
+
+<p>Save a serializable Java object to filename.</p>
+
+<p>Since the AWT Button class happens to be serializable, we could test
+drive the <code>save()</code> command.</p>
+
+<PRE>
+   save(foo, "myButton.ser");
+</PRE>
+
+<p>If we did save our button, we could revive it later with the
+<code>load()</code> command.</p>
+
+<pre>  bar = load("myButton.ser");
+  frame(bar);
+</pre>
+
+<BR>
+<HR>
+
+<H3><A NAME="serverCommand">server</A></H3>
+
+<p><code>void server(int port);</code></p>
+
+<p>Create a <A HREF="file:///D|/jde-dev/doc/guide.html#server">Server Mode</A>
+server attached to the current interpreter, listening on the specified
+port.</p>
+
+<BR>
+<HR>
+
+<H3><A NAME="setAccessibilityCommand">setAccessibility</A></H3>
+
+<p><code>setAccessibility(boolean b);</code></p>
+
+<p>Setting accessibility on enables access to private and other
+non-public fields and methods.</p>
+
+<BR>
+<HR>
+
+<H3><A NAME="setClasspathCommand">setClassPath</A></H3>
+
+<p><code>void setClassPath(URL[]);</code></p>
+
+<p>Change the classpath to the specified array of directories and/or archives.</p>
+
+See "Class Path Management" for details.
+
+
+<BR>
+<HR>
+
+
+<H3><A NAME="setFontCommand">setFont</A></H3>
+<p><code>Font setFont(Component comp, int ptsize)</code></p>
+
+<p>Change the point size of the font on the specified component,
+to <code>ptsize</code>.</p>
+<BR>
+<HR>
+
+<H3><A NAME="setNameSpaceCommand">setNameSpace</A></H3>
+<p><code>setNameSpace(ns)</code></p>
+
+
+<p>Set the namespace (context) of the current scope. 
+The following example illustrates swapping the current namespace. 
+</p>
+
+<pre>
+    fooState = object(); 
+    barState = object(); 
+    
+    print(this.namespace);
+    setNameSpace(fooState.namespace);
+    print(this.namespace);
+    a=5;
+    setNameSpace(barState.namespace);
+    print(this.namespace);
+    a=6;
+    
+    setNameSpace(fooState.namespace);
+    print(this.namespace);
+    print(a);  // 5
+    
+    setNameSpace(barState.namespace);
+    print(this.namespace);
+    print(a); // 6
+    
+</pre>
+
+<p>You could use this to creates the effect of a static namespace for a method by explicitly setting the namespace upon entry.</p> 
+
+<BR>
+<HR>
+
+<H3><A NAME="setStrictJavaCommand">setStrictJava</A></H3>
+<p><code>void setStrictJava(boolean val)</code></p>
+
+
+<p> Enable or disable "Strict Java Mode". When strict Java mode is enabled BeanShell will: 
+</p>
+
+<ol>
+  <li><p>Require typed variable declarations, method arguments and return types.</p> 
+  </li>
+  <li>
+    <p> Modify the scoping of variables to look for the variable
+  declaration first in the parent namespace, as in a java method
+  inside a java class. e.g. if you can write a method called
+  incrementFoo() that will do the expected thing without referring to
+  "super.foo".</p>
+    <p>See "Strict Java Mode" for more details.</p> 
+    </li>
+</ol>
+
+<p><strong>Note</strong> Currently most standard BeanShell commands will not work in Strict Java mode simply because they have not been written with full types, etc. 
+</p> 
+ 
+
+
+<H3>
+<A NAME="ShowCommand"></A>show</H3>
+<TT>void show();</TT>
+
+<P>Toggle on or off the display of the value of expressions evalauted on
+the command line. Show mode may be useful if you find yourself typing print()
+a lot.
+<BR>
+<HR>
+
+
+<H3>
+<A NAME="sourceCommand"></A>source</H3>
+<p><code>Object source(String filename)</code></p> 
+<p><code>Object source(URL url)</code></p> 
+
+<p>Read filename into the interpreter and evaluate it in the current namespace.
+Like Bourne Shell "." command.
+</p>
+
+<BR>
+<HR>
+
+<H3>
+<A NAME="unsetCommand"></A>unset</H3>
+<TT>void unset(String name);</TT>
+
+<P>"undefine" the variable specified by 'name' (So that it tests == void).
+
+<p><strong>Note</strong> There will be a better way to do this in the future. This is currently equivalent to doing</p>
+
+<pre>
+  namespace.setVariable(name, null); 
+</pre>
+<BR>
+<HR>
+
+<H3>
+<A NAME="whichCommand">which</A></H3>
+
+<p><code>which( classIdentifier | string | class )</code></p> 
+ 
+<p>Use classpath mapping to determine the source of the specified class file. (Like the Unix which command for executables).  
+</p>
+
+<BR>
+<HR>
+
+<H2>
+<A NAME="MakeCommands"></A>Making BeanShell Commands</H2>
+Adding to the set of "prefab" commands supplied with bsh can be about as
+easy as writing any other bsh methods. You simply have to place your bsh
+scripts in a bsh/commands/ directory in the classpath (or inside the JAR
+file).
+
+<P>&nbsp;
+<BR>&nbsp;
+</BODY>
+</HTML>

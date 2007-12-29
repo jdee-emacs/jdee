@@ -1,0 +1,372 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<title>JDEE Universal Communication Interface (JUCI)</title>
+<style type="text/css">
+  body { font-family: Verdana, Arial, Helvetica, sans-serif }
+  p { font-size: 9pt }
+  p.footnote { font-size: 8pt }
+  li {  font-size: 9pt }
+  td {  font-size: 9pt }
+</style>
+</head>
+
+<body>
+
+<h2>JDEE Universal Communication Interface (JUCI)</h2>
+
+<p> JUCI (pronounced `juicy') is YABA (Yet Another Bloody Anagram) for
+the JDEE Universal Communication Interface.  The intent of JUCI is to
+provide a standard programming convention and infrastructure for
+managing and integrating communication between Elisp and Java programs
+through the Beanshell. </p>
+
+<h3>Contents</h3>
+<ul>
+  <li><a href="#overview">Overview</a></li>
+  <li><a href="#using">Using JUCI</a></li>
+  <li><a href="#naming">JUCI naming convention</a></li>
+  <li><a href="#conversion">Conversion of objects between Elisp and Java</a></li>
+  <li><a href="#components">Components of JUCI</a></li>
+  <li><a href="#debugging">Debugging</a></li>
+  <li><a href="#todo">TODO</a></li>
+  <li><a href="#gpl">License</a></li>
+</ul>
+
+<a name="overview" />
+<h3>Overview</h3>
+
+<p> JUCI provides two-way communication between Elisp code running in
+Emacs and Java code running in the Beanshell.  This means that not
+only can Java code be executed in a uniform manner by Elisp code, but
+Java code has the ability to call back to Elisp code, retrieving user
+input, querying the current buffer position or filename, or any other
+conceivable information.  This is achieved by spawning a separate,
+parallel thread inside the JVM running the Beanshell to execute Java
+code so that if that code wishes to call back to Elisp, the foreground
+Beanshell thread can still be free to receive the result of that
+evaluation through further script statement evaluation.  The two
+threads work together through the JUCI Connection object (maintained
+on the Java side) which is shared between them and represents a sort
+of "interprocess communication session."</p>
+
+<a name="using" />
+<h3>Using JUCI</h3>
+
+<p> Calling Java from Elisp is straightforward; you create a Java
+interface containing the methods you wish to call from Elisp and an
+implementation of that interface that has a default constructor: </p>
+
+<pre>
+package my.util;
+
+public interface Helper {
+  Object doSomething(Object arg);
+}
+
+public class HelperImpl implements Helper {
+  public HelperImpl() {}
+
+  public Object doSomething(Object arg) {
+    // ...
+  }
+}
+</pre>
+
+<p> <i>[<b>Aside Note:</b> Creating the interface/implementation split
+is a necessary step because of JUCI's use of the
+<code>java.lang.reflect.Proxy</code> mechanism to interpose/decorate
+around the underlying Java method being invoked.  In this case, the
+connection proxy decorates the implementation by queuing the method
+for invocation on the background thread.  A notable side-effect of
+this is that Java code that is executed on the Beanshell's primary
+thread cannot use JUCI to call Elisp; the Java code needs to be
+initially invoked through JUCI for that to happen. (However, the
+LispWriter class is still available to use standalone to generate lisp
+forms in that case.)]</i> </p>
+
+<p> On the Elisp side, in order to call this Java class, all you would
+need to do is invoke a JUCI helper function
+<code>jde-juci-invoke-java</code> like this: </p>
+
+<pre>
+(defun my-util-helper-do-something (arg)
+  (jde-juci-invoke-java "my.util.HelperImpl" "doSomething" arg))
+</pre>
+
+<p> For Java code that calls Elisp, you declare just an interface.  On
+the Elisp side, you implement that interface by creating a function
+with a name following certain conventions (<a href="#naming">see
+below</a>) and a matching argument list: </p>
+
+<pre>
+package my.util;
+
+public interface Prompt {
+  String getUserInput(String prompt);
+}
+
+;; Elisp implementation of above interface
+(defun my-util-prompt-get-user-input (prompt)
+  (read-from-minibuffer prompt))
+
+// Java client code that invokes Elisp implementation
+
+Prompt prompt = (Prompt) jde.juci.ConnectionFactory.getConnection(Prompt.class);
+String result = promt.getUserInput("Your name: ");
+</pre>
+
+<p> This will cause Emacs to enter the minibuffer (prompting with the
+string "Your name: "), capture the user-entered string, and return it
+to the Java code. </p>
+
+<a name="naming" />
+<h3>JUCI naming convention</h3>
+
+<p> In order to connect Elisp code with the Java interface method it
+implements, a naming convention has been established.  The Elisp
+function that is called when you invoke a Java interface (in the
+Java-to-Elisp direction) will be determined by applying the following
+algorithm to the fully qualified class name and method </p>
+
+<ul>
+  <li>Convert all non-letters and digits to dashes ('-').</li>
+  <li>Convert the transition from a lowercase letter to an uppercase
+  letter to a dash.</li>
+  <li>Downcase all letters.</li>
+</ul>
+
+<p>For example, the Java interface method
+<code>jde.foo.Bar.frobnicate()</code> would translate to
+<code>jde-foo-bar-frobnicate</code> in Elisp.</p>
+
+<p> The naming convention is also in effect in the other direction,
+except it is only suggested, not enforced (since the mapping using the
+above algorithm would be one Elisp name to many Java names and because
+the <code>jde-juci-invoke-java</code> function takes a fully-qualified
+class name and a method name as arguments). </p>
+
+<a name="conversion" />
+<h3>Conversion of objects between Elisp and Java</h3>
+
+<p> One of the key duties of JUCI is to faithfully convert Elisp
+objects to a Beanshell script form of its closest Java equivalent, and
+vice versa.  The following table indicates conversion equivalents
+implemented by JUCI: </p>
+
+<table border="1" width="60%">
+  <tr>
+    <td align="center" colspan="2"><b>Elisp to Java conversion</b>
+    (via <code>jde-juci-bshify-object</code> function)</td>
+  </tr>
+  <tr>
+    <td width="50%"><b>Elisp object</b></td>
+    <td width="50%"><b>Java object</b></td>
+  </tr>
+  <tr>
+    <td><code>t</code></td>
+    <td><code>true</code> (<code>Boolean.TRUE</code>)</td>
+  </tr>
+  <tr>
+    <td><code>nil</code></td>
+    <td><code>false</code> (<code>Boolean.FALSE</code>)</td>
+  </tr>
+  <tr>
+    <td><code>'null</code></td>
+    <td><code>null</code></td>
+  </tr>
+  <tr>
+    <td>number</td>
+    <td>implicit conversion to <code>java.lang.Number</code>
+    subclasses (done by the Beanshell)</td>
+  </tr>
+  <tr>
+    <td>string</td>
+    <td><code>java.lang.String</code></td>
+  </tr>
+  <tr>
+    <td>symbol</td>
+    <td><code>jde.juci.Symbol</code></td>
+  </tr>
+  <tr>
+    <td>dotted-pair</td>
+    <td><code>jde.juci.Cons</code></td>
+  </tr>
+  <tr>
+    <td>alist (sequence of dotted-pairs)</td>
+    <td><code>java.util.Map</code>&nbsp;&dagger;</td>
+  </tr>
+  <tr>
+    <td>any sequence</td>
+    <td><code>java.util.List</code></td>
+  </tr>
+</table>
+
+<p class="footnote">&dagger; At the moment, half of this conversion is
+actually done inside the <code>ConnectionImpl</code> class; the Elisp
+conversion layer converts to a <code>List</code> of <code>Cons</code>
+objects, and then <code>ConnectionImpl</code> detects this and
+finishes the job.  The main reason for this is that there isn't an
+easy way to construct a map inline (no analogue to
+<code>java.util.Arrays.asList</code>).</p>
+
+<table border="1" width="60%">
+  <tr>
+    <td align="center" colspan="2"><b>Java to Elisp conversion</b>
+    (via <code>jde.juci.LispWriter</code> class)</td>
+  </tr>
+  <tr>
+    <td width="50%"><b>Java object</b></td>
+    <td width="50%"><b>Elisp object</b></td>
+  </tr>
+  <tr>
+    <td><code>true</code> (<code>Boolean.TRUE</code>)</td>
+    <td><code>t</code></td>
+  </tr>
+  <tr>
+    <td><code>false</code> (<code>Boolean.FALSE</code>)</td>
+    <td><code>nil</code></td>
+  </tr>
+  <tr>
+    <td><code>null</code></td>
+    <td><code>nil</code></td>
+  </tr>
+  <tr>
+    <td><code>java.lang.Number</code></td>
+    <td>implicit conversion to Elisp number (done by the Emacs
+    <code>eval</code> function)</td>
+  </tr>
+  <tr>
+    <td><code>java.lang.String</code></td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <td><code>jde.juci.Symbol</code></td>
+    <td>symbol</td>
+  </tr>
+  <tr>
+    <td><code>jde.juci.Cons</code></td>
+    <td>dotted-pair</td>
+  </tr>
+  <tr>
+    <td><code>java.util.Map</code></td>
+    <td>alist (sequence of dotted-pairs)</td>
+  </tr>
+  <tr>
+    <td><code>java.util.Collection</code></td>
+    <td>list (ordered by the collection's iterator) </td>
+  </tr>
+  <tr>
+    <td><code>(<a href="#todo">TODO</a>) java.lang.Object[]</code></td>
+    <td>list</td>
+  </tr>
+</table>
+
+<a name="components" />
+<h3>Components of JUCI</h3>
+
+<p>For those who wish to delve further into the implementation details
+of JUCI, the following is a road map of where in the source code to
+look for aspects of JUCI's functionality:</p>
+
+<ul>
+  <li> Java components (<code>jde.juci</code> package) <br/>
+      <ul>
+	<li><code>Connection</code> -- the interface that represents a
+	JUCI session.  Constructed by the
+	<code>ConnectionFactory</code>, it also is a proxy for the
+	class(es) provided to the factory.</li>
+	<li><code>ConnectionFactory</code> -- factory for
+	<code>Connection</code> objects.</li>
+	<li><code>ConnectionImpl</code> -- under-the-hood
+	implementation of the connection interface that serves as
+	traffic cop for the pair of threads that send data back and
+	forth between Elisp and Java.</li> <li><code>LispWriter</code>
+	-- object responsible for converting Java objects to lisp
+	forms on standard output.</li>
+	<li><code>Symbol/Cons/Quoted</code> -- compatibility objects
+	that can be used by Java code to properly construct more
+	complicated Elisp forms.  The Symbol object ensures that a
+	string will be translated without double quotes.  The Cons
+	object can be used to construct a dotted-pair form such as
+	those found in typical Elisp alists (e.g., <code>(a
+	. b)</code>).  The Quoted object is the equivalent of the
+	single-quote (') or the <code>(quote ...)</code> form.</li>
+      </ul>
+  </li>
+  <li> Elisp components (<code>jde-juci.el</code> Elisp package) <br/>
+      <ul>
+	<li><code>jde-juci-invoke-java, jde-juci-invoke-script</code>
+	-- function used to invoke a Java object or Beanshell script
+	   through JUCI.</li>
+	<li><code>jde-juci-invoke-elisp</code> -- function used by the
+	Java side of the JUCI infrastructure to execute an Elisp
+	function and return its results back to Java.</li>
+	<li><code>jde-juci-bshify-object</code> -- function used to
+	convert Elisp objects to Beanshell script versions of the
+	equivalent Java objects.</li>
+      </ul>
+  </li>
+</ul>
+
+<a name="debugging" />
+<h3>Debugging</h3>
+
+<p> Debugging problems in the JUCI layer is tricky for several
+reasons; largely because the flow of execution switches from Emacs and
+its Elisp engine to the Beanshell scripting engine to Java code.  At
+this point, you're pretty much limited to logging statements.  But
+since standard output is one of the communication channels, Java code
+cannot rely on trusty <code>System.out.println</code>.  For this,
+there is a <code>Logger</code> class that writes to a file that can be
+invoked from the <code>ConnectionImpl</code>.  To wire up the file
+that the logger dumps to, set the variable
+<code>jde-juci-logger-filename</code> on the Elisp side with the log
+filename.  When a JUCI connection is created, if this variable is set,
+the <code>setLoggerFilename</code> method on the connection will be
+called and this enables the logger.</p>
+
+<p> On the Elisp side, every statement sent to the Beanshell for
+execution is copied to the <code>*jde-log*</code> buffer.</p>
+
+<p> Some attempt is made to preserve errors/exceptions and send them
+back across the connection boundary.  Usually an error/exception will
+eventually unwind and result in a <code>RuntimeException</code> being
+thrown from the last statement evaluated in the Beanshell (which
+<code>bsh-eval</code> dutifully replicates to the
+<code>*Messages*/*Message-Log*</code> buffer). </p>
+
+<a name="todo" />
+<h3>TODO</h3>
+
+<p>
+<ul>
+  <li>Support conversion of Java arrays to Elisp lists.</li>
+  <li>Provide mechanism for Beanshell scripts invoked through JUCI to
+  obtain an equivalent of a JUCI connection for calling back to Elisp.
+  Currently only one-way communication exists for Beanshell
+  scripts.</li>
+  <li>Dynamic generation of EIEIO proxies for Java interfaces.</li>
+</ul>
+</p>
+
+<a name="gpl" />
+<h3>License</h3>
+<p> This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of the
+License, or (at your option) any later version. </p>
+
+<p> This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details. </p>
+
+<p> You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA </p>
+
+<p><i><!-- hhmts start --> Last modified: Sun Feb 23 23:27:46 Central Standard Time 2003 <!-- hhmts end --></i></p>
+</body>
+</html>

@@ -1,0 +1,1228 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBk XML V4.4CR2//EN" 
+ "file:///c:/home/xae-dev/xae/doctypes/docbook/docbookx.dtd" []>
+
+
+<?xml-stylesheet href="file:///c:/home/jde-dev/jde/doc/src/styles/html/jdebook.xsl" type="text/xsl"  ?>
+
+<book>
+
+  <title>Debugging with jdb</title>
+
+
+  <bookinfo>
+
+    <releaseinfo>
+      <remark>
+	Revised for JDEE <productnumber>2.3.3</productnumber>
+      </remark>
+    </releaseinfo>
+
+    <copyright>
+      <year>1997</year>
+      <year>1998</year>
+      <year>1999</year>
+      <year>2000</year>
+      <year>2001</year>
+      <year>2002</year>
+      <year>2003</year>
+      <holder>Paul Kinnucan</holder>
+    </copyright>
+  </bookinfo>
+
+  <chapter>
+
+    <title><anchor id="Intro"/>Debugger Setup</title>
+
+    <para>You should perform the following steps before attempting to use jdb.</para>
+
+    <itemizedlist>
+
+      <listitem>
+	<para>Set the configuration variable
+	  <varname>jde-debugger</varname> to <option>jdb</option> if
+	  you are using version 1.3 (or later) of the Windows or
+	  Solaris versions of the JDK or version 1.2.2 (or later) of
+	  the Linux version of the JDK. Set
+	  <varname>jde-debugger</varname> to <option>oldjdb</option>
+	  if you are using older versions of the JDK.</para>
+	</listitem>
+
+
+      <listitem>
+	  <para>
+	    Use <varname>jde-sourcepath</varname> to specify the paths
+	    of any source code that you expect to visit while
+	    debugging your application (see <ulink
+	      url="#SettingSourcePath"> 
+	      Setting the Source Path</ulink>). If you suspect that a
+	    problem is occurring in the Java API, you should include
+	    the API source files in your source path.
+	  </para>      
+	</listitem>
+
+
+    <listitem>
+	  <para>	
+	    Set <varname>jde-compile-option-debug</varname> on 
+	    (see 
+	    <ulink url="../jde-ug/jde-ug-content.html#CompilingJavaPrograms">Compiling 
+	      Java Programs</ulink>). This causes the compiler to insert
+	    information needed by the debugger into your
+	    application's class files.
+	  </para>      
+	</listitem>
+
+      <listitem>
+	  <para>Specify the app's main class either by setting the
+	    <varname>jde-run-application-class</varname> variable  or by starting the
+	    debugger from the buffer that contains the source file for
+	    the main class.
+	  </para>      
+	</listitem>
+    </itemizedlist>
+
+  </chapter>
+
+  <chapter>
+
+    <title><anchor id="RunningDebugger"/>Running the Debugger</title>
+
+    <sect3>
+
+      <title><anchor id="StartingDebugger"/>Starting the Debugger</title>
+
+      <para>To debug a program with <filename>jdb</filename>,
+	first select a buffer containing the source of the program you
+	want to debug (or a source buffer containing the program's
+	main class if you have not set
+	<varname>jde-run-application-class</varname>). Then execute
+	the JDEE's <command>jde-debug</command> command. You can execute
+	this command by:
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>Selecting 
+	    <menuchoice>
+	      <guimenu>JDE</guimenu>
+	      <guimenuitem>Debug App</guimenuitem></menuchoice> 
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    Entering the key combination 
+	    <keycombo>
+	      <keycap>C</keycap>
+	      <keycap>c</keycap>
+	    </keycombo> <keycombo>
+	      <keycap>C</keycap>
+	      <keycap>v</keycap></keycombo> <keycombo>
+	      <keycap>C</keycap>
+	      <keycap>d</keycap></keycombo>
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>Entering <keycombo>
+	      <keycap>M</keycap>
+	      <keycap>x</keycap></keycombo> <command>jde-debug</command></para>
+	</listitem>
+  
+      </itemizedlist>
+
+      <para>The JDEE launches jdb, passing to it the name of the main
+	class of the program in the current source buffer and any
+	debug options that you have specified via the JDEE's debugger
+	option variables (see <ulink
+	  url="#SettingDebugOptions">Setting Debug Options</ulink>.
+	jdb in turn launches a virtual machine to run the debuggee
+	program and stops the virtual machine before the main method
+	of the program's main class. Meanwhile the JDEE splits the
+	source window into two windows.
+      </para>
+
+      <screenshot>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="images/debug1.gif"/>
+	  </imageobject>
+	</mediaobject>
+      </screenshot>
+
+      <para> 
+	The upper window shows the source buffer.  The menu bar
+	of the source buffer displays a menu (<guimenu>Jdb</guimenu>)
+	of debug commands. The lower window shows the debugger
+	interaction buffer.
+      </para>
+
+      <para>At this point, you can set breakpoints, run to a breakpoint that
+      you set before you started the debugger, or step into the main method
+      of your program.</para>
+
+
+      <sect4>
+
+	<title><anchor id="SettingDebugOptions"/>Setting Debug Options</title>
+
+	<para>The <command>jde-jdb</command> command (selected by
+	<menuchoice>
+	    <guimenu>JDE</guimenu>
+	    <guimenuitem>Debug App</guimenuitem></menuchoice> when jdb
+	  is the debugger for the current project) can optionally pass
+	  command-line arguments that specify various debug options to
+	  jdb when starting jdb. The JDEE provides two ways to specify
+	  these options: via customization variables or in the
+	  minibuffer when you run the <command>jde-jdb</command>
+	  command.</para>
+      
+	<para>The <command>jde-jdb</command> command passes any
+	  options that you specify via customization variables to jdb.
+	  In addition, if you set the customization variable
+	  <varname>jde-db-read-vm-args</varname> to a non-nil value,
+	  the <command>jde-jdb</command> command prompts you to enter
+	  debugger options in the minibuffer. It appends the options
+	  that you enter to the options specified via customization
+	  variables. The JDEE saves the arguments that you enter in a
+	  minibuffer history list. You can recall previously entered
+	  options by pressing the up or down arrows on your keyboard.
+	</para>
+
+      </sect4>
+
+      <sect4>
+
+	<title><anchor id="SettingAppArguments"/>Setting App Arguments</title>
+
+	<para>You can use the customization variable
+	  <varname>jde-db-option-application-args</varname> to specify
+	  arguments to be passed to the application launched by jdb.
+	  The <command>jde-jdb</command> command inserts the specified
+	  arguments on the command-line that it constructs to run
+	  jdb.</para>
+
+	<para>In addition, if you set the customization variable
+	  <varname>jde-db-read-app-args</varname> to a
+	  non-<option>nil</option> value, the
+	  <command>jde-jdb</command> command prompts you to enter the
+	  application arguments in the minibuffer. It appends the
+	  options that you enter to the arguments specified via
+	  <varname>jde-db-option-application-args</varname>. The JDEE
+	  saves the arguments that you enter in a minibuffer history
+	  list. You can recall previously entered options by pressing
+	  the up or down arrows on your keyboard. </para>
+
+    </sect4>
+
+    </sect3>
+
+
+    <sect3>
+
+      <title><anchor id="EnteringCommands"/>Entering Debug Commands</title>
+
+	<para>The JDE lets you enter commands from either the current source
+	  buffer or from the debugger command-line interaction buffer.
+	  You can enter all debugger commands from the debugger
+	  buffer. You can enter only a subset of debugger commands
+	  from the current source buffer. </para>
+
+	<para> To enter a debugger command
+	  from the current source buffer, select the command from the
+	  jdb menu or type the shortcut key for the command. The <guimenu>Jdb</guimenu>
+	  menu lists the shortcut keys
+	  for debugger commands. </para>
+
+ 
+	<para>To enter a command in the debugger interaction window, type the
+	  command at the debugger prompt and press the <keycap>Enter</keycap>
+	  key. To see a list of debugger commands, enter the command
+	  <command>help</command>.
+	</para>
+
+    </sect3>
+
+    <sect3>
+
+      <title><anchor id="SteppingProgram"/>Stepping Through a Program</title>
+
+      <para>
+	Jdb provides a set of command-line commands that advance a
+	program to the next line or the next breakpoint. The JDEE's
+	jdb interface provides Emacs commands that invoke the jdb's
+	step commands from a source buffer and move a debug cursor to
+	the next line to be executed in the source buffer.  If you
+	prefer, you can enter jdb's step commands directly in the jdb
+	buffer. 
+      </para>
+
+      <sect4>
+
+	<title><anchor id="StepCommands"/>Step Commands</title>
+
+	<para> The following table lists the jdb step commands
+	  supported by the JDEE.
+	</para>
+
+	<table>
+	  <title>Step Commands</title>
+	  <tgroup cols="4">
+	    <thead>
+	      <row>
+		<entry>Jdb Menu Item</entry>
+		<entry>Emacs Command</entry>
+		<entry>jdb Command</entry>
+		<entry>Description</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry>Step Over</entry>
+		<entry>jde-bug-step-over</entry>
+		<entry>next</entry>
+		<entry><para>Advance to the next line in the current
+		    method, stepping over any lines that invoke other
+		    methods.</para></entry>
+	      </row>
+	      <row>
+		<entry>Step Into</entry>
+		<entry>jde-debug-step-into</entry>
+		<entry>step</entry>
+		<entry><para>Advance to the next line in the
+		    program.</para></entry>
+	      </row>
+	      <row>
+		<entry>Step Out</entry>
+		<entry>jde-debug-step-out</entry>
+		<entry>step up</entry>
+		<entry><para>Advance to the next line in the method
+		    that invoked the current method.</para></entry>
+	      </row>
+	      <row>
+		<entry>Continue</entry>
+		<entry>jde-debug-cont</entry>
+		<entry>cont</entry>
+		<entry><para>Advance to the next breakpoint or to the
+		    end of the program, whichever comes
+		    first.</para></entry>
+	      </row>
+	    </tbody>
+	</tgroup>
+	</table>
+
+      </sect4>
+
+      <sect4>
+
+	<title><anchor id="DebugCursor"/>Debug Cursor</title>
+
+	<para>The JDEE uses an arrow, called the debug cursor, to
+	  indicate the next line to be executed as the result of a
+	  step or continue command. The debug cursor appears in the
+	  left gutter of the source window containing the next line to
+	  be executed.</para>
+
+	<screenshot>
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata fileref="images/debug_cursor.gif"/>
+	  </imageobject>
+	  </mediaobject>
+	</screenshot>
+
+	  <para>If the step or continue command advances the
+	  program to a line that is not displayed in the current
+	  source window, the JDEE opens the source file containing the
+	  line, if necessary, and displays the source buffer in the
+	  current source window, with the window scrolled to show the
+	  line at which the program has halted.</para>
+
+	<note>
+	  <para>A blank source buffer indicates that the debugger
+	    cannot find the source file into which you have stepped.
+	    You should check your source path setting (see <ulink
+	      url="#SettingSourcePath">Setting the Source
+	      Path</ulink>) to ensure that it includes all source
+	    files in the execution path of your program. 
+	  </para>
+	</note>
+      </sect4>
+
+    </sect3>
+
+  </chapter>
+
+
+  <chapter>
+
+    <title><anchor id="SettingBreakpoints"/>Setting Breakpoints</title>
+
+ 
+    <para>To set a breakpoint on any executable line in the current
+      source buffer, click on the line and select <menuchoice>
+	<guimenu>Jdb</guimenu>
+	<guimenuitem>Set Breakpoint</guimenuitem></menuchoice>
+      (<keycombo>
+	<keycap>C</keycap>
+	<keycap>c</keycap></keycombo><keycombo>
+	<keycap>C</keycap>
+	<keycap>a</keycap></keycombo>
+	<keycombo>
+	<keycap>C</keycap>
+	<keycap>b</keycap></keycombo>).  The JDEE highlights the
+      current line to indicate that a breakpoint is to be set at that
+      line. </para>
+
+    <screenshot>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="images/breakpoint.gif"/>
+	  </imageobject>
+	</mediaobject>
+    </screenshot>
+
+
+    <para>
+      If the debugger is
+      running, the JDEE issues a command to the debugger to set a
+      breakpoint at the highlighted line. If not, the JDEE issues the
+      breakpoint command as soon as you start the debugger. If the
+      class in which the breakpoint is to be set is currently in memory
+      and the breakpoint is valid, the debugger sets the breakpoint.
+      If the class in which the breakpoint is set is not in memory,
+      the debugger puts it on a list of pending breakpoints. If the
+      class is subsequently loades, the debugger sets the breakpoint
+      in the class.
+    </para>
+
+
+    <sect3>
+      <title><anchor id="BreakpointColors"/>Breakpoint Colors</title>
+      
+ 
+      <para>    
+	The color of a breakpoint highlight indicates the status of the breakpoint
+	as follows.
+      </para>
+
+      <table>
+	<title>Breakpoint Colors</title>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry>Color</entry>
+	      <entry>Description</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry>Green</entry>
+	      <entry>The JDEE has not yet issued a command to the
+		debugger to set the breakpoint.</entry>
+	    </row>
+	    <row>
+	      <entry>Yellow</entry>
+	      <entry>The breakpoint is pending loading of the class in which it
+	      is to be set.</entry>
+	    </row>
+	    <row>
+	      <entry>Red</entry>
+	      <entry>The breakpoint has been set.</entry>
+	    </row>
+
+	  </tbody>
+	</tgroup>
+      </table>
+
+    </sect3>
+
+    <sect3>
+      <title><anchor id="ClearingBreakpoints"/>Clearing
+	Breakpoints</title>
+      <para>
+      To clear a breakpoint from a line in the current buffer, click
+	on the line and select <menuchoice>
+	  <guimenu>Jdb</guimenu>
+	  <guimenuitem>Toggle Breakpoint</guimenuitem></menuchoice>
+	(<keycombo>
+	  <keycap>C</keycap>
+	  <keycap>c</keycap></keycombo>
+	  <keycombo>
+	  <keycap>C</keycap>
+	  <keycap>a</keycap></keycombo>
+	<keycombo>
+	  <keycap>C</keycap>
+	  <keycap>b</keycap></keycombo>).
+      </para>
+
+      <para>To clear all breakpoints set in the current session,
+	select <menuchoice><guimenu>Jdb</guimenu> <guimenuitem>Clear
+	    Breakpoints</guimenuitem></menuchoice>.
+      </para>
+ 
+      <note>
+	<para>You can also set and clear breakpoints by entering jdb
+	  breakpoint commands in the jdb interaction buffer. See the
+	  jdb documentation for information on using the jdb
+	  breakpoint commands.</para>
+      </note>
+
+    </sect3>
+    
+  </chapter>
+
+  <chapter>
+
+    <title><anchor id="SettingSourcePath"/>Setting the Source Path</title>
+
+    <para>The <varname>jde-sourcepath</varname> variable specifies the
+	directories the JDEE should search for source for classes
+	visited by the debugger as you step through your program.
+    </para>
+
+
+    <para>To set this variable, enter <command>M-x customize-variable jde-sourcepath</command>.
+      The customization buffer for jde-sourcepath appears. The buffer shows the current
+      source path as a list of paths.</para>
+
+      <screenshot>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="images/debug2.gif"/>
+	  </imageobject>
+	</mediaobject>
+      </screenshot>
+
+      <para>To add a path, click the <guibutton>INS</guibutton> button
+      corresponding to the position in the list and enter the path in
+      the resulting edit field. To delete a path, click the <guibutton>DEL</guibutton> button
+      corresponding to the path. You can use environment variables in paths and
+      use dot notation to specify paths relative to the project file for the
+      project to which this sourcepath applies. When you are done editing the buffer,
+      press the <guibutton>State</guibutton> button to set the
+      variable.</para>
+
+      <para>To avoid having to specify the sourcepath every time you
+      start a session, save the setting of
+      <varname>jde-db-sourcepath</varname> in your
+      <filename>prj.el</filename> file (see <ulink
+	url="../jde-ug/jde-ug-content.html#SavingProjSettings">Saving
+	Project Settings</ulink>)  To save the setting in your project
+      file, select 
+	<menuchoice>
+	<guimenu>JDE</guimenu>
+	<guimenuitem>Project</guimenuitem><guimenuitem>Project File</guimenuitem>
+	<guimenuitem>Save</guimenuitem></menuchoice> (<keycombo>
+	<keycap>C</keycap>
+	<keycap>c</keycap>
+      </keycombo>
+      <keycombo>
+	<keycap>C</keycap>
+	<keycap>v</keycap>
+      </keycombo>
+      <keycombo>
+	<keycap>C</keycap>
+	<keycap>p</keycap>
+      </keycombo>
+      ). </para>
+
+
+      <para>
+      You must specify the paths of the top-level directories of any
+      source code that you might visit while debugging your
+      application. The source code directory structure must mirror
+      your application's package structure. For example, suppose that your
+      application includes a set of classes packaged in the
+      <filename>myapp</filename> directory. Then, the source for those classes
+      must be reside in a directory named <filename>myapp</filename> and you must
+      specify the path of <filename>myapp</filename>'s parent directory.
+      </para>
+
+      <para>If you want to step through the JDK source code,
+	select the source code install option when you install the JDK
+	and set the <varname>jde-sourcepath</varname> variable
+	to the top-level directory containing the source code.
+	The JDE will use the JDK's package structure to find the
+	source code in the subdirectories. </para>
+
+
+  </chapter>
+
+
+  <chapter>
+
+    <title><anchor id="DisplayingVariables"/>Displaying Variables</title>
+
+    <para>This section shows you how to display the values of variables
+    (or expressions).</para>
+
+    <sect3>
+
+      <title><anchor id="DisplayingExpressions"/>Displaying
+	Expressions</title>
+
+      <para>When the debuggee program is stopped, the debugger lets
+	you display the value of any valid Java expression composed of
+	variables currently in scope.  For example, to display the
+	value of a local, in-scope variable whose source is displayed
+	in a Java source buffer, put the point on the variable and
+	select
+      <menuchoice>
+	  <guimenu>Jdb</guimenu>
+	  <guimenuitem>Display</guimenuitem>
+	  <guimenuitem>Expression</guimenuitem>
+      </menuchoice>. The JDEE prompts you to enter an expression to be
+	evaluated and displayed in the minibuffer.</para>
+
+      <screenshot>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="images/display_var1.gif"/>
+	  </imageobject>
+	</mediaobject>
+      </screenshot>
+
+
+      <para> The default expression is the variable at point in the
+	source buffer. Edit the displayed expression and press
+	<keycap>Enter</keycap>. The JDEE issues a command to the
+	debugger to display the variable in the jdb buffer.</para>
+
+      <screenshot>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="images/display_var2.gif"/>
+	  </imageobject>
+	</mediaobject>
+      </screenshot>
+
+    </sect3>
+
+    <sect3>
+      <title><anchor id="DisplayingObjects"/>Displaying
+	Objects</title>
+      <para>To display the values of the fields of an object
+	referenced by an in-scope variable in the current source
+	buffer, and select
+      <menuchoice>
+	  <guimenu>Jdb</guimenu>
+	  <guimenuitem>Display</guimenuitem>
+	  <guimenuitem>Object</guimenuitem>
+      </menuchoice>. The JDEE prompts you to enter the name of the
+	variable in the minibuffer. The default is the variable at
+	point in the source buffer. Press <keycap>Enter</keycap>. The
+	JDEE issues a <command>dump</command> command to the debugger
+	to display the field values of the object referenced by the
+	variable you entered.</para>
+
+      <screenshot>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="images/display_obj.gif"/>
+	  </imageobject>
+	</mediaobject>
+      </screenshot>
+    </sect3>
+
+
+
+    <sect3>
+      <title><anchor id="DisplayingLocals"/>Displaying Locals
+      </title>
+      <para>To display the values of all in-scope local variables,
+	including the values of the arguments of the method in which
+	the program is halted, select
+      <menuchoice>
+	  <guimenu>Jdb</guimenu>
+	  <guimenuitem>Display</guimenuitem>
+	  <guimenuitem>Locals</guimenuitem>
+      </menuchoice>. The JDEE issues a <command>locals</command>
+	command to the debugger to display the local variable
+	values.</para>
+
+      <screenshot>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="images/display_locals.gif"/>
+	  </imageobject>
+	</mediaobject>
+      </screenshot>
+    </sect3>
+  </chapter>
+
+  <chapter>
+    <title><anchor id="SettingVariables"/>Setting Variables</title>
+    
+    <para>Jdb allows you to change the values of variables that are 
+    in scope. To change the value of a variable via the JDEE's jdb
+    interface:</para>
+
+    <orderedlist>
+
+      <listitem>
+	<para>Position point on the variable you want to change.</para>
+      </listitem>
+
+      <listitem>
+	<para>Select <menuchoice>
+	    <guimenu>Jdb</guimenu>
+	    <guimenuitem>Set Variable</guimenuitem>
+	  </menuchoice>.
+	</para>
+	<para>The JDEE prompts you to enter a left expression that
+	  represents the variable whose value you want to change. The
+	  default is the variable at point in the source buffer.
+	</para>
+
+	<screenshot>
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata fileref="images/set_var1.gif"/>
+	    </imageobject>
+	  </mediaobject>
+	</screenshot>
+
+	<note>
+	  <para>Edit the expression if necessary. For example, to set
+	    the value of an array element at point, edit the
+	    expression to include the index of the element.</para>
+	</note>
+
+      </listitem>
+
+      <listitem>
+	<para>Press <keycap>Enter</keycap>.</para>
+	<para>The JDEE prompts you to enter the new value of the
+	  variable.</para>
+
+	<screenshot>
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata fileref="images/set_var2.gif"/>
+	    </imageobject>
+	  </mediaobject>
+	</screenshot>
+      </listitem>
+
+      <listitem>
+	<para>Enter the new value at the prompt in the minibuffer.</para>
+
+	<screenshot>
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata fileref="images/set_var3.gif"/>
+	    </imageobject>
+	  </mediaobject>
+	</screenshot>
+      </listitem>
+	
+
+      <listitem>
+	<para>Press <keycap>Enter</keycap>.</para>
+	<para>The JDEE issues a <command>set</command> command to the
+	  debugger to set the specified variable to the new
+	  value.</para>
+
+	<screenshot>
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata fileref="images/set_var4.gif"/>
+	    </imageobject>
+	  </mediaobject>
+	</screenshot>
+
+      </listitem>
+
+    </orderedlist>
+
+  </chapter>
+
+  <chapter>
+
+    <title><anchor id="DebugExternalProcesses"/>Debugging External Processes</title>
+
+    <para>Normally jdb launches the application that it debugs.
+      However, you can use jdb to debug processes that are not
+      launched by jdb itself. This is useful, for example, if you need
+      to debug a process running on a remote computer or a Java
+      process launched by a nonJava process.</para>
+    
+    <para>Jdb provides two
+      modes for debugging external processes: attach mode and listen
+      mode. When started in attach mode, jdb connects itself to the
+      external process. When started in listen mode, jdb waits for an
+      external process to connect itself to jdb. Each mode has
+      advantages. Attach mode allows you to debug an external process
+      anytime after it has started. Listen mode allows you to debug
+      the startup of a Java process launched by a nonJava process.</para>
+
+    <para>
+      The following sections explain how to use the JDEE's jdb
+      interface to run jdb in attach and listen mode.</para>
+
+    <sect3>
+      <title><anchor id="AttachingProcesses"/>Attaching Processes</title>
+      
+      <para>To attach jdb to an external process, you must ensure that the 
+      external process is started in debug server mode. You must then
+      start jdb in attach mode.</para>
+
+      <sect4>
+	<title><anchor id="DebugServerMode"/>Starting the External
+	  Process in Debug Server Mode</title>
+
+	<para>To start an external process in debug server mode, you
+	  must start the vm that runs the process with the following
+	  command-line options:</para>
+
+	<itemizedlist>
+	  <listitem>
+	    <para><literal>-Xdebug</literal></para>
+	  </listitem>
+
+	  <listitem>
+	    <para>
+	      <literal>-Xrunjdwp:transport=<keycap>TRANSPORT</keycap>,address=<keycap>ADDRESS</keycap>,server=y,suspend=<keycap>SUSPEND</keycap></literal>
+	    </para>
+	    <para>where</para> 
+	      <itemizedlist>
+		<listitem>
+		<para><literal><keycap>TRANSPORT</keycap></literal> is
+		  the type of communications channel between jdb and
+		  the debuggee process, either
+		  <literal>dt_socket</literal> (socket) or
+		  <literal>dt_shmem</literal> (shared memory, valid
+		  only for Windows systems)</para>
+		</listitem>
+	      
+	      <listitem>
+		<para><literal><keycap>ADDRESS</keycap></literal> is
+		  the address of the socket port or shared memory area
+		  used by the debuggee process to listen for a jdb
+		  connection.</para>
+	      </listitem>
+
+	      <listitem>
+		<para><literal><keycap>SUSPEND</keycap></literal> is
+		  either <literal>y</literal> (suspend the debuggee
+		  process at startup, i.e., to wait for jdb to start,
+		  a useful option when you need to debug an
+		  application's startup code) or <literal>n</literal>
+		  (do not suspend the debuggee process)</para>
+	      </listitem>
+	    </itemizedlist>	      
+	  
+	  </listitem>
+	</itemizedlist>
+
+	<example>
+	  <title>Specifying Socket Transport</title>
+	  <para><literal>-Xdebug
+	      -Xrunjdwp:transport=dt_socket,address=4444,server=y,suspend=n</literal></para>
+	</example>
+
+	<example>
+	  <title>Specifying Shared Memory Transport (MS Windows only)</title>
+	  <para><literal>-Xdebug
+	      -Xrunjdwp:transport=dt_shmem,address=javadebug,server=y,suspend=n</literal></para>
+	</example>
+
+
+	<para>The JDEE customization variable, <varname>jde-run-option-debug</varname>, causes
+	the JDEE to generate these arguments automatically when launching a vm to run a  Java
+	application. Thus, if you plan to launch the debuggee process from the JDEE, you
+	should set this variable to the desired options.</para>
+      </sect4>
+
+      <sect4>
+	<title><anchor id="AttachMode"/>Starting jdb in Attach
+	  Mode</title>
+
+	<para>To attach jdb to an existing process via a socket, 
+	  select <menuchoice>
+	    <guimenu>Jdb</guimenu>
+	    <guimenuitem>External Process</guimenuitem>
+	    <guimenuitem>Attach Via Socket</guimenuitem>
+	  </menuchoice> from the Emacs menu bar. By default, 
+	  the JDEE uses the socket address specified by 
+	  the customization variable <varname>jde-db-option-connect-socket</varname>. 
+	  If you set this variable to Prompt (nil), the JDEE 
+	  prompts you to enter a socket address in the minibuffer. 
+	</para>
+
+	<note>
+	  <para>The default socket address specified by
+	    <varname>jde-db-option-connect-socket</varname>
+	  is the same as the default socket address specified
+	  by <varname>jde-run-option-debug</varname>. Thus, if you
+	  want to attach jdb to a process started by the JDEE, the
+	  only variable you have to set is 
+	    <varname>jde-run-option-debug</varname> (to run 
+	  the debuggee process in socket attach mode).</para>
+	</note>
+
+
+	<para>To attach jdb to an existing process via a shared memory
+	  connection (Windows platforms only), 
+	  select <menuchoice>
+	    <guimenu>Jdb</guimenu>
+	    <guimenuitem>External Process</guimenuitem>
+	    <guimenuitem>Attach Via Shared Memory</guimenuitem>
+	  </menuchoice> from the Emacs menu bar. By default, 
+	  the JDEE uses the shared memory transport name specified by 
+	  the customization variable 
+	  <varname>jde-db-option-connect-shared-memory-name</varname>. 
+	  If you set this variable to Prompt (nil), the JDEE 
+	  prompts you to enter a shared-memory name in the minibuffer. 
+	</para>
+
+	<note>
+	  <para>The default shared memory name specified by
+	    <varname>jde-db-option-connect-shared-memory-name</varname>
+	  is the same as the default shared memory name specified
+	  by <varname>jde-run-option-debug</varname>. Thus, if you
+	  want to attach jdb to a process started by the JDEE, the
+	  only variable you have to set is 
+	    <varname>jde-run-option-debug</varname> (to run 
+	  the debuggee process in shared memory attach mode).</para>
+	</note>
+
+      </sect4>
+
+    </sect3>
+
+    <sect3>
+      <title><anchor id="ListeningForProcesses"/>Listening for Processes</title>
+
+      <para>To connect an external process to a jdb instance running in listener
+      mode:</para>
+
+      <orderedlist>
+	<listitem>
+	  <para>Start jdb in listener mode (see <ulink url="#ListenMode">Starting
+	    jdb in Listen Mode</ulink>)</para>
+	</listitem>
+	<listitem>
+	  <para>Start the debuggee process in debug client 
+	    mode(see <ulink url="#DebugClientMode">Starting
+	    the External Process in Debug Client Mode</ulink>)</para>
+	</listitem>
+      </orderedlist>
+
+      <sect4>
+	<title><anchor id="ListenMode"/>Starting jdb in Listen Mode</title>
+	<para>To start jdb in listen mode, select <menuchoice>
+	    <guimenu>Jdb</guimenu>
+	    <guimenuitem>External Process</guimenuitem>
+	    <guimenuitem>Listen For</guimenuitem>
+	  </menuchoice> from the Emacs menu bar. By default, the 
+	  JDEE prompts you to enter the address of the process to
+	  be debugged in the minibuffer. The JDEE customization variable
+	  jde-db-option-listen-address allows you to specify a default
+	  debuggee address. If you set this variable, the JDEE does not
+	  prompt you to enter an address.
+	</para>
+
+	<para>To start jdb listening for  existing process via a socket, 
+	  select <menuchoice>
+	    <guimenu>Jdb</guimenu>
+	    <guimenuitem>External Process</guimenuitem>
+	    <guimenuitem>Listen Via Socket</guimenuitem>
+	  </menuchoice> from the Emacs menu bar. By default, 
+	  the JDEE uses the socket address specified by 
+	  the customization variable <varname>jde-db-option-connect-socket</varname>. 
+	  If you set this variable to Prompt (nil), the JDEE 
+	  prompts you to enter a socket address in the minibuffer. 
+	</para>
+
+	<note>
+	  <para>The default socket address specified by
+	    <varname>jde-db-option-connect-socket</varname>
+	  is the same as the default socket address specified
+	  by <varname>jde-run-option-debug</varname>. Thus, if you
+	  want jdb to listen for a process started by the JDEE, the
+	  only variable you have to set is 
+	    <varname>jde-run-option-debug</varname>, i.e., to run 
+	  the debuggee process in socket listen (client) mode.</para>
+	</note>
+
+
+	<para>To start jdb listening for a process via a shared memory
+	  connection (Windows platforms only), 
+	  select <menuchoice>
+	    <guimenu>Jdb</guimenu>
+	    <guimenuitem>External Process</guimenuitem>
+	    <guimenuitem>Listen Via Shared Memory</guimenuitem>
+	  </menuchoice> from the Emacs menu bar. By default, 
+	  the JDEE uses the shared memory transport name specified by 
+	  the customization variable 
+	  <varname>jde-db-option-connect-shared-memory-name</varname>. 
+	  If you set this variable to Prompt (nil), the JDEE 
+	  prompts you to enter a shared-memory name in the minibuffer. 
+	</para>
+
+	<note>
+	  <para>The default shared memory name specified by
+	    <varname>jde-db-option-connect-shared-memory-name</varname>
+	  is the same as the default shared memory name specified
+	  by <varname>jde-run-option-debug</varname>. Thus, if you
+	  want  jdb to listen for a process started by the JDEE, the
+	  only variable you have to set is 
+	    <varname>jde-run-option-debug</varname>, i.e., to run 
+	  the debuggee process in shared memory listen (client) mode.</para>
+	</note>
+    
+      </sect4>
+
+
+      <sect4>
+	<title><anchor id="DebugClientMode"/>Starting the External
+	  Process in Debug Client Mode</title>
+
+	<para>To start an external process in debug client mode, you
+	  must start the vm that runs the process with the following
+	  command-line options:</para>
+
+	<itemizedlist>
+	  <listitem>
+	    <para><literal>-Xdebug</literal></para>
+	  </listitem>
+
+	  <listitem>
+	    <para>
+	      <literal>-Xrunjdwp:transport=<keycap>TRANSPORT</keycap>,address=<keycap>ADDRESS</keycap>,server=n,suspend=<keycap>SUSPEND</keycap></literal>
+	    </para>
+	    <para>where</para> 
+	      <itemizedlist>
+		<listitem>
+		<para><literal><keycap>TRANSPORT</keycap></literal> is
+		  the type of communications channel between jdb and
+		  the debuggee process, either
+		  <literal>dt_socket</literal> (socket) or
+		  <literal>dt_shmem</literal> (shared memory, valid
+		  only for Windows systems)</para>
+		</listitem>
+	      
+	      <listitem>
+		<para><literal><keycap>ADDRESS</keycap></literal> is
+		  the address of the socket port or shared memory area
+		  used by jdb to listen for a debuggee process
+		  connection.</para>
+	      </listitem>
+
+	      <listitem>
+		<para><literal><keycap>SUSPEND</keycap></literal> is
+		  either <literal>y</literal> (suspend the debuggee
+		  process when the connection occurs,
+		  a useful option when you need to debug an
+		  application's startup code) or <literal>n</literal>
+		  (do not suspend the debuggee process)</para>
+	      </listitem>
+	    </itemizedlist>	      
+	  
+	  </listitem>
+	</itemizedlist>
+
+	<example>
+	  <title>Specifying Socket Transport</title>
+	  <para><literal>-Xdebug
+	      -Xrunjdwp:transport=dt_socket,address=4444,server=n,suspend=n</literal></para>
+	</example>
+
+	<example>
+	  <title>Specifying Shared Memory Transport (MS Windows only)</title>
+	  <para><literal>-Xdebug
+	      -Xrunjdwp:transport=dt_shmem,address=javadebug,server=n,suspend=n</literal></para>
+	</example>
+
+
+	<para>The JDEE customization variable, <varname>jde-run-option-debug</varname>, causes
+	the JDEE to generate these arguments automatically when launching a vm to run a  Java
+	application. Thus, if you plan to launch the debuggee process from the JDEE, you
+	should set this variable to the desired options.</para>
+
+      </sect4>
+
+    </sect3>
+
+  </chapter>
+
+  <chapter>
+
+    <title><anchor id="DebugOptions"/>Debug Options</title>
+
+    <para>The JDEE allows you to specify debug options by setting JDEE
+      configuration variables. You can use the Emacs customization
+      feature to set debug variables interactively. To use the
+      customization feature, select <menuchoice>
+	<guimenu>Project</guimenu>
+	<guimenuitem>Options</guimenuitem>
+	<guimenuitem>Debug</guimenuitem></menuchoice> from the
+      <guimenu>JDE</guimenu> menu. (See <ulink
+	url="../jde-ug/jde-ug-content.html#ConfiguringJDE">Configuring
+	the JDEE</ulink> for more information on using the
+      customization feature). To save the compilation settings in the
+      project file (see <ulink
+	url="../jde-ug/jde-ug-content.html#UsingProjectFiles">Using
+	Project Files</ulink> for the current source buffer, select
+      <menuchoice>
+	<guimenu>Project</guimenu>
+	<guimenuitem>Project File</guimenuitem>
+	<guimenuitem>Save</guimenuitem></menuchoice> from the
+      <guimenu>JDE</guimenu> menu.</para>
+
+    <para>The following table lists the jdb customization variables.</para>
+
+
+    <table>
+
+      <title>Jdb Customization  Variables</title>
+
+      <tgroup cols="3">
+
+	<thead>
+	  <row>
+	    <entry>Variable</entry>
+	    <entry>Group</entry>
+	    <entry>Usage</entry>
+	  </row>
+	</thead>
+
+	<tbody>
+    <row>
+        <entry valign="top"><varname>jde-debugger</varname></entry>
+        <entry valign="top">Project</entry>
+        <entry valign="top">Specify which debugger to use to debug the current project.</entry>
+    </row>
+    <row>
+        <entry valign="top"><varname>jde-sourcepath</varname></entry>
+        <entry valign="top">Project</entry>
+        <entry valign="top">Specify location(s) of source files that
+        can be visited while stepping through a program.</entry>
+    </row>
+    <row>
+        <entry valign="top"><varname>jde-db-mode-hook</varname></entry>
+        <entry valign="top">Project</entry>
+        <entry valign="top">Customization hook for jde-db inferior
+        mode.</entry>
+    </row>
+    <row>
+        <entry valign="top"><varname>jde-global-classpath</varname></entry>
+        <entry valign="top">Project</entry>
+        <entry valign="top">Specify class paths for compile, run,
+        and debug commands.</entry>
+    </row>
+    <row>
+        <entry valign="top"><varname>jde-db-read-vm-args</varname></entry>
+        <entry valign="top">Project</entry>
+        <entry>Specifies whether to read debugger VM arguments from
+        the minibuffer.</entry>
+    </row>
+    <row>
+        <entry valign="top"><varname>jde-db-read-app-args</varname></entry>
+        <entry valign="top">Project</entry>
+        <entry>Specifies whether to read command-line application
+        arguments from the minibuffer.</entry>
+    </row>
+    <row>
+        <entry valign="top"><varname>jde-db-option-classpath</varname></entry>
+        <entry valign="top">Debug</entry>
+        <entry valign="top">Specifies the classpath for the
+        Java interpreter. This option overrides the
+        jde-global-classpath option.</entry>
+    </row>
+    <row>
+        <entry valign="top"><varname>jde-db-option-verbose</varname></entry>
+        <entry valign="top">Debug</entry>
+        <entry valign="top">Print messages about the running
+        process.</entry>
+    </row>
+    <row>
+        <entry valign="top"><varname>jde-db-option-properties</varname></entry>
+        <entry valign="top">Debug</entry>
+        <entry valign="top">Specify property values.</entry>
+    </row>
+    <row>
+        <entry valign="top"><varname>jde-db-option-heap-size</varname></entry>
+        <entry valign="top">Debug</entry>
+        <entry valign="top">Specify the initial and maximum size of
+        the interpreter heap.</entry>
+    </row>
+    <row>
+        <entry valign="top"><varname>jde-db-option-stack-size</varname></entry>
+        <entry valign="top">Debug</entry>
+        <entry valign="top">Specify size of the C and Java stacks.</entry>
+    </row>
+    <row>
+        <entry valign="top"><varname>jde-db-option-garbage-</varname>
+        <varname>collection</varname></entry>
+        <entry valign="top">Debug</entry>
+        <entry valign="top">Specify garbage collection
+        options.</entry>
+    </row>
+    <row>
+        <entry valign="top"><varname>jde-db-option-java-profile</varname></entry>
+        <entry valign="top">Debug</entry>
+        <entry valign="top">Enable Java profiling.</entry>
+    </row>
+    <row>
+        <entry valign="top"><varname>jde-db-option-heap-profile</varname></entry>
+        <entry valign="top">Debug</entry>
+        <entry valign="top">Output heap profiling data.</entry>
+    </row>
+    <row>
+        <entry valign="top"><varname>jde-db-option-verify</varname></entry>
+        <entry valign="top">Debug</entry>
+        <entry valign="top">Verify classes.</entry>
+    </row>
+    <row>
+        <entry valign="top"><varname>jde-db-option-vm-args</varname></entry>
+        <entry valign="top">Debug</entry>
+        <entry valign="top">Specify command-line arguments to be
+        passed to the Java VM.</entry>
+    </row>
+	  <row>
+	    <entry valign="top"><varname>jde-db-option-application-args</varname></entry>
+	    <entry valign="top">Debug</entry>
+	    <entry valign="top">Specify command-line arguments to pass
+	      to the application.</entry>
+	  </row>
+	  <row>
+	    <entry valign="top"><varname>jde-db-option-connect-socket</varname></entry>
+	    <entry valign="top">Debug</entry>
+	    <entry valign="top">Specify socket address of a running process
+	      to which you want to connect the debugger, using a
+	      debugger attach or listen command.</entry>
+	  </row>
+	  <row>
+	    <entry valign="top"><varname>jde-db-option-connect-shared-memory-name</varname></entry>
+	    <entry valign="top">Debug</entry>
+	    <entry valign="top">Specify shared memory name used by the debugger
+	      to attach or listen for debuggee processes to debug.</entry>
+	  </row>
+	  <row>
+	    <entry valign="top"><varname>jde-db-option-host</varname></entry>
+	    <entry valign="top">Debug</entry>
+	    <entry valign="top">Host of a remote process to which you
+	      wish to attach the debugger. This option is invalid for JDK verions
+	      greater than JDK 1.1.x.</entry>
+	  </row>
+	</tbody>      
+      </tgroup>
+    </table>
+  </chapter>
+
+</book>
+
+<!-- 
+Local Variables: 
+mode: xae
+sgml-indent-step: 2
+sgml-indent-data: t
+sgml-set-face: t
+sgml-insert-missing-element-comment: nil
+End:
+ -->

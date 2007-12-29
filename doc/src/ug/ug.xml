@@ -1,0 +1,3269 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE book PUBLIC "-//Arbortext//DTD DocBk XML V2.0//EN" 
+ "file:///d:/tpe-dev/tpe/doctypes/docbook/docbookx.dtd" []>
+
+<?xml-stylesheet href="../styles/html/jdebook.xsl" type="text/xsl"  ?> 
+
+<!-- 
+<?xml-stylesheet href="file:///d|tpe-dev/tpe/styles/docbook/html/docbook.xsl" type="text/xsl"  ?>
+-->
+
+<book>
+
+  <title>JDE User's Guide</title> 
+
+  <chapter>
+
+    <anchor id="Intro"></anchor>
+    <title>Introduction</title>
+
+    <para>Welcome to the <emphasis>JDE User's Guide</emphasis>. This guide explains how
+to use the JDE to develop Java applications and applets. The
+guide assumes that you are familiar with Emacs and
+JavaSoft's Java development tools.
+</para>
+
+    <section>
+
+<anchor id="Intro"></anchor>
+<title>About the JDE</title>
+
+      <para>
+The Java Development Environment (JDE) is an Emacs Lisp
+package that interfaces Emacs to third-party Java application
+development tools, such as those provided by JavaSoft's Java
+Development Kit (JDK). The result is an integrated development
+environment (IDE) comparable in power to many commercial Java
+IDEs. Features include: </para>
+
+<itemizedlist>
+
+	  <listitem>
+	    <para>
+source code editing with syntax highlighting and auto
+indentation
+</para>
+	  </listitem>
+	  <listitem>
+	    <para>
+automatic completion of class fields and methods    
+</para>
+	  </listitem>
+	  <listitem>
+	    <para>
+compilation with automatic jump from error messages to
+responsible line in the source code.
+</para>
+	  </listitem>
+	  <listitem>
+	    <para>
+generates class and method skeletons automatically
+</para>
+	  </listitem>
+	  <listitem>
+	    <para>
+run Java application in an interactive (comint) Emacs
+buffer
+</para>
+	  </listitem>
+	  <listitem>
+	    <para>
+integrated debugging with interactive debug command
+buffer and automatic display of current source file/line
+when stepping through code
+</para>
+	  </listitem>
+	  <listitem>
+	    <para>
+browse JDK doc, using the browser of your choice
+</para>
+	  </listitem>
+
+	  <listitem><para>
+browse your source code, using the Emacs etags facility
+or a tree-structured speedbar.
+</para></listitem>
+
+	  <listitem><para>
+supports latest version of JavaSoft's Java Development
+</para></listitem>
+
+	  <listitem><para>
+runs on any platform supported by Emacs and Sun's Java SDK (e.g.,
+Win95/NT and Solaris)
+</para></listitem>
+
+	  <listitem><para>
+easily and infinitely customizable
+</para></listitem>
+
+	  <listitem><para>
+works with FSF Emacs and XEmacs
+</para></listitem>
+
+	</itemizedlist>
+
+</para>
+
+    </section>
+
+
+    <section>
+      <title>JDE Requirements</title>
+
+      <para>The JDE requires the following software: </para>
+
+      <itemizedlist>
+
+	<listitem>
+	  <para><ulink url="http://www.gnu.org/">FSF Emacs</ulink> or <ulink
+									     url="http://www.xemacs.org/">XEmacs</ulink> on Unix
+platforms; the 20.6.1 version of <ulink
+					url="http://www.cs.washington.edu/homes/voelker/ntemacs.html">NT/Emacs</ulink>
+on Windows platforms, for general source file editing and
+tool integration functions.
+</para></listitem>
+
+	<listitem><para>
+<ulink url="http://www.javasoft.com/products/jdk/1.1/index.html">Java
+Development Kit (JDK)</ulink> or compatible set of Java
+development tools (compiler, virtual machine, debugger,
+class libraries, etc.)
+</para></listitem>
+
+	<listitem><para>
+Web browser (e.g., Netscape or Internet Explorer) for
+viewing documentation.
+</para></listitem>
+
+	<listitem>
+	  <para>
+latest versions of Eric Ludlam's speedbar and semantic bovinator packages
+available for download from
+<ulink url="http://www.ultranet.com/~zappo/semantic.shtml">Eric's home page</ulink>
+</para></listitem>
+
+	<listitem><para>
+<ulink url="http://www.cygnus.com/misc/gnu-win32/">bash</ulink>
+or other Unix-style shell highly recommended for Windows95/NT
+environments.
+</para></listitem>
+
+      </itemizedlist>
+
+    </section>
+
+    <section>
+<anchor id="JDEComponents"></anchor>
+<title>JDE Components</title>
+
+
+
+      <para>
+The JDE distribution includes the following files:
+</para>
+
+      <itemizedlist>
+
+	<listitem><para> 
+<ulink  url="../../lisp/jde.el"><filename>jde.el</filename></ulink>. Defines jde-mode, a major
+Emacs mode for developing Java code.
+</para></listitem>
+
+	<listitem><para>
+<ulink url="../../lisp/jde-run.el"><filename>jde-run.el</filename></ulink>. Runs Java
+applications and applets
+</para></listitem>
+
+	<listitem><para>
+<ulink url="../../lisp/jde-db.el"><filename>jde-db.el</filename></ulink>. Interfaces Emacs to
+<command>jdb</command>, the command-line debugger that comes with the JDK.
+</para></listitem>
+
+	<listitem><para>
+<ulink url="../../lisp/jde-gen.el"><filename>jde-gen.el</filename></ulink>. Contains code
+generation templates.
+</para></listitem>
+
+	<listitem><para>
+<filename>bsh.jar</filename>. Compiled files for the <ulink
+							    url="http://www.beanshell.org/">BeanShell</ulink>, a
+Java source code interpreter developed by Pat Neimeyer.
+</para></listitem>
+
+	<listitem><para>
+<ulink url="../../lisp/beanshell.el"><filename>beanshell.el</filename></ulink>. Provides an
+Emacs interface to the BeanShell interpreter.
+</para></listitem>
+
+	<listitem><para>
+<ulink url="../../lisp/jde-wiz.el"><filename>jde-wiz.el</filename></ulink>. Provides &quot;wizards&quot;
+that generate skeleton implementations of interfaces and
+skeleton overrides of methods declared by superclasses.
+</para></listitem>
+
+	<listitem><para>
+<ulink url="../../lisp/jde-complete.el"><filename>jde-complete.el</filename></ulink>. Automatic field
+and method completion package.
+</para></listitem>
+
+	<listitem><para>
+<ulink url="../../lisp/jde-parse.el"><filename>jde-parse.el</filename></ulink>. 
+Java parser package.</para>
+	</listitem>
+
+	<listitem><para>
+<ulink url="../../lisp/java.bnf"><filename>java.bnf</filename></ulink>. 
+Java grammar used to generate the JDE's lisp-based Java parser.
+</para></listitem>
+
+	<listitem><para>
+<ulink url="../../lisp/jde-bug.el"><filename>jde-bug.el
+</filename></ulink>. 
+JDEbug user interface package.
+</para></listitem>
+
+	<listitem><para>
+<ulink url="../../lisp/jde-dbs.el"><filename>jde-dbs.el</filename></ulink>. 
+JDEbug low-level command interface package.
+</para></listitem>
+
+	<listitem><para>
+<ulink url="../../lisp/jde-dbo.el"><filename>jde-dbo.el</filename></ulink>. 
+JDEbug output processing functions.
+</para></listitem>
+
+	<listitem><para>
+source code, jar files, and documentation for the 
+<ulink url="../../java/">Java components</ulink> of the JDE.</para></listitem>
+	<listitem><para><ulink url="../../lisp/jtags"><filename>jtags</filename></ulink> is a bash shell script that
+tags Java source hierarchies.
+</para></listitem>
+
+	<listitem><para>
+<ulink url="../../lisp/jtags.csh"><filename>jtags.csh</filename></ulink> is a c shell script
+that tags Java source heierarchies.
+</para></listitem>
+
+      </itemizedlist>
+    </section>
+
+
+    <section>
+<anchor id="LatestVersion"></anchor>
+<title>Latest Version</title>
+
+
+      <para>See the <ulink url="http://sunsite.auc.dk/jde/">Emacs JDE Home
+Page</ulink> for instructions on downloading and installing the most
+recent version of the JDE. 
+</para>
+
+
+    </section>
+
+    <section>
+
+<anchor id="ContactingAuthor"></anchor>
+<title>Contacting the Author</title>
+
+
+      <para>Please send bug reports and enhancement suggestions to 
+<ulink url="mailto:paulk@mathworks.com">Paul Kinnucan</ulink>.
+</para>
+      
+    </section>
+
+  </chapter>
+
+  <chapter>
+
+<anchor id="EditingJavaSourceFiles"></anchor>
+<title>Editing Java Source Files</title>
+
+
+    <para>
+To edit an existing Java source file, load it into an Emacs
+buffer by executing <command>C-x C-f</command>. Loading a Java source file
+into a buffer causes the buffer to enter into <function>jde-mode</function>,
+a variant of <function>java-mode</function>, which is in turn a variant of
+the standard Emacs <function>cc-mode</function> for editing source files
+written in C and related languages. Jde mode offers all the
+specialized source file editing commands of <function>cc-mode</function> plus
+functions for compiling, running, and debugging Java source files.
+You can invoke the commands by selecting them from the <guimenu>JDE</guimenu>
+menu that <function>jde-mode</function> displays on the Emacs menu bar or by
+typing the commands in the Emacs minibuffer (see the figure below).
+</para>
+
+    <figure>
+      <title></title>
+      <screenshot>
+	<graphic fileref="images/jdemenu.gif" width="600" depth="360"></graphic>
+      </screenshot>
+    </figure>
+
+    <section>
+
+<anchor id="DocumentingCode"></anchor>
+<title>Documenting Code</title>
+
+      <para>
+The JDE provides complete support for generating HTML documentation for 
+Java classes from comments inserted into the source code for those classes.
+</para>
+
+      <para>See also</para>
+      <para><ulink url="#DisplayingDoc">Displaying Java Documentation</ulink></para>
+
+      <section>
+
+<anchor id="InsertingComments"></anchor>
+<title>Inserting Javadoc Comments</title>
+
+	<para>
+To insert a skeleton javadoc comment for a class or method, position point in the first line of
+the method or class and select <guimenuitem>JDE-&gt;Document</guimenuitem> from the Emacs menubar 
+or type <command>C-c C-v j</command>.
+</para>
+
+	<para>
+To customize the javadoc skeletons, select <guimenuitem>JDE-&gt;Options-&gt;Project-&gt;Javadoc</guimenuitem> 
+from the Emacs menubar.
+</para>
+
+	<note>
+	  <title>Thanks...</title>
+	  <para>
+to <ulink url="mailto:david@dponce.com">David Ponce</ulink> for developing the JDE's javadoc 
+comment generation facility.
+</para>
+	</note>
+
+      </section>
+
+      <section>
+
+<anchor id="GeneratingJavadoc"></anchor>
+<title>Generating the Documentation</title>
+
+
+	<para>
+To generate documentation for the current project, open any source
+file in the project and select <guimenuitem>Make Doc</guimenuitem> from the
+<guimenu>JDE</guimenu> menu or enter <command>M-x jde-javadoc-make</command>.
+</para>
+
+	<para>
+The <command>jde-javadoc-make</command> command runs the JDK's javadoc program to 
+generate the documentation. The <command>javadoc</command> command
+
+must be on your system's command path.
+</para>
+
+	<para>
+The <command>jde-javadoc-make</command> command uses
+ <varname>jde-global-classpath</varname> 
+as the <varname>-classpath</varname> and <varname>jde-db-source-directories
+</varname>
+as the <varname>-sourcepath</varname> option for generating the doc. You can specify all
+
+other javadoc options via JDE customization variables. To specify the
+
+options, select <menuchoice><guimenu>Project</guimenu> <guisubmenu>Options</guisubmenu><guimenuitem>Javadoc</guimenuitem></menuchoice> from the <menuchoice><guimenu>JDE</guimenu></menuchoice>
+menu. Use 
+<varname>jde-javadoc-gen-packages</varname> to specify the packages, classes, or source
+
+files for which you want to generate javadoc. If this variable is <varname>nil</varname>,
+
+the <command>jde-javadoc-make</command> generates javadoc for the Java source file in the current
+
+buffer.
+</para>
+
+	<note>
+	  <para>
+Thanks to <ulink url="mailto:sakliban@cs.wustl.edu">Sergey A Klibanov
+</ulink> for developing the JDE's javadoc generation facility.
+</para>
+	</note>
+
+      </section>
+    </section>
+
+    <section>
+
+<anchor id="CodeCompletion"/>
+<title>Code Completion</title>
+
+      <para>
+With the JDE, you can enter the first few letters of a Java keyword, field, or method name and then have the JDEenter the remaining characters. When completing methods, the JDE enters the method arguments as well. The following sections describes the completion options that the JDE offers.
+</para>
+
+      <section>
+
+<anchor id="JavaKeywordCompletion"></anchor>
+<title>Java Keyword Completion</title>
+
+	<para>The JDE defines a set of abbreviations for Java keywords. When you type one of these abbreviations followed by a space in a Java source buffer, the JDE optionally expands the abbreviation into the keyword. For example, when the abbreviation mode is enabled, you need only type <varname>fa</varname> followed by a space to enter the Java keyword <varname>false</varname>. To enable or disable abbreviation mode, select <menuchoice><guimenu moreinfo="none">JDE</guimenu> <guisubmenu moreinfo="none">Project</guisubmenu><guisubmenu>Options</guisubmenu><guimenuitem>General</guimenuitem></menuchoice> and toggle the boolean variable <varname>jde-enable-abbrev-mode</varname>. To change,
+remove, or add an abbreviation, edit the variable <varname>jde-mode-abbreviations</varname>
+in the project customization buffer.</para>
+
+	<note><para>The JDE's Java keyword expansion facility is based on the Emacs <varname>abbrev-mode</varname> facility. For more information, see the Emacs user manual.</para></note>
+
+      </section>
+
+      <section>
+
+<anchor id="ControlFlowCompletion"/>
+<title>Control Flow Completion</title>
+
+	<para>The JDE defines abbreviations for Java control flow structures, such as if-then-else. When you enter the abbreviation followed by a space, the JDE expands the abbreviation into a corresponding control structure template.</para>
+
+	<example>
+	  <title>Expanding a Control Flow Abbreviation</title>
+
+	  <para>The if-then-else abbreviation</para>
+
+	  <programlisting>
+ife
+</programlisting>
+
+	  <para>expands to the control flow structure</para>
+
+	  <programlisting>
+if ( ) {    
+  } // end of if ()
+  else   
+} // end of if ()else
+</programlisting>
+	</example>
+
+	<section>
+	  <title>Control Flow Abbreviations</title>
+
+	  <para>The JDE defines the following abbreviations for control structures.</para>
+
+	  <table>
+	    <title></title>
+	    <tgroup cols="2">
+	      <colspec colnum="1"></colspec>
+	      <colspec colnum="2"></colspec>
+	      <thead>
+		<row><entry>Statement</entry><entry>Abbreviation</entry></row>
+	      </thead>
+	      <tbody>
+		<row>
+		  <entry><varname>if-then</varname></entry>
+		  <entry><varname>if</varname></entry>
+		</row>
+		<row>
+		  <entry><varname>else</varname></entry>
+		  <entry><varname>else</varname></entry>
+		</row>
+		<row>
+		  <entry><varname>if-then-else</varname></entry>
+		  <entry><varname>ife</varname></entry>
+		</row>
+		<row>
+		  <entry><varname>while</varname></entry>
+		  <entry><varname>while</varname></entry>
+		</row>
+		<row>
+		  <entry><varname>for</varname></entry>
+		  <entry><varname>for</varname></entry>
+		</row>
+		<row>
+		  <entry><varname>for (int I=0;I&lt;UL;I++)</varname></entry>
+		  <entry><varname>for</varname></entry>
+		</row>
+		<row>
+		  <entry><varname>main method</varname></entry>
+		  <entry><varname>main</varname></entry>
+		</row>
+		<row>
+		  <entry><varname>switch</varname></entry>
+		  <entry><varname>switch</varname></entry>
+		</row>
+		<row>
+		  <entry><varname>case</varname></entry>
+		  <entry><varname>case</varname></entry>
+		</row>
+	      </tbody>
+	    </tgroup>
+	  </table>        
+
+	  <note><para>
+You must enable the JDE's Java keyword abbreviation mode to use the control flow abbreviations. See <ulink url="#JavaKeywordCompletion">Java Keyword Completion</ulink> for more information.
+</para>
+	  </note>
+
+	</section>
+
+	<section>
+	  <title>Left Brace Placement</title>
+	  
+	  <para>
+The JDE's Java control flow templates support two options for opening brace placement: placement on the first line of the template (Kerningham &amp; Ritchie Style, the default) and placement on a separate line. Type <command>M-x customize-variable jde-gen-k&amp;r</command> to specify the style you prefer.
+</para>
+	</section>
+
+	<section>
+	  <title>Customizing the Control Flow Templates</title>
+
+	  <para>You can customize the templates to suit any indentation style. To customize the templates, select 
+<menuchoice>
+	      <guimenu>Project</guimenu>
+	      <guisubmenu>Options</guisubmenu>
+	      <guimenuitem>Autocode</guimenuitem>
+	    </menuchoice>
+from the JDE menu.</para>
+	</section>
+
+	<section>
+	  <title>Enabling Variable Content</title>
+
+	  <para>Some templates optionally prompt you for items to insert into the template. To enable 
+prompting, set the variable <varname>tempo-interactive</varname> to a 
+non-<varname>nil</varname> value in your <filename>.emacs</filename> file.</para>
+	</section>
+
+	<section>
+	  <title>Disabling the Control Flow Abbreviations</title>
+
+	  <para>To disable the control flow abbreviations, set the variable <varname>jde-gen-cflow-enable</varname> off.</para>
+
+	  <note>
+	    <title>Thanks to...</title>
+
+	    <para>Thanks to Eric D. Friedman &gt;friedman@lmi.net&lt;
+for contributing the control flow templates.</para>
+	  </note>
+
+	</section>
+
+      </section>
+
+      <section>
+
+<anchor id="DynamicKeywordCompletion"/>
+<title>Dynamic Keyword Completion</title>
+
+	<para>Emacs provides dynamic completion commands attempt to find completions for the word at point in the current buffer or other buffers.
+</para> 
+
+	<example>
+	  <title>Using Dynamic Completion</title>
+
+	  <para>
+Suppose that the current source buffer contains the class names <varname>Component</varname> and <varname>Container</varname>. Now suppose you enter <varname>Co</varname>
+somewhere in the buffer and type <keycombo><keycap>M</keycap><keycap>/</keycap></keycombo>. 
+The text <varname>Component</varname> replaces <varname>Co</varname> in the buffer. 
+</para>
+
+	  <para>Typing <keycombo><keycap>M</keycap><keycap>/</keycap></keycombo> again changes <varname>Component</varname> to <varname>Container</varname>. In this way, you can cycle through all the possible completions for <varname>Co</varname> in the current buffer.
+</para> 
+	</example>
+
+	<section>
+	  <title>Dynamic Completion Commands</title>
+
+	  <para>Emacs provides two dynamic completion commands.</para>
+	  <para>
+The <command>dabbrev-expand</command> command is bound to the key combination <keycombo><keycap>M</keycap><keycap>/</keycap></keycombo> by default. It searches the current buffer for completions of the word at point and, if none are found, other buffers of the same type. For example, if the current buffer is a Java source buffer, it searches other Java source buffers for completions if none are found in the active buffer.
+</para>
+
+	  <para>
+The <command>hippie-expand</command> command provides more extensive search capabilities. See the docstrings for these functions for more information.
+</para>
+	</section>
+
+      </section>
+
+      <section>
+
+<anchor id="FieldAndMethodCompletion"/>
+<title>Field and Method Completion</title>
+
+
+	<para>
+The JDE provides two commands for completing a Java field or method name at point in the current buffer.</para>
+	<itemizedlist>
+	  <listitem>
+	    <para><command>jde-complete-at-point</command>
+(<keycombo><keysym>C-c</keysym><keysym>C-v</keysym></keycombo>)
+</para>
+	  </listitem>
+	  <listitem>
+	    <para><command>jde-complete-at-point-menu</command> 
+(<keycombo><keysym>C-c</keysym><keysym>C-.</keysym></keycombo>)
+</para>
+	  </listitem>
+	</itemizedlist>
+
+	<section>
+	  <title>jde-complete-at-point</title>
+
+	  <para>
+This command is bound to <keycombo><keysym>C-c</keysym><keysym>C-v</keysym></keycombo>. It finds all the fields and methods that complete the name at point. It then inserts the first potential completion in the buffer at point. Repeatedly typing <keycombo><keysym>C-c</keysym><keysym>C-v</keysym></keycombo> causes the JDE to cycle through the other potential completions. If the completion is a method name, the command completes the method name and displays the method signature in the minibuffer.
+</para>
+
+	  <example>
+	    <title>Completing a String Method Name</title>
+	    <para>
+Typing <keycombo><keysym>C-c</keysym><keysym>C-v</keysym></keycombo>
+</para>
+
+	    <programlisting>
+   String s;
+   s.get
+        ^
+</programlisting>
+	    <para>
+completes the method name at point as follows</para>
+
+	    <programlisting>
+   String s;
+   s.getClass(
+              ^
+</programlisting>
+
+	    <para>and displays</para>
+
+	    <programlisting>
+  java.lang.Class getClass()
+</programlisting>
+
+	    <para>in the minibuffer. Repeatedly typing <keycombo><keysym>C-c</keysym><keysym>C-v</keysym></keycombo> cycles through all the other get methods for the Java  <varname>String</varname> class.</para>
+	  </example>
+
+	  <para>This command works for all of the following cases.</para>
+
+	  <itemizedlist>
+	    <listitem>
+	      <para>objects referenced by variables declared in the current buffer</para>
+	    </listitem>
+	    <listitem>
+	      <para>static fields and methods</para>
+	    </listitem>
+	    <listitem>
+	      <para>
+fields and methods of objects defined by the current class and its parent
+</para>
+	      <para>
+Names of fields and methods of the current class must start with <varname>this</varname> or 
+<varname>.</varname> (period). Names of fields and methods declared by
+the parent of the current class must start with <varname>super</varname>.
+</para>
+	      <para>For example, this command completes</para>
+	      <programlisting>
+  .
+   ^
+  this.
+       ^
+  super.
+        ^
+</programlisting>
+	    </listitem>
+
+	    <listitem>
+	      <para>
+objects referenced by the fields of objects referenced by variables declared in the
+current class or its parent or by static fields
+</para>
+	      <para>For example, this command completes</para>
+	      <programlisting>
+  System.out.prin
+                 ^
+</programlisting>
+	    </listitem>
+
+	    <listitem>
+	      <para>
+objects returned by methods of objects referenced by variables defined in the current 
+</para>
+	      <para>
+For example, this command completes
+</para>
+	      <programlisting>
+  Toolkit.getDefaultToolkit().get
+                                 ^
+</programlisting>
+	    </listitem>
+
+	    <listitem>
+	      <para>
+objects referenced by method parameters</para>
+	      <para>
+For example, this command completes
+</para>
+	      <programlisting>
+  void setColor(String color) {
+     color.get
+              ^
+  }
+</programlisting>
+	    </listitem>
+	  </itemizedlist>
+
+	  <para>
+The <command>jde-complete-at-point</command> command uses the Beanshell to run Java code that in turn uses Java's reflection (class introspection) capability to determine the fields and methods defined for the class of object at point. The command starts the Beanshell if it is not running. This can cause a noticeable delay in the execution of the command the first time it is used in a session. The response can also be slow for classes containing many methods and fields.
+</para>
+
+	  <para>
+The completion command works only for compiled classes that reside in the classpath defined by <varname>jde-global-classpath</varname> when the Beanshell starts. Thus, if the command is unable to complete a method or field, make sure that the class that defines the field or method is compiled and exists on <varname>jde-global-classpath</varname>.
+</para>
+	</section>
+
+	<section>
+	  <title>jde-complete-at-point-menu</title>
+	  <para>This command works exactly like <command>jde-complete-at-point</command> except that it displays the potential completions for a field or method in a popup menu. Selecting a completion from the menu causes the command to use it to complete the method or field at point.
+</para>
+	</section>
+      </section>
+    </section>
+
+    <section>
+
+<anchor id="GeneratingCode"/>
+<title>Generating Code</title>
+
+      <para>The JDE provides the following code generation capabilities.</para>
+
+      <itemizedlist>
+	<listitem><para>Code wizards</para></listitem>
+	<listitem><para>Code templates</para></listitem>
+      </itemizedlist>
+
+      <section>
+
+<anchor id="CodeWizards"/>
+<title>Code Wizards</title>
+
+	<para>
+The JDE provides code generation wizards that generate class-dependent code without requiring you to supply any other information than the unqualified name of the class.
+</para>
+
+	<para>
+The wizards use the BeanShell to run a Java utility that searches the classpath specified by <varname>jde-global-classpath</varname> for classes that match the unqualified name. If a wizard finds more than one class of the same unqualified name on the classpath, i.e., a class that exists in more than one package, it prompts you to select one of the classes.
+</para>
+
+	<note>
+	  <para>
+A wizard starts the Beanshell interpreter if it is not already running. Thus, you may experience a slight delay when invoking a wizard for the first time in a session.
+</para>
+	  </note>
+
+	<section>
+
+<anchor id="ImportWizard"/>
+<title>Import Wizard</title>
+
+	  <para>
+The import wizard generates an import statement for the class name at point if an import statement does not already exist for that class. The wizard generates the import statement at the head of the source buffer.
+</para>
+
+	  <para>
+To import the class at point, select <menuchoice> <guimenu>JDE</guimenu> <guisubmenu>Wizards</guisubmenu><guimenuitem>Import Class</guimenuitem></menuchoice> from the Emacs menubar or type <keycombo><keysym>C-c</keysym><keysym>C-v</keysym><keysym>C-z</keysym></keycombo>.
+</para>
+
+	  <para>
+The import wizard searches the current classpath for classes that match the class name at point, which may be unqualified. If the import wizard finds more than one class of the same unqualified name on the current classpath, it prompts you to select one of the classes to import.
+</para>
+
+	  <note>
+	    <para>
+The classpath that the import wizard searches for import candidates is the classpath specified by <varname>jde-global-classpath</varname> when the BeanShell was last started.
+</para>
+	    </note>
+
+	  <para>
+The customization variable <varname>jde-wiz-import-excluded-packages</varname> allows you to specify a list of packages to exclude from consideration for import into the current source file. If the import wizard finds any classes on the classpath that belong to the list of prohibited packages, it removes them from the list of classes considered for import.
+</para>
+	  </section>
+
+	<section>
+
+<anchor id="MethodOverrideWizard"/>
+<title>Method Override Wizard</title>
+
+	  <para>
+The method override wizard generates a skeleton method that
+overrides a similarly named method defined by a superclass.
+</para>
+
+	  <para>To override a method of a superclass: </para>
+
+	  <orderedlist>
+
+	    <listitem>
+	      <para>
+Position the Emacs point at the location in the buffer
+where you want the generated method to appear.
+</para>
+	      <para>
+The point must be within the class that is overriding the  method. 
+</para>
+	      <para>
+<screenshot>
+		  <mediaobject>
+		    <imageobject>
+		      <imagedata fileref="images/OverrideMeth1.gif" width="472" depth="328"/>
+		    </imageobject>
+		    <textobject>
+		      <phrase>Screen capture showing point inside a class.</phrase>
+		    </textobject>
+		  </mediaobject>
+		</screenshot>
+</para>
+	    </listitem>
+
+
+	    <listitem>
+	      <para>
+Select <menuchoice><guisubmenu>Wizards</guisubmenu><guimenuitem>Override Method</guimenuitem>
+		</menuchoice> from the <menuchoice><guimenu>JDE</guimenu>
+		</menuchoice> menu or enter <keycombo><keycap>M</keycap><keycap>x</keycap>
+		</keycombo>&nbsp;<varname>jde-wiz-overrided-method</varname>. 
+</para>
+	      <para>
+<screenshot>
+		  <mediaobject>
+		    <imageobject>
+		      <imagedata fileref="images/OverrideMeth2.gif"/>
+		    </imageobject>
+		    <textobject><phrase>Screen shot showing <menuchoice><guimenu>Wizards</guimenu>
+			</menuchoice> menu.</phrase>
+		    </textobject>
+		  </mediaobject>
+		</screenshot>
+</para>
+
+	      <para>
+The JDE prompts you to enter the name of the method to be overridden in the minibuffer. 
+</para>
+	      <para>
+<screenshot>
+		  <mediaobject>
+		    <imageobject>
+		      <imagedata fileref="images/OverrideMeth3.gif"/>
+		    </imageobject>
+		    <textobject><phrase>Screen shot showing prompt for method name.</phrase>
+		    </textobject>
+		  </mediaobject>
+		</screenshot>
+</para>
+
+	      <para>
+The name must be the name of a method defined by an
+ancestor of the class in which the Emacs point is located.
+The compiled class of the ancestor must be on the
+classpath specified by <varname>jde-global-classpath</varname>. 
+</para>
+	    </listitem>
+
+	    <listitem>
+	      <para>
+Enter the name of the method to be overridden. 
+</para>
+	      <para>
+If the ancestors of the class in which you are overriding the
+method define more than one method of the same name, the
+wizard displays a dialog buffer that lists the methods.
+For example, Java's awt class hierarchy defines several
+variants of the method <varname>repaint</varname>. If you specify <varname>repaint</varname>
+as the method to override, the JDE displays the following
+dialog buffer: 
+</para>
+	      <para>
+<screenshot>
+		  <mediaobject>
+		    <imageobject>
+		      <imagedata fileref="images/OverrideMeth4.gif"/>
+		    </imageobject>
+		    <textobject><phrase>Screen shot showing dialog buffer for selecting method.</phrase>
+		    </textobject>
+		  </mediaobject>
+		</screenshot>
+</para>
+
+	      <para>
+The dialog buffer lists the signature of each variant
+of the method you specified. Next to each signature is a
+radio button. The radio button of the currently selected
+signature contains an asterisk. To select another
+signature, right-click the radio button next to the
+variant. To confirm your selection and dismiss the dialog,
+right-click the <guibutton>[Ok]</guibutton> button. 
+</para>
+
+	    </listitem>
+	    <listitem>
+	      <para>
+Select the method variant you want to override and
+click the <guibutton>[Ok]</guibutton> button. 
+</para>
+	      <para>The wizard inserts a skeleton implementation of the selected
+method at the current point in the Java source buffer.</para>
+
+	      <para>
+<screenshot>
+		  <mediaobject>
+		    <imageobject>
+		      <imagedata fileref="images/OverrideMeth5.gif"/>
+		    </imageobject>
+		    <textobject><phrase>Screen shot showing the inserted method.</phrase>
+		    </textobject>
+		  </mediaobject>
+		</screenshot>
+</para>
+
+	      <para>
+The wizard also inserts import statements for any
+classes referenced by the method that are not already
+imported by the containing class either explicitly or
+implicitly. The wizard inserts the import statements at
+the head of the source buffer after any existing import
+statements, or any package statement, or the first blank
+line in the buffer. 
+</para>
+	      <note><para>
+The method override wizard uses the BeanShell to create the interface 
+implementation. If the BeanShell is not currently running, the wizard 
+starts the BeanShell. Thus, if the BeanShell is not already running,
+you may experience a short pause the first time you override a method.
+</para>
+	      </note>
+	    </listitem>
+	  </orderedlist>
+
+	</section>
+
+	<section>
+
+<anchor id="InterfaceWizard"/>
+<title>Interface Wizard</title>
+
+	  <para>
+This wizard creates a skeleton implementation of any interface
+defined on the classpath specified by <varname>jde-global-classpath</varname>.
+</para>
+
+	  <para>To create an implementation of an interface: </para>
+
+	  <orderedlist>
+	    <listitem>
+	      <para>
+If the interface is to be implemented by a new class,
+create the class in a buffer.
+</para>
+	    </listitem>
+	    <listitem>
+	      <para>
+Position the Emacs point at the point in the class where
+you want the implementation of the interface's methods to
+appear.
+</para>
+	    </listitem>
+	    <listitem>
+	      <para>
+Select <menuchoice><guimenu>JDE</guimenu><guisubmenu>Wizards</guisubmenu>
+		  <guimenuitem>Implement Interface</guimenuitem> </menuchoice> or enter 
+<keycombo><keycap>M</keycap><keycap>x</keycap></keycombo>&nbsp;<varname>jde-wiz-implement-interface</varname>. 
+</para>
+	      <para>
+The JDE prompts you to enter the name of the interface to be implemented. 
+</para>
+	    </listitem>
+	    <listitem>
+	      <para>Enter the fully qualified name of the interface,
+for example, <classname>java.awt.Event.MouseListener</classname>.</para>
+	      <para>
+The wizard inserts skeleton implementations of the methods
+declared by the interface at the current point in the
+current buffer. It inserts import statements for any
+classes required by the interface at the head of the
+current buffer (only if import statements do not already
+exist for the required classes). It also updates or
+creates an implements clause for the class.
+</para>
+	    </listitem>
+	  </orderedlist>
+
+	  <note><para>
+The interface wizard uses the BeanShell to create
+the interface implementation. If the BeanShell is not currently
+running, it starts the BeanShell. Thus, if the BeanShell is not
+already running, you may experience a short pause the first time
+you use the wizard. </para>
+	  </note>
+	  </section>
+
+	<section>
+
+<anchor id="DelegateWizard"/>
+<title>Delegate Wizard</title>
+
+
+	  <para>
+This wizard generates methods that delegate calls to a class in the current buffer
+to an attribute of the class, i.e., to an object that is a field of the current class.  
+For example, if the current buffer contains class <classname>A</classname> and 
+<classname>A</classname> has an attribute, <varname>A.b</varname>, that is an instance of class <classname>B</classname>,  this wizard generates all the public methods of class <classname>B</classname> in <classname>A</classname> and delegates handling of those methods to <varname>b</varname>.
+</para>
+
+	  <note><title>Thanks to...</title>
+	    <para>
+<ulink url="mailto:cfhart@Z-TEL.com">Charles Hart</ulink> for
+contributing this wizard.
+</para>
+	    </note>
+
+	</section>
+      </section>
+
+      <section>
+
+<anchor id="CodeTemplates"/>
+<title>Code Templates</title>
+
+<section>
+
+<anchor id="BufferTemplates"/>
+<title>Buffer Templates</title>
+
+	  <para>These commands create buffers containing a skeleton Java class.
+Each command prompts you to enter the path to a new Java source
+file. They then create a buffer for the new file and insert a
+template for a class of the same name as the newly created file.
+In particular, the command </para>
+
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+<menuchoice><guimenu>Files</guimenu><guisubmenu>JDE New</guisubmenu><guimenuitem>Class</guimenuitem></menuchoice> creates a buffer containing a generic Java public class.
+</para>
+	    </listitem>
+
+	    <listitem>
+	      <para>
+<menuchoice><guimenu>Files</guimenu><guisubmenu>JDE New</guisubmenu><guimenuitem>Console</guimenuitem></menuchoice> creates a buffer containing the main class of a
+Java console application.
+</para>
+	    </listitem>
+
+	    <listitem>
+	      <para>
+<menuchoice><guimenu>Files</guimenu><guisubmenu>JDE New</guisubmenu><guimenuitem>Other</guimenuitem></menuchoice> prompts you to create any of the above buffers or a
+custom (user-defined) buffer.
+</para>
+	    </listitem>
+
+	  </itemizedlist>
+
+	  <para>
+You can create an empty Java class buffer by selecting 
+<menuchoice><guimenu>Files</guimenu><guisubmenu>Open</guisubmenu></menuchoice> 
+(<keycombo><keycap>C</keycap><keycap>x</keycap></keycombo>&nbsp;<keysym>f</keysym>) and
+entering the path for a new file whose root name is the same as
+the class you want to create and whose extension is <filename>.java.</filename>
+</para>
+
+	  <section>
+	    <title>Specifying Boilerplate Text</title>
+
+	    <para>
+You can specify boilerplate text (for example, a copyright
+notice) to be inserted at the head of class source files created
+by the JDE. The JDE provides two ways to specify the boilerplate
+text. The simplest way is to enter the lines of boilerplate text
+as the value of the customization variable <varname>jde-gen-buffer-boilerplate</varname>.
+Another way to specify the text is to set the value of the
+customization variable <varname>jde-gen-boilerplate-function</varname>to a
+function that generates the boilerplate text. (The default value
+of this variable is <varname>jde-gen-create-buffer-boilerplate</varname>,
+which returns the value of the boilerplate variable, 
+<varname>jde-gen-buffer-boilerplate</varname>).
+The functional approach allows you to generate boilerplate text
+dynamically by evaluating the appropriate Lisp code. By saving
+the values of boilerplate variables in project files, you can
+specify different boilerplate text&nbsp; for each project. 
+</para>
+
+	  </section>
+
+	  <section>
+	    <title>Customization Variables</title>
+
+	    <para>The following JDE customization variables control creation of
+autocoded Java source buffers: 
+</para>
+
+	    <table>
+	      <title></title>
+	      <tgroup cols="3">
+		<colspec colnum="1"></colspec>
+		<colspec colnum="2"></colspec>
+		<colspec colnum="3"></colspec>
+		<thead>
+		  <row>
+		    <entry>Variable</entry>
+		    <entry>Group</entry>
+		    <entry>Usage</entry>
+		  </row>
+		  </thead>
+		<tbody>
+		  <row>
+		    <entry><varname>jde-gen-class-buffer-template</varname></entry>
+		    <entry>Autocode</entry>
+		    <entry>Template for a generic public class buffer.</entry>
+		  </row>
+		  <row>
+		    <entry><varname>jde-gen-console-buffer-template</varname></entry>
+		    <entry>Autocode</entry>
+		    <entry>Template for a console application buffer.</entry>
+		  </row>
+		  <row>
+		    <entry><varname>jde-gen-jfc-app-buffer-template</varname></entry>
+		    <entry>Autocode</entry>
+		    <entry>Template for a JFC (Swing) application.</entry>
+		  </row>
+		  <row>
+		    <entry><varname>jde-gen-buffer-templates</varname></entry>
+		    <entry>Autocode</entry>
+		    <entry>Specifies templates available to create
+Java buffers.</entry>
+		  </row>
+		  <row>
+		    <entry><varname>jde-gen-buffer-boilerplate</varname></entry>
+		    <entry>Autocode</entry>
+		    <entry>Specifies lines of text to be inserted
+at the head of class files.</entry>
+		  </row>
+		  <row>
+		    <entry><varname>jde-gen-boilerplate-function</varname></entry>
+		    <entry>Autocode</entry>
+		    <entry>Specifies a function that returns a string of
+        boilerplate text. The default value is <varname>jde-gen-create-buffer-boilerplate</varname>,
+        which returns the value of <varname>jde-gen-buffer-boilerplate</varname>.</entry>
+		  </row>
+		</tbody>
+	      </tgroup>
+	    </table>
+
+	    <para>
+See <ulink url="#CustomizingAutocode">Customizing Autocode
+Templates</ulink> for information on how to customize the class
+autocode templates. </para>
+
+	  </section>
+
+	</section>
+
+	<section>
+
+<anchor id="PointTemplates"/>
+<title>Point Templates</title>
+
+
+	  <para>The following commands insert templates at the current point
+in the buffer: </para>
+
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+<menuchoice><guimenu>JDE</guimenu><guisubmenu>Generate</guisubmenu>
+		  <guimenuitem>Get/Set Pair</guimenuitem></menuchoice>
+generates an instance variable and a get and set method.
+for that variable
+</para>
+	    </listitem>
+	    <listitem>
+	      <para>
+<menuchoice><guimenu>JDE</guimenu><guisubmenu>Generate</guisubmenu>
+		  <guimenuitem>Println</guimenuitem></menuchoice>
+generates a <programlisting>System.out.println(...);</programlisting> statement.
+</para>
+	    </listitem>
+	    <listitem>
+	      <para>
+<menuchoice><guimenu>JDE</guimenu><guisubmenu>Generate</guisubmenu>
+		  <guimenuitem>Action</guimenuitem></menuchoice>
+generates and registers an action listener for a
+specified component.
+</para>
+	    </listitem>
+	    <listitem>
+	      <para>
+<menuchoice><guimenu>JDE</guimenu><guisubmenu>Generate</guisubmenu>
+		  <guisubmenu>Listener</guisubmenu><guimenuitem>Window</guimenuitem></menuchoice> 
+generates and registers a window listener for a specified
+window.
+</para>
+	    </listitem>
+	    <listitem>
+	      <para>
+<menuchoice><guimenu>JDE</guimenu><guisubmenu>Generate</guisubmenu>
+		  <guisubmenu>Listener</guisubmenu><guimenuitem>Mouse</guimenuitem></menuchoice>
+generates and registers a mouse listener for a specified
+component.
+</para>
+	    </listitem>
+	    <listitem>
+	      <para>
+<menuchoice><guimenu>JDE</guimenu><guisubmenu>Generate</guisubmenu>
+		  <guimenuitem>Other</guimenuitem></menuchoice>
+allows you to select any of the above templates or a
+custom (user-defined) template.
+</para>
+	    </listitem>
+	  </itemizedlist>
+
+	  <para>The following variables control generation of code at point: 
+</para>
+
+	  <table>
+	    <title></title>
+	    <tgroup cols="3">
+	      <colspec colnum="1"></colspec>
+	      <colspec colnum="2"></colspec>
+	      <colspec colnum="3"></colspec>
+	      <thead>
+		<row>
+		  <entry>Variable</entry>
+		  <entry>Group</entry>     
+		  <entry>Usage</entry>
+		</row>
+	      </thead>
+	      <tbody>
+		<row>
+		  <entry><varname>jde-gen-get-set-var-template</varname></entry>
+		  <entry>Autocode</entry>
+		  <entry>Defines a get/set method pair template.</entry>
+		</row>
+		<row>
+		  <entry><varname>jde-gen-listener-action-template</varname></entry>
+		  <entry>Autocode</entry>
+		  <entry>Defines an action listener template.</entry>
+		</row>
+		<row>
+		  <entry><varname>jde-gen-listener-window-template</varname></entry>
+		  <entry>Autocode</entry>
+		  <entry>Defines a window listener template.</entry>
+		</row>
+		<row>
+		  <entry><varname>jde-gen-listener-mouse-template</varname></entry>
+		  <entry>Autocode</entry>
+		  <entry>Defines a mouse listener template.</entry>
+		</row>
+		<row>
+		  <entry><varname>jde-gen-inner-class-template</varname></entry>
+		  <entry>Autocode</entry>
+		  <entry>Defines a template for creating a class inside
+        another class or inside an existing source buffer.</entry>
+		</row>
+		<row>
+		  <entry><varname>jde-gen-code-templates</varname></entry>
+		  <entry>Autocode</entry>
+		  <entry>Specifies available code templates.</entry>
+		</row>
+	      </tbody>
+	    </tgroup>
+	  </table>
+
+	  <para>See</para>
+
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+<ulink url="#CustomizingStandardTemplates">Customizing
+Standard Templates</ulink> for information on how to customize 
+templates provided by the JDE.
+</para>
+	    </listitem>
+	    <listitem>
+	      <para>
+<ulink url="#CreatingCustomTemplates">Creating Custom
+Templates</ulink> for information on how to create templates
+from scratch.
+</para>
+	    </listitem>
+	  </itemizedlist>
+	  </section>
+
+	<section>
+
+<anchor id="CustomizingTemplates"/>
+<title>Customizing Templates</title>
+
+	  <para>You can customize the JDE's standard code templates, using the Emacs
+customization feature. </para>
+
+	  <para>To customize an autocode template: </para>
+
+	  <orderedlist>
+	    <listitem>
+	      <para>Select <menuchoice>
+		  <guimenu>JDE</guimenu>
+		  <guisubmenu>Options</guisubmenu>
+		  <guimenuitem>Autocode</guimenuitem></menuchoice></para>
+	      <para>The JDE displays a customization buffer containing the
+autocode templates. </para>
+	    </listitem>
+	    <listitem>
+	      <para>Edit the template to suit your needs.</para> 
+	      <para>The JDE uses the
+template format defined by <filename>tempo.el</filename> to represent
+class templates. Each template consists of a list of
+strings, symbols, and functions, each of which represents
+content to be inserted successively into the buffer at
+the current point. The strings represent fixed content.
+The symbols and functions represent variable content. See
+the docstring for the function <varname>tempo-define-template</varname>
+for more information, including the meaning of special
+symbols such as <varname>'n</varname>. </para>
+	    </listitem>
+	    <listitem>
+	      <para>Select the state button associated with the template.</para> 
+	      <para>A menu pops up with a list of options for saving your
+changes. </para>
+	    </listitem>
+	    <listitem>
+	      <para>Save your changes.</para> 
+	      <para>Select 
+<menuchoice><guimenuitem>Save for Future Sessions</guimenuitem></menuchoice> if you want 
+your changes to apply to all projects. If you want your changes to apply
+ only to the current projects, select <menuchoice>
+		  <guimenuitem>Set for Current Session</guimenuitem></menuchoice>. Then select 
+<menuchoice>
+		  <guimenu>JDE</guimenu>
+		  <guisubmenu>Options</guisubmenu>
+		  <guimenuitem>Save Project</guimenuitem></menuchoice>
+to save your changes in the current project's project file.</para>
+	    </listitem>
+	  </orderedlist>
+	  </section>
+
+	<section>
+
+<anchor id="CreatingTemplates"/>
+<title>Creating Templates</title>
+
+	  <para>The JDE considers any command (interactive function) that
+inserts code into a buffer at point to be a template. The JDE
+uses the Emacs tempo library to create built-in templates.
+You can use tempo to create your own, add-on templates (see below
+and the doc for the <varname>tempo-define-template </varname>for
+more information) or create templates from scratch.
+In either case, once you have created a template, you can add it
+to the JDE's lists of available code and/or buffer templates, 
+using the JDE's <varname>jde-gen-code-templates</varname> and/or 
+<varname>jde-gen-buffer-templates</varname>
+variables, respectively. Adding a template to these lists enables
+you to invoke the templates from the JDE menus. When adding a
+template, you need to specify a unique title for the template.
+These titles enable you to specify the templates when invoking
+them, using the JDE's custom code template commands  
+(<menuchoice><guimenu>Files</guimenu>
+	      <guisubmenu>JDE New</guisubmenu>
+	      <guimenuitem>Custom</guimenuitem></menuchoice>  and  
+<menuchoice><guimenuitem>JDE</guimenuitem>
+	      <guisubmenu>Generate</guisubmenu>
+	      <guimenuitem>Custom</guimenuitem></menuchoice>). You can use
+auto completion to enter a template title when invoking a custom
+code generation command. Note that you can specify different sets
+of templates for different projects, by setting and saving the
+template list variables in project files. See the following
+sections for more information: </para>
+
+	  <itemizedlist>
+	    <listitem>
+	      <para><ulink url="#DefiningTemplate">Defining a Template and
+Template Insertion Function</ulink></para>
+	    </listitem>
+	    <listitem>
+	      <para><ulink url="#RegisterTemplate">Registering Custom
+Templates</ulink></para>
+	    </listitem>
+	    <listitem>
+	      <para><ulink url="#AssignKeyToTemplate">Assigning Keys To
+emplates</ulink></para>
+	    </listitem>
+	  </itemizedlist>
+
+	  <section>
+
+<anchor id="DefiningTemplate"/>
+<title>Defining a Template and Template Insertion Function</title>
+
+
+	    <para>The <varname>tempo-define-template</varname> macro enables you
+to define a template and a function that inserts that template at the
+current point in the current buffer. You specify the template as a
+list oftemplate elements where each element is text, a special symbol,
+or a Lisp expression. The function inserts each text element exactly
+as specified in the buffer; it replaces special symbols with some text
+(e.g., user input), and it replaces Lisp expressions with the text
+that results from evaluating them. </para>
+
+	    <para>For example, the following Lisp code </para>
+
+	    <programlisting>
+    (tempo-define-template
+      &quot;foo&quot;                              ;; template name
+       '(&quot;System.out.println(\&quot;foo\&quot;);&quot;) ;;template definition
+       &quot;f&quot;                               ;; abbreviation
+    &quot;Inserts a print foo message&quot;)       ;; template documentation
+</programlisting>
+
+	    <para>defines a template for Java code that always prints
+&quot;foo&quot; to standard out: </para>
+
+	    <programlisting>
+    System.out.println(&quot;foo&quot;);
+</programlisting>
+
+	    <para>Notice that the template definition uses the Lisp string escape
+character to specify the string &quot;foo&quot;.  This is necessary
+when you want to include quoted strings in a template definition.)
+</para>
+
+	    <para>The sample Lisp form also defines an interactive template
+function <varname>tempo-template-foo</varname>. Now suppose you insert
+the sample code in your <filename>.emacs</filename> file. After Emacs
+starts up, whenever you enter the command <keycombo>
+		<keycap>M</keycap><keycap>x</keycap></keycombo>
+<varname>tempo-template-foo,</varname> Emacs inserts </para>
+
+	    <programlisting>
+     System.out.println(&quot;foo&quot;);
+</programlisting>
+
+	    <para>at the current point in your Java source buffer (or any buffer,
+tempo doesn't care). </para>
+
+	    <para>The preceding example is admittedly not vary useful because it
+always prints the same text. You can create more useful templates,
+using special tempo template symbols and lisp forms. This
+approach, for example, allows you to create a template that can
+print any user-defined text to standard out: </para>
+
+	    <programlisting>
+     (tempo-define-template
+       &quot;debug&quot;                          ;; template name
+       '(&quot;if (debug)&quot; n&gt;                ;; insert new line plus indent
+       &quot;System.out.println(&quot;
+       (p &quot;Enter debug message:&quot;)       ;; Prompts for debug message
+       &quot;);&quot;)
+       &quot;d&quot;                              ;; abbreviation 
+
+       &quot;Inserts a print debug message&quot;) ;; template documentation 
+</programlisting>
+
+	    <para>The template function produced by this example prompts you to
+enter the text to be printed when inserting the function into a
+buffer. In particular, it inserts </para>
+
+	    <programlisting>
+     if (debug)
+       System.out.println(DEBUG-MESSAGE);
+</programlisting>
+
+	    <para>where <varname>DEBUG-MESSAGE</varname> is any text that you enter. For
+example, suppose you enter </para>
+
+	    <programlisting>
+     &quot;Selected color = &quot; + color
+</programlisting>
+
+	    <para>at the prompt. The template function inserts </para>
+
+	    <programlisting>
+     if (debug)
+       System.out.println(&quot;Selected color = &quot; + color);
+</programlisting>
+
+	    <para>at the current point in the buffer. </para>
+
+	    <para>See the documentation for <varname>tempo-define-template</varname> (type
+<keycombo><keycap>c</keycap><keycap>h</keycap></keycombo>&nbsp;<keysym>f</keysym>&nbsp;
+<varname>tempo-define-template</varname>) for more
+information on creating templates. </para>
+	  </section>
+
+	  <section>
+
+<anchor id="RegisterTemplate"/>
+<title>Registering Custom Templates</title>
+
+
+	    <para>You can register templates that you create with the JDE. When
+you register a template with the JDE, it appears among the list of
+templates that you can select when you select <menuchoice>
+		<guimenu>JDE</guimenu><guisubmenu>Generate</guisubmenu>
+		<guimenuitem>Other....</guimenuitem></menuchoice>. You register a
+template by customizing the JDE variable
+<varname>jde-gen-code-templates</varname>. The value of this variable is a list
+of the template functions that the JDE command  <menuchoice>
+		<guimenu>JDE</guimenu><guisubmenu>Generate</guisubmenu>
+		<guimenuitem>Other....</guimenuitem></menuchoice> can invoke. To
+register a custom template, add its name to the list. For example, the
+following screen shows the customization buffer for
+<varname>jde-gen-code-templates</varname> after it has been customized to
+include the template defined in the previous example. </para>
+
+	    <para>
+<screenshot>
+		<mediaobject>
+		  <imageobject>
+		    <imagedata fileref="images/RegisterTemplate.gif"/>
+		  </imageobject>
+		  <textobject>
+		    <phrase>Screenshot showing customization buffer for registering
+templates.</phrase>
+		  </textobject>
+		</mediaobject>
+	      </screenshot>
+</para>
+
+	    <para>To insert a template that you have registered </para>
+
+	    <procedure>
+	      <step performance="required">
+		<para>Select <menuchoice>
+		    <guimenu>JDE</guimenu><guisubmenu>Generate</guisubmenu>
+		    <guimenuitem>Other....</guimenuitem></menuchoice></para>
+		<para>The JDE displays the prompt</para>
+		<programlisting>
+  Enter template:
+</programlisting>
+		<para>in the minibuffer. </para>
+	      </step>
+	      <step>
+		<para>Enter the template's name and press <keycap>Enter</keycap></para>
+		<para>or,</para>
+		<para>press the <keycap>Tab</keycap> key to
+display a list of templates in a completion buffer: </para>
+		<para>
+<screenshot>
+		    <mediaobject>
+		      <imageobject>
+			<imagedata fileref="images/TemplateList.gif"/>
+		      </imageobject>
+		      <textobject>
+			<phrase>Screenshot showing template completion buffer.</phrase>
+		      </textobject>
+		    </mediaobject>
+		  </screenshot>
+</para>
+		<para>Select the template you want by double-clicking its
+name.</para>
+
+	      </step>
+	    </procedure>
+
+	  </section>
+
+	  <section>
+
+<anchor id="AssignKeyToTemplate"/>
+<title>Assigning Keys to Templates</title>
+
+	    <para>You can assign templates to keyboard keys to speed use of
+frequently used templates. For example, insert this form </para>
+
+	    <programlisting>
+     (global-set-key [f9] 'jde-gen-to-string-method)
+</programlisting>
+
+	    <para>in your <filename>.emacs</filename> file to assign the <keycap>F9</keycap> function key to
+the JDE template that generates a skeleton <varname>toString</varname>
+method. </para>
+	  </section>
+	</section>
+      </section>
+    </section>
+
+
+
+    
+  </chapter>
+
+  <chapter>
+
+<anchor id="CompilingJavaPrograms"/>
+<title>Compiling Java Programs</title>
+
+    <para>The <varname>jde-compile</varname> command (<menuchoice>
+	<guimenuitem>JDE</guimenuitem>
+	<guimenuitem>Compile</guimenuitem></menuchoice>,
+<keycombo>
+	<keycombo>
+	  <keycap>C</keycap>
+	  <keycap>c</keycap></keycombo><keycombo>
+	  <keycap>C</keycap><keycap>v</keycap></keycombo>
+	<keycombo>
+	  <keycap>C</keycap><keycap>c</keycap></keycombo></keycombo>) compiles the Java source file in the
+current buffer, using <varname>javac</varname>, the Java compiler provided
+by the JDK, or another compiler that you specify (see <ulink
+							     url="#SpecifyingCompiler">Specifying a Compiler</ulink>). The
+compile command displays the output of the compiler in a separate
+compilation buffer. If a compilation buffer does not exist, the
+compile command creates the buffer; otherwise, it reuses the
+existing compile output buffer. The compilation buffer operates
+in <varname>compilation-mode</varname>, a standard Emacs buffer mode. This
+mode greatly simplify locating compilation errors in the Java
+source code. For example, to find the line that cause a
+compilation error, simply click the error message in the
+compilation buffer. </para>
+    
+    <para>The JDE uses the Emacs command <varname>start-process-shell-command</varname>
+to launch a Java compile process. This command in turn uses the equivalent of</para>
+    
+    <programlisting>
+  SHELL COMMAND_SWITCH javac OPTIONS BUFFER_NAME.java
+</programlisting>
+
+    
+    <para> to launch the compile process where <varname>SHELL</varname> is
+the command shell specified by the Emacs variable
+<varname>shell-file-name</varname>  and 
+<varname>COMMAND_SWITCH</varname> is the value of the Emacs variable
+<varname>shell-command-switch</varname>. You must set these variables
+to be compatible in your <filename>.emacs</filename> file. For example,
+if you set <varname>shell-file-name</varname> to
+<varname>bash</varname>, you must set
+<varname>shell-command-switch</varname> to <varname>-c</varname>, the
+command  switch used by <varname>bash</varname>.
+</para>
+    
+    <note>
+      <para>Compile processes are the only processes launched by JDE, using a
+command shell. The JDE uses the Emacs command <varname>start-process</varname> to launch all
+other processes, e.g., java, jdb, and JDEbug processes. The <varname>start-process</varname>
+launches processes as subprocesses of Emacs, without doing any wild-card expansion or
+environment variable substitution of command-line arguments.
+</para>
+      </note>
+    
+
+    <section>
+
+<anchor id="CompilationOptions"/>
+<title>Compilation Options</title>
+
+
+      <para>The JDE allows you to specify compilation options by setting
+compilation variables.You must use the Emacs customization
+feature or, if available, JDE functions to set compilation
+variables. To use the customization feature, select <menuchoice>
+	  <guimenu>JDE</guimenu>
+	  <guisubmenu>Options</guisubmenu>
+	  <guimenuitem>Compile</guimenuitem></menuchoice>. (See <ulink url="#ConfiguringJDE">Configuring
+the JDE</ulink> for more information on using the customization
+feature). To save the compilation settings in the project
+file (see <ulink url="#UsingProjectFiles">Using Project Files</ulink>)
+for the current source buffer, select <menuchoice>
+	  <guimenuitem>JDE</guimenuitem>
+	  <guisubmenu>Options</guisubmenu>
+	  <guimenuitem>Update
+Project</guimenuitem></menuchoice>.
+</para>
+      
+      <section>
+	<title>Setting Compile Options Interactively</title>
+	
+	<para>If you set the customization variable
+<varname>jde-read-compile-args</varname> to a
+non-<varname>nil</varname> value, the JDE compile command prompts you
+to enter compilation options in the minibuffer. It appends the options
+that you enter to the options specified via customization variables.
+The JDE saves the arguments that you enter in a minibuffer history
+list. You can recall previously entered options by pressing the up or
+down arrows on your keyboard. </para>
+	
+	<note>
+	  <para>The JDE uses the values of the JDE customization variables to
+set the compiler's command-line option switches. The JDE assumes that
+the compiler you are using (specified by the customization variable
+<varname>jde-compiler</varname>) has the same set of command-line
+switches as the latest version of <varname>javac</varname>, the
+compiler supplied with JavaSoft's JDK. If the command-line switch for
+a particular option supported by the compiler your are using is not
+the same as that specified by the latest version of
+<varname>javac</varname>, you must use the variable
+<varname>jde-compile-option-command-line-args</varname> to select the
+option.</para>
+	  </note>
+      </section>
+
+      <section>
+	<title>Customization Variables</title>
+	
+	<para>The following table lists the JDE compilation variables and
+the functions used to set them.</para>
+	
+	<table>
+	  <title></title>
+	  <tgroup cols="3">
+	    <colspec colnum="1" align="left"/>
+	    <colspec colnum="2" align="left"/>
+	    <colspec colnum="3" align="left"/>
+	    <thead>
+	      <row>
+		<entry><para>Name</para></entry>
+		<entry><para>Group</para></entry>
+		<entry><para>Usage</para></entry>
+	      </row>
+	    </thead>
+	    <tbody valign="top">
+	      <row>
+		<entry><para><varname>jde-compiler</varname></para></entry>
+		<entry>Project</entry>
+		<entry><para>Specifies the compiler (javac, by default)
+to use to compile the code in the current source buffer. The command
+<varname>jde-set-compiler</varname> sets the buffer-local value of
+this option.</para></entry>
+	      </row>
+	      <row>
+		<entry><varname>jde-compile-option-command-line-</varname>&nbsp;
+        
+        <varname>args</varname>&nbsp;</entry>
+		<entry >Compile</entry>
+		<entry >Specifies a string of
+        command-line arguments to be passed to the compiler.</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-global-classpath</varname></entry>
+		<entry >Project</entry>
+		<entry >Specify class paths
+        for compile, run, and debug commands.</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-read-compile-args</varname></entry>
+		<entry >Project</entry>
+		<entry >Specify whether to read compile
+        options from the minibuffer.</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-compile-option-classpath</varname></entry>
+		<entry >Compile&nbsp;</entry>
+		<entry >Specifies the
+        classpath for compile command. If set, this variable
+        overrides <varname>jde-global-classpath</varname>.&nbsp;</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-compile-option-sourcepath</varname></entry>
+		<entry  >Compile</entry>
+		<entry >Specifies the path of source files
+        for classes required to compile the current class.</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-quote-classpath</varname></entry>
+		<entry >Project&nbsp;</entry>
+		<entry >Quote the classpath
+        argument.</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-compile-option-directory</varname></entry>
+		<entry >Compile&nbsp;</entry>
+		<entry >Specifies the
+        directory into which to place the compiled class.&nbsp;</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-compile-option-deprecation</varname></entry>
+		<entry >Compile&nbsp;</entry>
+		<entry >Warn of use or
+        override of a deprecated member or class&nbsp;</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-compile-option-debug</varname></entry>
+		<entry >Compile&nbsp;</entry>
+		<entry >Generate information
+        about local variables for debug tools.&nbsp;</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-compile-option-optimize</varname></entry>
+		<entry >Compile&nbsp;</entry>
+		<entry >Directs the compiler
+        to try to generate faster varname.&nbsp;</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-compile-option-depend</varname></entry>
+		<entry >Compile</entry>
+		<entry >Analyze dependencies.</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-compile-option-depend-switch</varname></entry>
+		<entry >Compile</entry>
+		<entry >Command line switch that causes the
+        compiler to analyze dependencies.</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-compile-option-vm-args</varname></entry>
+		<entry >Compile&nbsp;</entry>
+		<entry >Specify command-line
+        arguments for Java interpreter used to run the compiler.&nbsp;</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-compile-option-verbose-path</varname></entry>
+		<entry >Compile&nbsp;</entry>
+		<entry >Print verbose messages.</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-compile-option-verbose</varname></entry>
+		<entry >Compile</entry>
+		<entry >List directories searched to
+        compile current class.</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-compile-option-nowarn</varname></entry>
+		<entry >Compile&nbsp;</entry>
+		<entry >Turn off warnings.</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-compile-option-encoding</varname></entry>
+		<entry >Compile&nbsp;</entry>
+		<entry >Specify the source
+        file encoding name, such as EUCJIS\SJIS.&nbsp;</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-compile-option-target</varname></entry>
+		<entry >Compile</entry>
+		<entry >Generate code compatible with a
+        specified vm version.</entry>
+	      </row>
+	      <row>
+		<entry ><varname>jde-compile-option-bootclasspath</varname></entry>
+		<entry >Compile</entry>
+		<entry>Specify classpath of standard
+        libraries for target vm.</entry>
+	      </row>
+	      <row>
+		<entry><varname>jde-compile-option-bootclasspath</varname></entry>
+		<entry>Compile</entry>
+		<entry>Specify path of directories
+        containing extensions for target vm.</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+      </section>
+    </section>
+  </chapter>
+
+  <chapter>
+
+<anchor id="BuildingJavaApplications"/>
+<title>Building Java Applications</title>
+
+    <para>The <menuchoice>
+	<guimenu>JDE</guimenu><guimenuitem>Build</guimenuitem></menuchoice>
+command builds or rebuilds an application. This command has two
+operating modes: java and make. In java mode, this command uses
+javac's built-in make (<varname>-depend</varname>) facility to rebuild
+a project. In make mode, this command uses a user-specified make
+utility, such as GNU make, to rebuild a project. See <ulink
+							    url="#SampleMakefile">Sample Makefile</ulink> for an example of a
+makefile for building a Java project. JDE configuration variables
+control which mode is used. In particular, if the variable
+<varname>jde-build-use-make</varname> is non-<varname>nil</varname>,
+this command invokes the make program specified by the variable
+<varname>jde-make-program</varname>. If the variable
+<varname>jde-make-args</varname> is a non-empty string, this function
+uses its contents to invoke make; otherwise, it prompts you to enter
+command-line arguments for make. If
+<varname>jde-build-use-make</varname> is <varname>nil</varname>, this
+function invokes javac on the source file for the class specified by
+<varname>jde-run-app-class</varname>, with the
+<varname>-depend</varname> option. This causes javac to recompile all
+missing or out-of-date files required to run the application's main
+class. JDE finds the source for your application's main class by
+searching the directories specified by
+<varname>jde-db-source-directories</varname>. Thus, you must set this
+variable to use the Java build mode. </para>
+    
+
+    <section>
+
+<anchor id="BuildOptions"/>
+<title>Build Options</title>
+
+
+      <para>The following table summarizes the usage of the build
+configuration variables.</para>
+      
+      <table>
+	<title></title>
+	<tgroup cols="3">
+	  <colspec colnum="1" align="left"/>
+	  <colspec colnum="2" align="left"/>
+	  <colspec colnum="3" align="left"/>
+	  <thead>
+	    <row>
+	      <entry>Name</entry>
+	      <entry>Group</entry>
+	      <entry>Usage</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top"><varname>jde-build-use-make</varname></entry>
+	      <entry valign="top">Project</entry>
+	      <entry>A non-nil values causes the JDE to use a make utility
+(specified by <varname>jde-make-program</varname>) to execute the
+<menuchoice><guimenu>JDE</guimenu><guimenuitem>Build</guimenuitem>
+		</menuchoice> command. A nil values causes the JDE to use
+<varname>javac</varname> with the <varname>-depend</varname> option to
+execute the
+<menuchoice><guimenu>JDE</guimenu><guimenuitem>Build</guimenuitem>
+		</menuchoice> command.</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-make-program</varname></entry>
+	      <entry valign="top">Project</entry>
+	      <entry>Specifies the name of the make utility used to execute the
+<menuchoice><guimenu>JDE</guimenu><guimenuitem>Build</guimenuitem>
+		</menuchoice> command. The default values is
+<varname>make</varname>.</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-make-args</varname></entry>
+	      <entry valign="top">Project</entry>
+	      <entry>Specifies a string of command-line arguments (for example,
+&quot;<varname>-f mymakefile all</varname>&quot;) to be passed to the
+make utility used to execute the JDE-&gt;Build command. If the null
+string (&quot;&quot;), the JDE prompts the user to enter the
+command-line arguments in the minibuffer.</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </table>
+      
+      <section>
+
+<anchor id="SampleMakefile"/>
+<title>Sample Makefile</title>
+
+	<para>The following is a sample makefile that you can use as a model
+for creating makefiles to build Java projects. </para>
+	
+	<programlisting>
+JDK = d:/jdk1.2/lib/classes.zip 
+JMATH = d:/jmath/src 
+CLASSPATH = $(JMATH);$(JDK) 
+COMPILER = javac 
+VM = java 
+COPTIONS = -g -deprecation 
+ROPTIONS = 
+
+CLASSES = Test.class \ 
+          JMathError.class \ 
+          JMathException.class \ 
+          LinearSystem.class 
+
+.SUFFIXES: .java .class 
+
+all : $(CLASSES) 
+
+# Rebuild (if necessary) and run the JMath test suite.
+
+run: $(CLASSES) 
+     $(VM) -classpath &quot;$(CLASSPATH)&quot; jmath.Test
+
+
+# Remove all class files from the project directory. 
+clean: 
+     rm *.class 
+
+# Implicit rule for making Java class files from Java
+
+# source files. 
+.java.class: 
+    $(COMPILER) $(COPTIONS) -classpath &quot;$(CLASSPATH)&quot; $? 
+</programlisting>
+      </section>
+      </section>
+  </chapter>
+
+  <chapter>
+
+<anchor id="RunningJavaApps"/>
+<title>Running Java Applications</title>
+
+
+    <para>The JDE allows you to run a Java application as an Emacs
+subprocess. You can run multiple applications concurrently, but
+only one instance of each application at a time. The JDE displays
+each application's standard and error output in an Emacs command
+interface (<varname>comint</varname>) buffer. You can interact with
+applications that accept command line input via the <varname>comint</varname>
+buffer. When interacting with an application, you can use any of <varname>comint-mode</varname>'s
+extensive set of command-line history commands to speed
+interaction. To run an application, enter </para>
+    
+    <programlisting>
+     M-x jde-run
+</programlisting>
+    
+    <para>or select <menuchoice><guimenu>Java</guimenu>
+	<guimenuitem>Run App</guimenuitem></menuchoice> on the
+Emacs menubar or type <keycombo>
+	<keycap>C</keycap><keycap>c</keycap></keycombo>&nbsp;<keycombo>
+	<keycap>C</keycap><keycap>v</keycap></keycombo>&nbsp;<keycombo>
+	<keycap>C</keycap><keycap>r</keycap></keycombo>. </para>
+    
+
+    <section>
+
+
+<anchor id="SpecifyingStartupDirectory"/>
+<title>Specifying a Startup Directory</title>
+
+      <para>The JDE can start an application from any directory that you
+specify. By default, the JDE starts an application from the
+default directory of the current source buffer. The default
+directory of the current source buffer is the directory
+containing the source file displayed in the buffer. You can
+specify another directory as the startup directory by setting the
+JDE customization variable <varname>jde-run-working-directory</varname>.</para>
+      
+      <para>To set this variable, </para>
+      
+      <procedure>
+
+	<step>
+	  <para>Display its customization panel.</para> 
+	  <para>You can do this by typing </para>
+	  <para><keycombo>
+	      <keycap>M</keycap><keycap>x</keycap></keycombo>&nbsp;<varname>customize-variable</varname>&nbsp;<varname>jde-run-working-directory</varname></para>
+	  <para>or selecting <menuchoice><guimenu>JDE</guimenu>
+	      <guisubmenu>Options</guisubmenu><guimenuitem>Project</guimenuitem></menuchoice>
+to display the project customization panel and searching this panel
+for <varname>jde-run-working-directory</varname>.
+</para>
+	  <para>
+<screenshot>
+	      <mediaobject>
+		<imageobject>
+		  <imagedata fileref="images/WorkingDirectory.gif"/>
+		</imageobject>
+		<textobject>
+		  <phrase>Screenshow showing customization buffer for
+<varname>jde-run-working-directory</varname>.</phrase>
+		</textobject>
+	      </mediaobject>
+	    </screenshot>
+</para>
+	</step>
+
+	<step>
+	  <para>Enter the working directory in the variable's edit field.</para></step>
+
+	<step>
+	  <para>Save the new setting.</para> 
+	  <para>To save the edited bindings, right click the
+<guibutton>[State]</guibutton> button and choose <menuchoice>
+	      <guimenuitem>Set for current session</guimenuitem></menuchoice> if you
+want the settings to apply only to the current project or <menuchoice>
+	      <guimenuitem>Save for future sessions</guimenuitem></menuchoice> if
+you want the settings to apply to all projects. In either case, you
+should save the new settings in you project file if your project has a
+project file. To save the new settings in your project file, switch to
+a source buffer and choose <menuchoice><guimenu>JDE</guimenu>
+	      <guisubmenu>Options</guisubmenu><guimenuitem>Save
+Project</guimenuitem></menuchoice>.</para>
+	</step>
+
+      </procedure>
+      </section>
+
+    <section>
+
+<anchor id="RunVMArgs"/>
+<title>Setting VM Command-Line Arguments</title>
+
+      <para>If you set the customization variable
+<varname>jde-run-read-vm-args</varname> to a
+non-<varname>nil</varname> value, the JDE compile command prompts you
+to enter virtual machine options in the minibuffer. It appends the
+options that you enter to the options specified via customization
+variables. The JDE saves the arguments that you enter in a minibuffer
+history list. You can recall previously entered options by pressing
+the up or down arrows on your keyboard. </para>
+
+      </section>
+
+    <section>
+
+<anchor id="RunAppArgs"/>
+<title>Setting Command-Line Application Arguments</title>
+
+
+      <para>If you set the customization variable
+<varname>jde-run-read-app-args</varname> to a
+non-<varname>nil</varname> value, the JDE compile command prompts you
+to enter command-line application arguments in the minibuffer. It
+appends the options that you enter to the arguments specified via the
+customization variable
+<varname>jde-run-option-application-args</varname>. The JDE saves the
+arguments that you enter in a minibuffer history list. You can recall
+previously entered options by pressing the up or down arrows on your
+keyboard. </para>
+      </section>
+
+    <section>
+<anchor id="RunOptions"/>
+<title>Run Customization Variables</title>
+
+      <para>The JDE allows you to specify run-time options by setting run
+variables.You can use the Emacs customization feature to set run-time
+variables interactively. To use the customization feature, select
+<menuchoice>
+	  <guimenu>JDE</guimenu><guisubmenu>Project</guisubmenu><guisubmenu>Options</guisubmenu><guimenuitem>Run</guimenuitem></menuchoice>.
+(See <ulink url="#ConfiguringJDE">Configuring the JDE</ulink> for more
+information on using the customization feature). To save the
+compilation settings in the project file (see <ulink
+						     url="#UsingProjectFiles">Using Project Files</ulink>) for the current
+source buffer, select <menuchoice>
+	  <guimenu>JDE</guimenu>
+	  <guisubmenu> Project</guisubmenu><guisubmenu>Project
+File</guisubmenu><guimenuitem>Save Project</guimenuitem></menuchoice>.
+</para>
+      
+      <para>The following table lists the JDE run variables and the
+functions used to set them. 
+&nbsp; </para>
+      
+      <table>
+	<title></title>
+	<tgroup cols="3">
+	  <colspec colnum="1"/>
+	  <colspec colnum="2"/>
+	  <colspec colnum="3"/>
+	  <thead>
+	    <row>
+	      <entry>Variable</entry>
+	      <entry>Group</entry>
+	      <entry>Usage</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top"><varname>jde-run-mode-hook</varname></entry>
+	      <entry valign="top">Project</entry>
+	      <entry valign="top">List of hook functions run by <varname>jde-run-mode</varname></entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-working-directory</varname></entry>
+	      <entry valign="top">Project</entry>
+	      <entry>Startup directory for running or debugging Java
+        applications.</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-application-class</varname></entry>
+	      <entry valign="top">Project&nbsp;</entry>
+	      <entry valign="top">Name of the Java class to run. The
+        command <varname>jde-run-set-app</varname> sets the buffer-local
+        value of this variable.&nbsp;</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-java-vm</varname></entry>
+	      <entry valign="top">Project&nbsp;</entry>
+	      <entry valign="top">Specify Java interpreter for non-Windows
+        platforms. The command <varname>jde-run-set-vm</varname> sets the
+        buffer-local value of this variable.&nbsp;</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-java-vm-w</varname></entry>
+	      <entry valign="top">Project&nbsp;</entry>
+	      <entry valign="top">Specify Java interpreter for Windows
+        platforms. The command <varname>jde-run-set-vm-w</varname> sets the
+        buffer-local value of this variable.&nbsp;</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-global-classpath</varname></entry>
+	      <entry valign="top">Project&nbsp;</entry>
+	      <entry valign="top">Specify class paths for compile, run,
+        and debug commands. The command<varname> jde-set-global-classpath</varname>
+        sets the buffer-local value of this variable.&nbsp;</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-classic-mode-vm</varname></entry>
+	      <entry valign="top">Project</entry>
+	      <entry>Specifies that the JDE should run the JDK's classic version
+            of the Java virtual machine (as opposed to the HotSpot version).
+            This option applies only to versions of the JDK that include
+            both a classic and a HotSpot vm.</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-read-vm-args</varname></entry>
+	      <entry valign="top">Project</entry>
+	      <entry>Specifies whether to read vm arguments from the&nbsp;
+        minibuffer.</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-option-classpath</varname></entry>
+	      <entry valign="top">Run&nbsp;</entry>
+	      <entry valign="top">Specifies the classpath for&nbsp; the
+        Java interpreter. This option overrides the jde-global-classpath
+        option.&nbsp;</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-option-verbose</varname></entry>
+	      <entry valign="top">Run&nbsp;</entry>
+	      <entry valign="top">Print messages about the running process.&nbsp;</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-option-properties</varname></entry>
+	      <entry valign="top">Run&nbsp;</entry>
+	      <entry valign="top">Specify property values.</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-option-heap-size</varname></entry>
+	      <entry valign="top">Run&nbsp;</entry>
+	      <entry valign="top">Specify the initial and maximum size of
+        the interpreter heap.&nbsp;</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-option-stack-size</varname></entry>
+	      <entry valign="top">Run&nbsp;</entry>
+	      <entry valign="top">Specify size of the C and Java stacks.</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-option-garbage-</varname>&nbsp; 
+        <varname>collection</varname>&nbsp;</entry>
+	      <entry valign="top">Run</entry>
+	      <entry valign="top">Specify garbage collection options.&nbsp;</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-option-java-profile</varname></entry>
+	      <entry valign="top">Run&nbsp;</entry>
+	      <entry valign="top">Enable Java profiling.</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-option-heap-profile</varname></entry>
+	      <entry valign="top">Run&nbsp;</entry>
+	      <entry valign="top">Output heap profiling data.</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-option-verify</varname></entry>
+	      <entry valign="top">Run&nbsp;</entry>
+	      <entry valign="top">Verify classes.</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-option-vm-args</varname></entry>
+	      <entry valign="top">Run&nbsp;</entry>
+	      <entry valign="top">Specify command-line arguments to be
+        passed to the Java vm. The command jde-run-set-args sets
+        the buffer-local value of this variable.&nbsp;</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-option-application-args</varname></entry>
+	      <entry valign="top">Run&nbsp;</entry>
+	      <entry valign="top">Specify command-line arguments to pass
+        to the application. The command <varname>jde-run-set-app-args </varname>sets
+        the buffer-local value of this variable.&nbsp;</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </table>
+      
+    </section>
+    </chapter>
+
+  <chapter>
+
+<anchor id="WorkingWithApplets"/>
+<title>Working with Applets</title>
+
+    <para>The JDE provides specialized commands for running and
+debugging applets.</para>
+    
+    <section>
+      
+<anchor id="RunningApplets"/>
+<title>Running Applets</title>
+
+      <para>To run an applet:</para>
+      
+      <procedure>
+
+	<step>
+	  <para>Open the applet's source file in a buffer.</para>
+	</step>
+
+	<step>
+	  <para>Choose <menuchoice>
+	      <guimenu>JDE</guimenu><guimenuitem>Run Applet</guimenuitem>
+	    </menuchoice>.</para>
+	  <para>The JDE searches for an html file in the directory containing
+the applet source file and displays the first file it finds, using
+your system's default browser. If the JDE cannot find an html page in
+the applet's source file directory, it signals an error by default.
+</para>
+	</step>
+
+      </procedure>
+      
+      <para>The <menuchoice><guimenu>JDE</guimenu>
+	  <guimenuitem>Run Applet</guimenuitem></menuchoice> command assumes by
+default that the directory containing the applet's source also
+contains an html page for testing that applet. If this is not true in
+your case, you have two options. You can either specify the path of
+the applet file via the JDE customization variable
+<varname>jde-run-applet-doc</varname> or you can use the
+<varname>jde-run-applet</varname> command to run your applet. If the
+<varname>jde-run-applet-doc</varname> variable is not a null string,
+<menuchoice><guimenu>JDE</guimenu>
+	  <guimenuitem>Run Applet</guimenuitem></menuchoice> displays the
+document that the variable specifies instead of searching the source
+file directory for a document to display. The
+<varname>jde-run-applet</varname> command prompts you to enter in the
+minibuffer the path of an html file to display. If you enter nothing,
+the command defaults to the behavior of <menuchoice><guimenu>JDE</guimenu>
+	  <guimenuitem>Run Applet</guimenuitem></menuchoice>.</para>
+      
+      <para>The run commands chooses the viewer as follows. If <varname>jde-run-applet-viewer</varname>
+is a null string (the default) or browse-url, the JDE uses browse-url
+to launch the applet doc in your system's default browser.
+Otherwise, the menu command uses comint to launch the viewer (e.g.,
+appletviewer) specified by <varname>jde-run-applet-viewer</varname>.</para>
+      </section>
+
+    <section>
+      
+<anchor id="DebuggingApplets"/>
+<title>Debugging Applets</title>
+
+      <para>To debug an applet:</para>
+      
+      <procedure>
+
+	<step>
+	  <para>Open the applet's source file in a buffer.</para></step>
+
+	<step>
+	  <para>Choose <menuchoice><guimenu>JDE</guimenu>
+	      <guimenuitem>Debug Applet</guimenuitem></menuchoice>.</para>
+	  <para>The JDE searches for an html file in the directory containing
+the applet source file. If the JDE cannot find an html page in the
+applet's source file directory, it signals an error by default.
+Otherwise, it runs appletviewer in debug mode on the first file that
+it finds.</para>
+	  <para>The Emacs window splits into two panes.</para>
+	</step>
+      </procedure>
+      
+      <para>The top pane shows the applet's source file with the debug
+cursor pointing to the first line of the applet's init file. The
+bottom pane displays the debugger's command line interface. You
+can now set breakpoints, single-step, or continue running the
+applet. See <ulink url="#DebuggingApps">Debugging Applications</ulink>
+for more information.</para>
+      
+      <para>If you want to specify the document to be used to test the
+applet, customize the variable jde-run-applet-doc or execute <varname>M-x
+jde-db-applet</varname>. This command prompts you to enter the test
+document's name.</para>
+      </section>
+
+    <section>
+
+<anchor id="AppletOptions"/>
+<title>Applet Customization Variables</title>
+
+      <para>The JDE allows you to specify run-time options for applets by
+setting JDE configuration variables.You must use the Emacs
+customization feature to set applet run-time variables. To use the customization feature, select <menuchoice>
+	  <guimenu>JDE</guimenu><guisubmenu>Options</guisubmenu><guimenuitem>Run</guimenuitem></menuchoice>.
+(See <ulink url="#ConfiguringJDE">Configuring the JDE</ulink> for
+more information on using the customization feature). In some
+cases, the JDE also provides functions for setting the buffer-local
+values of the compilation variables. To save the compilation
+settings in the project file (see <ulink url="#UsingProjectFiles">Using
+Project Files</ulink>) for the current source buffer, select
+<menuchoice><guimenu>JDE</guimenu><guisubmenu>Options</guisubmenu><guimenuitem>Update Project</guimenuitem></menuchoice>. </para>
+      
+      <para>The following table lists the JDE applet run-time variables
+and the functions used to set them. </para>
+      
+      <table>
+	<title></title>
+	<tgroup cols="3">
+	  <thead>
+	    <row>
+	      <entry>Variable</entry>
+	      <entry>Group</entry>
+	      <entry>Usage</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top"><varname>jde-run-applet-viewer</varname></entry>
+	      <entry valign="top">Project&nbsp;</entry>
+	      <entry valign="top">Specify name of viewer to use to display
+        page containing the applet. The command <varname>jde-run-set-applet-viewer</varname>
+        sets the buffer-local value of this variable.&nbsp;</entry>
+	    </row>
+	    <row>
+	      <entry valign="top"><varname>jde-run-applet-doc</varname></entry>
+	      <entry valign="top">Project&nbsp;</entry>
+	      <entry valign="top">Specify name of document containing
+        applet to be viewed. The command <varname>jde-run-set-applet-doc</varname>
+        sets the buffer-local value of this variable.&nbsp;</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </table>
+    </section>
+
+    </chapter>
+
+  <chapter>
+
+<anchor id="DebuggingApps"/>
+<title>Debugging Applications</title>
+
+    <para>The JDE provides two options for debugging Java applications.</para>
+    
+    <itemizedlist>
+      <listitem>
+	<para>An Emacs interface to <command>jdb</command>, the command-line
+debugger that comes with the JDK. See <ulink url="jdb-guide.html"
+					     target="jdb-guide">Debugging with jdb</ulink> for more
+information.</para>
+      </listitem>
+
+      <listitem>
+	<para>
+JDEbug, a Java debugger developed specifically for use with the JDE.
+See <ulink url="../jdebug/ug/jdebug-ug.html" target="jdebug-ug">JDEbug
+User's Guide</ulink> for more information</para>.
+      </listitem>
+    </itemizedlist>
+    
+    <para>JDEbug provides more debugging features but requires a JDK 1.2
+or higher vm. You must use <command>jdb</command> to debug applications
+running on earlier vms.</para>
+
+    </chapter>
+
+
+  <chapter>
+
+<anchor id="SettingGlobalClasspath"/>
+<title>Setting a Global Classpath</title>
+
+
+    <para>The JDE allows you to define a classpath that applies to
+compiling, running, and debugging Java code. You define this
+classpath by customizing the <varname>jde-global-classpath</varname>
+option. To display a customization buffer for this variable,
+select <menuchoice><guimenu>JDE</guimenu><guisubmenu>Project</guisubmenu><guisubmenu>Options</guisubmenu><guimenuitem>General</guimenuitem></menuchoice>
+or enter <keycombo><keycap>M</keycap><keycap>x</keycap></keycombo>&nbsp;<varname>customize-variable</varname>&nbsp;<varname>jde-global-classpath</varname>.</para>
+    
+    <note>
+      <para> Do not make the mistake of setting 
+<varname>jde-global-classpath</varname> the way you set the
+<varname>-classpath</varname> switch of the Java vm. The value of
+<varname>jde-global-classpath</varname> is a list of strings, each of
+which specifies a path. When starting a program that requires the
+<varname>-classpath</varname> switch, such as
+<command>javac</command>,  the JDE converts this list to a string
+consisting of paths separated by a semicolon or colon.</para>
+      </note>
+
+    <para>You can also define separate classpaths for compile, run, and
+debug operations by customizing the variables
+<varname>jde-compile-option-classpath</varname>, or
+<varname>jde-run-option-classpath</varname>,
+<varname>jde-debug-option-classpath</varname>, respectively. If you
+set any of these variables, the variable overrides the value defined
+by <varname>jde-global-classpath</varname> for the operation to which
+the variable applies. </para>
+    </chapter>
+
+  <chapter>
+
+<anchor id="UsingProjectFiles"/>
+<title>Using Project Files</title>
+
+    <para>A project file is a Lisp file that the JDE loads and evaluates
+whenever you open a Java source file belonging to a specific
+project. Project files allow you to save and restore project-specific
+JDE configurations. For example, you can use a project file to
+set the value of the <varname>jde-global-classpath</varname> variable to a
+project-specific classpath automatically whenever you load a file
+belonging to that project. </para>
+    
+    <section>
+      <title>How the JDE Finds Project Files</title>
+      
+      <para>To simplify the task of finding project files, the JDE makes
+two assumptions. First, it assumes that all Java source files
+relating to a particular project live in a single directory tree.
+Second, it assumes that all project files have the same file name.
+The name assumed by default is&nbsp; prj.el. You can use the JDE
+configuration variable <varname>jde-project-file-name</varname> to specify
+another name. When you open a Java source file, the JDE looks for
+a project file in the directory containing the source file. If it
+cannot find a project file in the source file directory, it
+searches up the directory tree until it finds a project file or
+reaches the root of the directory tree. If the JDE finds a
+project file, it loads and evaluates the contents of the file as
+the last step in creating the buffer containing the Java source
+file. </para>
+      </section>
+
+    <section>
+
+<anchor id="ProjectFileContents"/>
+<title>Project File Contents</title>
+
+
+      <para>A project file can contain any Lisp code that can be evaluated
+correctly as the last step in creating a Java source buffer. For
+example, a project file can contain code that sets the value of JDE
+configuration variables. In general, a project file can contain any
+code that could be implemented as a <varname>jde-mode</varname> hook
+function. In fact, you can think of a project file as a
+project-specific <varname>jde-mode</varname> hook function. </para>
+      </section>
+
+    <section>
+
+<anchor id="CreatingProjectFiles"/>
+<title>Creating a Project File</title>
+
+      <para>The easiest way to create a project file is to use the
+<varname>jde-save-project</varname> command (<menuchoice>
+	  <guimenu>JDE</guimenu>
+	  <guisubmenu>Project</guisubmenu><guisubmenu>Project
+File</guisubmenu><guimenuitem>Save
+Project</guimenuitem></menuchoice>). This command saves the current
+values of all the JDE configuration variables in the project file for
+the selected Java buffer. (To be precise, the command inserts Lisp
+code in the project file that restores the current settings of the
+configuration variables; if such code already exists in the file, it
+replaces it with updated code.) If the project file does not exist,
+the command creates the project file. Thus, to create a project file
+that sets JDE configuration variables to project-specific values:
+</para>
+      
+      <procedure>
+	<step>
+	  <para>Open any source file belonging to the project.</para>
+	</step>
+	<step>
+	  <para>Set the values of the JDE configuration variables to the
+appropriate values for the project to which the source file
+belongs.</para>
+	</step>
+	<step>
+	  <para>See <ulink url="#ConfiguringJDE">Configuring the JDE</ulink> for
+information on how to set the values of the JDE configuration
+variables.</para>
+	</step>
+	<step>
+	  <para>Select <menuchoice>
+	      <guimenu>JDE</guimenu>
+	      <guisubmenu>Project</guisubmenu><guisubmenu>Project
+File</guisubmenu><guimenuitem>Save Project</guimenuitem></menuchoice>
+to create a project file in the directory containing the source
+file.</para>
+	</step>
+      </procedure>
+      
+      <para>Once you have created the project file, you can insert
+additional configuration code into the file if desired. Note that
+the <varname>jde-save-project</varname> command edits rather than replaces
+existing project files. Thus, you can use the command to update
+configuration variable settings without disturbing any other
+configuration code that you have inserted manually into the
+project file. 
+</para>
+    </section>
+
+    </chapter>
+
+  <chapter>
+
+<anchor id="DisplayingDoc"/>
+<title>Displaying Java Documentation</title>
+
+
+    <para>
+The JDE provides commands for displaying the JDK API documentation
+and context-sensitive help for classes.
+</para>
+    
+    <section>
+
+<anchor id="BrowsingJDKDoc"/>
+<title>Browsing JDK Documentation</title>
+
+
+      <para>The <varname>jde-browse-jdk-doc</varname> command (<menuchoice>
+	  <guimenu>JDE</guimenu><guimenuitem>Browse JDK
+Doc</guimenuitem></menuchoice>, <keycombo>
+	  <keycap>C</keycap><keycap>c</keycap></keycombo>&nbsp;
+<keycombo>
+	  <keycap>C</keycap><keycap>v</keycap></keycombo>&nbsp;<keycombo>
+	  <keycap>C</keycap><keycap>n</keycap></keycombo>) opens
+the JDK documentation in a
+browser. By default, this command displays the JDK documentation
+page at JavaSoft's web site. To display a different copy, set the
+variable <varname>jde-jdk-doc-url</varname> to the url of the index page of
+the copy you want to be displayed. </para>
+      </section>
+
+    <section>
+
+<anchor id="ClassHelp"/>
+<title>Context-Sensitive Class Help</title>
+
+
+      <para>The JDK provides context-sensitive help for Java classes. To
+use this facility, you must first customize the variable
+<varname>jde-help-docsets</varname> to specify the
+location of class documentation on your system. The JDE
+class help facility supports javadoc documentation by default
+but it works with other types of documentation as well.</para>
+      
+      <para>Once you have specified the location of class documentation 
+on your system, you can get help for the class at point in the
+current buffer by selecting <menuchoice>
+	  <guimenu>JDE</guimenu><guisubmenu>Help</guisubmenu><guimenuitem>Symbol
+at Point</guimenuitem></menuchoice>.</para>
+    </section>
+
+    </chapter>
+
+  <chapter>
+    
+<anchor id="BrowsingSourceCode"/><title>Browsing Source Code</title>
+
+    <para>The JDE provides the following facilities for browsing Java source code:</para>
+    
+    <itemizedlist>
+      <listitem>
+	<para><ulink url="#ShowClassSource"><varname>jde-show-class-source</varname> command</ulink></para></listitem>
+      <listitem>
+	<para><ulink url="#ClassesMenu">Classes index menu</ulink></para>
+      </listitem>
+      <listitem>
+	<para><ulink url="#Speedbar">Speedbar</ulink></para></listitem>
+      <listitem>
+	<para><ulink url="#Tags">Etags</ulink></para></listitem>
+    </itemizedlist>
+    
+    <section>
+
+<anchor id="ShowClassSource"/>
+<title>jde-show-class-source Command</title>
+
+      <para>
+The <varname>jde-show-class-source</varname> command (<keycombo>
+	  <keycap>C</keycap><keycap>c</keycap></keycombo>&nbsp;<keycombo>
+	  <keycap>C</keycap><keycap>v</keycap></keycombo>&nbsp;<keycombo>
+	  <keycap>C</keycap><keycap>y</keycap></keycombo>) finds and opens the Java source file for the class whose qualified or unqualified name appears at point. If more than one class with the same name exists on <varname>jde-global-classpath</varname>, this command prompts you to select one of the classes. The following conditions must be true for this command to work. First, a class file for this class must exist on the cclasspath specified by <varname>jde-global-classpath</varname>. Secondly, the source for the class must exist on one of the paths specified by <varname>jde-db-source-directories</varname>. This command uses the Beanshell to determine the fully qualified name of the class to be found. It starts the Beanshell if necessary. Thus, the command may respond somewhat slowly the first time you it in a session.</para>
+      </section>
+
+    <section>
+
+<anchor id="ClassesMenu"/>
+<title>Classes Index Menu</title>
+
+
+      <para>The <menuchoice><guimenu>Classes</guimenu></menuchoice> index
+menu appears by default in the Emacs menubar whenever a Java source
+buffer is active. The menu consists of a cascading list of all
+classes, methods, fields, and imports defined in the current buffer
+plus the package to which the current buffer belongs. Selecting any
+item scrolls the buffer to the statement that defines the item.</para>
+      
+      <para><screenshot>
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata fileref="images/classes_menu1.gif"/>
+	    </imageobject>
+	    <textobject>
+	      <phrase>Screenshot showing Classes menu.</phrase>
+	    </textobject>
+	  </mediaobject>
+	</screenshot>
+</para>
+      <para>The top-level menu contains an entry for each each class defined by the active buffer followed by entries for the imports and package of the current buffer. Selecting the entry for a class displays a submenu listing the inner classes, methods, and fields defined by the class. Selecting the entry for an inner class displays another submenu for that class, and so on. Selecting the <menuchoice><guimenu>imports</guimenu></menuchoice> entry on the top-level menu displays a submenu listing all the classes and packages imported by the active buffer.</para>  
+      
+      <section>
+	<title>Special Index Entries</title>
+	<para>The index menu includes the following special index entries:</para>
+	
+	<itemizedlist>
+
+	  <listitem>
+	    <para><menuchoice><guimenu>*Rescan*</guimenu></menuchoice></para>
+	    <para>Selecting this item causes the JDE to rebuild the index menu.
+You should rebuild the menu whenever you edit the buffer.
+</para>
+	  </listitem>
+
+	  <listitem>
+	    <para><menuchoice><guimenu>*class def*</guimenu></menuchoice></para>
+	    <para>Selecting this item takes you to the start of the definition of
+the class on whose submenu it appears. Turn the variable 
+<varname>jde-imenu-include-classdef</varname> off to suppress
+inclusion of these items in the menu.</para>
+	    </listitem>
+
+	</itemizedlist>
+	</section>
+
+      <section>
+	<title>Alphabetizing the Classes Menu</title>
+	
+	<para>By default the <menuchoice><guimenu>Classes</guimenu></menuchoice> menu lists methods and fields in the order in which the active buffer defines them. Use the variable <varname>jde-imenu-sort</varname> to customize the menu to list methods and fields alphabetically in either ascending or descending order.</para>
+	</section>
+
+      <section>
+
+<anchor id="SuppressingSignatures"/>
+<title>Suppressing Method Signatures and Field Types</title>
+
+	<para>By default the <menuchoice><guimenu>Classes</guimenu></menuchoice> menu displays the signatures of methods and the types of fields displayed in the active buffer. The method signatures enable you to distinguish overloaded method names. The menu can also display the names of methods and fields without signatures and types. Use the variable <varname>jde-imenu-include-signature</varname> to turn signature and type display off or on.</para>
+	</section>
+
+      <section>
+<anchor id="DisablingClassesMenu"/>
+<title>Disabling the Classes Menu</title>
+
+
+	<para>Set the variable <varname>jde-imenu-enable</varname> off to disable the  <menuchoice><guimenu>Classes</guimenu></menuchoice> menu. When disabled, the menu does not appear in the Emacs menubar.</para>
+      </section>
+      </section>
+
+    <section>
+
+<anchor id="Speedbar"/>
+<title>Using the Speedbar</title>
+
+      <para>To display the speedbar, select <menuchoice>
+	  <guimenu>JDE</guimenu>
+	  <guimenuitem> Speedbar</guimenuitem></menuchoice>. The
+speedbar opens in a separate frame.</para>
+
+      <para><screenshot>
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata fileref="images/speedbar1.gif"/>
+	    </imageobject>
+	    <textobject>
+	      <phrase>Screenshot showing the speedbar.</phrase>
+	    </textobject>
+	  </mediaobject>
+	</screenshot>
+</para>
+      <para>The speedbar displays a list of the files and subdirectories in the directory containing the file displayed in the current buffer. The speedbar highlights the file displayed in the current buffer.</para>
+      <para>Click on the expand (+) button in front of any file. The node for the
+file expands</para>
+      
+      <para><screenshot>
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata fileref="images/speedbar2.gif"/>
+	    </imageobject>
+	    <textobject>
+	      <phrase>Screenshot showing a speedbar entry.</phrase>
+	    </textobject>
+	  </mediaobject>
+	</screenshot>
+</para>
+
+      <para>to show up to three entries, depending on the contents of the source file.</para>
+      
+      <section>
+
+	<title>Package</title>
+	<para>
+  This item expands to show the package to which the file belongs.
+</para>
+	
+	<para><screenshot>
+	    <mediaobject>
+	      <imageobject>
+		<imagedata fileref="images/speedbar3.gif"/>
+	      </imageobject>
+	      <textobject>
+		<phrase>Screenshot showing a speedbar entry.</phrase>
+	      </textobject>
+	    </mediaobject>
+	  </screenshot>
+</para>
+
+	<para>
+  Clicking on the package scrolls the buffer to the corresponding package declaration.
+</para>
+	</section>
+      
+      <section>
+	<title>Types</title>
+	<para>
+  This item expands to show the classes in the selected file.
+</para>
+
+	<para><screenshot>
+	    <mediaobject>
+	      <imageobject>
+		<imagedata fileref="images/speedbar4.gif"/>
+	      </imageobject>
+	      <textobject>
+		<phrase>Screenshot showing a speedbar entry.</phrase>
+	      </textobject>
+	    </mediaobject>
+	  </screenshot>
+</para>
+
+	<para>
+  Each class expands to show the constructors, methods, fields,
+  and inner classes defined by the class and the class's parent,
+  if any. Inner classes also expand and their inner classes, 
+  and so on. The constructors and methods expand to show arguments 
+  and argument types and return types. Fields expand to show
+  their type.
+</para>
+	
+	<para>
+  Clicking on any class, inner class, method, constructor, or field 
+  scrolls the buffer to show that item.
+</para>
+	</section>
+
+      <section>
+	<title>Dependencies</title>
+	
+	This item expands to show the classes and packages imported by the current source file.
+	
+	<para><screenshot>
+	    <mediaobject>
+	      <imageobject>
+		<imagedata fileref="images/speedbar5.gif"/>
+	      </imageobject>
+	      <textobject>
+		<phrase>Screenshot showing a speedbar entry.</phrase>
+	      </textobject>
+	    </mediaobject>
+	  </screenshot>
+</para>
+
+	<para>Click on class or package to scroll the buffer to the corresponding import statement.</para>
+	</section>
+
+      <section>
+	<title>Updating the Speedbar</title>
+	
+	<para>If you make changes to a source buffer, you must update the speedbar view to reflect the changes. To update the speedbar view of a buffer:</para>
+	
+	<procedure>
+	  <step>
+	    Collapse the speedbar view of the buffer.
+	    <para>
+      This is necessary only if the speedbar view is expanded. To collapse the speedbar view, 
+      click the collapse button (-) next to the buffer's file name in the speedbar view.
+    </para>
+	  </step>
+	  <step>
+	    Hold the shift key down while clicking the expand button (+) next to the buffer's name
+	    in the speedbar view. 
+	  </step>
+	</procedure>
+      </section>
+      </section>
+
+    <section>
+      
+<anchor id="Tags"/>
+<title>Tags</title>
+
+      <para>To use the <varname>etags</varname> facility, you must first construct a
+TAGS file that indexes every symbol in your source code. The JDE
+package contains two shell scripts that you can use to tag your
+source code, one for <command>csh</command> shells and the other for <command>bash</command>.
+The <command>bash</command> version is called <command>jtags</command>; the <command>csh</command>
+version, <command>jtags.csh</command>. </para>
+      
+      <section>
+
+<anchor id="TaggingCode"/>
+<title>Tagging Java Source Code</title>
+
+
+
+	<para>To tag your source code, first copy the appropriate shell
+script to a directory in your Emacs path. Then start a shell (<keycombo>
+	    <keycap>M</keycap><keycap>x</keycap></keycombo>&nbsp;
+shell). Change to the top-level directory containing your
+source code and then enter <command>jtags</command>. The <command>jtags</command>
+script tags every <filename>.java</filename> file in the current directory
+and in all descendants of the current directory, storing the
+result in a file called <filename>TAGS</filename> in the top-level directory.
+</para>
+	</section>
+
+      <section>
+	
+<anchor id="FindingSymbols"/>
+<title>Finding the Definition of a Symbol</title>
+
+
+	<para>To find the definition of a symbol, put your cursor anywhere
+in the symbol and enter
+<keycombo><keycap>M</keycap><keycap>.</keycap></keycombo>. Emacs
+responds by locating
+and opening (if necessary) the file containing the definition and
+positioning the point at the definition. (The first time you type
+<keycombo><keycap>M</keycap><keycap>.</keycap></keycombo>, Emacs
+prompts you to load the <filename>TAGS</filename> file.)</para>
+      </section>
+    </section>
+
+    </chapter>
+
+  <chapter>
+    
+<anchor id="CustomizingJDE"/>
+<title>Customizing the JDE</title>
+
+
+    <para>
+This section describes various ways you can customize the JDE.
+</para>
+    
+    <section>
+
+<anchor id="CustomizationVariables"/>
+<title>Customization Variables</title>
+
+      <para>
+JDE customization variables allow you to specify compile, run, debug,
+and other JDE options. </para>
+
+      <note>
+	<para> The traditional way of customizing Emacs is to use
+<varname>setq</varname> forms to set the values of customization
+variables in the Emacs initialization (<filename>.emacs</filename>)
+file. This method does <emphasis>not</emphasis> work for JDE
+customization variables. To set a JDE customization variable, you
+<emphasis>must</emphasis> use the customization buffer for a variable
+(see the Emacs online manual for information on the customization
+feature). This is because the JDE context switching code resets all
+JDE customization variables to their default or customized (via a
+custom buffer) values whenever you open a Java source file or switch
+projects.
+</para> 
+      </note>
+
+      <para> The following section explains  how to use the Emacs
+customization  feature to set the value of a JDE customization
+variable.</para>
+
+    </section>
+
+    <section>
+
+<anchor id="SettingVariable"/>
+<title>Setting a Variable</title>
+
+
+      <para>
+To set a JDE customization variable:
+</para>
+      
+      <procedure>
+	<step>
+	  <para>Determine the name of the variable you want to customize.</para>
+	  <para> Refer to the section of this guide that documents the feature
+you want to customize for the name of the corresponding variable. Or
+type <keycombo><keycap>C</keycap><keycap>h</keycap></keycombo>&nbsp;
+<keysym>v</keysym> followed by the JDE group prefix
+(<varname>jde-</varname>) or subgroup prefix (e.g., 
+<varname>jde-compile-option-</varname>, see <ulink
+						   url="#JDECustomizationGroups"> JDE Customization Groups</ulink>). Emacs
+displays all variables belonging to the JDE group or subgroup. You 
+can then browse this list, using Emacs search, completion, and
+documentation display command, to find the applicable variable.
+</para>
+	</step>
+
+	<step>
+	  <para>Display a customization buffer for the variable.</para>
+	  <para> If you know the name of the variable, the easiest way to
+display a  customization buffer for the variable is to select 
+<menuchoice><guimenu>Help</guimenu><guisubmenu>Customize</guisubmenu>
+	      <guimenuitem>Specific Option...</guimenuitem></menuchoice> from the
+Emacs menubar or type <keycombo><keycap>M</keycap><keycap>x</keycap>
+	    </keycombo>&nbsp;<varname>customize-variable</varname>.
+If you know the group to which the variable belongs (.e.g., compile
+options), you can display the customization buffer for the group. This
+is useful when you want to customize several related variables. See 
+<ulink url="#JDECustomizationGroups">JDE Customization Groups</ulink> for 
+more information. 
+</para>
+	</step>
+
+	<step>
+	  <para>Edit the value for the variable displayed in the customization
+buffer.</para>
+	</step>
+
+	<step>
+	  <para>Save the value for the variable in your <filename>.emacs</filename> or <filename>.prj</filename> file.</para>
+	  <para> If you want the setting to apply to all projects that do not
+have a project file (see <ulink url="#UsingProjectFiles">Using Project
+Files</ulink>), you should save the variable in your 
+<filename>.emacs</filename> file. To save the variable in your
+<filename>.emacs</filename> file, select <menuchoice><guimenuitem>Save
+for Future Sessions</guimenuitem></menuchoice> from the
+<menuchoice><guimenu>State</guimenu></menuchoice> menu for the
+variable in the customization buffer.
+</para>
+	  <para> If you want the setting to apply only to a particular project,
+you should save the setting in the <filename>.prj</filename> file for
+that project. To do this, open a source file from that project, select
+<menuchoice><guimenuitem>Set for Current Session</guimenuitem>
+	    </menuchoice> from the <menuchoice><guimenu>State</guimenu>
+	    </menuchoice> menu for the variable, select the source buffer, and
+select <menuchoice><guimenu>JDE</guimenu><guisubmenu>Project</guisubmenu><guisubmenu>Project Files</guisubmenu><guimenuitem>Save</guimenuitem></menuchoice>
+(<keycombo><keycap>C</keycap><keycap>c</keycap></keycombo>&nbsp;<keycombo><keycap>C</keycap><keycap>v</keycap></keycombo>&nbsp;<keycombo><keycap>C</keycap><keycap>p</keycap></keycombo>) from the  Emacs menubar.
+</para>
+	  <note>
+	    <para> If a project file does exist for the
+project, the JDE will prompt you to enter a name for the project. It
+then creates a project file for the project with the name that you
+enter.    
+</para>
+	  </note>  
+	</step>
+      </procedure>
+      
+      </section>
+
+    <section>
+
+<anchor id="JDECustomizationGroups"/>
+<title>JDE Customization Groups</title>
+
+
+      <para>The JDE defines a top-level customization group, the JDE Group,
+for JDE customization variables. The JDE Group itself contains
+the following subgroups:</para>
+      
+
+      <section>
+
+<anchor id="CompileOptionGroup"/>
+<title>Compile Option Group</title>
+
+
+	<para>Specifies compile options corresponding to the command-line
+arguments (e.g., -d) accepted by the JDK compiler, javac. When you
+execute the JDE compile command, the JDE uses the settings of this
+group to construct a list of command-line arguments that it passes to
+the Java compiler that the JDE uses to compile Java source programs.
+The compiler is itself an option that you can specify (see the Project
+Option Group). You can specify command-line arguments directly by
+setting the value of the
+<varname>jde-compile-option-command-line-args</varname> variable. You
+can display the customization buffer for the Compile Option Group by
+selecting <menuchoice><guimenu>JDE</guimenu><guisubmenu>
+Project</guisubmenu>-<guisubmenu>Options</guisubmenu>
+<guimenuitem>Compile</guimenuitem></menuchoice>
+from the <productname>Emacs</productname> menubar. </para>
+	</section>
+
+      <section>
+
+<anchor id="CompileOptionGroup"/>
+<title>Run Option Group</title>
+
+
+	<para>Specifies run-time options corresponding to the command-line
+arguments (for example, -classpath) accepted by the JDK virtual
+machine, java. When you execute the JDE Run command,&nbsp; the
+JDE uses the settings of this group to construct a list of
+command-line arguments that it passes to the Java interpreter
+used by the JDE to run applications. This group also contains
+options for specifying non-java command-line arguments (in case
+you want to use a VM that accepts a different set of arguments
+than java does) and for specifying arguments to be passed to the
+application (as opposed to the virtual machine interpreting the
+application.) You can display the customization buffer for the
+Run Option Group by selecting <menuchoice><guimenu>JDE</guimenu>
+	    <guisubmenu>Project</guisubmenu>-<guisubmenu>Options</guisubmenu>
+<guimenuitem>Run</guimenuitem></menuchoice>
+from the <productname>Emacs</productname> menubar. </para>
+	</section>
+
+      <section>
+
+
+<anchor id="DebugOptionGroup"/>
+<title>Debug Option Group</title>
+
+	<para>Specifies run-time options corresponding to the command-line
+arguments (for example, -classpath) accepted by the JDK debugger,
+jdb. jdb accepts the same command-line arguments as java. However,
+the JDE maintains two parallel sets of configuration variables
+for these programs in case you want to use a different set of
+options for running a program in debug mode then you use for
+running it normally. When you execute the JDE Debug command,
+the JDE uses the settings of this group to construct a list of
+command-line arguments that it passes to the Java debugger used
+by the JDE to run applications in debug mode. You can display the
+customization buffer for the Debug Option Group by selecting 
+<menuchoice><guimenu>JDE</guimenu>
+	    <guisubmenu>Project</guisubmenu>-<guisubmenu>Options</guisubmenu>
+<guimenuitem>Debug</guimenuitem></menuchoice>
+from the <productname>Emacs</productname> menubar. </para>
+	</section>
+
+      <section>
+
+<anchor id="AutocodeGroup"/>
+<title>Autocode Group</title>
+
+
+	<para>Specifies templates used to generate code automatically. </para>
+	</section>
+
+      <section>
+
+<anchor id="GeneralGroup"/>
+<title>General Options Group</title>
+
+
+	<para>Specify all other JDE options. You can display the
+customization buffer for the General Option Group by selecting 
+<menuchoice><guimenu>JDE</guimenu>
+	    <guisubmenu>Project</guisubmenu>-<guisubmenu>Options</guisubmenu>
+<guimenuitem>General</guimenuitem></menuchoice>
+from the <productname>Emacs</productname> menubar. </para>
+      </section>
+    </section>
+    </chapter>
+
+  <chapter>
+
+<anchor id="Customizingjde_mode"/>
+<title>Customizing jde-mode</title>
+
+
+    <para>The JDE defines a major mode, named jde-mode, for editing Java
+source files. This mode derives from the standard Emacs Java
+source editing mode java-mode. In particular, it inherits all the
+functions and customization variables defined by java-mode and
+adds its own customization variables. When you load a Java source
+file, Emacs runs a JDE mode initialization function called jde-mode.
+The jde-mode function in turn calls the Java mode intialization
+function, java-mode. The last thing that jde-mode does before
+returning is to call a JDE mode function, if it exists. You can
+customize the JDE by defining a JDE mode hook function in your .emacs
+file. The following is an example of how to do this: </para>
+    
+
+    <programlisting>
+(defun my-jde-mode-hook ()
+  (message &quot;my-jde-mode-hook function executed&quot;))
+(add-hook 'jde-mode-hook 'my-jde-mode-hook)
+</programlisting>
+
+    <para>The preceding example defines a JDE mode hook function named
+my-jde-mode-hook and adds it to the list of JDE mode hook
+functions, using the Emacs Lisp function add-hook. Now, whenever
+you open a Java source file, jde-mode invokes the function my-jde-mode-hook.
+Of course, the hook function defined in this example is trivial.
+A real-world example might do something more useful, such as
+setting a custom indentation style. </para>
+    
+
+    <section>
+
+<anchor id="Keybindings"/>
+<title>Customizing Key Bindings</title>
+
+
+      <para>A key binding establishes an equivalence between a keystroke
+or a sequence of keystrokes and an interactive Lisp function. The
+keystroke or keystroke combination causes Emacs to execute the
+function to which the keystroke (combination) is bound. For
+example, the JDE by default binds the keystroke <keycombo><keycap>C</keycap><keycap>c</keycap></keycombo>&nbsp;<keycombo><keycap>C</keycap><keycap>v</keycap></keycombo>&nbsp;<keycombo><keycap>C</keycap><keycap>c</keycap></keycombo>
+to the function <varname>jde-compile</varname>. You can use the JDE
+customization facility to change the standard JDE bindings or
+create bindings for functions that do not have default bindings. </para>
+      
+      <para>To customize key bindings: </para>
+      
+      <procedure>
+	<step>
+	  <para>Open a buffer on the JDE customization variable <varname>jde-key-bindings</varname>.</para>
+	  <para>You can do this by typing
+<keycombo><keycap>M</keycap><keycap>x</keycap>
+	    </keycombo>&nbsp;<varname>customize-variable</varname>&nbsp;
+<varname>jde-key-bindings</varname> or by selecting <menuchoice>
+	      <guimenu>JDE</guimenu><guisubmenu>Options</guisubmenu><guimenuitem>Project</guimenuitem></menuchoice> and searching the
+resulting JDE project customization buffer for
+<varname>jde-key-bindings</varname>. </para>
+	  <para>The key bindings panel looks like this: </para>
+
+	  <para><screenshot>
+	      <mediaobject>
+		<imageobject>
+		  <imagedata fileref="images/KeyBindings.gif"/>
+		</imageobject>
+		<textobject>
+		  <phrase>Screenshot showing key bindings buffer.</phrase>
+		</textobject>
+	      </mediaobject>
+	    </screenshot>
+</para>
+
+	</step>
+	<step>
+	  <para>Edit the buffer to specify altered or new bindings.</para>
+	  <para>For example, to add a binding, right click the
+<guibutton>[INS]</guibutton> button, then enter the key stroke in the
+<guilabel>Key</guilabel> field and the interactive function (command)
+to which it is bound in the <guilabel>Command</guilabel> field.</para>
+	</step>
+
+	<step>
+	  <para>Save the edited bindings.</para>
+	  <para>To save the edited bindings, right click the
+<guibutton>[State]</guibutton> button and choose <menuchoice>
+	      <guimenuitem>Set for current session</guimenuitem></menuchoice> if you
+want the settings to apply only to the current project or
+<menuchoice><guimenuitem>Save for future
+sessions</guimenuitem></menuchoice>if you want the settings to apply
+to all projects. In either case, you should save the new settings in
+you project file if your project has a project file. To save the new
+settings in your project file, switch to a source buffer and choose
+<menuchoice><guimenu>JDE</guimenu><guisubmenu> Options</guisubmenu><guimenuitem>Save Project</guimenuitem></menuchoice> from the Emacs menubar. 
+</para>
+	</step>
+      </procedure>
+    </section>
+  </chapter>
+
+</book>
+
+
+
+<!-- 
+Local Variables: 
+mode: tpe
+sgml-indent-step: 2
+sgml-set-face: t
+sgml-insert-missing-element-comment: nil
+End:
+ -->

@@ -1,0 +1,365 @@
+<html>
+<head><title>java treeview applet tListe : nice navigation menu explorer style </title>
+<META NAME="keywords" CONTENT="rbl, berthou, shareware, applet, java, button, bouton, treeview, tree, menu, tliste">
+<LINK REL=STYLESHEET TYPE='text/css' HREF='./rbl_1.css'>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function tpopup(iz)
+{
+	if (iz == 1) {
+		msg=window.open("./j_tl11_popup.html", "tListePopup", "scrollbars=no,toolbar=no,directories=no,menubar=no,resizable=yes,width=250,height=400");
+	}
+	else 
+	{
+		msg=window.open("./j_tl_popup.html", "tListePopup", "scrollbars=no,toolbar=no,directories=no,menubar=no,resizable=yes,width=250,height=400");
+	}
+}
+//--->
+</SCRIPT>
+</head>
+<body bgcolor=#FFFFFF>
+
+<TABLE CELLPADDING=3 width="100%" BGCOLOR=4040A0>
+<TR>
+   <TH class="tit">
+	<FONT SIZE="+2" class="tit" COLOR=D0F0FF>Java TreeView tliste V 6.15</FONT>
+</TH></TR></TABLE>
+<BR>
+
+<CENTER>
+
+<A NAME="_0">
+<TABLE BGCOLOR=C0E0FF><TR><TD>
+	<FONT SIZE=1>
+	[
+	<A HREF="http://www.javaside.com/j_tscrol.html" TARGET=donnee>tScroll</A> |
+	<A HREF="http://www.javaside.com/j_tonglet.html" TARGET=donnee>tOnglet</A> |
+	<A HREF="http://www.javaside.com/j_tliste.html" TARGET=donnee>tListe</A> |
+	<A HREF="http://www.javaside.com/j_tcaldate.html" TARGET=donnee>tCalDate</A> |
+	<A HREF="http://www.javaside.com/j_tcalevent.html" TARGET=donnee>tCalEvent</A> |
+	<A HREF="http://www.javaside.com/j_teurocalc.html" TARGET=donnee>tEuroCalc</A> |
+	<A HREF="http://www.javaside.com/j_tbbar.html" TARGET=donnee>tBBar</A> |
+	<A HREF="http://www.javaside.com/j_tchart.html" TARGET=donnee>tChart</A> |
+	<A HREF="http://www.javaside.com/j_tfunction.html" TARGET=donnee>tFunction</A> |
+	<A HREF="http://www.javaside.com/j_jvmine.html" TARGET=donnee>Winmine</A> |
+	<A HREF="http://www.javaside.com/j_butto.html" TARGET=donnee>tButton</A> 
+	]
+	</FONT>
+</TD></TR></TABLE>
+<TABLE><TR><TD BGCOLOR=D0F0FF>
+	<FONT SIZE=1>
+	[ <A HREF="http://www.javaside.com/search/index.html" TARGET=donnee>Search</A> 
+	| <A HREF="http://www.javaside.com" TARGET=_top>Home Page (English)</A>    
+	| <A HREF="http://www.javaside.com/fr/" TARGET=_top>Home Page (Fancais)</A>
+	]
+	</FONT>
+</TD></TR></TABLE>
+<BR>
+<HR>
+
+
+<TABLE WIDTH="95%"><TR><TH COLSPAN=2 BGCOLOR=#D0F0FF>INDEX</TH></TR>
+<TR><TD class="b1">
+<FONT SIZE=+1 class="b1">	
+	<ul>	
+	<li><A HREF="index.html#_Z">News...</A></li>
+	<li><A HREF="index.html#_A">Description</A></li>
+	<li><A HREF="index.html#_1">Registration / Enregistrement</A></li>
+	<li><A HREF="index.html#_2">HTML Source</A></li>
+	<li><A HREF="index.html#_3">Parameters</A></li>
+	<li><A HREF="index.html#_4">Data File</A></li>
+	<li><A HREF="index.html#_5">History</A></li>
+	<li><A HREF="index.html#_6">Download</A></li>
+	<li><A HREF="index.html#_7">Use Java Script</A></li>
+	<li><A HREF="javascript:tpopup(0)">Samples 1 Popup</A></li>
+	<li><A HREF="j_tliste0.html">Samples 2</A> Javascript samples</li>
+	<li><A HREF="http://www.javaside.com/j_tliste2.html">Samples 3</A> V 6.01 in JDK 1.02</li>
+	<li><A HREF="j_tl_img.html">tListe Image library</A></li>
+	<li><A HREF="http://www.javaside.com/asp_tliste.html">tListe Full <B>ASP</B> (no java)</A> (<A HREF="http://www.aspside.com/pp_tliste/" target="_new">Sample</A>)</li>
+	<li><A HREF="http://www.javaside.com/perl_tliste.html">tListe Full <B>PERL</B> (no java)</A> (<A HREF="http://www.aspside.com/pp_perl/" target="_new">Sample</A>)</li>
+	<li><A HREF="index.html#_8">Reseller Welcome...</A></li>
+	</ul>
+</FONT>
+</TD>
+<TD ALIGN=CENTER>
+<applet codeBase="./" archive="tli_rbl.jar" code=tli_rbl.class width=150 height=330 MAYSCRIPT>
+    <param name=file            value="./txt/tdesc.txt">
+    <param name=target          value="_new">
+    <param name=csep            value=";">
+    <param name=bImg            value="./img/icon3.gif">
+    <param name=bgcolor		value=13693183>
+    <param name=font0		value="Arial, 0, 12, 0, -255">
+    <param name=font1		value="Times, 0, 12, 0, 12000">
+    <param name=font2		value="Arial, 1, 13, 1242, 165000">
+    <param name=font3		value="Arial, 3, 14, 55, 1255">
+</applet>
+
+</TD></TR></TABLE>
+<P>
+
+<A NAME="_Z"><HR><BR>
+<TABLE WIDTH="95%"><TR><TH BGCOLOR=#D0F0FF>News V 6.15</TH></TR>
+<TR><TD class="b0">
+	VERSION 6.15 <b>only in JDK 1.1x</b>
+	<UL>
+	<li>New scroll bar, with mouseDragged support, can change scrollbar style</li>
+	<li>Add keys words (use in Javascript to get 1 item) </li>
+	<li>Add javascript function </li>
+	<li>support encoding</li>
+	<li>add "local" parameter, (for all data in param)</li>
+	<li>Change default char separator ( ";" )</li>
+	</UL>
+</TD></TR></TABLE>
+<A ALIGN=RIGHT HREF="_tliste.html#_0">Retour Index</A><P>
+
+<A NAME="_A"><HR><BR>
+<TABLE WIDTH="95%"><TR><TH BGCOLOR=#D0F0FF>Description</TH></TR>
+<TR><TD class="b0">
+tListe is a nice and fast <B>TreeView Applet</B>. The applet's size is very small (between 12 and 20 Ko). 
+tListe runs on all browsers with JDK 1.02 / 1.1 support.<BR>
+This version is available in JDK 1.1x ( the last JDK 1.02 is 6.01 ) .
+<P>
+tListe est une <B>applet de liste hierarchique</B> (TreeView). Sa taille r&eacute;duite 
+vous permet de l'utiliser facilement (entre 12 et 20 Ko suivant la version). Elle est totalement
+parametrable et fonctionne sur tous les navigateur supportant le JDK 1.02.<BR>
+Cette derniere version n'est disponible qu' en version JDK 1.1 (La derniere version JDK 1.02 est la 6.01).
+</TD></TR></TABLE>
+<A ALIGN=RIGHT HREF="_tliste.html#_0">Retour Index</A><P>
+
+<A NAME="_1"><HR><BR>
+<TABLE WIDTH="95%"><TR><TH BGCOLOR=#D0F0FF>Registration / Enregistrement</TH></TR>
+<TR><TD class="b0">
+tListe is a <B>FreeWare</B> for non commercial sites.<BR>
+For personal use, I would ask that you place a link to my home page and send me your URL which will use the tListe applet.<BR>
+For professional / commercial use, you will need to obtain a "professional registration". 
+With this registration you can use tListe with no reference to me and I will send the complete source to you.<BR>
+For more information about "<B>Professional registration</B>" :
+<A HREF="mailto:rberthou@wanadoo.fr?subject=US Info enreg tListe">R. BERTHOU.</A>
+<P>
+tListe est une Applet <B>FreeWare</B> pour les sites non commerciaux, son utilisation est donc
+gratuite. Vous devez seulement ajouter une r&eacute;f&eacute;rence &agrave; l'auteur (un lien vers se site).
+et me faire parvenir l'URL de la page utilisant tListe.<BR>
+Pour une utilisation plus "professionnelle" vous devez vous enregistrer. Cet enregistrement vous permet 
+d'avoir les sources de l'applet et de ne pas faire r&eacute;f&eacute;rence
+&agrave; l'auteur.<BR>
+Pour plus d'informations sur "<B>l'Enregistrement Professionnel</B>" (limite d'utilisation des sources,...) :
+<A HREF="mailto:rberthou@wanadoo.fr?subject=Info enreg tListe">R. BERTHOU.</A>
+<P>
+</TD></TR></TABLE>
+<A ALIGN=RIGHT HREF="_tliste.html#_0">Retour Index</A><P>
+
+
+<A NAME="_2"><HR><BR>
+<TABLE WIDTH="95%"><TR><TH BGCOLOR=#D0F0FF>HTML Source</TH></TR>
+<TR><TD class="b0">
+<PRE>
+&lt;applet code=tli_rbl.class width=140 height=300&gt;
+    &lt;param name=file         value="./txt/tdesc.txt"&gt;
+    &lt;param name=target       value="donnee"&gt;
+    &lt;param name=csep         value=";"&gt;
+    &lt;param name=bImg         value="./img/incon3.gif"&gt;
+    &lt;param name=bgImg        value="./img/f_2.gif"&gt;
+    &lt;param name=audio        value="./au/"&gt;
+    &lt;param name=bgcolor      value=50000&gt;
+    &lt;param name=v0 		value="http://www.javaside.com"&gt;
+    &lt;param name=v1 		value="_top"&gt;
+    &lt;param name=font0	value="Arial, 0, 12, 0, -255"&gt;
+    &lt;param name=font1	value="Times, 0, 12, 0, 12000"&gt;
+    &lt;param name=font2	value="Arial, 2, 14, 255, -255"&gt;
+    &lt;param name=font3	value="Arial, 3, 14, 55, 1255"&gt;
+&lt;/applet&gt;
+</PRE>
+</TD></TR></TABLE>
+<A ALIGN=RIGHT HREF="_tliste.html#_0">Retour Index</A><P>
+
+<A NAME="_3"><HR><BR>
+<TABLE WIDTH="95%"><TR><TH BGCOLOR=#D0F0FF>Parametres</TH></TR>
+<TR><TD class="b0"><CENTER>
+<TABLE BORDER CELLPADDING=3 class="b0">
+	<TR BGCOLOR=F0EFD0><TH>Param name</TH><TH>Type</TH><TH>Description</TH></TR>
+	<TR><TD>file</TD><TD>string</TD><TD>File scritp use "./" for relative URL</TD></TR>
+	<TR><TD>bImg</TD><TD>string</TD><TD>Name of bitmaps buttons "./img/icon3.gif</TD></TR>
+	<TR><TD>bgImg</TD><TD>string</TD><TD>Name of background image</TD></TR>
+	<TR><TD>bgcolor</TD><TD>integer</TD><TD>Border color</TD></TR>
+	<TR><TD>target</TD><TD>string</TD><TD>Default target windows</TD></TR>
+	<TR><TD>csep</TD><TD>string</TD><TD>char separator in data file (default ";")</TD></TR>
+	<TR><TD>audio</TD><TD>string</TD><TD>File path for song (.au) </TD></TR>
+	<TR><TD>local</TD><TD>string</TD><TD>"yes" if you put all data in param (no data file) <b>added in 6.15</b></TD></TR>
+	<TR><TD>encoding</TD><TD>string</TD><TD>Encoding definition for texte file (default Cp1252) <b>added in 6.15</b></TD></TR>
+	<TR><TD>coef</TD><TD>integer</TD><TD>Size line % </TD></TR>
+	<TR><TD>v0..9</TD><TD>string</TD><TD>Variable definition<BR>With this you can reduce data file size<BR>
+				if v0 = "http://www."  and in your data file you put $0yahoo.com tliste applet read http://www.yahoo.com
+	</TD></TR>
+	<TR><TD>font0</TD><TD>Bullet style</TD><TD>Font Name, font style, size, font color, bgcolor</TD></TR>
+	<TR><TD>font1..9</TD><TD>Font style</TD><TD>Font Name, font style, size, font color, visited color</TD></TR>
+</TABLE>
+!! <B>Warning</B> !! convert your hexa color code into decimal before use it.<BR>
+sample :<BR>
+ white => #FFFFFF => 16777215<BR>
+ red => #FF0000 => 16711680<BR>
+<A HREF="http://www.berthou.com/color_code.html" TARGET="new">See http://www.berthou.com/color_code.html</A>
+</CENTER>
+</TD></TR></TABLE>
+<A ALIGN=RIGHT HREF="_tliste.html#_0">Retour Index</A><P>
+
+<A NAME="_4"><HR><BR>
+<TABLE WIDTH="95%"><TR><TH BGCOLOR=#D0F0FF>Data File Format</TH></TR>
+<TR><TD class="b0">
+<CENTER>
+<TABLE BORDER CELLPADDING=3 class="b0">
+	<TR BGCOLOR=F0EFD0><TH>Colum</TH><TH>Name</TH><TH>Type</TH><TH>Description</TH></TR>
+	<TR><TD>1</TD><TD>Level</TD><TD>Integer</TD><TD>Item level 0..20<BR>
+		 Remarques :<BR>
+		 98 Button Bar image (with tListe V4.0)<BR>
+		 99 Bitmap image<BR>
+	</TD></TR>
+	<TR><TD>2</TD><TD>Item Name</TD><TD>string</TD><TD>Name of item (URL of bitmap if level 99)</TD></TR>
+	<TR><TD>3</TD><TD>Bitmap number</TD><TD>Integer</TD><TD>Item bitmap (0..9)<BR>
+			Rem :	MOD(2) = 0 => treenode close (if node)<BR>
+	 			MOD(2) = 1 => treenode open (if node)<BR>
+				2 node disable.<BR>
+				sample if node "0, 10,12,20,..." => node close<BR>
+				               "1, 11,13,21,..." => node open<BR>
+		  <A HREF="j_tl_img.html">View tListe Image library</A>
+	</TD></TR>
+	<TR><TD>3b</TD><TD>Font style</TD><TD>int</TD><TD>Selected font and color style</TD></TR>
+	<TR><TD>4</TD><TD>Dest URL</TD><TD>string</TD><TD>Dest. URL ( begin "./" if local URL )</TD></TR>
+	<TR><TD>5</TD><TD>Target</TD><TD>string</TD><TD>Target Frame (overide default in PARAM option)<BR>
+							Rem : to load another datafile use "_reload"<BR>
+							if "_" use default target <BR>
+							if "_reload" load another file<BR>
+							if "_prev"  load a previos file (not use url column)<BR>
+							if "_insert" insert a file<BR>
+							if "_script" call javascript function<BR>
+	</TD></TR>
+	<TR><TD>6</TD><TD>Date New</TD><TD>YYYYMMDD</TD><TD>Last day to display "new" bitmap</TD></TR>
+	<TR><TD>-</TD><TD>Help Bullet</TD><TD>string</TD><TD><B>Begin with "?"</B> String help display in bullet, you can define this param in 5, 6 or 7 col.</TD></TR>
+	<TR><TD>-</TD><TD>Help Status</TD><TD>string</TD><TD><B>Begin with "#"</B> String help display status bar, you can define this param in 5, 6 or 7 col.</TD></TR>
+	<TR><TD>-</TD><TD>Key-words</TD><TD>string</TD><TD><B>Begin with "key="</B> key-words definition for javascript use.</TD></TR>
+</TABLE>
+</CENTER>
+  <A HREF="./txt/tliste.txt">Sample tliste.txt</A><BR>
+  <A HREF="./txt/tliste2.txt">And tliste2.txt</A>
+</TD></TR></TABLE>
+<A ALIGN=RIGHT HREF="_tliste.html#_0">Retour Index</A><P>
+
+
+<A NAME="_7"><HR><BR>
+<TABLE WIDTH="95%"><TR><TH BGCOLOR=#D0F0FF>Use JavaScript</TH></TR>
+<TR><TD class="b0"><CENTER>
+With tListe you can call external javascript function (with LiveConnect and <B>MAYSCRIPT</B> tag)<BR>
+<TABLE BORDER class="b0">
+<TR><TD>_script</TD><TD>With this you can call javascript function when you click on tliste item<BR>
+     1 § Alert-2 § 7 § javascript:alert('You click on Alert-2') § _script 
+</TD></TR>
+</TABLE>
+
+And you can call tListe function in JavaScript...<BR>
+You can call :<BR>
+<TABLE BORDER class="b0">
+<TR><TD>rFile("yourfile.txt", 1)</TD><TD>To load another data file.</TD></TR>
+<TR><TD>closeAll( 0 )</TD><TD>to close all item  folder.</TD></TR>
+<TR><TD>closeAll( 1 )</TD><TD>to open all item  folder.</TD></TR>
+<TR><TD>change('Outils', i)</TD><TD>to open or close 'Outils' item and see this in 1st position<br> if "i" equals "0" the url is not open</TD></TR>
+<TR><TD>setBgcolor( int rgbcolor )</TD><TD>to change background color.</TD></TR>
+<TR><TD>search('toto', i)</TD><TD>search key-word "toto" and open this item if "i" is not equals "0" .</TD></TR>
+</TABLE>
+</CENTER>
+</TD></TR></TABLE>
+<A ALIGN=RIGHT HREF="#_0">Retour Index</A><P>
+
+<A NAME="_5"><HR><BR>
+<TABLE WIDTH="95%"><TR><TH BGCOLOR=#D0F0FF>History</TH></TR>
+<TR><TD class="b0"><CENTER>
+<TABLE BORDER=1 class="b0">
+<TR><TD>6.15</TD><TD>Minor bug in "new" image and can select font with icon=2</TD></TR>
+<TR><TD>6.01</TD><TD>Minor bug in "new" image and can select font with icon=2</TD></TR>
+<TR><TD>6.00</TD><TD>Change "Loading",<BR>
+		     Add help status<BR>
+		     define variables,<BR>
+		     Define multi font,...</TD></TR>
+<TR><TD>5.20</TD><TD>More javascript interaction.</TD></TR>
+<TR><TD>5.10</TD><TD>Add _insert and _prev commands, .</TD></TR>
+<TR><TD>5.01</TD><TD>Minor bug in "new" image</TD></TR>
+<TR><TD>5.00</TD><TD>Same file in applet and ASP script,<BR>
+		     support resize,<BR>
+                     put all gif in 1 file<BR>
+                     other minor changes.</TD></TR>
+<TR><TD>4.61</TD><TD>Support JavaScript connection.</TD></TR>
+<TR><TD>4.51</TD><TD>Set max icon to 30, multi icon in node, change bullet bgcolor an font color.</TD></TR>
+<TR><TD>4.16</TD><TD>Add play song in tli_rbl.</TD></TR>
+<TR><TD>4.15</TD><TD>Add loading display.</TD></TR>
+<TR><TD>4.13</TD><TD>minor bug in reload option.</TD></TR>
+<TR><TD>4.12</TD><TD>2 minor updates (can hide select button, help bullet with no url).</TD></TR>
+<TR><TD>4.11</TD><TD>Correct bug in initCookies.</TD></TR>
+<TR><TD>4.10</TD><TD>Add active line.</TD></TR>
+<TR><TD>4.01</TD><TD>Correct a minor bug in lineBar.</TD></TR>
+<TR><TD>4.00</TD><TD>Major version :<BR>Add button bar and save data in cookies.</TD></TR>
+<TR><TD>3.33</TD><TD>Correct a minor bug in lineBar.</TD></TR>
+<TR><TD>3.32</TD><TD>Minor bug generate by V 3.31 in bitpam image.</TD></TR>
+<TR><TD>3.31</TD><TD>if URL node is empty open or close node.</TD></TR>
+<TR><TD>3.30</TD><TD>Extend number of bitmap image (10 -> 20) and rename line images.<BR>Delete tli_save (bug in cookies).</TD></TR>
+<TR><TD>3.22/21</TD><TD>Correct minor bug in help bullet with long text, and add a "new" bitmap.</TD></TR>
+<TR><TD>3.20</TD><TD>Add help bullet.</TD></TR>
+<TR><TD>3.15</TD><TD>I create 4 versions of tListe (RBL, MF, MP, SAVE), and add line bar.<BR>
+				RBL - To add a bitmap image in first position<BR>
+				MF  - Min size with data file<BR>
+				MP  - Min size with no data file (all data in param)<BR>
+				SAVE- Old tListe3 with save data in cookies
+	</TD></TR>
+<TR><TD>3.00</TD><TD>Add save data with cookies</TD></TR>
+</TABLE></CENTER>
+</TD></TR></TABLE>
+<A ALIGN=RIGHT HREF="_tliste.html#_0">Retour Index</A><P>
+
+
+<A NAME="_6"><HR><BR>
+<TABLE WIDTH="95%" BGCOLOR=#D0F0FF><TR><TH BGCOLOR=#D0F0FF>Download files</TH></TR>
+<TR><TD class="b0"><CENTER>
+<TABLE WIDTH="100%" class="b0">
+      <tr>
+        <td><a HREF="j_tliste0.html">tListe V 6.15 <B>JDK 1.1x</B></a></td>
+        <td><a HREF="asp/download.asp?id=331">tli_rbl.zip</a> (81 KB) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="asp/download.asp?id=1331"><small>(backup)</small></A></td>
+      </tr>
+      <tr>
+        <td><a HREF="j_tliste0.html">tListe V 6.01</a></td>
+        <td><a HREF="asp/download.asp?id=131">tli_rbl.zip</a> (81 KB) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="asp/download.asp?id=1131"><small>(backup)</small></A></td>
+      </tr>
+      <tr>
+        <td>tListe V 4.51 Cookies</td>
+        <td><a HREF="asp/download.asp?id=231">tliste.zip</a> (21 KB)</td>
+      </tr>
+      <tr>
+        <td>tListe V 4.51-MF</td>
+        <td><a HREF="asp/download.asp?id=232">tli_mf.zip</a> (17 KB)</td>
+      </tr>
+      <tr>
+        <td>tListe V 4.51-MP</td>
+        <td><a HREF="asp/download.asp?id=233">tli_mp.zip</a> (16 KB)</td>
+      </tr>
+    </table>
+</CENTER>
+</TD></TR></TABLE>
+<A ALIGN=RIGHT HREF="_tliste.html#_0">Retour Index</A><P>
+
+<A NAME="_8"><HR><BR>
+<TABLE WIDTH="95%"><TR><TH BGCOLOR=#D0F0FF>Reseller Welcome...</TH></TR>
+<TR><TD class="b0">
+If you want to resell this product in your country, then please send me an e-mail for further information. 
+
+</TD></TR></TABLE>
+<A ALIGN=RIGHT HREF="_tliste.html#_0">Retour Index</A><P>
+
+
+<HR SIZE="3">
+<FONT SIZE=1> 
+<B> Copyright &copy 1996..2000, <A HREF="mailto:rberthou@wanadoo.fr">R. BERTHOU.</A> Tous droits r&eacute;serv&eacute;s.</B><BR>
+<I>Derni&egrave;re modification le 26 Mars 2000 21H48</I>
+</FONT>
+<BR>
+ 
+</CENTER>
+
+
+</BODY>
+</HTML>
