@@ -5,7 +5,7 @@
 ;; Maintainer: Paul Kinnucan
 ;; Keywords: tools, processes
 
-;; Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Paul Kinnucan
+;; Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2008 Paul Kinnucan
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -132,15 +132,16 @@ Prints JNI-related messages including information about which native
 methods have been linked and warnings about excessive creation of
 local references.")))
 
+;;(makunbound 'jde-run-option-properties)
 (defcustom jde-run-option-properties nil
   "*Specify property values.
 Enter the name of the property, for example, awt.button.color, in the
 Property Name field; enter its value, for example, green, in the
 Property Value field. You can specify as many properties as you like."
   :group 'jde-run-options
-  :type '(repeat (cons 
-		  (string :tag "Property Name") 
-		  (string :tag "Property Value"))))
+  :type '(repeat (cons :tag "Property"
+		  (string :tag "Name") 
+		  (string :tag "Value"))))
 
 (defcustom jde-run-option-heap-size (list
 				     (cons 1 "megabytes")
