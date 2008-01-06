@@ -5,7 +5,7 @@
 ;; Maintainer: Paul Kinnucan
 ;; Keywords: java, tools
 
-;; Copyright (C) 1997, 1998, 2001, 2002, 2003, 2004, 2005 Paul Kinnucan.
+;; Copyright (C) 1997, 1998, 2001, 2002, 2003, 2004, 2005, 2008 Paul Kinnucan.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -191,9 +191,24 @@ that you might want to use with the JDE."
 
 (defcustom jde-compile-option-classpath nil
 "*Specify paths of classes required to compile this project.
-The JDE uses the specified paths to construct a -classpath
-argument to pass to the compiler. This option overrides the
-`jde-global-classpath' option."
+The JDEE uses the specified paths to construct a -classpath
+argument to pass to the compiler. If you do not specify this
+option, the JDEE uses the value of the `jde-global-classpath'
+option to compile this project.
+
+Starting in JDK 1.6, a class path element containing a basename
+of * is considered equivalent to specifying a list of all the
+files in the directory with the extension .jar or .JAR.  For
+example, if directory foo contains a.jar and b.JAR, then the
+class path element foo/* is expanded to A.jar;b.JAR, except that
+the order of jar files is unspecified. All jar files in the
+specified directory, even hidden ones, are included in the
+list. A classpath entry consisting simply of * expands to a list
+of all the jar files in the current directory. The CLASSPATH
+environment variable, where defined, will be similarly
+expanded. Note: Depending of the configuration of your command
+line environment, you may have to quote the wild card character,
+for example, javac -cp \"*.jar\" MyClass.java."
   :group 'jde-compile-options
   :type '(repeat (file :tag "Path")))
 
@@ -348,9 +363,40 @@ warnings."
   :group 'jde-compile-options
   :type 'boolean)
 
+;;(makunbound 'jde-compile-option-annotation-processors)
+(defcustom jde-compile-option-annotation-processors nil
+"*Names of the annotation processors to run. This bypasses the default discovery process."
+  :group 'jde-compile-options
+  :type '(repeat (string :tag "Name")))
+
+;;(makunbound 'jde-compile-option-annotation-processing)
+(defcustom jde-compile-option-annotation-processing 
+  (list "compile and process annotations")
+"*Controls whether annotation processing and/or compilation is done."
+  :group 'jde-compile-options
+  :type '(list
+	  (radio-button-choice 
+	   :format "%t \n%v"
+	   :tag "Processing:"
+	   (const "compile and process annotations")
+	   (const "compile only")
+	   (const "process annotations only"))))
+
+;;(makunbound 'jde-compile-option-annotation-processor-options)
+(defcustom jde-compile-option-annotation-processor-options nil
+"*Options to pass to annotation processors. These are not
+interpreted by javac directly, but are made available for use by
+individual processors. key should be one or more identifiers
+separated by \".\"."
+  :group 'jde-compile-options
+  :type '(repeat 
+	  (cons :tag "Option"
+	   (string :tag "Key") 
+	   (string :tag "Value"))))
+
 (defcustom jde-compile-option-encoding ""
 "*Specify the source file encoding name, such as EUCJIS\\SJIS.
-If this option is not specified, then the platform default converter
+If this option is not specified, the platform default converter
 is used."
   :group 'jde-compile-options
   :type 'string)
@@ -384,7 +430,8 @@ source files.
 	   (const "default")
 	   (const "1.3")
 	   (const "1.4")
-	   (const "1.5"))))
+	   (const "1.5")
+	   (const "1.6"))))
 
 ;;(makunbound 'jde-compile-option-target)
 (defcustom jde-compile-option-target (list "1.1")
@@ -975,6 +1022,72 @@ buffer."
   (oset this version "1.5"))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                            ;;
+;; J2SDK 1.6 Compiler                                                         ;;
+;;                                                                            ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  
+(defclass jde-compile-javac-16 (jde-compile-javac-15)
+  ()
+  "Class of JDK 1.6 javac compilers.")
+
+(defmethod initialize-instance ((this jde-compile-javac-16) &rest fields)
+ ;; Call parent initializer.
+
+  (call-next-method)
+
+  ;; Set compiler version.
+  (oset this version "1.6"))
+
+(defmethod jde-compile-annotation-processors-arg ((this jde-compile-javac-16))
+  "Get the annotation processors argument for this compiler."
+  (if jde-compile-option-annotation-processors
+    (list
+     "-processor"
+     (mapconcat 'identity 
+		jde-compile-option-annotation-processors 
+		","))))
+
+(defmethod jde-compile-annotation-processing-arg ((this jde-compile-javac-16))
+  (let ((option (car jde-compile-option-annotation-processing)))
+    (cond
+     ((string= option "compile and process annotations")
+      nil)
+     ((string= option "compile only")
+      (list "-proc:none"))
+     ((string= option "process annotations only")
+      (list "-proc:only")))))
+
+(defmethod jde-compile-annotation-processor-options-args ((this jde-compile-javac-16))
+    "Get property arguments."
+    (mapcar
+     (lambda (option)
+       (let ((key (car option))
+	     (value (cdr option)))
+	 (if (string= value "")
+	     (format "-A%s" key)
+	   (format "-A%s=%s" key value))))
+     jde-compile-option-annotation-processor-options))
+
+(defmethod jde-compile-get-args ((this jde-compile-javac-16))
+  (append
+   (jde-compile-classpath-arg this)
+   (jde-compile-encoding-arg this)
+   (jde-compile-debug-arg this)
+   (jde-compile-output-dir-arg this)
+   (jde-compile-deprecation-arg this)
+   (jde-compile-optimize-arg this)
+   (jde-compile-depend-arg this)
+   (jde-compile-annotation-processing-arg this)
+   (jde-compile-annotation-processors-arg this)
+   (jde-compile-annotation-processor-options-args this)
+   (jde-compile-vm-args this)
+   (jde-compile-verbose-arg this)
+   (jde-compile-nowarn-arg this)
+   (jde-compile-command-line-args this)))
+
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                            ;;
@@ -1056,7 +1169,8 @@ buffer."
    (jde-compile-javac-12 "javac 1.2.x")
    (jde-compile-javac-13 "javac 1.3.x")
    (jde-compile-javac-14 "javac 1.4.x")
-   (jde-compile-javac-15 "javac 1.5.x"))
+   (jde-compile-javac-15 "javac 1.5.x")
+   (jde-compile-javac-16 "javac 1.6.x"))
   "List of supported javac compilers.")
 
 (defun jde-compile-get-javac ()
