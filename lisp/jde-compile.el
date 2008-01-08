@@ -363,6 +363,7 @@ warnings."
   :group 'jde-compile-options
   :type 'boolean)
 
+
 ;;(makunbound 'jde-compile-option-annotation-processors)
 (defcustom jde-compile-option-annotation-processors nil
 "*Names of the annotation processors to run. This bypasses the default discovery process."
@@ -401,6 +402,39 @@ is used."
   :group 'jde-compile-options
   :type 'string)
 
+;;(makunbound 'jde-compile-option-implicit)
+(defcustom jde-compile-option-implicit 
+  (list "Generate and warn")
+"*Specify whether to generate class files for source files loaded in 
+order to get type information needed to compile and/or process
+annotations in other files. Options are:
+
+  * Generate and warn
+
+    Generate class files for source files loaded to get type info for other files.
+    Do not generate class files for source files needed only to process 
+    annotations. Instead issue a warning.
+
+  * Generate and do not warn
+
+    Generate class files for source files needed to compile other files. Do
+    not generate class files for source needed for processing annotions
+    in other files and do not warn that class files are not generated. 
+
+  * Do not generate
+
+    Do not generate class files for implicitly loaded source files. 
+"
+  :group 'jde-compile-options
+  :type '(list
+	  (radio-button-choice 
+	   :format "%t \n%v"
+	   :tag "Processing:"
+	   (const "Generate and warn")
+	   (const "Generate and do not warn")
+	   (const "Do not generate"))))
+
+
 ;;(makunbound 'jde-compile-option-source)
 (defcustom jde-compile-option-source (list "default")
 "*Enables JDK version-specific features to be used in
@@ -411,6 +445,8 @@ source files.
   1.4     The compiler accepts code containing assertions. 
 
   1.5     Enables 1.5-specific features.
+
+  1.6     Enables 1.6-specific features.
 
   Select \"default\" to use the source features that
   the compiler supports by default, i.e., to not include the -source
@@ -1069,6 +1105,16 @@ buffer."
 	   (format "-A%s=%s" key value))))
      jde-compile-option-annotation-processor-options))
 
+(defmethod jde-compile-implicit-arg ((this jde-compile-javac-16))
+  (let ((option (car jde-compile-option-implicit)))
+    (cond
+     ((string= option "Generate and warn")
+      nil)
+     ((string= option "Generate and do not warn")
+      (list "-implicit:class"))
+     ((string= option "Do not generate")
+      (list "-implicit:none")))))
+
 (defmethod jde-compile-get-args ((this jde-compile-javac-16))
   (append
    (jde-compile-classpath-arg this)
@@ -1081,6 +1127,7 @@ buffer."
    (jde-compile-annotation-processing-arg this)
    (jde-compile-annotation-processors-arg this)
    (jde-compile-annotation-processor-options-args this)
+   (jde-compile-implicit-arg this)
    (jde-compile-vm-args this)
    (jde-compile-verbose-arg this)
    (jde-compile-nowarn-arg this)
