@@ -1114,6 +1114,18 @@ to a debugger."
   
   (oset this :version "1.5"))
 
+(defclass jde-run-vm-1-6 (jde-run-vm-1-5) ()
+  "Represents the JDK 1.6.x vm")
+
+(defmethod initialize-instance ((this jde-run-vm-1-6) &rest fields)
+  "Constructor for the class representing the JDK 1.6 vm."
+
+  ;; Call parent initializer.
+  (call-next-method)
+  
+  (oset this :version "1.6"))
+
+
 
 (defvar jde-run-virtual-machines
   (list
@@ -1121,7 +1133,8 @@ to a debugger."
    (jde-run-vm-1-2 "JDK 1.2 vm")
    (jde-run-vm-1-3 "JDK 1.3 vm")
    (jde-run-vm-1-4 "JDK 1.4 vm")
-   (jde-run-vm-1-5 "JDK 1.5 vm"))
+   (jde-run-vm-1-5 "JDK 1.5 vm")
+   (jde-run-vm-1-6 "JDK 1.6 vm"))
   "*List of supported virtual machines.")
 
 (defun jde-run-get-vm ()
