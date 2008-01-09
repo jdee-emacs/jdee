@@ -5,7 +5,7 @@
 ;; Maintainer: Paul Kinnucan
 ;; Keywords: java, tools
 
-;; Copyright (C) 1997-2006 Paul Kinnucan.
+;; Copyright (C) 1997-2008, 2008 Paul Kinnucan.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@
 ;;; Code:
 
 ;;;###autoload
-(defconst jde-version "2.3.5.1"
+(defconst jde-version "2.3.5.2"
   "JDE version number.")
 
 (defconst jde-cedet-min-version "1.0beta2"
