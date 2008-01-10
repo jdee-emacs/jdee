@@ -94,7 +94,8 @@ enter to the make program along with the arguments specified by
 	       "Make args: "
 	       jde-interactive-make-args
 	       nil nil
-	       '(jde-interactive-make-arg-history . 1))))
+	       '(jde-interactive-make-arg-history . 1)))
+    (setq jde-interactive-make-args ""))
 
   (let ((make-command
 	 (jde-make-make-command 
