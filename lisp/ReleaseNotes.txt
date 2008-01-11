@@ -31,6 +31,8 @@ JDE 2.3.5.2
 
 * The JDEE has been updated to support the JDK 1.6 tool suite.
 
+* Add jde-gen-makefile-buffer for creating Makefile.
+
 JDE 2.3.5.1
 
 * Fixes regressions in Documentation->Generate commands 
