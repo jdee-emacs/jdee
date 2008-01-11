@@ -2356,6 +2356,11 @@
 		    <entry>Template for a JUnit test case class. This template requires
 		    the <ulink url="http://www.junit.org">JUnit</ulink> test framework.</entry>
 		  </row>
+		  <row>
+		    <entry><varname>jde-gen-makefile-buffer-template</varname></entry>
+		    <entry>Autocode</entry>
+		    <entry>Template for a Makefile.</entry>
+		  </row>
 
 		  <row>
 		    <entry><varname>jde-gen-buffer-templates</varname></entry>
