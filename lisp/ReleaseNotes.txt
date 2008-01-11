@@ -1,4 +1,4 @@
-JDE 2.3.5.1
+JDE 2.3.5.2
 
 ***************************************************************
 *                         PLEASE READ                         *
@@ -28,6 +28,10 @@ JDE 2.3.5.1
 * overlay-fix.el from the semantic web site.                  *
 *                                                             *
 ***************************************************************
+
+* The JDEE has been updated to support the JDK 1.6 tool suite.
+
+JDE 2.3.5.1
 
 * Fixes regressions in Documentation->Generate commands 
   caused by inadvertent double quoting of string options,
