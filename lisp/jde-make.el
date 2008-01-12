@@ -42,6 +42,14 @@ location as its working directory."
   :group 'jde-make
   :type 'string)
 
+(defcustom jde-make-enable-find nil
+"*Specify whether jde-make find the Makefile based on your current
+directory. If non-nil, we will search up the directory hierarchy from the
+current directory for the build definition file. Also note that, if non-nil,
+this will relax the requirement for an explicit jde project file."
+   :group 'jde-make
+   :type 'boolean)
+
 (defcustom jde-make-args ""
   "*Specifies arguments to be passed to make program."
   :group 'jde-make
@@ -78,6 +86,18 @@ list of arguments entered in the minibuffer."
 	      (concat " " more-args))
 	  " "))
 
+(defun jde-make-find-build-file (dir)
+  "Find the next Makefile upwards in the directory tree from DIR.
+Returns nil if it cannot find a project file in DIR or an ascendmake directory."
+  (let ((file (find "Makefile"
+                    (directory-files dir) :test 'string=)))
+    
+    (if file
+        (setq file (expand-file-name file dir))
+      (if (not (jde-root-dir-p dir))
+          (setq file (jde-make-find-build-file (concat dir "../")))))
+
+    file))
 
 ;;;###autoload
 (defun jde-make ()
@@ -98,13 +118,19 @@ enter to the make program along with the arguments specified by
     (setq jde-interactive-make-args ""))
 
   (let ((make-command
-	 (jde-make-make-command 
-	  jde-interactive-make-args))
-	(save-default-directory default-directory)
-	(default-directory 
-	  (if (string= jde-make-working-directory "")
-	      default-directory
-	    (jde-normalize-path 'jde-make-working-directory))))
+         (jde-make-make-command 
+          jde-interactive-make-args))
+        (save-default-directory default-directory)
+        (default-directory 
+          (if (string= jde-make-working-directory "")
+              (if jde-make-enable-find
+                  (let ((jde-make-buildfile
+                         (jde-make-find-build-file default-directory)))
+                    (if jde-make-buildfile
+                        (file-name-directory jde-make-buildfile)
+                      default-directory))
+                default-directory)
+            (jde-normalize-path 'jde-make-working-directory))))
 
 
     ;; Force save-some-buffers to use the minibuffer

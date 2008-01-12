@@ -33,6 +33,8 @@ JDE 2.3.5.2
 
 * Add jde-gen-makefile-buffer for creating Makefile.
 
+* Add jde-make-find-build-file feature in jde-make.
+
 JDE 2.3.5.1
 
 * Fixes regressions in Documentation->Generate commands 

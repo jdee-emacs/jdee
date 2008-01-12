@@ -3410,6 +3410,22 @@
 		  </para>
 		</entry>
 	      </row>
+          <row>
+        <entry
+         valign="top"><varname>jde-make-enable-find</varname></entry>
+	      <entry valign="top">Project</entry>
+	      <entry><para>off</para></entry>
+	      <entry>
+		<para> Specify whether jde-make find the
+		  <filename>Makefile</filename> file based on your
+		  current directory. If non-nil, we will search up the
+		  directory hierarchy from the current directory for
+		  the build definition file. Also note that, if
+		  non-nil, this will relax the requirement for an
+		  explicit jde project file.</para>
+	    </entry>
+          </row>
+
 	    </tbody>
 	  </tgroup>
 	</table>
