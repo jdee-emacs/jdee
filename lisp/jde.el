@@ -1489,6 +1489,19 @@ SYMBOL is unnecessary."
     (setq p (jde-convert-cygwin-path p))
     p))
 
+(defun jde-directory-files-recurs (dir &optional include-regexp)
+  "Get all the files in DIR, and any subdirectories of DIR, whose
+names match INCLUDE-REGEXP."
+  (let (files)
+    (loop for file in (directory-files dir t) do
+          (if (not (or (string= (concat dir "/.") file)
+                       (string= (concat dir "/..") file)))
+              (if (file-directory-p file)
+                  (setq files (append files (jde-directory-files-recurs file include-regexp)))
+                (if (or (not include-regexp)
+                        (string-match include-regexp file))
+                    (setq files (append files (list file)))))))
+    files))
 
 (defun jde-expand-directory (dir include-regexp exclude-regexps symbol)
   "Get all the files in DIR whose names match INCLUDE-REGEXP except those whose
@@ -1504,7 +1517,7 @@ root names match EXCLUDE-REGEXPS. Return the files normalized against SYMBOL."
 	    (loop for regexp in exclude-regexps do
 		  (if (string-match regexp file-name)
 		      (throw 'match t))))))
-    (directory-files dir t include-regexp))))
+    (jde-directory-files-recurs dir include-regexp))))
 
 
 (defun jde-expand-classpath (classpath &optional symbol)

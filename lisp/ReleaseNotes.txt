@@ -40,6 +40,10 @@ JDE 2.3.5.2
   having the quotes stripped.  Arguments containing whitespace should
   work now.
 
+* When jde-expand-classpath-p is non-nil so that library classpath
+  entries are expanded, this scanning now recursively includes
+  subdirectories.
+
 JDE 2.3.5.1
 
 * Fixes regressions in Documentation->Generate commands 
