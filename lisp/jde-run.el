@@ -505,13 +505,16 @@ to the executable specified by `jde-run-executable'."
  "Converts a string of command-line arguments to a list of arguments.
 Any substring that is enclosed in single or double quotes or does not include
 whitespace is considered a parameter."
-   (let ((n (string-match "[^\" ][^ ]*\\|\"[^\"]*\"\\|'[^']*'" s))
- 	(i 0)
+   (let ((n (string-match "[^\"' ][^ ]*\\|\"[^\"]*\"\\|'[^']*'" s))
+ 	(tok)
  	(tokens '()))
      (while n
-       (setq tokens (append tokens (list (match-string 0 s))))
        (setq n (match-end 0))
-       (setq n (string-match "[^\" ][^ ]*\\|\"[^\"]*\"\\|'[^']*'" s n)))
+       (setq tok (match-string 0 s))
+       (if (string-match "[\"']\\([^\"']*\\)[\"']" tok)
+           (setq tok (match-string 1 tok)))
+       (setq tokens (append tokens (list tok)))
+       (setq n (string-match "[^\"' ][^ ]*\\|\"[^\"]*\"\\|'[^']*'" s n)))
      tokens))
 
 (defun jde-run-make-arg-string (args)
