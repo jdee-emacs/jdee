@@ -1570,8 +1570,12 @@ Here goes all the error message parsing."
 
 (defun jde-run-etrace-goto (&optional next)
   "Display the current stack using `compilation-goto-locus'."
-  (compilation-goto-locus (jde-run-etrace-current-marker next)))
-
+  (jde-run-etrace-current-marker next)
+  (if jde-emacs22p
+      (compilation-goto-locus (car jde-run-etrace-current-marker)
+                              (cdr jde-run-etrace-current-marker)
+                              nil)
+    (compilation-goto-locus jde-run-etrace-current-marker)))
 
 (defun jde-run-etrace-show-at-mouse (event)
   "Jump to the stack position at the mouse click.

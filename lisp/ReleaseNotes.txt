@@ -44,6 +44,8 @@ JDE 2.3.5.2
   entries are expanded, this scanning now recursively includes
   subdirectories.
 
+* Fixes for Emacs 22 compatibility: jde-run-etrace-goto.
+
 JDE 2.3.5.1
 
 * Fixes regressions in Documentation->Generate commands 

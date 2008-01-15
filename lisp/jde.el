@@ -53,6 +53,9 @@
 (defconst jde-emacs21p (and (string-match "\\bEmacs\\b" (emacs-version))
 			    (>= emacs-major-version 21)))
 
+(defconst jde-emacs22p (and (string-match "\\bEmacs\\b" (emacs-version))
+			    (>= emacs-major-version 22)))
+
 (unless (fboundp 'custom-set-default)
    (defalias 'custom-set-default 'set-default)) 
 
