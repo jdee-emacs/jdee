@@ -1157,7 +1157,9 @@ standard `java-mode'."
 	  ;; font-lock-set-defaults accepts no arguments.
           (apply 'font-lock-set-defaults (list t))
         (if global-font-lock-mode
-            (turn-on-font-lock-if-enabled))))
+            (if (fboundp 'turn-on-font-lock-if-enabled) 
+                (turn-on-font-lock-if-enabled)
+              (turn-on-font-lock-if-desired)))))  ;; Newer emacs renamed -if-enabled to -if-desired
     ;; Always turn on font locking if `jde-use-font-lock' is non-nil.
     (if jde-use-font-lock
         (turn-on-font-lock))))
