@@ -1244,7 +1244,8 @@ Does nothing but return nil if `jde-log-max' is nil."
     ["Entity Bean"     jde-ejb-entity-bean-buffer t])
    (list
     "Build file..."
-    ["Makefile"        jde-gen-makefile-buffer t])
+    ["Makefile"        jde-gen-makefile-buffer t]
+    ["Ant buildfile"   jde-gen-ant-buildfile-buffer t])
    ["Other..."         jde-gen-buffer t]
    )
   "*The JDE New buffer menu"

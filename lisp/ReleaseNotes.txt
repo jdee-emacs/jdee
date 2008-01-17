@@ -35,6 +35,8 @@ JDE 2.3.5.2
 
 * Add jde-make-find-build-file feature in jde-make.
 
+* Add jde-gen-ant-buildfile-buffer for creating ant buildfile.
+
 * Fixed bugs in jde-run-parse-args: arguments quoted with single
   quotes were handled incorrectly; and quoted arguments were not
   having the quotes stripped.  Arguments containing whitespace should

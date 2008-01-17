@@ -2361,6 +2361,11 @@
 		    <entry>Autocode</entry>
 		    <entry>Template for a Makefile.</entry>
 		  </row>
+		  <row>
+		    <entry><varname>jde-gen-ant-buildfile-buffer-template</varname></entry>
+		    <entry>Autocode</entry>
+		    <entry>Template for a ant buildfile.</entry>
+		  </row>
 
 		  <row>
 		    <entry><varname>jde-gen-buffer-templates</varname></entry>
