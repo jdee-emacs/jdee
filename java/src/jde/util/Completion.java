@@ -640,7 +640,7 @@ public class Completion {
  * - do not do recursion for PUBLIC/PRIVATE access, or for interfaces. Saves
  * function calls, and fixes a bug that meant listing non-accessible private
  * members.
- * Thanks to Petter MÅÂhlÅÈn for contributing these changes.
+ * Thanks to Petter Mahlen for contributing these changes.
  *
  * Revision 1.16  2001/11/18 02:40:01  jslopez
  * Cleaned up imports.
@@ -651,7 +651,7 @@ public class Completion {
  *
  * Revision 1.14  2001/09/28 13:35:05  jslopez
  * Now getClassInfo retreives protected, and default package info
- * for super classes. Thanks to Petter MÅÂhlÅÈn [petter.mahlen@chello.se]
+ * for super classes. Thanks to Petter Mahlen [petter.mahlen@chello.se]
  *
  * Revision 1.13  2001/09/09 14:30:07  jslopez
  * Removed inecessary isPublic called in several places inside listClassInfo.

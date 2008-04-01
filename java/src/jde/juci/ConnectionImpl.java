@@ -318,8 +318,8 @@ public class ConnectionImpl implements InvocationHandler, Connection {
 
       if (global != null) {
         try {
-          global.getNameSpace().setVariable(variableName, null);
-        } catch (bsh.EvalError ee) {
+          global.getNameSpace().setVariable(variableName, null, true);
+        } catch (bsh.UtilEvalError ee) {
           // All we're doing is attempting to unset the variable here, so if
           // we fail at that, the consequences are probably harmless...
         }

@@ -2,7 +2,7 @@
  *    ClassInfo.java
  *    Copyright (C) 2002, 2003 Rodrigo Reyes (reyes@chez.com),
  *                       Javier Lopez (jslopez@forumsys.com), 
- *                       Petter Måhlén (petter.mahlen@chello.se)
+ *                        Mahlen (petter.mahlen@chello.se)
  *                       Paul Kinnucan (pkinnucan@attbi.com)
  *
  *    $Revision: 1.1 $
@@ -33,7 +33,7 @@ import jde.util.DynamicClassLoader;
  *
  * @author Rodrigo Reyes (reyes@chez.com),
  * @author Javier Lopez (jslopez@forumsys.com)
- * @author Petter Måhlén (petter.mahlen@chello.se)
+ * @authoMahlen (petter.mahlen@chello.se)
  * @author Paul Kinnucan (pkinnucan@attbi.com) 
  */
 

@@ -92,9 +92,9 @@ public class ImportWizard {
     
     try {
       ZipFile zipFile = new ZipFile(classPathFile);
-      Enumeration enum = zipFile.entries();
-      while (enum.hasMoreElements()) {
-	ZipEntry zipEntry = (ZipEntry)enum.nextElement();
+      Enumeration en = zipFile.entries();
+      while (en.hasMoreElements()) {
+	ZipEntry zipEntry = (ZipEntry)en.nextElement();
 	String current = zipEntry.getName();
 	if (current.toLowerCase().endsWith(".class")) {
 	  current = current.substring(0, current.length() - 6);
