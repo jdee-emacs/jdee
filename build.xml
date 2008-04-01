@@ -83,6 +83,7 @@
     <javac classpathref="build.classpath" 
            debug="${build.debug}" 
            deprecation="${build.deprecation}" 
+           source = "1.4"
            destdir="${build.classes}" 
            srcdir="${src.dir}">
        <patternset>
