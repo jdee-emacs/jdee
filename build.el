@@ -11,12 +11,18 @@
 ;; Elib packages and the environment variables CEDET_HOME and ELIB_HOME
 ;; must be defined in your environment.
 
-(add-to-list 'load-path (concat (getenv "CEDET_HOME") "/common"))
-(add-to-list 'load-path (concat (getenv "CEDET_HOME") "/eieio"))
-(add-to-list 'load-path (concat (getenv "CEDET_HOME") "/semantic"))
-(add-to-list 'load-path (concat (getenv "CEDET_HOME") "/semantic/bovine"))
-(add-to-list 'load-path (getenv "ELIB_HOME"))
+
+(load-file "./build-options.el")
+(add-to-list 'load-path (concat cedet-home "/common"))
+(add-to-list 'load-path (concat cedet-home "/eieio"))
+(add-to-list 'load-path (concat cedet-home "/semantic"))
+(add-to-list 'load-path (concat cedet-home "/semantic/bovine"))
+(add-to-list 'load-path (concat cedet-home "/speedbar"))
+(add-to-list 'load-path elib-home)
 (add-to-list 'load-path (expand-file-name"./lisp"))
+
+
+(message "%s" load-path)
 
 (load (expand-file-name "lisp/jde.el"))
 

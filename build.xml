@@ -16,6 +16,8 @@
   <property name="dist-name" value="${ant.project.name}"/>
   <property name="zipfile" value="${dist-name}.zip"/>
   <property name="dist" value="dist"/>
+  <!-- set this if you want...-->
+  <property name="emacs-command" value="emacs"/>
 
   <target name="init">
     <tstamp/>
@@ -36,6 +38,7 @@
   </target>
 
   <target name="lisp" depends="init" unless="lisp-is-uptodate">
+    <echo message="blah  ... ${emacs-command}"/>
     <exec executable="${emacs-command}">
       <arg value="--script"/>
       <arg value="build.el"/>
