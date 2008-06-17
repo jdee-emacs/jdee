@@ -352,8 +352,8 @@ just refrain from switching to it."
 The dialog sets SELECTION to the options selected by the user.")
 
 (defmethod initialize-instance ((this efc-multi-option-dialog) &rest fields)
-  "Dialog constructor."
-  (call-next-method))
+   "Dialog constructor."
+   (call-next-method))
 
 (defmethod efc-dialog-create ((this efc-multi-option-dialog))
   (message "%s..." (oref this build-message))
@@ -648,7 +648,7 @@ is an object of efc-visitor class."
   (if (efc-coll-type-compatible-p this item)
       (oset this items (append (oref this items) (list item)))
     (error "Tried to add an item of type %s to a list of items of type %s"
-	   (typep item) (oref this elem-type))))
+	   (type-of item) (oref this elem-type))))
 
 (defmethod efc-coll-iterator ((this efc-list))
   "Return an iterator for this list."
@@ -760,14 +760,14 @@ already contain the item."
 (defmethod initialize-instance ((this efc-hash-table) &rest fields)
   "Hash table constructor."
   (call-next-method)
-  (oset table (make-hash-table)))
+  (oset this table (make-hash-table)))
 
 (defmethod efc-coll-put ((this efc-hash-table) key value)
   "Put an item into the table."
   (if (efc-coll-type-compatible-p this value)
       (puthash key value (oref this table))      
     (error "Tried to add an item of type %s to a hash table of items of type %s"
-	   (typep value) (oref this elem-type))))
+	   (type-of value) (oref this elem-type))))
 
 (defmethod efc-coll-get ((this efc-hash-table) key)
   "Get an item from the table."
