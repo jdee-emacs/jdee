@@ -489,7 +489,7 @@ Returns a list constisting of the result of
 `jde-parse-get-innermost-class-at-point' followed by
 all modifieres of the class.
 Returns nil, if no class could be found."
-  (let ((class (jde-parse-get-innermost-class-at-point))
+    (let ((class (jde-parse-get-innermost-class-at-point))
         (mod-or-ws-re (concat "\\(" jde-parse-class-mod-re
                               "\\|" jde-parse-java-comment-or-ws-re
                               "\\)\\="))
@@ -535,6 +535,8 @@ is the position of the first character of the class
 or interface keyword or the first character
 of the new keyword in case of anonymous classes.
 Returns nil, if point is not in a class."
+
+  (semantic-refresh-tags-safe)
 (let ((left-paren-pos (c-parse-state)))
   (if left-paren-pos
       (save-excursion
