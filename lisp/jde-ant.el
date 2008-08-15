@@ -279,7 +279,7 @@ variable ANT_HOME."
 		(if (or 
 		     (string-match " " ant-home) ;; Quote path if it
 		     (string-match "." ant-home));; contains a space
-		    (concat "\"" ant-home "\"")  ;; or period.
+		    (concat delimiter ant-home delimiter)  ;; or period.
 		  ant-home)))
           (if (string= (car jde-ant-invocation-method) "Java")
               (concat
