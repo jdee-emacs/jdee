@@ -1,19 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <project name="jdee" default="configure-ebuild">
+  <!-- ** properties start ** -->
 
-  <property name="project.dir" location="."/>
 
-  <property name="config.dir" location="${project.dir}/config"/>
+  <!-- configuration directory -->
+  <property name="config.dir" location="./config"/>
   <property name="config.build.file" location="${config.dir}/config.properties"/>
 
-  <property name="src.lisp.dir" location="${project.dir}/lisp"/>
+  <!-- source code -->
+  <property name="src.lisp.dir" location="./lisp"/>
+  <property name="src.java.dir" location="./java/src"/>
 
-  <property name="build.dir" location="${project.dir}/build"/>
+  <!-- third party libraries -->
+  <property name="lib.java.dir" location="./java/lib"/>
+
+  <!-- create objects -->
+  <property name="build.dir" location="./build"/>
   <property name="build.lisp.dir" location="${build.dir}/lisp"/>
   <property name="build.lisp.file" location="${build.lisp.dir}/build.el"/>
 
-  <property name="dist.dir" location="${project.dir}/dist"/>
+  <property name="build.java.dir" location="${build.dir}/classes"/>
+
+
+  <!-- staging  -->
+  <property name="dist.dir" location="./dist"/>
+
+  <path id="compile.classpath">
+    <fileset dir="${lib.java.dir}"/>
+  </path>
+
+  <!-- ** properties start ** -->
+
 
 
   <target name="init">
@@ -30,7 +48,7 @@
   <target name="configure" depends="init" unless="config.uptodate">
 
     <!-- developers will usually have the following config file (i.e. source
-         installed libs) -->
+	 installed libs) -->
     <property file="${user.home}/.jdee-config.properties"/>
 
     <!-- project specific defaults (not user or instance specific) -->
@@ -44,6 +62,7 @@
     </propertyfile>
   </target>
 
+  <!-- configure (create/build) the emacs lisp build configuration files -->
   <target name="configure-ebuild" depends="configure">
     <mkdir dir="${build.lisp.dir}"/>
 
@@ -52,6 +71,8 @@
       <mapper type="glob" from="*.el" to="*.elc"/>
     </uptodate>
 
+
+    <!-- copy the lisp into place and create an emacs lisp build file -->
     <copy todir="${build.lisp.dir}">
       <fileset dir="${src.lisp.dir}" includes="*.el"/>
     </copy>
@@ -70,12 +91,23 @@
 </echo>
   </target>
 
-  <target name="build-lisp" depends="configure-ebuild" if="lisp-is-uptodate">
+  <target name="build-lisp" depends="configure-ebuild" if="lisp-is-uptodate"
+	  description="compile the JDEE Emacs lisp code">
     <exec dir="${build.lisp.dir}" executable="emacs">
       <arg value="--script"/>
       <arg value="build.el"/>
     </exec>
   </target>
+
+  <target name="build-java" depends="init-compile"
+	  description="compile the JDEE Java source code">
+    <mkdir dir="${build.java.dir}"/>
+    <javac srcdir="${src.java.dir}"
+	   destdir="${build.java.dir}"
+	   classpathref="compile.classpath"/>
+  </target>
+
+  <target name="build" depends="build-lisp, build-java"/>
 
 
   <target name="clean" depends="init">
