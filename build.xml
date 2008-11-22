@@ -1,105 +1,42 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project name="jdee" default="build">
-  <!-- Author: Dimitre Liotev (dl@znain.net). -->
-  <!--
-      This is the Ant build script for JDEE. To build the whole JDEE,
-      execute "ant". To build a distribution directory: "ant dist". To
-      create a zip file containing the JDEE distribution: "ant zip". To
-      clean everything: "ant clean".
 
-      Note that to compile the Elisp code you should either have the
-      "emacs" command in your PATH, or you should have the variable
-      EMACS_COMMAND defined in your environment.
-  -->
+<project name="jdee" default="compile">
 
-  <property environment="env"/>
-  <property name="dist-name" value="${ant.project.name}"/>
-  <property name="zipfile" value="${dist-name}.zip"/>
-  <property name="dist" value="dist"/>
-  <!-- set this if you want...-->
-  <property name="emacs-command" value="emacs"/>
+  <property name="project.dir" location="."/>
+  <property name="config.file" location="${project.dir}/config.properties"/>
+  <property name="build.dir" location="${project.dir}/build"/>
+  <property name="dist.dir" location="${project.dir}/dist"/>
 
   <target name="init">
     <tstamp/>
-    <mkdir dir="${dist}/${dist-name}"/>
-
-    <uptodate property="lisp-is-uptodate">
-      <srcfiles dir="lisp" includes="*.el"/>
-      <mapper type="glob" from="*.el" to="*.elc"/>
-    </uptodate>
-
-    <condition property="emacs-command" value="${env.EMACS_COMMAND}" else="emacs">
-      <isset property="env.EMACS_COMMAND"/>
-    </condition>
+    <uptodate property="config.uptodate" srcfile="${config.file}"
+	      targetfile="${config.file}"/>
   </target>
 
-  <target name="java" depends="init">
-    <ant dir="java" target="jar"/>
+  <target name="init-compile" depends="init">
+    <property file="${config.file}"/>
   </target>
 
-  <target name="lisp" depends="init" unless="lisp-is-uptodate">
-    <echo message="blah  ... ${emacs-command}"/>
-    <exec executable="${emacs-command}">
-      <arg value="--script"/>
-      <arg value="build.el"/>
-    </exec>
+  <target name="configure" depends="init" unless="config.uptodate">
+    <property file="${user.home}/.jdee-build.properties"/>
+    <property file="${project.dir}/config-default.properties"/>
+    <propertyfile file="${config.file}" comment="user editable build configuration parameters">
+      <entry key="config.time" type="date" value="now"/>
+      <entry key="cedet.dir" value="${cedet.dir}"/>
+      <entry key="elib.dir" value="${elib.dir}"/>
+    </propertyfile>
   </target>
 
-  <target name="build" depends="java, lisp">
+  <target name="compile" depends="init-compile">
   </target>
 
-  <target name="clean-java">
-    <ant dir="java" target="clean"/>
+  <target name="clean" depends="init">
+    <delete dir="${build.dir}"/>
+    <delete dir="${dist.dir}"/>
+    <delete file="${config.file}"/>
   </target>
 
-  <target name="clean-lisp">
-    <delete>
-      <fileset dir="lisp" includes="**/*.elc"/>
-    </delete>
-  </target>
-
-  <target name="clean" depends="clean-java, clean-lisp">
-    <delete dir="${dist}"/>
-    <delete file="${dist-name}.zip"/>
-  </target>
-
-  <target name="dist" depends="build">
-    <mkdir dir="${dist}/${dist-name}/lisp"/>
-    <mkdir dir="${dist}/${dist-name}/java/lib"/>
-    <mkdir dir="${dist}/${dist-name}/java/src"/>
-    <mkdir dir="${dist}/${dist-name}/java/bsh-commands"/>
-    <mkdir dir="${dist}/${dist-name}/plugins"/>
-    <mkdir dir="${dist}/${dist-name}/doc/html"/>
-    <mkdir dir="${dist}/${dist-name}/doc/tli_rbl"/>
-
-    <copy todir="${dist}/${dist-name}/lisp">
-      <fileset dir="lisp/"/>
-    </copy>
-
-    <copy todir="${dist}/${dist-name}/java/lib">
-      <fileset dir="java/lib"/>
-    </copy>
-
-    <copy todir="${dist}/${dist-name}/java/src">
-      <fileset dir="java/src"/>
-    </copy>
-
-    <copy todir="${dist}/${dist-name}/java/bsh-commands">
-      <fileset dir="java/bsh-commands"/>
-    </copy>
-
-    <copy todir="${dist}/${dist-name}/doc/html">
-      <fileset dir="doc/html"/>
-    </copy>
-
-    <copy todir="${dist}/${dist-name}/doc/tli_rbl">
-      <fileset dir="doc/tli_rbl"/>
-    </copy>
-
-  </target>
-
-  <target name="zip" depends="dist">
-    <zip destfile="${dist-name}.zip" basedir="${dist}"/>
+  <target name="cleanall" depends="clean">
   </target>
 
 </project>
