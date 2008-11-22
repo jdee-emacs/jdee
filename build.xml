@@ -70,7 +70,7 @@
 </echo>
   </target>
 
-  <target name="compile-ebuild" depends="configure-ebuild" if="lisp-is-uptodate">
+  <target name="build-lisp" depends="configure-ebuild" if="lisp-is-uptodate">
     <exec dir="${build.lisp.dir}" executable="emacs">
       <arg value="--script"/>
       <arg value="build.el"/>
