@@ -3,28 +3,69 @@
 <project name="jdee" default="compile">
 
   <property name="project.dir" location="."/>
-  <property name="config.file" location="${project.dir}/config.properties"/>
+
+  <property name="config.dir" location="${project.dir}/config"/>
+  <property name="config.build.file" location="${config.dir}/config.properties"/>
+
+  <property name="src.lisp.dir" location="${project.dir}/lisp"/>
+
   <property name="build.dir" location="${project.dir}/build"/>
+  <property name="build.lisp.dir" location="${build.dir}/lisp"/>
+  <property name="build.lisp.file" location="${build.lisp.dir}/build.el"/>
+
   <property name="dist.dir" location="${project.dir}/dist"/>
+
 
   <target name="init">
     <tstamp/>
-    <uptodate property="config.uptodate" srcfile="${config.file}"
-	      targetfile="${config.file}"/>
+    <uptodate property="config.uptodate" srcfile="${config.build.file}"
+	      targetfile="${config.build.file}"/>
+    <mkdir dir="${build.dir}"/>
   </target>
 
   <target name="init-compile" depends="init">
-    <property file="${config.file}"/>
+    <property file="${config.build.file}"/>
   </target>
 
   <target name="configure" depends="init" unless="config.uptodate">
-    <property file="${user.home}/.jdee-build.properties"/>
+
+    <!-- developers will usually have the following config file (i.e. source
+         installed libs) -->
+    <property file="${user.home}/.jdee-config.properties"/>
+
+    <!-- project specific defaults (not user or instance specific) -->
     <property file="${project.dir}/config-default.properties"/>
-    <propertyfile file="${config.file}" comment="user editable build configuration parameters">
+
+    <propertyfile file="${config.build.file}" comment="user editable build configuration parameters">
       <entry key="config.time" type="date" value="now"/>
       <entry key="cedet.dir" value="${cedet.dir}"/>
       <entry key="elib.dir" value="${elib.dir}"/>
+      <entry key="prefix.dir" value="${prefix.dir}"/>
     </propertyfile>
+  </target>
+
+  <target name="configure-ebuild" depends="init">
+    <mkdir dir="${build.lisp.dir}"/>
+    <copy todir="${build.lisp.dir}">
+      <fileset dir="${src.lisp.dir}" includes="*.el"/>
+    </copy>
+
+    <!--uptodate property="lisp-is-uptodate">
+      <srcfiles dir="lisp" includes="*.el"/>
+      <mapper type="glob" from="*.el" to="*.elc"/>
+    </uptodate-->
+
+<echo file="${build.lisp.file}">
+(dolist (path '("common"
+		"eieio"
+		"semantic"
+		"semantic/bovine"
+		"speedbar"
+		elib-home
+		"lisp"))
+  (add-to-list 'load-path path t))
+(byte-recompile-directory (expand-file-name "lisp") 0)
+</echo>
   </target>
 
   <target name="compile" depends="init-compile">
@@ -33,7 +74,7 @@
   <target name="clean" depends="init">
     <delete dir="${build.dir}"/>
     <delete dir="${dist.dir}"/>
-    <delete file="${config.file}"/>
+    <delete file="${config.build.file}"/>
   </target>
 
   <target name="cleanall" depends="clean">
