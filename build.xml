@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<project name="jdee" default="compile">
+<project name="jdee" default="configure-ebuild">
 
   <property name="project.dir" location="."/>
 
@@ -34,7 +34,7 @@
     <property file="${user.home}/.jdee-config.properties"/>
 
     <!-- project specific defaults (not user or instance specific) -->
-    <property file="${project.dir}/config-default.properties"/>
+    <property file="${config.dir}/default.properties"/>
 
     <propertyfile file="${config.build.file}" comment="user editable build configuration parameters">
       <entry key="config.time" type="date" value="now"/>
@@ -44,16 +44,17 @@
     </propertyfile>
   </target>
 
-  <target name="configure-ebuild" depends="init">
+  <target name="configure-ebuild" depends="configure">
     <mkdir dir="${build.lisp.dir}"/>
+
+    <uptodate property="lisp-is-uptodate">
+      <srcfiles dir="${build.lisp.dir}" includes="*.el"/>
+      <mapper type="glob" from="*.el" to="*.elc"/>
+    </uptodate>
+
     <copy todir="${build.lisp.dir}">
       <fileset dir="${src.lisp.dir}" includes="*.el"/>
     </copy>
-
-    <!--uptodate property="lisp-is-uptodate">
-      <srcfiles dir="lisp" includes="*.el"/>
-      <mapper type="glob" from="*.el" to="*.elc"/>
-    </uptodate-->
 
 <echo file="${build.lisp.file}">
 (dolist (path '("common"
@@ -61,15 +62,21 @@
 		"semantic"
 		"semantic/bovine"
 		"speedbar"
-		elib-home
-		"lisp"))
-  (add-to-list 'load-path path t))
-(byte-recompile-directory (expand-file-name "lisp") 0)
+		))
+  (add-to-list 'load-path (expand-file-name path "${cedet.dir}") t))
+(message "LOAD PATH: %s" (mapconcat #'identity load-path ":"))
+(add-to-list 'load-path "${src.lisp.dir}")
+(byte-recompile-directory (expand-file-name "${build.lisp.dir}") 0)
 </echo>
   </target>
 
-  <target name="compile" depends="init-compile">
+  <target name="compile-ebuild" depends="configure-ebuild" if="lisp-is-uptodate">
+    <exec dir="${build.lisp.dir}" executable="emacs">
+      <arg value="--script"/>
+      <arg value="build.el"/>
+    </exec>
   </target>
+
 
   <target name="clean" depends="init">
     <delete dir="${build.dir}"/>
