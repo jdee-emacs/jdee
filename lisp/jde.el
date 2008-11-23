@@ -59,6 +59,9 @@
 (unless (fboundp 'custom-set-default)
    (defalias 'custom-set-default 'set-default)) 
 
+;; Autoloads must be loaded first since move to sole `(require 'jde)' style.
+(require 'jde-autoload)
+
 (require 'jde-util)
 
 ;; The version of the JDEE distributed with XEmacs has its own

@@ -57,6 +57,7 @@
       (save-excursion (end-of-line n) (point))
     (line-end-position)))
 
+;;;###autoload
 (defun jde-require (feature)
    "Require FEATURE, either pre-installed or from the distribution.
  That is, first try to load the FEATURE library. Then try to load the

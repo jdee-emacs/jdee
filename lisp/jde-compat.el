@@ -30,7 +30,7 @@
 
 ;;; Code:
 
-
+;;;###autoload
 (defconst jde-xemacsp (string-match "XEmacs" (emacs-version))
   "Non-nil if we are running in the XEmacs environment.")
 

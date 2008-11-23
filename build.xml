@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<project name="jdee" default="configure-ebuild">
+<project name="jdee" default="build">
   <!-- ** properties start ** -->
 
 
@@ -63,7 +63,7 @@
   </target>
 
   <!-- configure (create/build) the emacs lisp build configuration files -->
-  <target name="configure-ebuild" depends="configure">
+  <target name="configure-ebuild" depends="configure,init-compile">
     <mkdir dir="${build.lisp.dir}"/>
 
     <uptodate property="lisp-is-uptodate">
@@ -78,6 +78,31 @@
     </copy>
 
 <echo file="${build.lisp.file}">
+(defun gen-autoloads (dir)
+  (let* ((libname "jde-autoload")
+         (filename (format "%s.el" libname))
+	 (filename-long (expand-file-name filename dir))
+	 (buf (find-file-noselect filename-long))
+	 files)
+    (save-excursion
+      (set-buffer buf)
+      (erase-buffer)
+      (dolist (file (remove nil
+			    (mapcar #'(lambda (file)
+					(unless
+					    (or (string= filename file)
+						(string-match "^\\.#" file))
+					  file))
+					(directory-files dir nil
+							 "\\.el$"))))
+	(generate-file-autoloads file))
+      (insert (format "\n(provide '%s)\n" libname))
+      (save-buffer buf)
+      (eval-buffer buf)
+      buf)))
+(require 'autoload)
+(setq autoload-buf (gen-autoloads "${build.lisp.dir}"))
+
 (dolist (path '("common"
 		"eieio"
 		"semantic"
@@ -85,8 +110,9 @@
 		"speedbar"
 		))
   (add-to-list 'load-path (expand-file-name path "${cedet.dir}") t))
+(add-to-list 'load-path "${src.lisp.dir}" t)
+(eval-buffer autoload-buf)
 (message "LOAD PATH: %s" (mapconcat #'identity load-path ":"))
-(add-to-list 'load-path "${src.lisp.dir}")
 (byte-recompile-directory (expand-file-name "${build.lisp.dir}") 0)
 </echo>
   </target>
@@ -107,7 +133,8 @@
 	   classpathref="compile.classpath"/>
   </target>
 
-  <target name="build" depends="build-lisp, build-java"/>
+  <target name="build" depends="build-lisp, build-java"
+	  description="compile all JDEE source code"/>
 
 
   <target name="clean" depends="init">
