@@ -22,6 +22,7 @@
 
   <property name="build.java.dir" location="${build.dir}/classes"/>
 
+  <property name="build.bin.emacs" value="emacs"/>
 
   <!-- staging  -->
   <property name="dist.dir" location="./dist"/>
@@ -119,7 +120,7 @@
 
   <target name="build-lisp" depends="configure-ebuild" if="lisp-is-uptodate"
 	  description="compile the JDEE Emacs lisp code">
-    <exec dir="${build.lisp.dir}" executable="emacs">
+    <exec dir="${build.lisp.dir}" executable="${build.bin.emacs}">
       <arg value="--script"/>
       <arg value="build.el"/>
     </exec>
