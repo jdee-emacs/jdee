@@ -25,14 +25,18 @@
   <property name="build.lisp.src.file" location="${config.dir}/build.el"/>
   <property name="build.lisp.dst.file" location="${build.config.dir}/build.el"/>
   <!-- for now, changes to this need to be reflected in the `require' in jde.el -->
-  <property name="build.lisp.autoload.libname" location="${build.lisp.dir}/jde-autoload"/>
-
+  <property name="build.lisp.autoload.libname" value="jde-autoload"/>
+  <property name="build.lisp.autoload.file" location="${build.lisp.dir}/${build.lisp.autoload.libname}.el"/>
   <property name="build.java.dir" location="${build.dir}/classes"/>
-
   <property name="build.bin.emacs" value="emacs"/>
 
   <!-- staging  -->
   <property name="dist.dir" location="./dist"/>
+  <property name="dist.lisp.dir" location="${dist.dir}/lisp"/>
+  <property name="dist.java.dir" location="${dist.dir}/java"/>
+  <property name="dist.java.lib.dir" location="${dist.java.dir}/lib"/>
+  <property name="dist.java.src.dir" location="${dist.java.dir}/src"/>
+  <property name="dist.jar.jde.file" location="${dist.java.lib.dir}/jde.jar"/>
 
   <path id="compile.classpath">
     <fileset dir="${lib.java.dir}"/>
@@ -61,18 +65,18 @@
 
     <condition property="lisp.uptodate">
       <and>
-	<available file="${build.lisp.autoload.libname}.el"/>
+	<available file="${build.lisp.autoload.file}"/>
 	<uptodate>
 	  <srcfiles dir="${build.lisp.dir}" includes="*.el"/>
 	  <mapper type="glob" from="*.el" to="*.elc"/>
 	</uptodate>
       </and>
     </condition>
-    <echo message="AFT: ${lisp.uptodate}"/>
   </target>
 
 
-  <target name="configure" depends="init,prepare-lisp-build" unless="config.uptodate">
+  <target name="configure" depends="init,prepare-lisp-build"
+	  unless="config.uptodate">
     <mkdir dir="${build.config.dir}"/>
 
     <!-- developers will usually have the following config file (i.e. source
@@ -93,7 +97,8 @@
 
 
   <!-- configure (create/build) the emacs lisp build configuration files -->
-  <target name="configure-ebuild" depends="configure,init-compile" unless="lisp.uptodate">
+  <target name="configure-ebuild" depends="configure,init-compile"
+	  unless="lisp.uptodate">
     <!-- copy the lisp to the build directory -->
     <copy todir="${build.lisp.dir}">
       <fileset dir="${src.lisp.dir}" includes="*.el"/>
@@ -133,21 +138,40 @@
 	  description="compile all JDEE source code"/>
 
 
-  <target name="dist" depends="build">
-    <mkdir dir="${dist.dir}"/>
-    <copy todir="${dist.dir}">
+  <target name="dist" depends="build" description="create the &quot;binary&quot; distribution">
+    <!-- create dist java lib directory -->
+    <mkdir dir="${dist.lisp.dir}"/>
+    <copy todir="${dist.lisp.dir}">
       <fileset dir="${build.lisp.dir}"/>
     </copy>
+
+    <!-- this subdir contains all things Java -->
+    <mkdir dir="${dist.java.lib.dir}"/>
+    <!-- third party libraries -->
+    <copy todir="${dist.java.lib.dir}">
+      <fileset dir="${lib.java.dir}"/>
+    </copy>
+
+    <!-- for those who want to look at the Java source -->
+    <mkdir dir="${dist.java.src.dir}"/>
+    <copy todir="${dist.java.src.dir}">
+      <fileset dir="${src.java.dir}"/>
+    </copy>
+
+    <!-- create the JDE jar file -->
+    <jar destfile="${dist.jar.jde.file}"
+	 basedir="${build.java.dir}"
+	 includes="**/*.class"/>
   </target>
 
 
   <target name="clean" depends="init">
     <delete dir="${build.dir}"/>
     <delete dir="${dist.dir}"/>
-    <delete file="${config.build.file}"/>
   </target>
 
   <target name="cleanall" depends="clean">
+    <delete file="${config.build.file}"/>
   </target>
 
 </project>
