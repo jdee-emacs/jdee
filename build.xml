@@ -6,7 +6,6 @@
 
   <!-- configuration directory -->
   <property name="config.dir" location="./config"/>
-  <property name="config.build.file" location="${config.dir}/config.properties"/>
 
   <!-- source code -->
   <property name="src.lisp.dir" location="./lisp"/>
@@ -17,8 +16,14 @@
 
   <!-- create objects -->
   <property name="build.dir" location="./build"/>
+
+  <property name="build.config.dir" location="${build.dir}/config"/>
+  <property name="config.build.file"
+	    location="${build.config.dir}/config.properties"/>
+
   <property name="build.lisp.dir" location="${build.dir}/lisp"/>
-  <property name="build.lisp.file" location="${build.lisp.dir}/build.el"/>
+  <property name="build.lisp.src.file" location="${config.dir}/build.el"/>
+  <property name="build.lisp.dst.file" location="${build.config.dir}/build.el"/>
 
   <property name="build.java.dir" location="${build.dir}/classes"/>
 
@@ -31,7 +36,7 @@
     <fileset dir="${lib.java.dir}"/>
   </path>
 
-  <!-- ** properties start ** -->
+  <!-- ** properties end ** -->
 
 
 
@@ -42,11 +47,15 @@
     <mkdir dir="${build.dir}"/>
   </target>
 
+
   <target name="init-compile" depends="init">
     <property file="${config.build.file}"/>
   </target>
 
+
   <target name="configure" depends="init" unless="config.uptodate">
+
+    <mkdir dir="${build.config.dir}"/>
 
     <!-- developers will usually have the following config file (i.e. source
 	 installed libs) -->
@@ -55,13 +64,15 @@
     <!-- project specific defaults (not user or instance specific) -->
     <property file="${config.dir}/default.properties"/>
 
-    <propertyfile file="${config.build.file}" comment="user editable build configuration parameters">
+    <propertyfile file="${config.build.file}"
+		  comment="user editable build configuration parameters">
       <entry key="config.time" type="date" value="now"/>
       <entry key="cedet.dir" value="${cedet.dir}"/>
       <entry key="elib.dir" value="${elib.dir}"/>
       <entry key="prefix.dir" value="${prefix.dir}"/>
     </propertyfile>
   </target>
+
 
   <!-- configure (create/build) the emacs lisp build configuration files -->
   <target name="configure-ebuild" depends="configure,init-compile">
@@ -72,59 +83,31 @@
       <mapper type="glob" from="*.el" to="*.elc"/>
     </uptodate>
 
-
     <!-- copy the lisp into place and create an emacs lisp build file -->
     <copy todir="${build.lisp.dir}">
       <fileset dir="${src.lisp.dir}" includes="*.el"/>
     </copy>
 
-<echo file="${build.lisp.file}">
-(defun gen-autoloads (dir)
-  (let* ((libname "jde-autoload")
-         (filename (format "%s.el" libname))
-	 (filename-long (expand-file-name filename dir))
-	 (buf (find-file-noselect filename-long))
-	 files)
-    (save-excursion
-      (set-buffer buf)
-      (erase-buffer)
-      (dolist (file (remove nil
-			    (mapcar #'(lambda (file)
-					(unless
-					    (or (string= filename file)
-						(string-match "^\\.#" file))
-					  file))
-					(directory-files dir nil
-							 "\\.el$"))))
-	(generate-file-autoloads file))
-      (insert (format "\n(provide '%s)\n" libname))
-      (save-buffer buf)
-      (eval-buffer buf)
-      buf)))
-(require 'autoload)
-(setq autoload-buf (gen-autoloads "${build.lisp.dir}"))
-
-(dolist (path '("common"
-		"eieio"
-		"semantic"
-		"semantic/bovine"
-		"speedbar"
-		))
-  (add-to-list 'load-path (expand-file-name path "${cedet.dir}") t))
-(add-to-list 'load-path "${src.lisp.dir}" t)
-(eval-buffer autoload-buf)
-(message "LOAD PATH: %s" (mapconcat #'identity load-path ":"))
-(byte-recompile-directory (expand-file-name "${build.lisp.dir}") 0)
-</echo>
+    <!-- create the file used to compile the emacs lisp code -->
+    <copy file="${build.lisp.src.file}" tofile="${build.lisp.dst.file}"/>
+    <replace file="${build.lisp.dst.file}">
+      <replacefilter token="@{cedet.dir}" value="${cedet.dir}"/>
+      <replacefilter token="@{src.lisp.dir}" value="${src.lisp.dir}"/>
+      <replacefilter token="@{build.lisp.dir}" value="${build.lisp.dir}"/>
+    </replace>
   </target>
+
 
   <target name="build-lisp" depends="configure-ebuild" if="lisp-is-uptodate"
 	  description="compile the JDEE Emacs lisp code">
+    <!-- invoke Emacs in batch mode to creat autoloads and compile emacs
+         lisp -->
     <exec dir="${build.lisp.dir}" executable="${build.bin.emacs}">
       <arg value="--script"/>
-      <arg value="build.el"/>
+      <arg value="${build.lisp.dst.file}"/>
     </exec>
   </target>
+
 
   <target name="build-java" depends="init-compile"
 	  description="compile the JDEE Java source code">
@@ -133,6 +116,7 @@
 	   destdir="${build.java.dir}"
 	   classpathref="compile.classpath"/>
   </target>
+
 
   <target name="build" depends="build-lisp, build-java"
 	  description="compile all JDEE source code"/>
