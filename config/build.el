@@ -1,10 +1,9 @@
 ;; Create autoloads and build the lisp source code.  The paths are substituted
 ;; by the ant build.
 
-(defun jde-make-autoloads (dir)
+(defun jde-make-autoloads (dir libname)
   "Generate the jde-autoloads.el for all elisp source files in DIR."
-  (let* ((libname "jde-autoload")
-         (filename (format "%s.el" libname))
+  (let* ((filename (format "%s.el" libname))
 	 (filename-long (expand-file-name filename dir))
 	 (buf (find-file-noselect filename-long))
 	 files)
@@ -26,7 +25,7 @@
       (eval-buffer buf)
       buf)))
 
-(defun jde-make-autoloads-and-compile (dir lisp-src-dir cedet-dir paths)
+(defun jde-make-autoloads-and-compile (dir lisp-src-dir cedet-dir paths autoload-libname)
   "Create autoloads and compile lisp code in DIR.
 LISP-SRC-DIR is the base directory for all third party lisp code use to
 compile.
@@ -34,7 +33,7 @@ compile.
 CEDET-DIR is the cedet lisp code base directory (see PATHS).
 
 PATHS are sub directories under CEDET-DIR we use to compile."
-  (let ((autoload-buf (jde-make-autoloads dir)))
+  (let ((autoload-buf (jde-make-autoloads dir autoload-libname)))
     (dolist (path paths)
       (add-to-list 'load-path (expand-file-name path cedet-dir) t))
     (add-to-list 'load-path lisp-src-dir t)
@@ -53,4 +52,5 @@ PATHS are sub directories under CEDET-DIR we use to compile."
 				  "semantic"
 				  "semantic/bovine"
 				  "speedbar"
-				  ))
+				  )
+				"@{build.lisp.autoload.libname}")

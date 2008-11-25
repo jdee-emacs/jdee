@@ -24,6 +24,7 @@
   <property name="build.lisp.dir" location="${build.dir}/lisp"/>
   <property name="build.lisp.src.file" location="${config.dir}/build.el"/>
   <property name="build.lisp.dst.file" location="${build.config.dir}/build.el"/>
+  <property name="build.lisp.autoload.libname" location="${build.lisp.dir}/jde-autoload"/>
 
   <property name="build.java.dir" location="${build.dir}/classes"/>
 
@@ -53,8 +54,24 @@
   </target>
 
 
-  <target name="configure" depends="init" unless="config.uptodate">
+  <!-- determine whether or not we need to compile emacs lisp/autoload files -->
+  <target name="prepare-lisp-build">
+    <mkdir dir="${build.lisp.dir}"/>
 
+    <condition property="lisp.uptodate">
+      <and>
+	<available file="${build.lisp.autoload.libname}.el"/>
+	<uptodate>
+	  <srcfiles dir="${build.lisp.dir}" includes="*.el"/>
+	  <mapper type="glob" from="*.el" to="*.elc"/>
+	</uptodate>
+      </and>
+    </condition>
+    <echo message="AFT: ${lisp.uptodate}"/>
+  </target>
+
+
+  <target name="configure" depends="init,prepare-lisp-build" unless="config.uptodate">
     <mkdir dir="${build.config.dir}"/>
 
     <!-- developers will usually have the following config file (i.e. source
@@ -75,15 +92,8 @@
 
 
   <!-- configure (create/build) the emacs lisp build configuration files -->
-  <target name="configure-ebuild" depends="configure,init-compile">
-    <mkdir dir="${build.lisp.dir}"/>
-
-    <uptodate property="lisp-is-uptodate">
-      <srcfiles dir="${build.lisp.dir}" includes="*.el"/>
-      <mapper type="glob" from="*.el" to="*.elc"/>
-    </uptodate>
-
-    <!-- copy the lisp into place and create an emacs lisp build file -->
+  <target name="configure-ebuild" depends="configure,init-compile" unless="lisp.uptodate">
+    <!-- copy the lisp to the build directory -->
     <copy todir="${build.lisp.dir}">
       <fileset dir="${src.lisp.dir}" includes="*.el"/>
     </copy>
@@ -94,11 +104,12 @@
       <replacefilter token="@{cedet.dir}" value="${cedet.dir}"/>
       <replacefilter token="@{src.lisp.dir}" value="${src.lisp.dir}"/>
       <replacefilter token="@{build.lisp.dir}" value="${build.lisp.dir}"/>
+      <replacefilter token="@{build.lisp.autoload.libname}" value="${build.lisp.autoload.libname}"/>
     </replace>
   </target>
 
 
-  <target name="build-lisp" depends="configure-ebuild" if="lisp-is-uptodate"
+  <target name="build-lisp" depends="configure-ebuild" unless="lisp.uptodate"
 	  description="compile the JDEE Emacs lisp code">
     <!-- invoke Emacs in batch mode to creat autoloads and compile emacs
          lisp -->
@@ -120,6 +131,14 @@
 
   <target name="build" depends="build-lisp, build-java"
 	  description="compile all JDEE source code"/>
+
+
+  <target name="dist" depends="build">
+    <mkdir dir="${dist.dir}"/>
+    <copy todir="${dist.dir}">
+      <fileset dir="${build.lisp.dir}"/>
+    </copy>
+  </target>
 
 
   <target name="clean" depends="init">
