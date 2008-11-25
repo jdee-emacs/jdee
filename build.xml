@@ -24,6 +24,7 @@
   <property name="build.lisp.dir" location="${build.dir}/lisp"/>
   <property name="build.lisp.src.file" location="${config.dir}/build.el"/>
   <property name="build.lisp.dst.file" location="${build.config.dir}/build.el"/>
+  <!-- for now, changes to this need to be reflected in the `require' in jde.el -->
   <property name="build.lisp.autoload.libname" location="${build.lisp.dir}/jde-autoload"/>
 
   <property name="build.java.dir" location="${build.dir}/classes"/>
@@ -123,8 +124,7 @@
   <target name="build-java" depends="init-compile"
 	  description="compile the JDEE Java source code">
     <mkdir dir="${build.java.dir}"/>
-    <javac srcdir="${src.java.dir}"
-	   destdir="${build.java.dir}"
+    <javac srcdir="${src.java.dir}" destdir="${build.java.dir}"
 	   classpathref="compile.classpath"/>
   </target>
 
