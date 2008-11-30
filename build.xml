@@ -36,7 +36,10 @@
   <property name="dist.java.dir" location="${dist.dir}/java"/>
   <property name="dist.java.lib.dir" location="${dist.java.dir}/lib"/>
   <property name="dist.java.src.dir" location="${dist.java.dir}/src"/>
+  <property name="dist.java.doc.dir" location="${dist.dir}/java/doc"/>
   <property name="dist.jar.jde.file" location="${dist.java.lib.dir}/jde.jar"/>
+  <property name="dist.doc.java.dir" location="${dist.java.dir}/doc"/>
+  <property name="dist.doc.java.api.dir" location="${dist.doc.java.dir}/api"/>
 
   <path id="compile.classpath">
     <fileset dir="${lib.java.dir}"/>
@@ -162,6 +165,13 @@
     <jar destfile="${dist.jar.jde.file}"
 	 basedir="${build.java.dir}"
 	 includes="**/*.class"/>
+
+    <javadoc sourcepath="${src.java.dir}"
+	     destdir="${dist.doc.java.api.dir}"
+	     classpathref="compile.classpath"
+	     author="true" version="true" use="true"
+	     windowtitle="JDEE Java API"
+	     />
   </target>
 
 
