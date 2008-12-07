@@ -48,12 +48,17 @@
   <!-- ** properties end ** -->
 
 
-
   <target name="init">
     <tstamp/>
-    <uptodate property="config.uptodate" srcfile="${config.build.file}"
-	      targetfile="${config.build.file}"/>
-    <mkdir dir="${build.dir}"/>
+
+    <!--available property="init.config.resource" file="${config.build.file}"/>
+    <fail unless="${init.config.resource}" message="type 'ant configure' first"/-->
+
+    <!-- developers will usually have the following config file (i.e. source
+	 installed libs) -->
+    <property file="${user.home}/.jdee-config.properties"/>
+
+    <property file="${config.build.file}"/>
 
     <condition property="build.bin.emacs"
 	       value="/Applications/Emacs.app/Contents/MacOS/Emacs">
@@ -69,11 +74,10 @@
 	<available file="${user.home}/Applications/Emacs.app" type="dir"/>
       </and>
     </condition>
-  </target>
 
-
-  <target name="init-compile" depends="init">
-    <property file="${config.build.file}"/>
+    <uptodate property="config.uptodate" srcfile="${config.build.file}"
+	      targetfile="${config.build.file}"/>
+    <mkdir dir="${build.dir}"/>
   </target>
 
 
@@ -103,10 +107,6 @@
 
     <mkdir dir="${build.config.dir}"/>
 
-    <!-- developers will usually have the following config file (i.e. source
-	 installed libs) -->
-    <property file="${user.home}/.jdee-config.properties"/>
-
     <!-- project specific defaults (not user or instance specific) -->
     <property file="${config.dir}/default.properties"/>
 
@@ -122,7 +122,7 @@
 
 
   <!-- configure (create/build) the emacs lisp build configuration files -->
-  <target name="configure-ebuild" depends="configure,init-compile"
+  <target name="configure-ebuild" depends="configure,init"
 	  unless="lisp.uptodate">
     <!-- copy the lisp to the build directory -->
     <copy todir="${build.lisp.dir}">
@@ -151,7 +151,7 @@
   </target>
 
 
-  <target name="build-java" depends="init-compile"
+  <target name="build-java" depends="init"
 	  description="compile the JDEE Java source code">
     <mkdir dir="${build.java.dir}"/>
     <javac srcdir="${src.java.dir}" destdir="${build.java.dir}"
