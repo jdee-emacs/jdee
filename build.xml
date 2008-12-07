@@ -39,7 +39,7 @@
 
   <property name="dist.doc.dir" location="${dist.dir}/doc"/>
   <property name="dist.doc.java.api.dir" location="${dist.doc.dir}/java/api"/>
-  <property name="dist.doc.ug.dir" location="${dist.doc.dir}/ug"/>
+  <property name="dist.doc.html.dir" location="${dist.doc.dir}/html"/>
 
   <path id="compile.classpath">
     <fileset dir="${lib.java.dir}"/>
@@ -50,10 +50,6 @@
 
   <target name="init">
     <tstamp/>
-
-    <!--available property="init.config.resource" file="${config.build.file}"/>
-    <fail unless="${init.config.resource}" message="type 'ant configure' first"/-->
-
     <!-- developers will usually have the following config file (i.e. source
 	 installed libs) -->
     <property file="${user.home}/.jdee-config.properties"/>
@@ -184,8 +180,8 @@
     </copy>
 
     <!-- user guide docs -->
-    <mkdir dir="${dist.doc.ug.dir}"/>
-    <copy todir="${dist.doc.ug.dir}">
+    <mkdir dir="${dist.doc.html.dir}"/>
+    <copy todir="${dist.doc.html.dir}">
       <!-- use the checked in generated docs for now -->
       <dirset dir="./doc/html" includes="*"/>
     </copy>
