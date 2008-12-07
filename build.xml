@@ -184,12 +184,14 @@
   </target>
 
 
-  <target name="clean" depends="init">
+  <target name="clean" depends="init"
+	  description="delete all derived objects EXCEPT the user edited configuration file">
     <delete dir="${build.dir}"/>
     <delete dir="${dist.dir}"/>
   </target>
 
-  <target name="cleanall" depends="clean">
+  <target name="clean-all" depends="clean"
+	  description="delete all derived objects">
     <delete file="${config.build.file}"/>
   </target>
 
