@@ -18,8 +18,7 @@
   <property name="build.dir" location="./build"/>
 
   <property name="build.config.dir" location="${build.dir}/config"/>
-  <property name="config.build.file"
-	    location="${build.config.dir}/config.properties"/>
+  <property name="config.build.file" location="./build.properties"/>
 
   <property name="build.lisp.dir" location="${build.dir}/lisp"/>
   <property name="build.lisp.src.file" location="${config.dir}/build.el"/>
@@ -81,7 +80,8 @@
 
 
   <target name="configure" depends="init,prepare-lisp-build"
-	  unless="config.uptodate">
+	  unless="config.uptodate"
+	  description="create the configuration file the user edits for builds">
     <mkdir dir="${build.config.dir}"/>
 
     <!-- developers will usually have the following config file (i.e. source
@@ -124,7 +124,7 @@
 	  description="compile the JDEE Emacs lisp code">
     <!-- invoke Emacs in batch mode to creat autoloads and compile emacs
          lisp -->
-    <exec dir="${build.lisp.dir}" executable="${build.bin.emacs}">
+    <exec dir="${build.lisp.dir}" executable="${build.bin.emacs}" failonerror="true">
       <arg value="--script"/>
       <arg value="${build.lisp.dst.file}"/>
     </exec>

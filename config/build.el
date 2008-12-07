@@ -33,6 +33,9 @@ compile.
 CEDET-DIR is the cedet lisp code base directory (see PATHS).
 
 PATHS are sub directories under CEDET-DIR we use to compile."
+  (dolist (path (list dir lisp-src-dir cedet-dir))
+    (if (not (file-directory-p path))
+	(error "Doesn't exist or not a directory: %s" path)))
   (let ((autoload-buf (jde-make-autoloads dir autoload-libname)))
     (dolist (path paths)
       (add-to-list 'load-path (expand-file-name path cedet-dir) t))
