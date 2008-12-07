@@ -183,7 +183,7 @@
     <mkdir dir="${dist.doc.html.dir}"/>
     <copy todir="${dist.doc.html.dir}">
       <!-- use the checked in generated docs for now -->
-      <dirset dir="./doc/html" includes="*"/>
+      <fileset dir="./doc/html" includes="**"/>
     </copy>
 
     <!-- create the JDE jar file -->
