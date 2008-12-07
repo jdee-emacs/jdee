@@ -27,7 +27,6 @@
   <property name="build.lisp.autoload.libname" value="jde-autoload"/>
   <property name="build.lisp.autoload.file" location="${build.lisp.dir}/${build.lisp.autoload.libname}.el"/>
   <property name="build.java.dir" location="${build.dir}/classes"/>
-  <property name="build.bin.emacs" value="emacs"/>
 
   <!-- staging  -->
   <property name="dist.dir" location="./dist"/>
@@ -55,6 +54,21 @@
     <uptodate property="config.uptodate" srcfile="${config.build.file}"
 	      targetfile="${config.build.file}"/>
     <mkdir dir="${build.dir}"/>
+
+    <condition property="build.bin.emacs"
+	       value="/Applications/Emacs.app/Contents/MacOS/Emacs">
+      <and>
+	<os family="mac"/>
+	<available file="/Applications/Emacs.app" type="dir"/>
+      </and>
+    </condition>
+    <condition property="build.bin.emacs"
+	       value="${user.home}/Applications/Emacs.app/Contents/MacOS/Emacs">
+      <and>
+	<os family="mac"/>
+	<available file="${user.home}/Applications/Emacs.app" type="dir"/>
+      </and>
+    </condition>
   </target>
 
 
@@ -78,10 +92,15 @@
     </condition>
   </target>
 
-
   <target name="configure" depends="init,prepare-lisp-build"
 	  unless="config.uptodate"
 	  description="create the configuration file the user edits for builds">
+
+    <!-- defaults -->
+    <property name="build.bin.emacs" value="emacs"/>
+    <!-- end defaults -->
+
+
     <mkdir dir="${build.config.dir}"/>
 
     <!-- developers will usually have the following config file (i.e. source
@@ -97,6 +116,7 @@
       <entry key="cedet.dir" value="${cedet.dir}"/>
       <entry key="elib.dir" value="${elib.dir}"/>
       <entry key="prefix.dir" value="${prefix.dir}"/>
+      <entry key="build.bin.emacs" value="${build.bin.emacs}"/>
     </propertyfile>
   </target>
 
