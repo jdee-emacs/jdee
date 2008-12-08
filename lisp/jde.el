@@ -37,7 +37,7 @@
 ;;; Code:
 
 ;;;###autoload
-(defconst jde-version "2.3.5.2"
+(defconst jde-version "2.3.6"
   "JDE version number.")
 
 (defconst jde-cedet-min-version "1.0beta2"
