@@ -528,7 +528,7 @@ It matches interfaces, named and anonymous classes.")
 (defun jde-parse-get-innermost-class-at-point ()
   "Get the innermost class containing point.
 If point is in a class, this function returns
-(CLASS_NAME . CLASS_POSITION). CLASS_NAME is the
+\(CLASS_NAME . CLASS_POSITION). CLASS_NAME is the
 name of the class. For anonymous classes it is
 the unqualified name of the superclass. CLASS_POSITION
 is the position of the first character of the class
@@ -536,7 +536,9 @@ or interface keyword or the first character
 of the new keyword in case of anonymous classes.
 Returns nil, if point is not in a class."
 
-  (semantic-refresh-tags-safe)
+;; commented out for now until current build upgraded to new semantci (emacs
+;; major version 23?)
+;;  (semantic-refresh-tags-safe)
 (let ((left-paren-pos (c-parse-state)))
   (if left-paren-pos
       (save-excursion

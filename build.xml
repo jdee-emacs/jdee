@@ -191,14 +191,21 @@
 	 basedir="${build.java.dir}"
 	 includes="**/*.class"/>
 
-    <javadoc sourcepath="${src.java.dir}"
+    <!--javadoc sourcepath="${src.java.dir}"
 	     destdir="${dist.doc.java.api.dir}"
 	     classpathref="compile.classpath"
 	     author="true" version="true" use="true"
 	     windowtitle="JDEE Java API"
-	     />
+	     /-->
   </target>
 
+  <target name="install" depends="init"
+	  description="install the derived objects (the entire dist)">
+      <mkdir dir="${prefix.dir}"/>
+      <copy todir="${prefix.dir}">
+	  <fileset dir="${dist.dir}"/>
+      </copy>
+  </target>
 
   <target name="clean" depends="init"
 	  description="delete all derived objects EXCEPT the user edited configuration file">
