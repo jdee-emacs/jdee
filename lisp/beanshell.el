@@ -336,7 +336,7 @@ The result is inserted as it comes in the compilation buffer."
 
               (insert output)
               (compilation-handle-exit 
-               'exit status
+	       'exit (string-to-number status)
                (if (string= "0" status)
                    "finished\n"
                  (format "exited abnormally with code %s\n"
