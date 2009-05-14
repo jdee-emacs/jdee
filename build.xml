@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <project name="jdee" default="build">
-  <!-- ** properties start ** -->
-
+    <!-- add in the contribs (add ant-contrib-VERSION.jar) to CLASSPATH -->
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+
+
+  <!-- ** properties start ** -->
 
   <!-- configuration directory -->
   <property name="config.dir" location="./config"/>
@@ -101,7 +103,6 @@
     <property name="build.bin.emacs" value="emacs"/>
     <!-- end defaults -->
 
-    <echo message="HERE"/>
     <mkdir dir="${build.config.dir}"/>
 
     <!-- project specific defaults (not user or instance specific) -->
@@ -125,13 +126,10 @@
       <fileset dir="${src.lisp.dir}" includes="*.el"/>
     </copy>
 
-    <escape-backslash property="cedet.escaped.dir" value="${cedet.dir}"/>
-    <escape-backslash property="src.lisp.escaped.dir" value="${src.lisp.dir}"/>
-    <escape-backslash property="build.lisp.escaped.dir" value="${build.lisp.dir}"/>
-
-
-    <echo message="CED: ${cedet.escaped.dir}, ${cedet.dir}, ${user.home}"/>
-
+    <!-- make windows paths "mixed" dos paths (cygwin term) -->
+    <mixed-path property="cedet.escaped.dir" value="${cedet.dir}"/>
+    <mixed-path property="src.lisp.escaped.dir" value="${src.lisp.dir}"/>
+    <mixed-path property="build.lisp.escaped.dir" value="${build.lisp.dir}"/>
 
     <!-- create the file used to compile the emacs lisp code -->
     <copy file="${build.lisp.src.file}" tofile="${build.lisp.dst.file}"/>
@@ -150,8 +148,8 @@
          -->
     <!-- here we set os=unix since otherwise the exec complains about the
          directory not existing -->
-    <escape-backslash property="build.lisp.escaped.dir" value="${build.lisp.dir}"/>
-    <escape-backslash property="build.lisp.dst.escaped.file" value="${build.lisp.dst.file}"/>
+    <mixed-path property="build.lisp.escaped.dir" value="${build.lisp.dir}"/>
+    <mixed-path property="build.lisp.dst.escaped.file" value="${build.lisp.dst.file}"/>
 
     <exec dir="${build.lisp.escaped.dir}"
 	  executable="${build.bin.emacs}" failonerror="true">
@@ -234,7 +232,9 @@
 
 
   <!-- macros -->
-  <macrodef name="escape-backslash">
+
+  <!-- make windows paths "mixed" dos paths (cygwin term) -->
+  <macrodef name="mixed-path">
       <attribute name="property"/>
       <attribute name="value"/>
       <sequential>
