@@ -3,6 +3,7 @@
 <project name="jdee" default="build">
   <!-- ** properties start ** -->
 
+  <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
   <!-- configuration directory -->
   <property name="config.dir" location="./config"/>
@@ -100,7 +101,7 @@
     <property name="build.bin.emacs" value="emacs"/>
     <!-- end defaults -->
 
-
+    <echo message="HERE"/>
     <mkdir dir="${build.config.dir}"/>
 
     <!-- project specific defaults (not user or instance specific) -->
@@ -116,7 +117,6 @@
     </propertyfile>
   </target>
 
-
   <!-- configure (create/build) the emacs lisp build configuration files -->
   <target name="configure-ebuild" depends="configure,init"
 	  unless="lisp.uptodate">
@@ -125,12 +125,20 @@
       <fileset dir="${src.lisp.dir}" includes="*.el"/>
     </copy>
 
+    <escape-backslash property="cedet.escaped.dir" value="${cedet.dir}"/>
+    <escape-backslash property="src.lisp.escaped.dir" value="${src.lisp.dir}"/>
+    <escape-backslash property="build.lisp.escaped.dir" value="${build.lisp.dir}"/>
+
+
+    <echo message="CED: ${cedet.escaped.dir}, ${cedet.dir}, ${user.home}"/>
+
+
     <!-- create the file used to compile the emacs lisp code -->
     <copy file="${build.lisp.src.file}" tofile="${build.lisp.dst.file}"/>
     <replace file="${build.lisp.dst.file}">
-      <replacefilter token="@{cedet.dir}" value="${cedet.dir}"/>
-      <replacefilter token="@{src.lisp.dir}" value="${src.lisp.dir}"/>
-      <replacefilter token="@{build.lisp.dir}" value="${build.lisp.dir}"/>
+      <replacefilter token="@{cedet.dir}" value="${cedet.escaped.dir}"/>
+      <replacefilter token="@{src.lisp.dir}" value="${src.lisp.escaped.dir}"/>
+      <replacefilter token="@{build.lisp.dir}" value="${build.lisp.escaped.dir}"/>
       <replacefilter token="@{build.lisp.autoload.libname}" value="${build.lisp.autoload.libname}"/>
     </replace>
   </target>
@@ -138,11 +146,17 @@
 
   <target name="build-lisp" depends="configure-ebuild" unless="lisp.uptodate"
 	  description="compile the JDEE Emacs lisp code">
-    <!-- invoke Emacs in batch mode to creat autoloads and compile emacs
-         lisp -->
-    <exec dir="${build.lisp.dir}" executable="${build.bin.emacs}" failonerror="true">
+    <!-- invoke Emacs in batch mode to creat autoloads and compile emacs lisp
+         -->
+    <!-- here we set os=unix since otherwise the exec complains about the
+         directory not existing -->
+    <escape-backslash property="build.lisp.escaped.dir" value="${build.lisp.dir}"/>
+    <escape-backslash property="build.lisp.dst.escaped.file" value="${build.lisp.dst.file}"/>
+
+    <exec dir="${build.lisp.escaped.dir}"
+	  executable="${build.bin.emacs}" failonerror="true">
       <arg value="--script"/>
-      <arg value="${build.lisp.dst.file}"/>
+      <arg value="${build.lisp.dst.escaped.file}"/>
     </exec>
   </target>
 
@@ -217,5 +231,17 @@
 	  description="delete all derived objects">
     <delete file="${config.build.file}"/>
   </target>
+
+
+  <!-- macros -->
+  <macrodef name="escape-backslash">
+      <attribute name="property"/>
+      <attribute name="value"/>
+      <sequential>
+	  <propertyregex property="@{property}" input="@{value}" regexp="\\"
+			 defaultValue="@{value}" replace="/" global="true"/>
+      </sequential>
+  </macrodef>
+
 
 </project>
