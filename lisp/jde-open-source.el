@@ -129,6 +129,8 @@ checks if it is a member of the base class(\"super\")."
         ;; searching for the thing-of-interest has failed 
         ;; let's try in the base class
           (progn
+            (if (not super-class)
+                (error "Method not found"))
             (let ((jde-open-cap-ff-function-temp-override 'find-file))
               (jde-show-superclass-source-2 tags))
             (beginning-of-buffer)
@@ -147,8 +149,6 @@ checks if it is a member of the base class(\"super\")."
                                    (concat "." class-name))
                      (match-string 1 (concat "." class-name)))
                    nil t)))
-            (if (not super-class)
-                (error "Method not found"))
             (setq super-class (car tags)))))))
 
 (defun jde-open-class-at-point ()
