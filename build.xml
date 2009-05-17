@@ -128,6 +128,7 @@
 
     <!-- make windows paths "mixed" dos paths (cygwin term) -->
     <mixed-path property="cedet.escaped.dir" value="${cedet.dir}"/>
+    <mixed-path property="elib.escaped.dir" value="${elib.dir}"/>
     <mixed-path property="src.lisp.escaped.dir" value="${src.lisp.dir}"/>
     <mixed-path property="build.lisp.escaped.dir" value="${build.lisp.dir}"/>
 
@@ -135,6 +136,7 @@
     <copy file="${build.lisp.src.file}" tofile="${build.lisp.dst.file}"/>
     <replace file="${build.lisp.dst.file}">
       <replacefilter token="@{cedet.dir}" value="${cedet.escaped.dir}"/>
+      <replacefilter token="@{elib.dir}" value="${elib.escaped.dir}"/>
       <replacefilter token="@{src.lisp.dir}" value="${src.lisp.escaped.dir}"/>
       <replacefilter token="@{build.lisp.dir}" value="${build.lisp.escaped.dir}"/>
       <replacefilter token="@{build.lisp.autoload.libname}" value="${build.lisp.autoload.libname}"/>
