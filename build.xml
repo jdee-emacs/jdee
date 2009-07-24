@@ -156,8 +156,7 @@
     <exec dir="${build.lisp.escaped.dir}"
 	  executable="${build.bin.emacs}" failonerror="true">
       <arg value="--batch"/>
-      <arg value="--no-site-file"/>
-      <arg value="--script"/>
+      <arg value="--load"/>
       <arg value="${build.lisp.dst.escaped.file}"/>
     </exec>
   </target>
