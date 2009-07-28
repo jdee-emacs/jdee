@@ -1500,14 +1500,14 @@ SYMBOL is unnecessary."
   "Get all the files in DIR, and any subdirectories of DIR, whose
 names match INCLUDE-REGEXP."
   (let (files)
-    (loop for file in (directory-files dir t) do
-          (if (not (or (string= (concat dir "/.") file)
-                       (string= (concat dir "/..") file)))
+    (loop for file in (directory-files dir) do
+          (if (not (member file '("." "..")))
+	      (let ((file (concat dir "/" file)))
               (if (file-directory-p file)
                   (setq files (append files (jde-directory-files-recurs file include-regexp)))
                 (if (or (not include-regexp)
                         (string-match include-regexp file))
-                    (setq files (append files (list file)))))))
+		      (setq files (append files (list file))))))))
     files))
 
 (defun jde-expand-directory (dir include-regexp exclude-regexps symbol)
