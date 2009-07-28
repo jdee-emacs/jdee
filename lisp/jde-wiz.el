@@ -99,7 +99,7 @@ extends clause is updated"
     (save-excursion
       (let* ((class-re "class[ \t]+\\([a-zA-z]+[a-zA-Z0-9._]*\\).*[ \n]*")
 	     (open-brace-pos
-	      (scan-lists (point) -1 1))
+	      (ignore-errors (scan-lists (point) -1 1)))
 	     (class-name-end-pos
 	      (when open-brace-pos
 		(goto-char open-brace-pos)
