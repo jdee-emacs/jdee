@@ -71,7 +71,7 @@ for FILE, but proper EOL-conversion and charcater interpretation is done!"
                 (file-readable-p ,exp-filename))
            (with-temp-buffer
              (insert-file-contents ,exp-filename)
-             (beginning-of-buffer)
+             (goto-char (point-min))
              ,@body)
          nil))))
 
@@ -120,7 +120,7 @@ checks if it is a member of the base class(\"super\")."
     ;; the class itself. This feature is only available if we
     ;; have senator!
     (when (and (fboundp 'senator-search-forward) (not (string= parsed-symbol "")))
-      (beginning-of-buffer)
+      (goto-char (point-min))
       (setq xtags (semantic-fetch-tags))
       (senator-parse)
       (setq parsed-symbol (concat "\\b" parsed-symbol "\\b"))
@@ -133,7 +133,7 @@ checks if it is a member of the base class(\"super\")."
                 (error "Method not found"))
             (let ((jde-open-cap-ff-function-temp-override 'find-file))
               (jde-show-superclass-source-2 tags))
-            (beginning-of-buffer)
+            (goto-char (point-min))
             (senator-parse)
             (search-forward "{" nil t)
             (setq tags (semantic-tag-type-superclasses
@@ -151,7 +151,15 @@ checks if it is a member of the base class(\"super\")."
                    nil t)))
             (setq super-class (car tags)))))))
 
-(defun jde-open-class-at-point ()
+(defun jde-open-class-at-event (event)
+  "Like `jde-open-class-at-point', but is mouse-bindable.
+
+Preserves point."
+  (interactive "e")
+  (jde-open-class-at-point
+   (posn-point (event-end event))))
+
+(defun jde-open-class-at-point (&optional position)
   "Opens the source file that defines the class of the symbol at point and
 scrolls the source file to the definition of the symbol, which can be the name of
 a variable, class, method, or attribute. This function has the
@@ -161,48 +169,55 @@ same requirements as the JDEE's field/method completion commands. See, for examp
 $CLASSPATH, then in the current directory."
   (interactive)
   (if (jde-open-functions-exist)
-      (let* ((thing-of-interest (thing-at-point 'symbol))
+      (let* ((old-point (if position
+                            (prog1
+                                (point)
+                              (goto-char position))))
+             (thing-of-interest (thing-at-point 'symbol))
              (pair (save-excursion 
-		     (end-of-thing 'symbol)
-		     (jde-parse-java-variable-at-point)))
+                     (end-of-thing 'symbol)
+                     (jde-parse-java-variable-at-point)))
              (class-to-open (jde-open-get-class-to-open
                              pair thing-of-interest)))
+        (if old-point
+            (goto-char old-point))
         (if (and class-to-open 
-		 (stringp class-to-open))
-	    ;; Handle the case where the definition of the symbol is in the current buffer.
-	    (let ((pos 
-		   (and 
-		    (string= (car pair) "")
-		    (jde-parse-find-declaration-of thing-of-interest))))
-	      (if pos 
-		  (goto-char pos)
-	      ;; Handle the case where the definition is in another buffer or an 
-              ;; unopened source file.
-		(let ((source 
-		       (jde-find-class-source-file class-to-open)))
-		  (if source
-		      ;; we have found the source file. So let´s open it and
-		      ;; then jump to the thing-of-interest
-		      (progn
-			(if (typep source 'buffer)
-			  (let ((pop-up-frames t)) 
-			    (set-buffer source)
-			    (display-buffer source)
-			    ;; (jde-mode)
-			    ;; (semantic-new-buffer-fcn)
-			    ;; (semantic-fetch-tags)
-			    )
-			  ;; (switch-to-buffer source)
-			  ;; (pop-to-buffer source other-window)
-			  ;; if the current buffer contains java-file-name do not try to
-			  ;; open the file
-			  (if (not (string-equal (buffer-file-name) source))
-			      (funcall (or jde-open-cap-ff-function-temp-override
-					   jde-open-class-at-point-find-file-function)
-				       source)))
-			(jde-open-jump-to-class thing-of-interest class-to-open))
-		    (message "Can not find the source for \"%s\"." class-to-open)))))
-	  (message "Cannot determine the class of \"%s\"." thing-of-interest)))
+                 (stringp class-to-open))
+            ;; Handle the case where the definition of the symbol is in the current buffer.
+            (let ((pos 
+                   (and 
+                    (string= (car pair) "")
+                    (jde-parse-find-declaration-of thing-of-interest))))
+              (ring-insert find-tag-marker-ring (point-marker))
+              (if pos
+                  (goto-char pos)
+                ;; Handle the case where the definition is in another buffer or an 
+                ;; unopened source file.
+                (let ((source 
+                       (jde-find-class-source-file class-to-open)))
+                  (if source
+                      ;; we have found the source file. So let´s open it and
+                      ;; then jump to the thing-of-interest
+                      (progn
+                        (if (typep source 'buffer)
+                            (let ((pop-up-frames t)) 
+                              (set-buffer source)
+                              (display-buffer source)
+                              ;; (jde-mode)
+                              ;; (semantic-new-buffer-fcn)
+                              ;; (semantic-fetch-tags)
+                              )
+                          ;; (switch-to-buffer source)
+                          ;; (pop-to-buffer source other-window)
+                          ;; if the current buffer contains java-file-name do not try to
+                          ;; open the file
+                          (if (not (string-equal (buffer-file-name) source))
+                              (funcall (or jde-open-cap-ff-function-temp-override
+                                           jde-open-class-at-point-find-file-function)
+                                       source)))
+                        (jde-open-jump-to-class thing-of-interest class-to-open))
+                    (message "Can not find the source for \"%s\"." class-to-open)))))
+          (message "Cannot determine the class of \"%s\"." thing-of-interest)))
     (message "You need JDEE >= 2.2.6 and Senator to use this command.")))
 
 (defun jde-open-class-source ( &optional unqual-class )
@@ -226,6 +241,7 @@ not associated with any project."
  	(if (or (eq class-names nil)
 		(not (listp class-names)))
  	    (error "Cannot find %s" unqualified-name))
+        (ring-insert find-tag-marker-ring (point-marker))
 	;; Turn off switching project settings to avoid 
 	;; resetting jde-sourcepath.
 	(let ((old-value jde-project-context-switching-enabled-p))

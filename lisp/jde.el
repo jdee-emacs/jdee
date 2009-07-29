@@ -105,9 +105,9 @@
 (require 'jde-class)
 (require 'executable)  ;; in XEmacs' sh-script package
 (require 'efc)
+(require 'etags)
 (require 'jde-open-source)
 (require 'jde-annotations)
-(require 'etags)
 (require 'regress)
 
 (if (not (fboundp 'custom-set-default))

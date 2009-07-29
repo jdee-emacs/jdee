@@ -421,7 +421,11 @@ the requested function are considered."
   (jde-xref-load-subclasses-table-if-necessary)
   (setq jde-xref-stack (jde-xref-get-callers
                             (jde-xref-get-current-signature) strict))
-  (jde-xref-next-caller))
+  (if jde-xref-stack
+      (progn
+        (ring-insert find-tag-marker-ring (point-marker))
+        (jde-xref-next-caller))
+    (message "No calls")))
 
 (defun jde-xref-goto-caller (caller)
   (jde-find-class-source (car caller))
