@@ -495,15 +495,15 @@ The current buffer must be in `jde-mode'."
                    (classname (jde-import-get-classname name))
                    (case-fold-search nil)
                    (number-of-matches 
-                    (substring (count-matches 
-                                (concat "\\b" classname "\\b")) 0 2)))
+                    (count-matches 
+                                (concat "\\b" classname "\\b"))))
               (if (or 
                    ;; If name is already listed in the set
                    ;; of required imports...
                    (member name required-imports)
                    ;;or the class is not reference in the file
                    ;;and is not an import of the whole package i.e. .*
-                   (and (< (string-to-number number-of-matches) 2)
+                   (and (< number-of-matches 2)
                         (not (string= classname "*")))
                    ;; or imports a class in the current package...
                    (and
