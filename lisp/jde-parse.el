@@ -1,5 +1,5 @@
 ;;; jde-parse.el
-;; $Revision: 1.70 $ 
+;; $Revision: 1.1 $ 
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Kinnucan
@@ -489,7 +489,7 @@ Returns a list constisting of the result of
 `jde-parse-get-innermost-class-at-point' followed by
 all modifieres of the class.
 Returns nil, if no class could be found."
-    (let ((class (jde-parse-get-innermost-class-at-point))
+  (let ((class (jde-parse-get-innermost-class-at-point))
         (mod-or-ws-re (concat "\\(" jde-parse-class-mod-re
                               "\\|" jde-parse-java-comment-or-ws-re
                               "\\)\\="))
@@ -512,7 +512,7 @@ Returns nil, if no class could be found."
           ;; assignment operator or open parenthese:
           "\\(?:" jde-parse-java-comment-or-ws-re "\\|[a-zA-Z0-9_.=(]\\)*"
           ;; keyword before classname:
-          "\\<\\(class\\|interface\\|new\\)"
+          "\\<\\(class\\|enum\\|interface\\|new\\)"
           "\\(?:" jde-parse-java-comment-or-ws-re "\\)+"
           ;; package part of superclass of anonymous class:
           "\\(?:[a-zA-Z0-9_]+\\.\\)*"
@@ -619,7 +619,7 @@ This function works only for qualified names that do not contain
 white space. It returns null if there is no qualified name at point."
   (let ((symbol-at-point (thing-at-point 'symbol)))
     (when symbol-at-point
-       (thing-at-point-looking-at "[^ \n\t();,:+]+")
+       (thing-at-point-looking-at "[^ \n\t();,:+<]+") ;; add < to prevent like "Map<String"
       (let ((qualified-name 
 	     (buffer-substring-no-properties
 	      (match-beginning 0)
@@ -658,6 +658,21 @@ white space. It returns null if there is no qualified name at point."
 			   (string x)))
 	     name ""))
 
+(defvar jde-parse-java-symbol-declare-re 
+  (sregexq
+   (1+              ;; A Java symbol comprises one or more of the following:
+    (char (?A . ?Z)   ;;   - upper case characters
+	  (?a . ?z)   ;;   - lower case characters
+	  (?0 . ?9)   ;;   - digits
+	  "[]"        ;;   - square brackets
+	  "?"         ;;   - question mark
+      "<,> \t\n\r";;   - java1.5 generic support
+	  "_"         ;;   - underscore
+	  "."         ;;   - period
+	  (160 . 255) ;;   - accented characters
+	  )))
+"Regular expression that matches any Java symbol declare.")
+
 (defun jde-parse-valid-declaration-at (point varname)
   "Verify that a POINT starts a valid java declaration
 for the VARNAME variable."
@@ -665,7 +680,8 @@ for the VARNAME variable."
     (goto-char point)
     (let ((case-fold-search nil)) ;; Why case-insensitive?
       (if (or
-	   (looking-at (concat "\\(" jde-parse-java-symbol-re "\\)[ \t\n\r]+"
+;; 	   (looking-at (concat "\\(" jde-parse-java-symbol-re "\\)[ \t\n\r]+"
+	   (looking-at (concat "\\(" jde-parse-java-symbol-declare-re "\\)[ \t\n\r]+"
                               (jde-parse-double-backslashes varname) 
                               "[]?[ \t\n\r]*[),;=]"))
 
@@ -673,10 +689,15 @@ for the VARNAME variable."
            ;;
            ;;   String a, b, c;
            ;;
-	   (looking-at (concat "\\(" jde-parse-java-symbol-re "\\)[ \t\n\r]+"
+;; 	   (looking-at (concat "\\(" jde-parse-java-symbol-re "\\)[ \t\n\r]+"
+	   (looking-at (concat "\\(" jde-parse-java-symbol-declare-re "\\)[ \t\n\r]+"
 			       "\\(" jde-parse-java-symbol-re "[ \t\n\r]*,[ \t\n\r]*\\)*"
                               (jde-parse-double-backslashes varname) 
-                              "[]?[ \t\n\r]*[,;]")))
+                              "[]?[ \t\n\r]*[,;]"))
+       ;; Parse jdk1.5 for (Type val : collection) {
+       (looking-at (concat "\\(" jde-parse-java-symbol-declare-re "\\)[ \t\n\r]+"
+                           varname "[ \t\n\r]*:[ \t\n\r]*"
+                           "\\(" jde-parse-java-symbol-re "[,{} \t\n\r]*\\)+" ")")))
           (let ((type (match-string 1))
                 (type-pos (match-beginning 1)))
             (goto-char type-pos)
@@ -734,12 +755,13 @@ could be found."
     (let ((symbol-list-entry-re
 	   (concat (concat jde-parse-java-symbol-re "[ \t\n\r]*,[ \t\n\r]*")))
 	  (orgpt (point))
-	   found pos resname foundpt)
+	   found pos resname foundpt lastpos)
       
       ;; Search backward in the buffer.
       (while (and (not found)
 		  (search-backward name nil t))
 	(setq pos (point))
+    (setq lastpos (point))
 
 	;; Position point at the start of the type
         ;; symbol in the declaration, e.g.,
@@ -756,8 +778,22 @@ could be found."
         ;; In this case, back over any entries in
         ;; the list ahead of name.
 	(while (looking-at symbol-list-entry-re)
+      (setq lastpos (point))
 	  (backward-word 1))
-	
+    ;;  List<String, List<String>> a;
+    ;;                    ^         
+    ;; In this case, back over any entries between < and >
+    (let ((try-count 0)
+          (max-try-count 20))
+      (while (and
+              (< try-count max-try-count)
+              (not
+               (= (count ?< (buffer-substring (point) lastpos))
+                  (count ?> (buffer-substring (point) lastpos)))))
+        (setq try-count (1+ try-count))
+        (backward-word 1)))
+      
+    
 	(setq resname (jde-parse-valid-declaration-at (point) name))
 	(setq foundpt (point))
 	(goto-char pos)
@@ -774,10 +810,25 @@ could be found."
 	(while (and (not found)
 		    (search-forward name nil t))
 	  (setq pos (point))
+      (setq lastpos (point))
 	  (backward-word 2)
 
 	  (while (looking-at symbol-list-entry-re)
+        (setq lastpos (point))
 	    (backward-word 1))
+
+    ;;  List<String, List<String>> a;
+    ;;                    ^         
+    ;; In this case, back over any entries between < and >
+      (let ((try-count 0)
+            (max-try-count 20))
+        (while (and
+                (< try-count max-try-count)
+                (not
+                 (= (count ?< (buffer-substring (point) lastpos))
+                    (count ?> (buffer-substring (point) lastpos)))))
+          (setq try-count (1+ try-count))
+          (backward-word 1)))
 
 	  (setq resname (jde-parse-valid-declaration-at (point) name))
 	  (setq foundpt (point))
@@ -1116,6 +1167,7 @@ at point. This function would return the list (obj.f1 ge)."
 
               ;;Checking for casting
               ;; ((Object) obj).ge
+              ;; FIXME can't work ok for generic type, eg: ((List<String>) obj).ge
               (if (and (not cast-type)
                        (string= first-part "")
                        (eq (char-before (+ 1 middle-point)) ?\()
@@ -1663,6 +1715,9 @@ otherwise."
 (provide 'jde-parse)
 
 ;; $Log: jde-parse.el,v $
+;; Revision 1.1  2007/10/15 23:07:58  lu
+;; *** empty log message ***
+;;
 ;; Revision 1.70  2004/12/12 14:27:01  paulk
 ;; Add templates provided by Ole Arndt.
 ;;
