@@ -103,7 +103,7 @@ affixed `jde-junit-tester-name-tag'."
 	   tester-name))
       (progn
 	(string-match 
-	 (concat tag "\\(.*\\)" tag "$")
+	 (concat "\\(.*\\)" tag "$")
 	 tester-name)))
     (substring tester-name (match-beginning 1) (match-end 1))))
 
@@ -162,7 +162,7 @@ affixed `jde-junit-tester-name-tag'."
    "\"/**\" '>'n"
    "\"* @return a <code>TestSuite</code>\" '>'n"
    "\"*/\" '>'n"
-   "\"public static TestSuite suite()\" '>" 
+   "\"public static TestSuite suite() \" '>" 
     
    "(if jde-gen-k&r "
    "()"
@@ -203,11 +203,110 @@ command `jde-junit-test-class', as a side-effect."
              "Insert a generic JUnit test class buffer skeleton."))
 	  (set-default sym val)))
 
+(defcustom jde-junit4-test-class-template
+  (list
+   "(funcall jde-gen-boilerplate-function)"
+   "(jde-gen-get-package-statement)"
+   "\"import junit.framework.JUnit4TestAdapter;\" '>'n"
+   "\"import org.junit.Assert;\" '>'n"
+   "\"import static org.junit.Assert.*;\" '>'n"
+   "\"import org.junit.Test;\" '>'n"
+   "'n"
+   "(progn (require 'jde-javadoc) (jde-javadoc-insert-start-block))"
+   "\" * \""
+   "\" Unit Test for class \""
+   "(jde-junit-get-testee-name (file-name-sans-extension (file-name-nondirectory buffer-file-name))) '>'n"
+   "\" \" (jde-javadoc-insert-empty-line)"
+   "\" \" (jde-javadoc-insert-empty-line)"
+   "\" * Created: \" (current-time-string) '>'n"
+   "\" \" (jde-javadoc-insert-empty-line)"
+   "\" \" (jde-javadoc-insert 'tempo-template-jde-javadoc-author-tag)"
+   "\" \" (jde-javadoc-insert 'tempo-template-jde-javadoc-version-tag)"
+   "\" \" (jde-javadoc-insert 'tempo-template-jde-javadoc-end-block \"*/\")"
+   "\"public class \""
+   "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+   "\" \" "
+    
+   "(if jde-gen-k&r "
+   "()"
+   "'>'n)"
+   "\"{\"'>'n"
+   "'n" 
+   
+   " \" /** \" '>'n"
+   " \"* Creates a new <code>\""
+   "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+   "\"</code> instance.\" '>'n"
+   " \"*\" '>'n" 
+   " \"* @param name test name\" '>'n"
+   " \"*/\"'>'n"
+
+   "\"public \""
+   "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+   "\"() \""
+
+   "(if jde-gen-k&r "
+   "()"
+   "'>'n)"
+   "\"{\"'>'n"
+
+   "\"}\"'>"
+   "'>'n"
+   "'n"
+   "\"/**\" '>'n"
+   "\"* @return a <code>TestMethod</code>\" '>'n"
+   "\"*/\" '>'n"
+   "\"@Test\" '>'n"
+   "\"public void testMethod() \" '>" 
+    
+   "(if jde-gen-k&r "
+   "() "
+   "'>'n)"
+   "\"{\"'>'n"
+   "\"}\"'>'n'n"
+
+   "\"/** \" '>'n"
+   "\"* Test Adapter \" '>'n"
+   "\"*/ \" '>'n"
+   "\"public static junit.framework.Test suite() \""
+   "(if jde-gen-k&r "
+   "()"
+   "'>'n)"
+   "\"{\"'>'n"
+   "\"return new JUnit4TestAdapter(\""
+   "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+   "\".class);\"'>'n"
+   "\"}\"'>'n"
+   
+   "\"}\">"
+   "\"// \""
+   "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+   "'>'n")
+  "*Template for new Java class.
+Setting this variable defines a template instantiation
+command `jde-junit4-test-class', as a side-effect."
+  :group 'jde-junit
+  :type '(repeat string)
+  :set '(lambda (sym val)
+	  (defalias 'jde-junit4-test-class-internal
+	    (tempo-define-template
+             "java-junit4-test-class-buffer-template"
+             (jde-gen-read-template val)
+             nil
+             "Insert a generic JUnit 4 test class buffer skeleton."))
+	  (set-default sym val)))
+
 ;;;###autoload
 (defun jde-junit-test-class ()
   "Instantiate a test class template."
   (interactive)
   (jde-junit-test-class-internal))
+
+;;;###autoload
+(defun jde-junit4-test-class ()
+  "Instantiate a test class template."
+  (interactive)
+  (jde-junit4-test-class-internal))
 
 ;;;###autoload
 (defun jde-junit-test-class-buffer ()
@@ -225,6 +324,28 @@ more information, see http://www.junit.org."
 	   (file-name-nondirectory buffer-file-name)))))
     (find-file (concat tester-name ".java"))
     (jde-junit-test-class-internal)
+    (beginning-of-buffer)
+    (search-forward "{")
+    (backward-char 1)
+    (c-indent-exp)
+    (tempo-forward-mark)))
+
+;;;###autoload
+(defun jde-junit4-test-class-buffer ()
+  "Create a buffer containing a skeleton unit test class having
+the same name as the root name of the buffer. This command
+prompts you to enter the file name of the test class. It assumes
+that the file name has the form CLASSTest.java where CLASS is the
+name of the class to be tested, e.g., MyAppTest.java. Use of
+tests generated with this template requires the JUnit test
+framework. For more information, see http://www.junit.org."
+  (interactive)
+  (let ((tester-name
+	 (jde-junit-get-tester-name 
+	  (file-name-sans-extension 
+	   (file-name-nondirectory buffer-file-name)))))
+    (find-file (concat tester-name ".java"))
+    (jde-junit4-test-class-internal)
     (beginning-of-buffer)
     (search-forward "{")
     (backward-char 1)
