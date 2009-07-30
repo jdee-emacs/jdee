@@ -32,19 +32,19 @@
   (list (list "JDK API"
 	      "http://java.sun.com/javase/6/docs/api"
 	      nil)
-	("User (javadoc)"
+	(list "User (javadoc)"
 	 "http://static.springsource.org/spring/docs/3.0.x/javadoc-api/"
 	 nil)
-	("User (javadoc)"
+	(list "User (javadoc)"
 	 "http://commons.apache.org/sandbox/functor/apidocs/"
 	 nil)
-	("User (javadoc)"
+	(list "User (javadoc)"
 	 "https://www.hibernate.org/hib_docs/v3/api"
 	 nil)
-	("User (javadoc)"
+	(list "User (javadoc)"
 	 "http://acegisecurity.org/acegi-security/apidocs"
 	 nil)
-	("User (javadoc)"
+	(list "User (javadoc)"
 	 "http://wicket.apache.org/docs/1.4"
 	 nil))
   "*Lists collections of HTML files documenting Java classes. 
