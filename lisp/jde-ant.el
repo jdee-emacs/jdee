@@ -253,6 +253,12 @@ variable ANT_HOME."
                               (not (featurep 'xemacs))))
                         "'"
                       "\""))
+	 (classpath-delimiter  (if (and (or (eq system-type 'windows-nt)
+			 (eq system-type 'cygwin32))
+		     (string-match "sh$" shell-file-name))
+		delimiter))
+	 (buildfile-delimiter  (if (eq system-type 'windows-nt)
+				   "\"" delimiter))
          (ant-program (if (or (string-match "\\\\" jde-ant-program)
                               (string-match "/" jde-ant-program))
                           (jde-normalize-path jde-ant-program)
@@ -264,15 +270,9 @@ variable ANT_HOME."
                (concat
 		(jde-get-jdk-prog 'java)
 		" -classpath "
-                (if (and (or (eq system-type 'windows-nt)
-			      (eq system-type 'cygwin32))
-                         (string-match "sh$" shell-file-name))
-                    delimiter)
+		classpath-delimiter
                 (jde-ant-build-classpath)
-	    (if (and (or (eq system-type 'windows-nt)
-			 (eq system-type 'cygwin32))
-		     (string-match "sh$" shell-file-name))
-		delimiter)))
+		classpath-delimiter))
 	   (if ant-home 
 	       (concat 
 		" -Dant.home=" 
@@ -289,9 +289,9 @@ variable ANT_HOME."
     (if (not (string= buildfile ""))
         (setq ant-command 
               (concat ant-command 
-                      " -buildfile " delimiter
+                      " -buildfile " buildfile-delimiter
                       (jde-normalize-path buildfile)
-                      delimiter)))
+                      buildfile-delimiter)))
 
     (if (not (string= jde-ant-args ""))
         (setq ant-command (concat ant-command " " jde-ant-args)))
