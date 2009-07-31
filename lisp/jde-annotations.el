@@ -33,6 +33,9 @@
 
 ;;; Code:
 
+(eval-when-compile
+  (require 'cc-mode))
+
 (defun c-preprend-offset (symbol offset)
   "Find the offset entry for SYMBOL and add OFFSET at the front of the list.
 See `c-set-offset' for a description of OFFSET and SYMBOL."
