@@ -5,52 +5,13 @@
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
 
-  <!-- ** properties start ** -->
-
-  <!-- configuration directory -->
+  <!-- basic properties, the rest are taken from ${config.dir}/build. -->
+  <property name="project.dir" location="./"/>
+  <property name="project.version" value="2.4.0"/>
   <property name="config.dir" location="./config"/>
 
-  <!-- source code -->
-  <property name="src.lisp.dir" location="./lisp"/>
-  <property name="src.java.dir" location="./java/src"/>
 
-  <!-- third party libraries -->
-  <property name="lib.java.dir" location="./java/lib"/>
-
-  <!-- create objects -->
-  <property name="build.dir" location="./build"/>
-
-  <property name="build.config.dir" location="${build.dir}/config"/>
-  <property name="config.build.file" location="./build.properties"/>
-
-  <property name="build.lisp.dir" location="${build.dir}/lisp"/>
-  <property name="build.lisp.src.file" location="${config.dir}/build.el"/>
-  <property name="build.lisp.dst.file" location="${build.config.dir}/build.el"/>
-  <!-- for now, changes to this need to be reflected in the `require' in jde.el -->
-  <property name="build.lisp.autoload.libname" value="jde-autoload"/>
-  <property name="build.lisp.autoload.file" location="${build.lisp.dir}/${build.lisp.autoload.libname}.el"/>
-  <property name="build.java.dir" location="${build.dir}/classes"/>
-
-  <!-- staging  -->
-  <property name="dist.dir" location="./dist"/>
-  <property name="dist.lisp.dir" location="${dist.dir}/lisp"/>
-  <property name="dist.java.dir" location="${dist.dir}/java"/>
-  <property name="dist.java.lib.dir" location="${dist.java.dir}/lib"/>
-  <property name="dist.java.src.dir" location="${dist.java.dir}/src"/>
-  <property name="dist.java.doc.dir" location="${dist.dir}/java/doc"/>
-  <property name="dist.jar.jde.file" location="${dist.java.lib.dir}/jde.jar"/>
-
-  <property name="dist.doc.dir" location="${dist.dir}/doc"/>
-  <property name="dist.doc.java.api.dir" location="${dist.doc.dir}/java/api"/>
-  <property name="dist.doc.html.dir" location="${dist.doc.dir}/html"/>
-
-  <path id="compile.classpath">
-    <fileset dir="${lib.java.dir}"/>
-  </path>
-
-  <!-- ** properties end ** -->
-
-
+  <!-- everything depends on this initialization target -->
   <target name="init">
     <tstamp/>
     <!-- developers will usually have the following config file (i.e. source
@@ -58,6 +19,11 @@
     <property file="${user.home}/.jdee-config.properties"/>
 
     <property file="${config.build.file}"/>
+
+    <property file="${config.dir}/project.properties"/>
+    <path id="compile.classpath">
+	<fileset dir="${lib.java.dir}"/>
+    </path>
 
     <condition property="build.bin.emacs"
 	       value="/Applications/Emacs.app/Contents/MacOS/Emacs">
@@ -174,7 +140,8 @@
 	  description="compile all JDEE source code"/>
 
 
-  <target name="dist" depends="build" description="create the &quot;binary&quot; distribution">
+  <target name="dist" depends="build"
+	  description="create the &quot;binary&quot; distribution">
     <!-- create dist java lib directory -->
     <mkdir dir="${dist.lisp.dir}"/>
     <copy todir="${dist.lisp.dir}">
@@ -214,7 +181,7 @@
 	     /-->
   </target>
 
-  <target name="install" depends="init"
+  <target name="install" depends="dist"
 	  description="install the derived objects (the entire dist)">
       <mkdir dir="${prefix.dir}"/>
       <copy todir="${prefix.dir}">
