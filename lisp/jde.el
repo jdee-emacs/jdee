@@ -449,7 +449,7 @@ by the current project."
   (let ((version (jde-java-version)))
     (string-match "\\([0-9]+\\)\\.\\([0-9]+\\)"
 		version)
-    (string-to-int
+    (string-to-number
      (substring 
      version 
      (match-beginning 1)
@@ -462,7 +462,7 @@ by the current project."
   (let ((version (jde-java-version)))
     (string-match "\\([0-9]+\\)\\.\\([0-9]+\\)"
 		version)
-    (string-to-int
+    (string-to-number
      (substring 
      version 
      (match-beginning 2)
@@ -1752,7 +1752,7 @@ jde.el."
 ;;
 ;; Problem reporting functions contributed by Phillip Lord <plord@hgmp.mrc.ac.uk>.
 ;;
-(defvar jde-problem-report-mail-address "jdee-devel@lists.sourceforge.net")
+(defvar jde-problem-report-mail-address "jdee-devel@lists.sourceforge.net" )
 
 (defun jde-submit-problem-report()
   "Submit a problem report for the JDEE." 
@@ -1803,62 +1803,56 @@ for insertion of the .emacs file"
       ;;insert the contents of the debug buffer if it is there. 
       (if debug-buffer
 	  (progn
-	    (insert-string "\n\n\nThe contents of the *JDEBug* buffer were\n\n")
-	    (insert-buffer debug-buffer)
-	    (goto-char (point-max))
-	    (insert-string "\n\n\nEnd Insert *JDEbug* buffer" ))
-	(insert-string "\n\n\nThere was no *JDEBug* buffer" ))
+	    (insert "\n\n\nThe contents of the *JDEBug* buffer were\n\n")
+	    (insert-buffer-substring debug-buffer)
+	    (insert "\n\n\nEnd Insert *JDEbug* buffer" ))
+	(insert "\n\n\nThere was no *JDEBug* buffer" ))
 
       ;;insert the contents of the CLI buffer if it exists.
       (if cli-buffer
 	  (progn
-	    (insert-string "\n\n\nThe contents of the CLI buffer are\n\n")
-	    (insert-buffer cli-buffer)
-	    (goto-char (point-max))
-	    (insert-string "\n\n\nEnd Insert CLI buffer" ))
-	(insert-string "\n\n\nThere is no CLI buffer" ))
+	    (insert "\n\n\nThe contents of the CLI buffer are\n\n")
+	    (insert-buffer-substring cli-buffer)
+	    (insert "\n\n\nEnd Insert CLI buffer" ))
+	(insert "\n\n\nThere is no CLI buffer" ))
 
 
       ;;insert the contents of the locals buffer if it exists.
       (if locals-buffer
 	  (progn
-	    (insert-string "\n\n\nThe contents of the locals buffer are\n\n")
-	    (insert-buffer locals-buffer)
-	    (goto-char (point-max))
-	    (insert-string "\n\n\nEnd Insert locals buffer" ))
-	(insert-string "\n\n\nThere is no locals buffer" ))
+	    (insert "\n\n\nThe contents of the locals buffer are\n\n")
+	    (insert-buffer-substring locals-buffer)
+	    (insert "\n\n\nEnd Insert locals buffer" ))
+	(insert "\n\n\nThere is no locals buffer" ))
 
       ;;insert the contents of the backtrace buffer if it is there. 
       (if backtrace-buffer
 	  (progn
-	    (insert-string "\n\n\nThe contents of the *Backtrace* buffer were\n\n")
-	    (insert-buffer backtrace-buffer)
-	    (goto-char (point-max))
-	    (insert-string "\n\n\nEnd Insert *Backtrace* buffer" ))
-	(insert-string "\n\n\nThere was no *Backtrace* buffer" ))
+	    (insert "\n\n\nThe contents of the *Backtrace* buffer were\n\n")
+	    (insert-buffer-substring backtrace-buffer)
+	    (insert "\n\n\nEnd Insert *Backtrace* buffer" ))
+	(insert "\n\n\nThere was no *Backtrace* buffer" ))
 
 
       ;;insert the contents of the messages buffer if it is there. 
       (if messages-buffer
 	  (progn
-	    (insert-string "\n\n\nThe contents of the *Messages* buffer were\n\n")
-	    (insert-buffer messages-buffer)
-	    (goto-char (point-max))
-	    (insert-string "\n\n\nEnd Insert *Messages* buffer" ))
-	(insert-string "\n\n\nThere was no *Messages* buffer" ))
+	    (insert "\n\n\nThe contents of the *Messages* buffer were\n\n")
+	    (insert-buffer-substring messages-buffer)
+	    (insert "\n\n\nEnd Insert *Messages* buffer" ))
+	(insert "\n\n\nThere was no *Messages* buffer" ))
 
       ;;insert the contents of the jde-log buffer if it is there. 
       (if jde-log-buffer
 	  (progn
-	    (insert-string "\n\n\nThe contents of the *jde-log* buffer were\n\n")
-	    (insert-buffer jde-log-buffer)
-	    (goto-char (point-max))
-	    (insert-string "\n\n\nEnd Insert *jde-log* buffer" ))
-	(insert-string "\n\n\nThere was no *jde-log* buffer" )))
+	    (insert "\n\n\nThe contents of the *jde-log* buffer were\n\n")
+	    (insert-buffer-substring jde-log-buffer)
+	    (insert "\n\n\nEnd Insert *jde-log* buffer" ))
+	(insert "\n\n\nThere was no *jde-log* buffer" )))
 
     (when process-environment
-      (insert-string "\n\n\nProcess environment: \n\n")
-      (insert-string (mapconcat (lambda (var) var) process-environment "\n")))
+      (insert "\n\n\nProcess environment: \n\n")
+      (insert (mapconcat (lambda (var) var) process-environment "\n")))
 
     (let* ((init-file-name (if (featurep 'xemacs) "init.el" ".emacs"))
 	   (buf (get-buffer-create 
@@ -1883,8 +1877,7 @@ for insertion of the .emacs file"
 	       init-file-name))
 
       (widget-insert 
-       (format "other files, please attempt to replicate the bug, using the\n" 
-	       init-file-name))
+       "other files, please attempt to replicate the bug, using the\n")
 
       (widget-insert 
        (format "minimal %s file suggested in the JDEE documentation, and note\n" 
@@ -1900,18 +1893,18 @@ for insertion of the .emacs file"
 	   (format "Insert your %s file into the problem report? " 
 		   init-file-name))
 	  (progn
-	    (insert-string 
+	    (insert 
 	     (format "\n\n\nThe contents of the %s file was\n\n\n"
 		     init-file-name))
 
 	    (if (featurep 'xemacs) 
-		(insert-file "~/.xemacs/init.el")
-	      (insert-file "~/.emacs"))
+		(insert-file-contents "~/.xemacs/init.el")
+	      (insert-file-contents "~/.emacs"))
 	    (goto-char (point-max))
-	    (insert-string 
+	    (insert 
 	     (format "\n\n\n=====end inserted %s file"
 		     init-file-name)))
-	(insert-string 
+	(insert 
 	 (format "\n\n\nThe user choose not to insert their %s file\n" 
 		 init-file-name)))
 

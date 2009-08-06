@@ -1135,7 +1135,7 @@ It then moves the point to the location to the constructor."
   (interactive "F")
   (find-file file)
   (jde-gen-jfc-app)
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (search-forward "{")
   (backward-char 1)
   (c-indent-exp)
@@ -1398,7 +1398,7 @@ of the buffer."
 	 (read-file-name "File: ")))
   (find-file file)
   (funcall (cdr (assoc template jde-gen-buffer-templates)))
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (search-forward "{")
   (backward-char 1)
   (c-indent-exp))
@@ -3606,7 +3606,7 @@ Returns t, if the template has been inserted, otherwise nil."
                 (save-excursion (re-search-backward "\\<.*\\="))))
            (abbrev
             (buffer-substring-no-properties abbrev-start (point)))
-           (template (assoc-ignore-case abbrev jde-gen-abbrev-templates)))
+           (template (assoc-string abbrev jde-gen-abbrev-templates t)))
       (if template
           (progn
             (delete-backward-char (length abbrev))

@@ -120,14 +120,14 @@
   (defmacro defgroup (&rest args)
     nil)
   (defmacro defface (var values doc &rest args)
-    (` (progn
-	 (defvar (, var) (quote (, var)))
-	 ;; To make colors for your faces you need to set your .Xdefaults
-	 ;; or set them up ahead of time in your .emacs file.
-	 (make-face (, var))
-	 )))
+    `(progn
+       (defvar ,var (quote ,var))
+       ;; To make colors for your faces you need to set your .Xdefaults
+       ;; or set them up ahead of time in your .emacs file.
+       (make-face ,var)
+       ))
   (defmacro defcustom (var value doc &rest args)
-    (` (defvar (, var) (, value) (, doc)))))
+    `(defvar ,var ,value ,doc)))
 
 (provide 'jde-compat)
 

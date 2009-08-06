@@ -123,17 +123,16 @@ for FILE, but proper EOL-conversion and charcater interpretation is done!"
                 (file-readable-p ,exp-filename))
            (with-temp-buffer
              (insert-file-contents ,exp-filename)
-             (beginning-of-buffer)
+             (goto-char (point-min))
              ,@body)
          nil))))
 
 (defmacro jde-normalize-paths (pathlist &optional symbol)
   "Normalize all paths of the list PATHLIST and returns a list with the
 expanded paths."
-  (` (mapcar (lambda (path)
-               (jde-normalize-path path (, symbol)))
-             (, pathlist))))
-
+  `(mapcar (lambda (path)
+             (jde-normalize-path path ,symbol))
+           ,pathlist))
 
 (defun jde-remove-inner-class (class) 
   "Removes the inner class name for the class"

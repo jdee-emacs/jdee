@@ -269,7 +269,7 @@ not associated with any project."
         (let ((parent (efc-query-options tags "Which super class?")))
           (if parent
               (jde-show-class-source parent))))
-    (jde-show-class-source "Object")))
+    (error "Superclass not available")))
 
 (defun jde-show-superclass-source () 
   "Show the source for the parent of the class at point."

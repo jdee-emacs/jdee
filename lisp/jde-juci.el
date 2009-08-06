@@ -298,11 +298,11 @@ that EXPECTED is `equal' to ACTUAL.  Signal an error if not."
   "xUnit-style assertion function to be used by unit tests.  Assert
 that a FORM, when executed, produces an error.  If no error is
 signaled, then signal an error."
-  (` (condition-case nil
-	 (let ((message-log-max))	;; quiet (message)
-	   (, form)
-	   (error "No error generated.  %S" (or (, msg) "")))
-       (error (message nil) t))))
+  `(condition-case nil
+       (let ((message-log-max))	;; quiet (message)
+         ,form
+         (error "No error generated.  %S" (or ,msg "")))
+     (error (message nil) t)))
 
 (defun jde-juci-test-roundtrips ()
   (jde-juci-xunit-assert-equal "hello" (jde-juci-test-echo "hello") "1a")
