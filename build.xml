@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <project name="jdee" default="build">
-    <!-- add in the contribs (add ant-contrib-VERSION.jar) to CLASSPATH -->
+
+
+  <!--
+
+     For compilation and installation instructions, see doc/install.html
+
+     -->
+
+
+  <!-- add in the contribs (add ant-contrib-VERSION.jar) to CLASSPATH -->
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
 
