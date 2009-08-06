@@ -480,45 +480,6 @@ expression in the returned regexp.  ALIASES are other names for TAG."
       (format "<\\(%s\\)>\\(%s\\)</\\(%s\\)>" tag-re hit-re tag-re)
       )))
 
-(defconst jde-java-font-lock-comment-faces
-  '(font-lock-comment-face font-lock-doc-face)
-  "List of faces font-lock uses for comments.")
-
-(defmacro jde-java-font-lock-at-comment (pos)
-  "Return non-nil if POS is in a comment."
-  `(memq (get-text-property ,pos 'face)
-         jde-java-font-lock-comment-faces))
-
-
-  (defsubst jde-java-font-lock-search-in-comment (regexp end)
-    "Search forward from point for regular expression REGEXP.
-Ensure matching occurs in a java comment.  Buffer position END bounds
-the search.  The match found must not extend after that position."
-    (let ((here (point))
-          ok b p)
-      (while (and (not ok)
-                  (setq p (re-search-forward regexp end t)))
-        (setq b (match-beginning 0))
-        (setq ok (and (jde-java-font-lock-at-comment b)
-                      (< p (next-single-property-change
-                            b 'face nil (point-max))))))
-      (if ok
-          (point)
-        (goto-char here)
-        nil)))
-
-(defun jde-java-font-lock-quote-matcher (end)
-  "Font lock matcher for comment enclosed in \`\'.
-Limit search to END position."
-  (jde-java-font-lock-search-in-comment
-   "`\\([^']*\\)'"
-   end))
-
-(defconst jde-java-font-lock-quote-keyword
-  '(jde-java-font-lock-quote-matcher
-    1 jde-java-font-lock-doc-tag-face t)
-  "Font lock keyword for comment enclosed in \`\'.")
-
 (eval-and-compile
   (if (featurep 'cc-fonts)
     
@@ -616,7 +577,6 @@ Limit search to END position."
       '(jde-java-font-lock-html-ahref-matcher
         1 jde-java-font-lock-link-face t)
       "Font lock keyword for javadoc HTML A HREF anchor.")
-
 
     (defvar jde-java-font-lock-html-keywords nil
       "List of HTML keywords defined so far.")
