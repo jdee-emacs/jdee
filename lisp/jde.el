@@ -1752,7 +1752,7 @@ jde.el."
 ;;
 ;; Problem reporting functions contributed by Phillip Lord <plord@hgmp.mrc.ac.uk>.
 ;;
-(defvar jde-problem-report-mail-address "jdee-devel@lists.sourceforge.net" )
+(defvar jde-problem-report-mail-address "jdee-devel@lists.sourceforge.net")
 
 (defun jde-submit-problem-report()
   "Submit a problem report for the JDEE." 
