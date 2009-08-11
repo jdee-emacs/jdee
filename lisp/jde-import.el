@@ -166,6 +166,13 @@ inserted."
   :group 'jde-project
   :type 'boolean)
 
+(defcustom jde-import-preferred-packages
+  '("java.util" "java" "javax")
+  "Classes from this packages will appear first in list prepared by
+jde-import-choose-import function."
+  :group 'jde-project
+  :type '(repeat string))
+
 (defun jde-import-current-package-p (class)
   "Returns non-nil if the fully qualified classname CLASS belongs to
 the same package as the class in the current buffer."
@@ -427,15 +434,24 @@ inserts the selected import in the buffer."
     (lambda (new-import)
       (unless  (jde-import-already-imports-class new-import existing-imports)
         new-import)
-    new-imports))))
+      new-imports))))
 
 (defun jde-import-choose-import (new-imports)
   "Prompts the user to select a class to import from a list of similarly
  named candidates."
-  (efc-query-options
-	 new-imports
-	 "Select import to insert."
-	 "Classes name dialog"))
+  (flet ((sort-helper
+          (a b)
+          (dolist (pkg jde-import-preferred-packages)
+            (let ((len (length pkg)))
+              (cond ((eq t (compare-strings pkg 0 len a 0 len))
+		     (return t))
+		    ((eq t (compare-strings pkg 0 len b 0 len))
+		     (return nil))
+		    (t (string< a b)))))))
+    (efc-query-options
+     (sort new-imports 'sort-helper)
+     "Select import to insert."
+     "Classes name dialog")))
 
 (defun jde-import-kill-extra-imports (&optional comment)
   "Delete extra Java import statements.

@@ -110,13 +110,12 @@ default method kills the dialog buffer."
     "Cancel")
    :dialog this)
 
-   (use-local-map widget-keymap)
-   (widget-setup)
+  (use-local-map widget-keymap)
+  (widget-setup)
 
-  ;; Position cursor over OK button.
-  ;; (forward-line 0)
-
+  ;; Position cursor over the first choice.
   (goto-char (point-min))
+  (widget-forward 1)
 
   (pop-to-buffer (oref this buf)))
 
@@ -159,9 +158,11 @@ dialog uses recursive edit to emulate a modal dialog.")
  	 (list
 	  'radio-button-choice
 	  :value (car (oref this options))
-	  :args (mapcar 
-		 (lambda (x) 
-		   (list 'item x)) 
+          :dialog this
+          :notify (lambda (button &rest ignore)
+                    (efc-dialog-ok (widget-get button :dialog)))
+	  :args (mapcar
+		 (lambda (x) (list 'item x))
 		 (oref this options)))))
   (widget-insert "\n"))
 
