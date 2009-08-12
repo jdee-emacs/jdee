@@ -1,5 +1,5 @@
 ;;; jde.el -- Integrated Development Environment for Java.
-;; $Revision: 1.357.2.4 $ $Date: 2006/03/09 04:19:37 $ 
+;; $Id$
 
 ;; Author: Paul Kinnucan <pkinnucan@attbi.com>
 ;; Maintainer: Paul Kinnucan
@@ -39,6 +39,9 @@
 ;;;###autoload
 (defconst jde-version "@@{project.version}@@"
   "JDE version number.")
+
+(defconst jde-revision "$Revision$"
+  "The subversion revision for this build.")
 
 (defconst jde-cedet-min-version "1.0beta2"
   "Cedet minimum version")
@@ -600,8 +603,6 @@ use in testing the JDEE's java classes."
   :group 'jde-project
   :type 'boolean)
 
-
-;; (makunbound 'jde-enable-senator)
 (defcustom jde-enable-senator t
   "Enable senator minor mode.
 This mode provides Java-aware buffer navigation and searching
@@ -1377,7 +1378,8 @@ you want to use."
 the conversion function specified by `jde-cygwin-path-converter'."
   (interactive "sPath: ")
   (funcall (car jde-cygwin-path-converter) 
-	   (if separator (substitute ?\: (string-to-char separator) path) path)))
+	   (if separator
+	       (substitute ?\: (string-to-char separator) path) path)))
 
 (defcustom jde-resolve-relative-paths-p t
   "If this variable is non-nil, the JDE converts relative paths to 
@@ -1643,8 +1645,6 @@ replaces with slashes."
                    (expand-file-name path)))
            (split-string cp jde-classpath-separator))))))
 
-
-
 (defvar jde-entering-java-buffer-hook 
   '(jde-reload-project-file 
     jde-which-method-update-on-entering-buffer)
@@ -1739,10 +1739,11 @@ jde.el."
       (signal 'error '("Cannot find JDE help file.")))))
 
 
-;;
-;; Problem reporting functions contributed by Phillip Lord <plord@hgmp.mrc.ac.uk>.
-;;
-(defvar jde-problem-report-mail-address "jdee-devel@lists.sourceforge.net")
+;; Problem reporting functions contributed by
+;; Phillip Lord <plord < at > hgmp.mrc.ac.uk>.
+(defconst jde-problem-report-mail-address
+  (concat "jdee-devel" (char-to-string ?@) "lists.sourceforge.net")
+  "Send email to this address for JDEE problem reporting.")
 
 (defun jde-submit-problem-report()
   "Submit a problem report for the JDEE." 
@@ -1762,7 +1763,6 @@ jde.el."
       'jde-problem-report-post-hooks
       "Please enter the details of your bug report here" )
      (message "Preparing bug report...done"))))
-
 
 (defun jde-problem-report-post-hooks()
   "Function run the reporter package done its work.
@@ -1939,8 +1939,8 @@ for insertion of the .emacs file"
    (if setnu-mode
        (if (> end start) 
 	   (setq jde-setnu-deletion-check 
-		 (string-match "[\n\r]" (buffer-substring-no-properties start end))))))
-
+		 (string-match "[\n\r]"
+			       (buffer-substring-no-properties start end))))))
 
 (defcustom jde-setnu-mode-threshold 20000
  "Maximum number of bytes in a file (buffer) that can result in
@@ -2001,7 +2001,8 @@ automatic line numbering."
                (print-help-return-message))))
 
 (defun jde-keys ()
-  "Displays JDE key bindings. Use `jde-bug-keys' to display JDEbug keybindings ."
+  "Displays JDE key bindings. Use `jde-bug-keys' to display JDEbug
+keybindings."
   (interactive)
   (jde-describe-map 'jde-mode-map))
 
