@@ -1,6 +1,5 @@
 ;;; jde-dbs.el -- JDEbug Session Interface Functions
 ;; $Id$
-;; $Revision$ $Date$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>

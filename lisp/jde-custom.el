@@ -2,7 +2,6 @@
 ;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
-;; Copyright (C) 2009 by Paul Landes
 ;; Keywords: java, tools
 
 ;; Copyright (C) 2004 Paul Kinnucan.
