@@ -220,22 +220,4 @@ will not be."
 
 (provide 'jde-class)
 
-;; $Log: jde-class.el,v $
-;; Revision 1.6  2003/07/15 06:03:13  ahyatt
-;; temp-directory was not always defined (in xemacs)
-;;
-;; Revision 1.5  2003/05/10 06:05:57  ahyatt
-;; Fix assorted bugs dealing with with-all-corresponding-class-infos and using with-all-class-files with package specifiers while using jar files.
-;;
-;; Revision 1.4  2003/05/06 06:50:55  ahyatt
-;; Fixes recent regression with default-directory not getting set back after making the xref db (if the jde-built-class-path contains jars)
-;;
-;; Revision 1.3  2003/05/06 05:25:47  ahyatt
-;; Fixed problem with package variable, and the function to recursively delete a directory.
-;;
-;; Revision 1.2  2003/05/03 08:43:41  paulk
-;; Fix typo in with-all-class-files.
-;;
-;; Revision 1.1  2003/03/13 19:06:20  ahyatt
-;; Added CVS tags
-;;
+;; End of jde-class.el

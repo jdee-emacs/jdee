@@ -296,45 +296,4 @@ you to select one of the interfaces to show."
 
 (provide 'jde-open-source)
 
-;; $Log: jde-open-source.el,v $
-;; Revision 1.15  2004/12/17 04:21:26  paulk
-;; Create infrastructure for supporting source archives in jde-sourcepath.
-;;
-;; Revision 1.14  2004/07/09 04:29:45  paulk
-;; Update to reflect new nomenclature in semantic 2.0.
-;;
-;; Revision 1.13  2004/01/13 06:15:25  paulk
-;; Some additional tweaks to jde-open-class-at-point.
-;;
-;; Revision 1.12  2004/01/13 06:07:25  paulk
-;; Rewrote jde-open-class-at-point to be more succinct and clear.
-;;
-;; Revision 1.11  2003/10/06 12:30:37  jslopez
-;; Fixes several broken cases with jde-open-class-at-point.
-;;
-;; Revision 1.10  2003/07/19 05:44:48  paulk
-;; Make error message for jde-open-class-at-point more meaningful.
-;;
-;; Revision 1.9  2003/01/03 16:24:25  jslopez
-;; Fixes bug handling finding method definition in a super class.
-;; The code was parsing the java file from where it was invoked instead
-;; of the class file that was pertinent.
-;;
-;; Revision 1.8  2002/08/22 04:15:17  jslopez
-;; Fixes jde-open-class-at-point to loop through
-;; all the super classes looking for the given token.
-;;
-;; Revision 1.7  2002/07/27 13:21:30  jslopez
-;; Fixes regression in jde-open-class-at-point.
-;;
-;; Revision 1.6  2002/07/27 13:03:19  jslopez
-;; Substitute obsolete call to jde-open-base-class-source.
-;;
-;; Revision 1.5  2002/07/01 04:52:11  paulk
-;; - Moved jde-open-class-source, jde-show-superclass-source, jde-show-interface-source from jde-help.el
-;;   to jde-open-source.el.
-;;
-;; - Removed jde-open-source-for-symbol because it has been superceded by jde-open-class-at-point.
-;;
-
-;; end jde-open-source.el
+;; End of jde-open-source.el

@@ -452,19 +452,4 @@ framework. For more information, see http://www.junit.org."
 
 (provide 'jde-junit)
 
-;; Change History
-;; $Log: jde-junit.el,v $
-;; Revision 1.5.2.1  2006/03/05 03:49:50  paulk
-;; Fix typo in jde-unit-get-testee-name. Thanks to Christophe Garion [garion@supaero.fr]
-;;
-;; Revision 1.5  2005/01/18 04:58:35  paulk
-;; Fix a bug in jde-junit-run command that causes a Lisp error whenever it is run.
-;;
-;; Revision 1.4  2004/11/13 17:01:39  jslopez
-;; Removes control characters.
-;;
-;; Revision 1.3  2004/10/18 04:20:15  paulk
-;; Add unit test support.
-;;
-
-;; end of jde-junit.el
+;; End of jde-junit.el

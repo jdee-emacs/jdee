@@ -436,28 +436,4 @@ This function uses the semantic bovinator to index the buffer."
 
 (provide 'jde-imenu)
 
-;; $Log: jde-imenu.el,v $
-;; Revision 1.7  2004/07/06 05:25:51  paulk
-;; Convert to new tag nomenclature used by semantic 2.0 to avoid
-;; byte-compilation errors caused by references to obsolete names.
-;;
-;; Revision 1.6  2003/09/21 03:35:37  paulk
-;; (jde-imenu-setup): Install correct override for Semantic 2.0. Submitted by David Ponce.
-;;
-;; Revision 1.5  2002/09/16 04:42:55  paulk
-;; XEmacs compatibility fix: added require statement for regexp-opt package.
-;;
-;; Revision 1.4  2001/05/23 03:51:45  paulk
-;; Removed which-func support as jde-which-method is better.
-;;
-;; Revision 1.3  2001/05/19 02:35:59  paulk
-;; Updated to support semantic 1.4. Thanks to David Ponce.
-;;
-;; Revision 1.2  2000/11/27 06:18:39  paulk
-;; Miscellaneous bug fixes and minor enhancements.
-;;
-;; Revision 1.1  2000/10/20 04:04:20  paulk
-;; Initial version.
-;;
-
-;;; jde-imenu.el ends here
+;; End of jde-imenu.el

@@ -237,35 +237,4 @@ list of four elements."
 
 (provide 'jde-stat)
 
-;; Change History
-;;
-;; $Log: jde-stat.el,v $
-;; Revision 1.7  2003/03/28 05:33:30  andyp
-;; XEmacs optimizations for JDEbug and efc.
-;;
-;; Revision 1.6  2002/11/21 04:18:41  paulk
-;; These packages, when autoloaded, now register and initialize the customization variables
-;; that they define to the values specified in the current project file.
-;;
-;; Revision 1.5  2002/10/11 05:53:21  paulk
-;; Added more packages to the list of packages that are demand loaded. This is intended to reduce the startup time for the JDEE.
-;;
-;; Revision 1.4  2002/10/01 05:43:10  paulk
-;; Made commands defined by this package autoloadable.
-;;
-;; Revision 1.3  2001/08/28 12:53:23  jslopez
-;; Fixing typo in the documentation for jde-stat-loc-report-project.
-;; Formatting the documentation of jde-stat-loc-count-directories and
-;; jde-stat-loc-count-directory.
-;;
-;; Revision 1.2  2001/08/28 00:50:33  jslopez
-;; Modified jde-stat-loc-report to take a count and a total number of files as
-;; arguments.
-;; Added jde-stat-loc-report-project and jde-stat-loc-report directory.
-;;
-;; Revision 1.1  2000/07/28 05:59:43  paulk
-;; Initial revision. Thanks to Stephane Nicolas <s.nicolas@videotron.ca>
-;; for contributing the initial version of this package.
-;;
-;;
 ;; End of jde-stat.el

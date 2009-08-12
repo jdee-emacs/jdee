@@ -187,22 +187,4 @@ the Application Project Creation dialog."
 
 (provide 'jde-project)
 
-;; Change History
-;;
-;; $Log: jde-project.el,v $
-;; Revision 1.5  2002/02/17 14:29:23  jslopez
-;; Adds documentation for src field.
-;;
-;; Revision 1.4  2002/02/17 14:24:07  jslopez
-;; Fixes compilation error.
-;;
-;; Revision 1.3  2001/12/08 13:25:18  jslopez
-;; Updated to reflect change in dialog class package name prefix from jde- to efc-.
-;;
-;; Revision 1.2  2000/12/18 05:22:46  paulk
-;; *** empty log message ***
-;;
-;; Revision 1.1  2000/11/27 06:21:10  paulk
-;; Initial revision
-;;
-;;
+;; End of jde-project.el

@@ -159,15 +159,4 @@ for JDEE variables in group customization buffers."
 
 (provide 'jde-custom)
 
-;; Change History
-;;
-;; $Log: jde-custom.el,v $
-;; Revision 1.2  2004/03/21 03:08:45  paulk
-;; Get rid of DOS line endings.
-;;
-;; Revision 1.1  2004/02/24 05:43:11  paulk
-;; Initial revision.
-;;
-;;
-;;
-;;
+;; End of jde-custom.el

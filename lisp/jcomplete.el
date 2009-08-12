@@ -56,8 +56,7 @@
 ;; <URL:http://sunsite.auc.dk/jde/>.
 ;; <URL:http://www.geocities.com/SiliconValley/Lakes/1506/>
 
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Kinnucan at paulk@mathworks.com.
+;;; Code:
 
 (defvar prf2-current-list nil
 "The list of all the completion. Each element of the list is a list

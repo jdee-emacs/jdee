@@ -201,29 +201,4 @@ With prefix argument ARG, turn on if positive, otherwise off..
 
 ;; Change History
 
-;;
-;; $Log: jde-plugins.el,v $
-;; Revision 1.7  2004/09/21 04:33:33  paulk
-;; Teach JDEE to ignore a CVS or RCS directory in the plugins directory.
-;;
-;; Revision 1.6  2004/02/21 07:59:20  paulk
-;; Fixed nasty bug in jde-pi-get-bsh-classpath.
-;;
-;; Revision 1.5  2003/06/21 09:01:43  paulk
-;; Fix typo. Thanks to Martin Schamberg.
-;;
-;; Revision 1.4  2003/06/18 05:05:30  paulk
-;; Fix bug in jde-plugin-minor-mode's menu-installing code for XEmacs.
-;;
-;; Revision 1.3  2003/06/09 05:45:26  paulk
-;; Test for nonexistence of plugins directory.
-;;
-;; Revision 1.2  2003/04/28 04:47:02  paulk
-;; Implemented installation of menus and beanshell classpath for plugins.
-;;
-;; Revision 1.1  2003/04/16 04:08:46  paulk
-;; Initial revision.
-;;
-;;
-
 ;; End of jde-plugins.el

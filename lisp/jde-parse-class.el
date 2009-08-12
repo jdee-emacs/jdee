@@ -791,46 +791,4 @@ must be calculated at runtime.")
 
 (provide 'jde-parse-class)
 
-;; $Log: jde-parse-class.el,v $
-;; Revision 1.9  2005/01/20 04:53:21  paulk
-;; Fix bug in jde-parse-class-get-code-attribute that caused it to compute the length of iinc JVM instructions
-;; as 5 bytes when they are in fact 6 bytes long. Thanks to Jack Klebanoff.
-;;
-;; Revision 1.8  2004/07/09 05:17:20  paulk
-;; Eliminated initialization of loop variable i to 0 in
-;; jde-parse-class-get-constants. It does not seem necessssary as dotimes
-;; initializes the variable itself to 0. Further, the initialization
-;; turned i into a free variable, causing a compiler warning. I tested
-;; jde-parse-class-get-constants before and after this change and the
-;; change made no difference.
-;;
-;; Revision 1.7  2003/06/19 17:01:39  ahyatt
-;; Now compatible with emacs and xemacs versions without MULE
-;;
-;; Revision 1.5  2003/03/08 06:32:45  ahyatt
-;; Now parses exception information
-;;
-;; Revision 1.4  2002/12/01 02:39:58  ahyatt
-;; Support for jde-xref's latest improvements, which require more
-;; information from each class.
-;;
-;; Revision 1.3  2002/11/21 04:26:33  ahyatt
-;; Changed my e-mail address to andy_jde@thehyatts.net
-;;
-;; Revision 1.2  2002/11/21 04:03:47  ahyatt
-;; Fixed a bug in jde-parse-class where two functions had the same
-;; definition.  The fix involved renamed a few classes to keep
-;; consistency.  jde-xref had to change as well.
-;;
-;; Removed a (newline) function call in jde-xref and replaced it with a "\n"
-;;
-;; In jde-xref, rewrote the parts of jde-xref-make-db-from-path which
-;; dealt with keeping track of the already parsed classes. Previous
-;; solution was really kludgey, this solution is only somewhat kludgey.
-;; I'm still thinking about this problem.
-;;
-;; Revision 1.1  2002/11/18 07:02:18  paulk
-;; Initial release.
-;;
-
-;; end of jde-xref.el
+;; End of jde-parse-class.el

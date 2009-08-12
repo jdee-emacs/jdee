@@ -916,8 +916,4 @@ optional."
 
 (provide 'regress)
 
-;;Local variables:
-;;change-log-default-name: "regress.changelog"
-;;End:
-
-;;; regress.el ends here
+;;; End of regress.el

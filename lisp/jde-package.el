@@ -244,44 +244,4 @@ this command does nothing. This command signals an error if the
 (provide 'jde-package)
 (run-hooks 'jde-package-load-hook)
 
-;;; Change History:
-
-;;
-;; $Log: jde-package.el,v $
-;; Revision 1.10  2002/12/19 06:39:44  paulk
-;; Update customization variables when jde-package.el is loaded.
-;;
-;; Revision 1.9  2002/12/19 06:13:15  paulk
-;; Fixed a bug caused by treating "." as a standard relative path character
-;; instead of a project file relative path character.
-;; Fixed and expanded some doc strings.
-;;
-;; Revision 1.8  2002/05/29 04:18:03  paulk
-;; Add the directories from jde-sourcepath to the
-;; directories considered when trying to derive a package name.
-;; Thanks to Michael N. Lipp <mnl@mnl.de>.
-;;
-;; Revision 1.7  2002/03/04 02:36:22  jslopez
-;; Removes extra log entries.(it was duplicated)
-;;
-;; Revision 1.6  2001/06/07 03:31:00  paulk
-;; Fixed NT/XEmacs incompatibility caused by XEmacs' use of back slash as the directory path separator. Thanks to David Ponce.
-;;
-;; Revision 1.5  2001/04/09 05:01:03  paulk
-;; Fixed bug in jde-package-get-directories-in-classpath that caused it to return t instead of a list when the classpath contained ".".
-;;
-;; Revision 1.4  2001/03/30 07:10:31  paulk
-;; Minor code improvement and cleanup and many checkdoc related
-;; cosmetic changes contributed by David Ponce.
-;;
-;; Revision 1.3  2001/03/13 04:23:58  paulk
-;; Cosmetic changes.
-;;
-;; Revision 1.2  2001/02/22 03:36:30  paulk
-;; Removed require for jde to fix infinite recursion loading bug.
-;;
-;; Revision 1.1  2001/02/21 05:52:02  paulk
-;; Initial revision.
-;;
-
-;;; jde-package.el ends here.
+;; End of jde-package.el

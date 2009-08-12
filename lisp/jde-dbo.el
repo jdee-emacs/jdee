@@ -565,45 +565,5 @@ The remaining elements are arguments to pass to the handler."
     (widget-setup)))
 
 (provide 'jde-dbo)
-;; $Log: jde-dbo.el,v $
-;; Revision 1.40  2004/06/03 02:04:11  paulk
-;; jde-require tree-widget.
-;;
-;; Revision 1.39  2003/09/27 05:34:36  ahyatt
-;; Exceptions should break when the user selects to suspend the thread as
-;; well (not just when the user selects to suspect all threads).
-;;
-;; Revision 1.38  2003/09/17 05:12:24  ahyatt
-;; Added exception breakpoints
-;;
-;; Revision 1.37  2002/12/19 22:19:06  ahyatt
-;; Fixed problem with nulls in the tree-view display
-;;
-;; Revision 1.36  2002/12/08 20:43:45  ahyatt
-;; Refactoring to support UI changes in jde-bug
-;;
-;; Revision 1.35  2002/02/04 05:47:17  paulk
-;; Added code to rehighlight breakpoints if the user kills a
-;; buffer for a source file that contains breakpoints and
-;; then reopens the file.
-;;
-;; Revision 1.34  2002/01/16 07:36:01  paulk
-;; Updated JDEbug to use most of the new generalized breakpoint functionality.
-;;
-;; Revision 1.33  2001/12/28 05:27:45  paulk
-;; Deleted jde-dbo-query-source-directory, jde-dbo-find-source-directory, and
-;; jde-dbo-show-line and replaced calls to these functions with calls to
-;; the equivalent functions in the jde-db package: jde-db-query-source-directory,
-;; jde-db-find-source-directory, and jde-db-set-debug-cursor.
-;;
-;; Revision 1.32  2001/12/04 06:14:29  paulk
-;; Replaced call to obsolete jde-bug-install-jdebug-menu with call to jde-bug-minor-mode.
-;;
-;; Revision 1.31  2001/11/27 21:06:49  jslopez
-;; Fixes some compilation messages.
-;; Adds code to be able to keep the state of
-;; the nodes in the JDEBug local variables tree.
-;;
-;; Revision 1.30  2001/11/23 15:58:47  jslopez
-;; Adds Log key word.
-;;
+
+;; End of jde-dbo.el

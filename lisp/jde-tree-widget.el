@@ -113,57 +113,6 @@
 ;; comments, suggestions, bug reports or upgrade requests are welcome.
 ;; Please send them to David Ponce <david@dponce.com>.
 
-;;; History:
-;;
-;; $Log: jde-tree-widget.el,v $
-;; Revision 1.1  2004/06/03 02:17:03  paulk
-;; Initial revision.
-;;
-;; Revision 1.4  2001/11/27 22:13:47  jslopez
-;; Adding David's change log entry.
-;;
-;; Revision 1.3  2001/11/27 20:56:25  jslopez
-;; Updates to the latest version. David added a hook
-;; to be able to persist the JDEBug local variables tree.
-;; (tree-widget-after-toggle-functions): New variable.  Hooks run
-;; after toggling a `tree-widget' folding.
-;; (tree-widget-toggle-folding): Run above hooks.  Updated doc
-;; string.
-;; Added pagination.  Minor comment changes.
-;;
-;; Revision 1.2  2001/10/26 11:20:38  jslopez
-;; Removing control characters.
-;;
-;; Revision 1.1  2001/10/26 06:45:57  paulk
-;; Initial revision.
-;;
-;; Revision 1.5  2001/05/11 23:11:18  ponce
-;; Updated version to 1.0.5.
-;;
-;; Revision 1.4  2001/05/11 23:02:14  ponce
-;; (tree-widget-value-create): Fixed a bug when the dynamic tree :dynargs
-;; function returns nil (no children).
-;;
-;; Revision 1.3  2001/03/16 14:23:15  ponce
-;; (tree-widget-example-1): removed unused free variable
-;; `tree-widget-sample'.
-;;
-;; Revision 1.2  2001/03/16 14:15:09  ponce
-;; (tree-widget-children-value-save): use `tree-widget-node' to get the
-;; :node value of widgets.  Check node and node-child values before
-;; saving properties.
-;;
-;; (tree-widget-button-keymap): new variable.  Keymap used inside node
-;; handle buttons.
-;;
-;; (tree-widget-node-handle): use `tree-widget-button-keymap'.
-;;
-;; (tree-widget-map): new utility function.
-;;
-;; Revision 1.1  2001/02/19 22:51:23  ponce
-;; Initial revision.
-;;
-
 ;;; Code:
 
 (require 'wid-edit)

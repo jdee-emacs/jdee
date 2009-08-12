@@ -81,5 +81,4 @@ windows-suffixes))
     (and file
 (find-file file))))
 
-
 (provide 'which)

@@ -158,17 +158,4 @@ and kills the dialog window."
     (efc-dialog-show dialog)
     (oref dialog selection)))
 
-;(defun efc-xemacs-test()
-;  (interactive)
-;  (message (efc-query-options (list "one" "two" "three")
-;			      "Select an option.")))
-
-;(defun efc-xemacs-test-ok()
-;  (interactive)
-;  (let ((dialog
-;	 (efc-dialog
-;	  "Ok cancel dialog"
-;	  :title "Ok cancel dialog")))
-;    (efc-dialog-show dialog)))
-
 (provide 'efc-xemacs)

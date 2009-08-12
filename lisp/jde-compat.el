@@ -133,27 +133,4 @@
 
 (provide 'jde-compat)
 
-;; Change History
-
-;;
-;; $Log: jde-compat.el,v $
-;; Revision 1.6  2004/10/11 03:59:22  paulk
-;; Various updates.
-;;
-;; Revision 1.5  2004/07/01 14:04:39  jslopez
-;; Compatibility fix for emacs in CVS. Replaces jde-xemacsp check for boundp for
-;; the following variables: compilation-nomessage-regexp-alist,
-;; compilation-file-regexp-alist, compilation-leave-directory-regexp-alist,
-;; compilation-enter-directory-regexp-alist. Uses the compilation-mode without a
-;; parameter. The emacs in CVS does not contain the variables, or the parameter
-;; for compilation mode.
-;;
-;; Revision 1.4  2003/10/23 03:57:11  paulk
-;; Added compatibility fix for older versions of XEmacs. Thanks to Len Trigg.
-;;
-;; Revision 1.3  2003/04/01 04:05:15  paulk
-;; Add change log to end of file.
-;;
-;;
-
 ;; End of jde-compat.el

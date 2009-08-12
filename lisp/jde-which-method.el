@@ -30,58 +30,7 @@
 ;; This package displays the name of the method at point
 ;; in the Emacs mode line.
 
-;;; History:
-
-;;  $Log: jde-which-method.el,v $
-;;  Revision 1.12  2004/06/07 03:30:42  paulk
-;;  Catch errors and print a message in update hook function.
-;;
-;;  Revision 1.11  2004/03/22 06:27:51  paulk
-;;  jde-which-method-update
-;;  - forces modeline update if necessary
-;;  - removed: (setq jde-which-method-current-point p)
-;;     it caused a warning and seems to be unnecessary.
-;;
-;;  Thanks to Martin Schwarmberger.
-;;
-;;  Revision 1.10  2001/03/23 09:01:42  paulk
-;;  Now update the mode line during idle times instead of after every keystroke. Thanks to Steven Monnier for suggesting this improvement.
-;;
-;;  Revision 1.9  2001/02/27 04:58:33  paulk
-;;  Disable jde-which-method-mode by default. This mode slows down scrolling, which is disconcerting to new users.
-;;
-;;  Revision 1.8  2000/11/27 06:18:41  paulk
-;;  Miscellaneous bug fixes and minor enhancements.
-;;
-;;  Revision 1.7  2000/10/20 04:12:12  paulk
-;;  *** empty log message ***
-;;
-;;  Revision 1.6  2000/10/10 06:39:24  paulk
-;;  Moved some which method customization variables into the which method customization group.
-;;
-;;  Revision 1.5  2000/10/08 12:55:39  paulk
-;;  *** empty log message ***
-;;
-;;  Revision 1.4  2000/10/06 05:41:28  paulk
-;;  Now optionally truncates method name.
-;;  Thanks to klaus.berndl@sdm.de. Also, moves method
-;;  name after point location display in mode line.
-;;
-;;  Revision 1.3  2000/09/05 04:42:22  paulk
-;;  Fixed a number of bugs.
-;;
-;;  Revision 1.2  2000/09/04 05:03:16  paulk
-;;  Added test for existence of method map.
-;;
-;;  Revision 1.1  2000/08/31 05:27:49  paulk
-;;  Initial revision.
-;;
-
 ;;; Code:
-
-;; Variables for customization
-;; ---------------------------
-;;
 
 (require 'jde-parse)
 

@@ -741,37 +741,4 @@ Bean-specific interactive function"
 
 (provide 'jde-ejb)
 
-;;; Change History:
-
-;; $Log: jde-ejb.el,v $
-;; Revision 1.7  2004/07/06 04:03:40  paulk
-;; Replace calls to template aliases to the actual template function
-;; names. This is intended to eliminate undefined function messages when
-;; byte-compiling this library.
-;;
-;; Revision 1.6  2004/07/06 03:43:56  paulk
-;; Provide defvars and jde- prefixes for global variables used in
-;; templates, e.g., jde-current-ejb-name. This eliminates
-;; byte-compilation warnings about undefined variables. Also, replace
-;; references to functions that get the values of these variables with
-;; the values themselves as this eliminates a function evaluation that
-;; seems to serve no useful purpose.
-;;
-;; Revision 1.5  2003/03/28 05:33:29  andyp
-;; XEmacs optimizations for JDEbug and efc.
-;;
-;; Revision 1.4  2003/01/19 05:11:36  paulk
-;; Updated to reflect EJB 2.x. Thanks to Yoon Kyung Koo.
-;;
-;; Revision 1.3  2002/12/02 14:38:17  jslopez
-;; Changes current-ejb-name to a function from a macro to fix byte-compilation.
-;;
-;; Revision 1.2  2002/09/30 04:40:23  paulk
-;; Made jde-ejb commands autoloadable.
-;;
-;; Revision 1.1  2002/09/26 06:12:27  paulk
-;; Initial revision.
-;;
-
-
 ;; End of jde-ejb.el

@@ -526,37 +526,4 @@ defined by the current project's project file."
 
 (provide 'jde-project-file)
 
-;; Change History
-;;
-;; $Log: jde-project-file.el,v $
-;; Revision 1.7  2004/11/13 14:16:16  jslopez
-;; Fixes typo. The description for the jde-project was showing in two lines
-;; instead of one.
-;;
-;; Revision 1.6  2004/07/06 01:47:42  paulk
-;; - Move jde-get-java-source-buffers and allied functions to jde-util.el.
-;; - Create jde-get-project-source-buffers.
-;; - Replace jde-get-current-project-buffers with jde-get-project-source-buffers.
-;;
-;; Revision 1.5  2004/06/07 03:32:56  paulk
-;; Catch errors in jde-reload-project-file to avoid nullifying other entering Java buffer
-;; hooks.
-;;
-;; Revision 1.4  2004/06/04 13:49:19  paulk
-;; Fixed the following bugs:
-;;  - Variable from default value to nil not saved in project file.
-;;  - Variable whose customization has been erased is not removed from project file.
-;;
-;; Revision 1.3  2004/03/03 03:55:45  paulk
-;; Moved project-related stuff to this file from jde.el.
-;;
-;; Revision 1.2  2004/02/24 05:51:21  paulk
-;; Cosmetic change.
-;;
-;; Revision 1.1  2004/02/09 06:46:07  paulk
-;; When switching projects, the JDEE now reinitializes only those variables that have
-;; project-specific values, i.e., that have been set in project files. This dramatically
-;; decreases project switching time. Thanks to Phillip Lord.
-;;
-;;
-;;
+;; End of jde-project-file.el
