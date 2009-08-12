@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <project name="jdee" default="build">
-
-
   <!--
-
      For compilation and installation instructions, see doc/install.html
-
      -->
-
 
   <!-- add in the contribs (add ant-contrib-VERSION.jar) to CLASSPATH -->
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
@@ -115,6 +110,10 @@
       <replacefilter token="@{src.lisp.dir}" value="${src.lisp.escaped.dir}"/>
       <replacefilter token="@{build.lisp.dir}" value="${build.lisp.escaped.dir}"/>
       <replacefilter token="@{build.lisp.autoload.libname}" value="${build.lisp.autoload.libname}"/>
+    </replace>
+
+    <replace file="${build.lisp.dir}/jde.el">
+      <replacefilter token="@@{project.version}@@" value="${project.version}"/>
     </replace>
   </target>
 
