@@ -37,7 +37,7 @@
 ;;; Code:
 
 ;;;###autoload
-(defconst jde-version "2.3.6"
+(defconst jde-version "@@{project.version}@@"
   "JDE version number.")
 
 (defconst jde-cedet-min-version "1.0beta2"
@@ -56,6 +56,9 @@
 (defconst jde-emacs22p (and (string-match "\\bEmacs\\b" (emacs-version))
 			    (>= emacs-major-version 22)))
 
+(defconst jde-emacs23p (and (string-match "\\bEmacs\\b" (emacs-version))
+			    (>= emacs-major-version 23)))
+
 (unless (fboundp 'custom-set-default)
    (defalias 'custom-set-default 'set-default)) 
 
@@ -63,19 +66,6 @@
 (require 'jde-autoload)
 
 (require 'jde-util)
-
-;; The version of the JDEE distributed with XEmacs has its own
-;; autoloads file (auto-autoloads.el). Therefore, require
-;; jde-autoloads only if this JDEE version is not part of the XEmacs
-;; package.
-(unless 
-    (and jde-xemacsp
-	 (file-exists-p 
-	  (expand-file-name 
-	   "jde/auto-autoloads.el"
-	   (jde-root))))
-	 (require 'jde-autoload))
-
 (require 'jde-custom)
 (require 'jde-help)
 (require 'semantic-load)
@@ -113,12 +103,10 @@
 (if (not (fboundp 'custom-set-default))
     (defalias 'custom-set-default 'set-default))
 
-
 (defgroup jde nil
   "Java Development Environment"
   :group 'tools
   :prefix "jde-")
-
 
 (defcustom jde-check-version-flag t
   "*Non-nil means to check versions of semantic, eieio, and speedbar.
@@ -209,8 +197,6 @@ whenever you open a Java source file."
   :group 'jde-project
   :type 'boolean)
 
-
-
 (defcustom jde-java-environment-variables '("JAVA_VERSION" "JAVA_HOME")
   "This variable specifies the names of environment variables used to
 specify the version and location of the JDK to be used by the JDE.
@@ -252,7 +238,7 @@ java enviroment variables."
 (defcustom jde-jdk-registry nil
   "Specifies the versions and locations of the JDKs installed on your
 system.  For each JDK to be registered, enter the version number
-(e.g., 1.4.0) of the JDK in the Version field. Enter the path of the
+\(e.g., 1.4.0) of the JDK in the Version field. Enter the path of the
 JDK's root directory (e.g., c:/jdk1.3.1 or $JAVA_HOME) in the Path
 field. Setting this variable determines the choices offered by the
 `jde-jdk' variable. You should therefore customize this variable
@@ -265,7 +251,6 @@ first."
 	   (string :tag "Path")))
   :set 'jde-set-jdk-dir-type)
 
-;; (makunbound 'jde-jdk)
 (defcustom jde-jdk nil
   "Specifies the version of the JDK to be used to develop the current
 project. The version must be one of the versions listed in the
@@ -290,6 +275,12 @@ the current project."
   (if (or (featurep 'xemacs) (< emacs-major-version 21))
       'custom-set-default
     '(jde-jdk-registry)))
+
+;;;###autoload
+(defun jde-version ()
+  "Get the version of JDEE."
+  (interactive)
+  (message "JDEE %s" jde-version))
  
 (defun jde-find-jdk-in-exec-path ()
   "Search for a JDK in `exec-path' and return the path of
@@ -315,7 +306,6 @@ JDK is not found anywhere in exec-path."
 	      (setq file nil)
 	      (cdr list))))
     file))
-
 
 (defun jde-get-jdk-dir () 
   "Get the root directory of the JDK currently being used by the
