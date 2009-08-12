@@ -694,10 +694,10 @@ for the VARNAME variable."
 			       "\\(" jde-parse-java-symbol-re "[ \t\n\r]*,[ \t\n\r]*\\)*"
                               (jde-parse-double-backslashes varname) 
                               "[]?[ \t\n\r]*[,;]"))
-       ;; Parse jdk1.5 for (Type val : collection) {
-       (looking-at (concat "\\(" jde-parse-java-symbol-declare-re "\\)[ \t\n\r]+"
-                           varname "[ \t\n\r]*:[ \t\n\r]*"
-                           "\\(" jde-parse-java-symbol-re "[,{} \t\n\r]*\\)+" ")")))
+           ;; Parse jdk1.5 for (Type val : collection) {
+           (looking-at (concat "\\(" jde-parse-java-symbol-declare-re "\\)[ \t\n\r]+"
+                               varname "[ \t\n\r]*:")))  ;[ \t\n\r]*"
+                               ;"\\(" jde-parse-java-symbol-re "[,{} \t\n\r]*\\)+" ")")))
           (let ((type (match-string 1))
                 (type-pos (match-beginning 1)))
             (goto-char type-pos)
@@ -753,7 +753,7 @@ Returns the character position in the buffer, or nil if no declaration
 could be found."
   (save-excursion
     (let ((symbol-list-entry-re
-	   (concat (concat jde-parse-java-symbol-re "[ \t\n\r]*,[ \t\n\r]*")))
+	   (concat jde-parse-java-symbol-re "[ \t\n\r]*,[ \t\n\r]*"))
 	  (orgpt (point))
 	   found pos resname foundpt lastpos)
       
