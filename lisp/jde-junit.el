@@ -1,9 +1,9 @@
 ;; jde-junit.el --- runs the junit test in the current buffer.
-;; $Revision: 1.5.2.1 $
+;; $Id$
 
 ;; Author: Paul Kinnucan
 ;; Author: Torsten Geise <torsten.geise@freenet.de>
-;; Maintainer: Paul Kinnucan
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: tools, processes
 
 ;; Copyright (C) 2004, 2005, 2006 Paul Kinnucan, Torsten Geise
@@ -25,10 +25,10 @@
 
 ;;; Commentary:
 
-;; This package is developed to perform junit test cases from within the 
+;; This package is developed to perform junit test cases from within the
 ;; current buffer. Most defuns are copied from jde sources and modified to
-;; do the right things to JUnit. 
-;; This package should be best integrated to the JDEE. That means this 
+;; do the right things to JUnit.
+;; This package should be best integrated to the JDEE. That means this
 ;; package uses the jde project files to store junit specific settings and
 ;; so on.
 
@@ -46,7 +46,7 @@
 (defcustom jde-junit-working-directory ""
   "*Path of the working directory for the test run.
 If you specify a path, the JDE launches the test run from the
-directory specified by the path. Otherwise the test run will be launched 
+directory specified by the path. Otherwise the test run will be launched
 from the current buffer's directory"
   :group 'jde-junit
   :type 'file)
@@ -98,11 +98,11 @@ affixed `jde-junit-tester-name-tag'."
 	(prefixp (cdr jde-junit-tester-name-tag)))
     (if prefixp
 	(progn
-	  (string-match 
+	  (string-match
 	   (concat "^" tag "\\(.*\\)")
 	   tester-name))
       (progn
-	(string-match 
+	(string-match
 	 (concat "\\(.*\\)" tag "$")
 	 tester-name)))
     (substring tester-name (match-beginning 1) (match-end 1))))
@@ -130,18 +130,18 @@ affixed `jde-junit-tester-name-tag'."
    "\"public class \""
    "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
    "\" extends TestCase \" "
-    
+
    "(if jde-gen-k&r "
    "()"
    "'>'n)"
    "\"{\"'>'n"
-   "'n" 
-   
+   "'n"
+
    " \" /** \" '>'n"
    " \"* Creates a new <code>\""
    "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
    "\"</code> instance.\" '>'n"
-   " \"*\" '>'n" 
+   " \"*\" '>'n"
    " \"* @param name test name\" '>'n"
    " \"*/\"'>'n"
 
@@ -158,12 +158,12 @@ affixed `jde-junit-tester-name-tag'."
    "\"}\"'>"
    "'>'n"
    "'n"
-    
+
    "\"/**\" '>'n"
    "\"* @return a <code>TestSuite</code>\" '>'n"
    "\"*/\" '>'n"
-   "\"public static TestSuite suite() \" '>" 
-    
+   "\"public static TestSuite suite() \" '>"
+
    "(if jde-gen-k&r "
    "()"
    "'>'n)"
@@ -173,7 +173,7 @@ affixed `jde-junit-tester-name-tag'."
    "'>'n"
    "\"return suite;\" '>'n"
    "\"}\"'>'n'n"
-   
+
    "\"/** \" '>'n"
    "\"* Entry point \" '>'n"
    "\"*/ \" '>'n"
@@ -184,7 +184,7 @@ affixed `jde-junit-tester-name-tag'."
    "\"{\"'>'n"
    "\"junit.textui.TestRunner.run(suite());\"'>'n"
    "\"}\"'>'n"
-   
+
    "\"}\">"
    "\"// \""
    "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
@@ -197,10 +197,10 @@ command `jde-junit-test-class', as a side-effect."
   :set '(lambda (sym val)
 	  (defalias 'jde-junit-test-class-internal
 	    (tempo-define-template
-             "java-junit-test-class-buffer-template"
-             (jde-gen-read-template val)
-             nil
-             "Insert a generic JUnit test class buffer skeleton."))
+	     "java-junit-test-class-buffer-template"
+	     (jde-gen-read-template val)
+	     nil
+	     "Insert a generic JUnit test class buffer skeleton."))
 	  (set-default sym val)))
 
 (defcustom jde-junit4-test-class-template
@@ -226,18 +226,18 @@ command `jde-junit-test-class', as a side-effect."
    "\"public class \""
    "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
    "\" \" "
-    
+
    "(if jde-gen-k&r "
    "()"
    "'>'n)"
    "\"{\"'>'n"
-   "'n" 
-   
+   "'n"
+
    " \" /** \" '>'n"
    " \"* Creates a new <code>\""
    "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
    "\"</code> instance.\" '>'n"
-   " \"*\" '>'n" 
+   " \"*\" '>'n"
    " \"* @param name test name\" '>'n"
    " \"*/\"'>'n"
 
@@ -257,8 +257,8 @@ command `jde-junit-test-class', as a side-effect."
    "\"* @return a <code>TestMethod</code>\" '>'n"
    "\"*/\" '>'n"
    "\"@Test\" '>'n"
-   "\"public void testMethod() \" '>" 
-    
+   "\"public void testMethod() \" '>"
+
    "(if jde-gen-k&r "
    "() "
    "'>'n)"
@@ -277,7 +277,7 @@ command `jde-junit-test-class', as a side-effect."
    "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
    "\".class);\"'>'n"
    "\"}\"'>'n"
-   
+
    "\"}\">"
    "\"// \""
    "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
@@ -290,10 +290,10 @@ command `jde-junit4-test-class', as a side-effect."
   :set '(lambda (sym val)
 	  (defalias 'jde-junit4-test-class-internal
 	    (tempo-define-template
-             "java-junit4-test-class-buffer-template"
-             (jde-gen-read-template val)
-             nil
-             "Insert a generic JUnit 4 test class buffer skeleton."))
+	     "java-junit4-test-class-buffer-template"
+	     (jde-gen-read-template val)
+	     nil
+	     "Insert a generic JUnit 4 test class buffer skeleton."))
 	  (set-default sym val)))
 
 ;;;###autoload
@@ -313,14 +313,14 @@ command `jde-junit4-test-class', as a side-effect."
   "Create a buffer containing a skeleton unit test class having the same name as the
 root name of the buffer. This command prompts you to enter the file name
 of the test class. It assumes that the file name has the form CLASSTest.java
-where CLASS is the name of the class to be tested, e.g., MyAppTest.java. Use 
+where CLASS is the name of the class to be tested, e.g., MyAppTest.java. Use
 `jde-gen-junit-add-test-to-suite' to add tests to the test suite. Use of
 tests generated with this template requires the JUnit test framework. For
 more information, see http://www.junit.org."
   (interactive)
   (let ((tester-name
-	 (jde-junit-get-tester-name 
-	  (file-name-sans-extension 
+	 (jde-junit-get-tester-name
+	  (file-name-sans-extension
 	   (file-name-nondirectory buffer-file-name)))))
     (find-file (concat tester-name ".java"))
     (jde-junit-test-class-internal)
@@ -341,8 +341,8 @@ tests generated with this template requires the JUnit test
 framework. For more information, see http://www.junit.org."
   (interactive)
   (let ((tester-name
-	 (jde-junit-get-tester-name 
-	  (file-name-sans-extension 
+	 (jde-junit-get-tester-name
+	  (file-name-sans-extension
 	   (file-name-nondirectory buffer-file-name)))))
     (find-file (concat tester-name ".java"))
     (jde-junit4-test-class-internal)
@@ -357,19 +357,19 @@ framework. For more information, see http://www.junit.org."
     "\"suite.addTest(new \""
     "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
     "\"(\\\"\" (P \"Test Name: \") \"\\\") \""
-    
+
     "(if jde-gen-k&r "
     "()"
     "'>'n)"
     "\"{\"'>'n"
-    
+
     "\"public void runTest()\""
-    
+
     "(if jde-gen-k&r "
     "()"
     "'>'n)"
     "\"{\"'>'n"
-    
+
     "(P \"Method to call: \") \"();\"'>'n"
     "\"}\"'>'n"
     "\"});\"'>'n"
@@ -400,13 +400,13 @@ framework. For more information, see http://www.junit.org."
   (interactive)
    (if (equal major-mode 'jde-mode)
        (let ((vm (jde-run-get-vm))
-	     (working-directory 
+	     (working-directory
 	      (if (string= jde-junit-working-directory "")
 		  default-directory
 		(jde-normalize-path 'jde-junit-working-directory))))
 	 (oset vm :main-class jde-junit-testrunner-type )
 	 (jde-run-set-app-args (concat (jde-db-get-package)
-				       (file-name-sans-extension 
+				       (file-name-sans-extension
 					(file-name-nondirectory (buffer-file-name)))))
 	 (cd working-directory)
 	 (jde-run-vm-launch vm))
@@ -444,10 +444,10 @@ framework. For more information, see http://www.junit.org."
 
 (eval-when-compile
   ;; This code will not appear in the compiled (.elc) file
-  (defun jde-junit-self-test () 
+  (defun jde-junit-self-test ()
     "Runs jde-dbs self tests."
     (interactive)
-    (apply 'regress 
+    (apply 'regress
 	   (list test-jde-dbs-proc))))
 
 (provide 'jde-junit)

@@ -1,11 +1,12 @@
 ;;; jde-plugins.el -- Support for JDEE plugins
-;; $Revision: 1.7 $ $Date: 2004/09/21 04:33:33 $ 
+;; $Id$
 
 ;; Author: Paul Kinnucan <pkinnucan@attbi.com>
-;; Maintainer: Paul Kinnucan
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 2003, 2004 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -24,10 +25,8 @@
 
 ;;; Commentary:
 
-
 (require 'eieio)
 (require 'executable)
-
 
 (defcustom jde-plugins-directory (expand-file-name "plugins" (jde-root))
   "Location of the JDEE's plugins directory."
@@ -44,7 +43,7 @@
    (plugins   :type list
 	      :allocation :class
 	      :initform nil
-	      :documentation 
+	      :documentation
 	     "Installed plugins."))
 "Class of plugins.")
 
@@ -52,8 +51,8 @@
 (defun jde-pi-register (plugin)
   "Register PLUGIN, which must be an object of
 type `jde-plugin'."
-  (oset-default 
-   'jde-plugin 
+  (oset-default
+   'jde-plugin
    plugins
    (cons plugin (oref 'jde-plugin plugins))))
 
@@ -61,11 +60,11 @@ type `jde-plugin'."
 (defun jde-pi-get-plugin-dir (plugin)
   "Returns the path of the directory containing PLUGIN."
   (expand-file-name plugin jde-plugins-directory))
-  
+
 
 (defun jde-pi-load-plugin (plugin)
   "Loads the plugin named PLUGIN. This function assumes that the plugin resides
-in a subdirectory of the JDEE's plugins directory named PLUGIN and that this 
+in a subdirectory of the JDEE's plugins directory named PLUGIN and that this
 subdirectory contains a subdirectory name lisp that contains
 a file named jde-PLUGIN.el. This function loads jde-PLUGIN.el."
   (let* ((plugin-dir (expand-file-name plugin jde-plugins-directory))
@@ -73,7 +72,7 @@ a file named jde-PLUGIN.el. This function loads jde-PLUGIN.el."
 	 (plugin-lisp-package-name (concat "jde-" plugin))
 	 (plugin-lisp-file-name (concat plugin-lisp-package-name ".el"))
 	 (plugin-lisp-file
-	  (expand-file-name 
+	  (expand-file-name
 	   plugin-lisp-file-name
 	   plugin-lisp-dir)))
     (if (file-exists-p plugin-lisp-file)
@@ -81,7 +80,7 @@ a file named jde-PLUGIN.el. This function loads jde-PLUGIN.el."
 	  (add-to-list 'load-path plugin-lisp-dir)
 	  (require (intern plugin-lisp-package-name)))
       (error "JDEE plugin Lisp file %s missing" plugin-lisp-file-name))))
-  
+
 
 (defun jde-pi-load-plugins ()
   "Loads the plugins in the JDEE's plugins directory."
@@ -94,7 +93,7 @@ a file named jde-PLUGIN.el. This function loads jde-PLUGIN.el."
 	       (lambda (file)
 		 (let ((file-name (file-name-nondirectory file)))
 		   (if (and
-			(file-directory-p file) 
+			(file-directory-p file)
 			(not (string= file-name "."))
 			(not (string= file-name ".."))
 			(not (string= file-name "CVS"))
@@ -113,7 +112,7 @@ a file named jde-PLUGIN.el. This function loads jde-PLUGIN.el."
     (loop for plugin in plugins do
 	  (setq classpath (append classpath (oref plugin bsh-cp))))
     classpath))
-    
+
 
 (defun jde-pi-install-plugins ()
   "This command installs any plugin distributables that it
@@ -122,7 +121,7 @@ the distributables are in jar or zip format and that the
 jar program is on the system path."
   (interactive)
 
-  (assert (executable-find "jar") nil 
+  (assert (executable-find "jar") nil
     "Cannot find the jar program on the system path.")
 
   (let ((zip-files
@@ -135,12 +134,12 @@ jar program is on the system path."
 	    (insert "JDEE Plugin Installation Log")
 	    (pop-to-buffer buf)
 	    (cd jde-plugins-directory)
-  	    (loop for zip-file in zip-files do
-		  (let ((result 
+	    (loop for zip-file in zip-files do
+		  (let ((result
 			 (shell-command-to-string
 			(concat "jar xvf " zip-file))))
 		    (insert "\n\n")
-		    (insert (format "Installing %s ..." 
+		    (insert (format "Installing %s ..."
 				    (file-name-sans-extension zip-file)))
 		    (insert "\n\n")
 		    (insert result)))
@@ -179,14 +178,14 @@ With prefix argument ARG, turn on if positive, otherwise off..
 \\{jde-plugin-mode-map}"
   (interactive
    (list (or current-prefix-arg
-             (if jde-plugin-minor-mode 0 1))))
+	     (if jde-plugin-minor-mode 0 1))))
 
   (setq jde-plugin-minor-mode
-        (if arg
-            (>
-             (prefix-numeric-value arg)
-             0)
-          (not jde-plugin-minor-mode)))
+	(if arg
+	    (>
+	     (prefix-numeric-value arg)
+	     0)
+	  (not jde-plugin-minor-mode)))
 
   (if (featurep 'xemacs)
       (let ((menu-spec (jde-plugin-make-menu-spec)))
@@ -200,7 +199,7 @@ With prefix argument ARG, turn on if positive, otherwise off..
 
 (provide 'jde-plugins)
 
-;; Change History 
+;; Change History
 
 ;;
 ;; $Log: jde-plugins.el,v $

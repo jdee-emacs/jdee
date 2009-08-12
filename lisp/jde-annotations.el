@@ -1,6 +1,8 @@
 ;;; jde-annotations.el --- Indentation for Java 5 annotations.
+;; $Id$
 
 ;; Copyright (C) 2006 by Suraj Acharya
+;; Copyright (C) 2009 by Paul Landes
 
 ;; Author: Suraj Acharya <sacharya@cs.indiana.edu>
 ;; Maintainer: Suraj Acharya <sacharya@cs.indiana.edu>
@@ -24,9 +26,8 @@
 ;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
-
 ;;; Commentary:
-;; 
+;;
 ;; This library tries to indent java annotations
 ;; (http://java.sun.com/j2se/1.5.0/docs/guide/language/annotations.html)
 ;; like the code examples listed in the webpage.
@@ -40,20 +41,20 @@
   "Find the offset entry for SYMBOL and add OFFSET at the front of the list.
 See `c-set-offset' for a description of OFFSET and SYMBOL."
   (let ((old-offset (cdr-safe (or (assq symbol c-offsets-alist)
-                                  (assq symbol (get 'c-offsets-alist
-                                                      'c-stylevar-fallback))))))
+				  (assq symbol (get 'c-offsets-alist
+						      'c-stylevar-fallback))))))
     (if old-offset
-        (if (listp old-offset)
-            (c-set-offset symbol (cons offset old-offset))
-          (c-set-offset symbol (list offset old-offset)))
+	(if (listp old-offset)
+	    (c-set-offset symbol (cons offset old-offset))
+	  (c-set-offset symbol (list offset old-offset)))
       (c-set-offset symbol offset))))
 
 (defun jde-annotations-setup ()
   "Set up java mode indent function to handle java 1.5 annotations.
 The setup function adds one of the custom indentation functions
-`c-single-indent-after-java-annotations' or `c-no-indent-after-java-annotations' 
+`c-single-indent-after-java-annotations' or `c-no-indent-after-java-annotations'
 to the offset lists of the symbols `arglist-intro', `topmost-intro-cont', `arglist-intro',
-`arglist-close', `statement-cont' and `func-decl-cont'. 
+`arglist-close', `statement-cont' and `func-decl-cont'.
 This function should be called after any calls to `c-set-style'."
   (c-preprend-offset 'arglist-intro 'c-single-indent-after-java-annotations)
   (c-preprend-offset 'topmost-intro-cont 'c-no-indent-after-java-annotations)
@@ -69,15 +70,15 @@ during this traversal, this function only sees whitespaces
 followed by either a '@' or a '(' then it returns t."
   (save-excursion
     (condition-case err ;; return nil if  any errors are thrown by forward-sexp
-        (let* ((lim (1- (c-point 'bol)))
-               (throws (catch 'notAnno
+	(let* ((lim (1- (c-point 'bol)))
+	       (throws (catch 'notAnno
 		     (goto-char (cdr langelem))
 		     (while (< (point) lim)
-                       (if (not (looking-at "\\(\\s \\|\n\\)*\\(@\\|(\\)"))
+		       (if (not (looking-at "\\(\\s \\|\n\\)*\\(@\\|(\\)"))
 			   (throw 'notAnno t))
-                       (forward-sexp 1)))))
-          (if (not throws)
-              t)))))
+		       (forward-sexp 1)))))
+	  (if (not throws)
+	      t)))))
 
 (defun c-no-indent-after-java-annotations (langelem)
   "If preceeded by java annotations, indent this line the same as the previous.
@@ -135,7 +136,7 @@ Indents as
 
 instead of
 @RequestForEnhancement(
-                       id	     = 2868724,
+		       id	     = 2868724,
 ...
 
 Argument LANGELEM The language element being indented."

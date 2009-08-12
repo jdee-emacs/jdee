@@ -1,12 +1,13 @@
 ;; jde-package.el -- Java package statement generator
-;; $Id: jde-package.el,v 1.10 2002/12/19 06:39:44 paulk Exp $
+;; $Id$
 
 ;; Copyright (C) 1998, 2000, 2001, 2002 by David Ponce
+;; Copyright (C) 2009 by Paul Landes
 
-;; Author:       David Ponce <david@dponce.com>
-;; Maintainer:   David Ponce <david@dponce.com>
-;;               Paul Kinnucan <paulk@mediaone.net>
-;; Created:      September 28 1998
+;; Author:     David Ponce <david@dponce.com>
+;; Maintainer: David Ponce
+;;             Paul Landes <landes <at> mailc dt net>
+;; Created:    September 28 1998
 
 ;; This file is not part of Emacs
 
@@ -86,11 +87,8 @@
 ;;   to search the current classpath list.  Default is
 ;;   '(`jde-compile-option-classpath' `jde-global-classpath')
 
-;;; History:
-;;
-;; See at end of this file.
-
 ;;; Code:
+
 (defconst jde-package-unknown-package-name
   "*unknown*"
   "The string returned when a package name can't be generated.")
@@ -136,10 +134,10 @@ The first one which has a non nil value will be used by jde-package."
 That is to say the first non-nil value found in the variables given by
 `jde-package-search-classpath-variables'."
   (let ((search-in jde-package-search-classpath-variables)
-        (classpath))
+	(classpath))
     (while (and search-in (not classpath))
       (setq classpath (symbol-value (car search-in))
-            search-in (cdr search-in)))
+	    search-in (cdr search-in)))
     classpath))
 
 (defun jde-package-get-directories-in-classpath ()
@@ -147,28 +145,28 @@ That is to say the first non-nil value found in the variables given by
   (mapcan
    (lambda (path)
        (if (or jde-resolve-relative-paths-p
-              (not   (string= path "."))) ; "." is ignored in classpath         
-           (let ((path (jde-normalize-path path)))
-             (if (file-directory-p path)
-                 (list (file-name-as-directory path))))))
+	      (not   (string= path "."))) ; "." is ignored in classpath
+	   (let ((path (jde-normalize-path path)))
+	     (if (file-directory-p path)
+		 (list (file-name-as-directory path))))))
    (jde-package-get-classpath)))
 
 
 (defun jde-package-seach-package-directories ()
   "Return a list of package directory candidates or nil if not found."
   (let ((dir (jde-normalize-path default-directory))
-        ;; case-insensitive for Windows
-        (case-fold-search (eq system-type 'windows-nt)))
+	;; case-insensitive for Windows
+	(case-fold-search (eq system-type 'windows-nt)))
     (mapcan
      (lambda (root)
-         (let ((root (regexp-quote root)))
-           (message "Seaching %S in %S..." root dir)
-           (and (string-match root dir)
-                (list (substring dir (match-end 0))))))
+	 (let ((root (regexp-quote root)))
+	   (message "Seaching %S in %S..." root dir)
+	   (and (string-match root dir)
+		(list (substring dir (match-end 0))))))
      (append (jde-package-get-directories-in-classpath)
 	     (mapcar
 	      (lambda (p)
-		(file-name-as-directory 
+		(file-name-as-directory
 		 (jde-normalize-path p 'jde-sourcepath)))
 	      jde-sourcepath)))))
 
@@ -176,8 +174,8 @@ That is to say the first non-nil value found in the variables given by
   "Return the best package directory candidate from CANDIDATES.
 The best is the shortest one that could be found."
   (car (sort candidates
-             (lambda (dir1 dir2)
-                 (string-match (regexp-quote dir1) dir2)))))
+	     (lambda (dir1 dir2)
+		 (string-match (regexp-quote dir1) dir2)))))
 
 (defun jde-package-get-package-directory ()
   "Return the package directory, if found; otherwise,
@@ -202,10 +200,10 @@ Replace ?/ by ?. and remove extra ?/ at end."
 current buffer, if the package name can be determined; otherwise,
 an empty string."
   (let* (
-         ;; The JDE always uses ?/ as directory separator so ensure
-         ;; [X]Emacs uses the same one when running on Windows!
-         (directory-sep-char ?/)
-         (package-name (jde-package-get-package-directory)))
+	 ;; The JDE always uses ?/ as directory separator so ensure
+	 ;; [X]Emacs uses the same one when running on Windows!
+	 (directory-sep-char ?/)
+	 (package-name (jde-package-get-package-directory)))
     (cond
      ((string= package-name jde-package-unknown-package-name)
       (message
@@ -216,8 +214,8 @@ an empty string."
       jde-package-default-package-comment)
      (t
       (message "package %s;%s"
-               (jde-package-convert-directory-to-package package-name)
-               jde-package-package-comment)))))
+	       (jde-package-convert-directory-to-package package-name)
+	       jde-package-package-comment)))))
 
 ;;;###autoload
 (defun jde-package-update ()
@@ -235,9 +233,9 @@ this command does nothing. This command signals an error if the
     (unless (string= package "")
       (goto-char (point-min))
       (if (re-search-forward jde-package-package-regexp nil t)
-          (replace-match package)
-        (insert package)
-        (newline)))))
+	  (replace-match package)
+	(insert package)
+	(newline)))))
 
 ;; Register and initialize the customization variables defined
 ;; by this package.

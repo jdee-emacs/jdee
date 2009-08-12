@@ -1,10 +1,11 @@
-;; JDE-PARSE-CLASS.EL --- Parse a Java class file.
-;; $Revision: 1.9 $ $Date: 2005/01/20 04:53:21 $
+;; jde-parse-class.el --- Parse a Java class file.
+;; $Id$
 ;;
 ;; Copyright (C) 2002, 2004, 2005 Andrew Hyatt
+;; Copyright (C) 2009 by Paul Landes
 ;;
 ;; Author: Andrew Hyatt <andy_jde@thehyatts.net>
-;; Maintainers: Andrew Hyatt and Paul Kinnucan
+;; Maintainer: Andrew Hyatt, Paul Landes <landes <at> mailc dt net>
 ;;
 ;; Keywords: java, tools
 ;;
@@ -26,7 +27,7 @@
 ;; LCD Archive Entry:
 ;; jde-parse-class|Andrew Hyatt|
 ;; |Parse a Java class file to get xref info for the JDEE.
-;; |$Date: 2005/01/20 04:53:21 $|$Revision: 1.9 $|~/packages/jde-parse-class.el
+;; |$Date$|$Revision$|~/packages/jde-parse-class.el
 
 ;;; Commentary:
 
@@ -73,12 +74,12 @@
 
 (defsubst jde-parse-class-get-next-const-val (constants)
   (cadr (jde-parse-class-lookup-constant
-         (jde-parse-class-get-next-2-bytes) constants)))
+	 (jde-parse-class-get-next-2-bytes) constants)))
 
 ;; xemacs without mule can't do utf-8
 (setq jde-parse-class-encoding
       (if (member 'utf-8 (coding-system-list))
-          'utf-8 'raw-text))
+	  'utf-8 'raw-text))
 
 (defun jde-parse-class-slash-to-dot (string)
   (subst-char-in-string ?/ ?. string))
@@ -93,64 +94,64 @@ keys: version, this-class, interfaces, fields, and methods."
   (let ((buf (find-file-noselect class-file nil t)))
     (set-buffer buf)
     (let* ((constants (jde-parse-class-get-constants))
-           (version (jde-parse-class-get-version))
-           (access (jde-parse-class-get-access-flags))
-           (this-class
-             (subst-char-in-string
-              ?/ ?. (cadr (jde-parse-class-lookup-constant
-                             (jde-parse-class-get-next-const-val constants)
-                              constants))))
-           (superclass (jde-parse-class-slash-to-dot
-                        (do-and-advance-chars 2
-                          (let ((val (jde-parse-class-get-const-ref
-                                      (point) constants)))
-                            (if (eq (cadr val) 0)
-                              nil ;; only Object can have no superclass
-                              (cadr (jde-parse-class-lookup-constant
-                                     (cadr val) constants)))))))
-           (interfaces (jde-parse-class-get-interfaces constants))
-           (fields (jde-parse-class-get-fields constants))
-           (methods (jde-parse-class-get-methods constants))
-           (attributes (jde-parse-class-get-attributes constants)))
+	   (version (jde-parse-class-get-version))
+	   (access (jde-parse-class-get-access-flags))
+	   (this-class
+	     (subst-char-in-string
+	      ?/ ?. (cadr (jde-parse-class-lookup-constant
+			     (jde-parse-class-get-next-const-val constants)
+			      constants))))
+	   (superclass (jde-parse-class-slash-to-dot
+			(do-and-advance-chars 2
+			  (let ((val (jde-parse-class-get-const-ref
+				      (point) constants)))
+			    (if (eq (cadr val) 0)
+			      nil ;; only Object can have no superclass
+			      (cadr (jde-parse-class-lookup-constant
+				     (cadr val) constants)))))))
+	   (interfaces (jde-parse-class-get-interfaces constants))
+	   (fields (jde-parse-class-get-fields constants))
+	   (methods (jde-parse-class-get-methods constants))
+	   (attributes (jde-parse-class-get-attributes constants)))
       (kill-buffer buf)
       `((version . ,version) (access . ,access)
-        (this-class . ,this-class) (superclass . ,superclass)
-        (interfaces . ,interfaces)
-        (fields . ,fields)
-        (methods . ,methods)
-        (attributes . ,attributes)))))
+	(this-class . ,this-class) (superclass . ,superclass)
+	(interfaces . ,interfaces)
+	(fields . ,fields)
+	(methods . ,methods)
+	(attributes . ,attributes)))))
 
 (defun jde-parse-class-extract-caught-exception-types (info)
   "Returns a list of a two-element of list of method signatures to
   caught exception types for each method"
   (mapcar (lambda (method)
-            (list `(,(cdr (nth 2 info))
-                      ,(cdr (assoc 'name method))
-                      ,@(cdr (assoc 'descriptor method)))
-                  (mapcar (lambda (class) (when class
-                                            (jde-parse-class-slash-to-dot class)))
-                          (cdr (assoc
-                                'catch-types
-                                (cdr
-                                 (assoc 'code
-                                        (cdr
-                                         (assoc 'attributes
-                                                method)))))))))
-          (cdr (assoc 'methods info))))
+	    (list `(,(cdr (nth 2 info))
+		      ,(cdr (assoc 'name method))
+		      ,@(cdr (assoc 'descriptor method)))
+		  (mapcar (lambda (class) (when class
+					    (jde-parse-class-slash-to-dot class)))
+			  (cdr (assoc
+				'catch-types
+				(cdr
+				 (assoc 'code
+					(cdr
+					 (assoc 'attributes
+						method)))))))))
+	  (cdr (assoc 'methods info))))
 
 (defun jde-parse-class-extract-thrown-exception-types (info)
   "Returns a two element list of method signatures to thrown exception
   types for each method"
   (mapcar (lambda (method)
-            (list `(,(cdr (nth 2 info))
-                      ,(cdr (assoc 'name method))
-                      ,@(cdr (assoc 'descriptor method)))
-                  (cdr
-                   (assoc 'exceptions
-                          (cdr
-                           (assoc 'attributes
-                                  method))))))
-          (cdr (assoc 'methods info))))
+	    (list `(,(cdr (nth 2 info))
+		      ,(cdr (assoc 'name method))
+		      ,@(cdr (assoc 'descriptor method)))
+		  (cdr
+		   (assoc 'exceptions
+			  (cdr
+			   (assoc 'attributes
+				  method))))))
+	  (cdr (assoc 'methods info))))
 
 (defun jde-parse-class-extract-method-calls (info)
   "Return a cons of a method signature, and a list of the methods it
@@ -158,25 +159,25 @@ calls.  Each method in the list is a list of the calling method or
 line number if available, the Class, method, and return value, and
 arguments.  INFO is the result of `jde-parse-class'"
   (mapcan (lambda (method) (mapcar (lambda (attr)
-                                     (list 
-                                      `(,(cdr (nth 2 info))
-                                         ,(cdr (assoc 'name method))
-                                         ,@(cdr (assoc 'descriptor method)) 
-                                         ,(car attr)) (cdr attr))) 
-                                   (cdr (assoc
-                                         'calls
-                                         (cdr
-                                          (assoc 'code
-                                                 (cdr
-                                                  (assoc 'attributes
-                                                         method))))))))
-          (cdr (assoc 'methods info))))
+				     (list
+				      `(,(cdr (nth 2 info))
+					 ,(cdr (assoc 'name method))
+					 ,@(cdr (assoc 'descriptor method))
+					 ,(car attr)) (cdr attr)))
+				   (cdr (assoc
+					 'calls
+					 (cdr
+					  (assoc 'code
+						 (cdr
+						  (assoc 'attributes
+							 method))))))))
+	  (cdr (assoc 'methods info))))
 
 (defun jde-parse-class-extract-interfaces (info)
   "Returns a list of fully qualified interface names that the class
   implements.  INFO is the result of `jde-parse-class'"
   (mapcar 'jde-parse-class-slash-to-dot
-          (cdr (assoc 'interfaces info))))
+	  (cdr (assoc 'interfaces info))))
 
 (defun jde-parse-class-extract-superclass (info)
   "Returns a list of fully qualified class names that are superclasses
@@ -186,15 +187,15 @@ arguments.  INFO is the result of `jde-parse-class'"
 (defun jde-parse-class-extract-method-signatures (info)
   "Returns a list of method names that the class implements"
   (mapcar (lambda (method-info) (cons (cdr (assoc 'name method-info))
-                                      (cdr (assoc 'descriptor method-info))))
-          (cdr (assoc 'methods info))))
+				      (cdr (assoc 'descriptor method-info))))
+	  (cdr (assoc 'methods info))))
 
 (defun jde-parse-class-extract-field-signatures (info)
   "Return a list of field names that the class defines"
   (mapcar (lambda (field-info)
-            (list (cdr (assoc 'name field-info))
-                  (cdr (assoc 'descriptor field-info))))
-          (cdr (assoc 'fields info))))
+	    (list (cdr (assoc 'name field-info))
+		  (cdr (assoc 'descriptor field-info))))
+	  (cdr (assoc 'fields info))))
 
 (defun jde-parse-class-extract-classname (info)
   "Returns the fully qualified classname that the class implements.
@@ -210,236 +211,236 @@ Returns the constant information contained at the reference"
   ;; we have to subtract one since the array index starts at 1
   ;; (according to the class file, not us
   (jde-parse-class-lookup-constant (jde-parse-class-get-2byte point)
-                                   constants))
+				   constants))
 
 (defun jde-parse-class-lookup-constant (num constants)
   "From an index value, get the constant for that index"
   (aref constants (- num 1)))
-  
+
 (defsubst jde-parse-class-get-next-length-val ()
   (jde-parse-class-get-next-2-bytes))
 
 (defun jde-parse-class-get-interfaces (constants)
   (let ((num (jde-parse-class-get-next-length-val))
-        (interfaces '()))
+	(interfaces '()))
     (dotimes (i num interfaces)
       (add-to-list 'interfaces (cadr (jde-parse-class-lookup-constant
-                                     (jde-parse-class-get-next-const-val
-                                      constants) constants))))))
+				     (jde-parse-class-get-next-const-val
+				      constants) constants))))))
 
 (defun jde-parse-class-get-methods (constants)
   (let ((num (jde-parse-class-get-next-length-val))
-        (methods '()))
+	(methods '()))
     (dotimes (i num (nreverse methods))
       (add-to-list 'methods (jde-parse-class-get-method constants)))))
 
 (defun jde-parse-class-get-method (constants)
   (list (cons 'access-flags (jde-parse-class-get-access-flags))
-        (cons 'name (jde-parse-class-get-next-const-val constants))
-        (cons 'descriptor (jde-parse-class-parse-complete-arg-signature
-                           (jde-parse-class-get-next-const-val constants)))
-        (cons 'attributes (jde-parse-class-get-attributes constants))))
+	(cons 'name (jde-parse-class-get-next-const-val constants))
+	(cons 'descriptor (jde-parse-class-parse-complete-arg-signature
+			   (jde-parse-class-get-next-const-val constants)))
+	(cons 'attributes (jde-parse-class-get-attributes constants))))
 
 (defun jde-parse-class-get-fields (constants)
   (let ((num (jde-parse-class-get-next-length-val))
-        (fields '()))
+	(fields '()))
     (dotimes (i num (nreverse fields))
       (add-to-list 'fields (jde-parse-class-get-field constants)))))
 
 (defun jde-parse-class-get-field (constants)
   (list (cons 'access-flags (jde-parse-class-get-access-flags))
-        (cons 'name (jde-parse-class-get-next-const-val constants))
-        (cons 'descriptor (car (jde-parse-class-parse-first-arg
-                           (jde-parse-class-get-next-const-val constants))))
-        (cons 'attributes (jde-parse-class-get-attributes constants))))
+	(cons 'name (jde-parse-class-get-next-const-val constants))
+	(cons 'descriptor (car (jde-parse-class-parse-first-arg
+			   (jde-parse-class-get-next-const-val constants))))
+	(cons 'attributes (jde-parse-class-get-attributes constants))))
 
 (defun jde-parse-class-get-attributes (constants)
   (let ((num (jde-parse-class-get-next-length-val))
-        (attributes '()))
+	(attributes '()))
     (dotimes (i num attributes)
       (add-to-list 'attributes (jde-parse-class-get-attribute constants)))))
 
 (defun jde-parse-class-get-attribute (constants)
   (let ((attribute-type (jde-parse-class-get-next-const-val constants))
-        (numbytes (jde-parse-class-get-next-4-bytes (point))))
+	(numbytes (jde-parse-class-get-next-4-bytes (point))))
     ;; TODO: implement the rest of the common attribute types
     (cond ((equal attribute-type "Code")
-            (cons 'code
-                  (jde-parse-class-get-code-attribute numbytes constants)))
-          ((equal attribute-type "LineNumberTable")
-            (cons 'line-number-table
-                  (jde-parse-class-get-line-number-attribute)))
-          ((equal attribute-type "Exceptions")
-            (cons 'throws
-                  (jde-parse-class-get-exception-attribute constants)))
-          ((equal attribute-type "SourceFile")
-            (cons 'source-file
-                  (jde-parse-class-get-source-file-attribute constants)))
-          (t (forward-char numbytes)))))
+	    (cons 'code
+		  (jde-parse-class-get-code-attribute numbytes constants)))
+	  ((equal attribute-type "LineNumberTable")
+	    (cons 'line-number-table
+		  (jde-parse-class-get-line-number-attribute)))
+	  ((equal attribute-type "Exceptions")
+	    (cons 'throws
+		  (jde-parse-class-get-exception-attribute constants)))
+	  ((equal attribute-type "SourceFile")
+	    (cons 'source-file
+		  (jde-parse-class-get-source-file-attribute constants)))
+	  (t (forward-char numbytes)))))
 
 (defun jde-parse-class-get-source-file-attribute (constants)
   (jde-parse-class-get-next-const-val constants))
 
 (defun jde-parse-class-get-exception-attribute (constants)
   (let ((num (jde-parse-class-get-next-length-val))
-        (classes '()))
+	(classes '()))
     (dotimes (i num classes)
       (add-to-list 'classes
-                   (cadr (jde-parse-class-lookup-constant
-                          (jde-parse-class-get-next-const-val constants)
-                          constants))))))
+		   (cadr (jde-parse-class-lookup-constant
+			  (jde-parse-class-get-next-const-val constants)
+			  constants))))))
 
 (defun jde-parse-class-get-line-number-attribute ()
   (let ((num (jde-parse-class-get-next-length-val))
-        (line-number-infos '()))
+	(line-number-infos '()))
     (dotimes (i num (nreverse line-number-infos))
       (add-to-list
        'line-number-infos
        (cons (jde-parse-class-get-next-2-bytes)
-             (jde-parse-class-get-next-2-bytes))))))
+	     (jde-parse-class-get-next-2-bytes))))))
 
 (defun jde-parse-class-get-code-attribute (numbytes constants)
   (goto-char (+ (point) 4)) ;; no one cares about max_stack and max_locals, right?
   (let* ((code-numbytes (jde-parse-class-get-next-4-bytes (point)))
-         (end-point (+ (point) code-numbytes))
-         (begin-point (point))
-         (calls '())
-         (catch-types '()))
+	 (end-point (+ (point) code-numbytes))
+	 (begin-point (point))
+	 (calls '())
+	 (catch-types '()))
     (while (< (point) end-point)
       (let* ((opcode-info (aref jde-parse-class-opcode-vec
-                                (char-int (char-after))))
-             (opcode-val (car opcode-info))
-             (opcode-length (cdr opcode-info)))
-        (forward-char)
-        (cond ((member opcode-val '(invokevirtual invokestatic invokespecial
-                                    invokeinterface getstatic putstatic
-                                    getfield putfield))
-                (do-and-advance-chars (- opcode-length 1)
-                  (add-to-list
-                   'calls
-                   (cons (- (point) begin-point)
-                         (jde-parse-class-parse-method-signature
-                          (jde-parse-class-lookup-method
-                           (jde-parse-class-get-const-ref (point) constants)
-                           constants))))))
-              ((eq opcode-val 'tableswitch)
-                ;; skip padding to go to a multiple of 4 from the begin-point.
-                ;; The second mod is to make sure on an offset of 4 we really don't skip anything
-                (forward-char (mod (- 4 (mod (- (point) begin-point) 4)) 4))
-                (forward-char 4)  ;; we don't care about default
-                (let ((low (jde-parse-class-get-next-4-bytes-as-signed))
-                      (high (jde-parse-class-get-next-4-bytes-as-signed)))
-                  (forward-char (* 4 (+ (- high low) 1)))))
-              ((eq opcode-val 'lookupswitch)
-                (forward-char (mod (- 4 (mod (- (point) begin-point) 4)) 4))
-                (forward-char 4)
-                (forward-char (* 8 (jde-parse-class-get-next-4-bytes-as-signed))))
-              ((eq opcode-val 'wide)
-                (let ((opcode2 (char-int (char-after))))
-                  (if (eq opcode2 'iinc)
-                    (forward-char 5)
-                    (forward-char 2))))
-              (t (forward-char (- opcode-length 1))))))
+				(char-int (char-after))))
+	     (opcode-val (car opcode-info))
+	     (opcode-length (cdr opcode-info)))
+	(forward-char)
+	(cond ((member opcode-val '(invokevirtual invokestatic invokespecial
+				    invokeinterface getstatic putstatic
+				    getfield putfield))
+		(do-and-advance-chars (- opcode-length 1)
+		  (add-to-list
+		   'calls
+		   (cons (- (point) begin-point)
+			 (jde-parse-class-parse-method-signature
+			  (jde-parse-class-lookup-method
+			   (jde-parse-class-get-const-ref (point) constants)
+			   constants))))))
+	      ((eq opcode-val 'tableswitch)
+		;; skip padding to go to a multiple of 4 from the begin-point.
+		;; The second mod is to make sure on an offset of 4 we really don't skip anything
+		(forward-char (mod (- 4 (mod (- (point) begin-point) 4)) 4))
+		(forward-char 4)  ;; we don't care about default
+		(let ((low (jde-parse-class-get-next-4-bytes-as-signed))
+		      (high (jde-parse-class-get-next-4-bytes-as-signed)))
+		  (forward-char (* 4 (+ (- high low) 1)))))
+	      ((eq opcode-val 'lookupswitch)
+		(forward-char (mod (- 4 (mod (- (point) begin-point) 4)) 4))
+		(forward-char 4)
+		(forward-char (* 8 (jde-parse-class-get-next-4-bytes-as-signed))))
+	      ((eq opcode-val 'wide)
+		(let ((opcode2 (char-int (char-after))))
+		  (if (eq opcode2 'iinc)
+		    (forward-char 5)
+		    (forward-char 2))))
+	      (t (forward-char (- opcode-length 1))))))
     (let ((num-exceptions (jde-parse-class-get-next-length-val)))
       (dotimes (i num-exceptions)
-        (let ((type (cdr (assoc 'catch-type
-                                 (jde-parse-class-get-exception-handler
-                                  constants)))))
-          (when type
-            (add-to-list 'catch-types type)))))
+	(let ((type (cdr (assoc 'catch-type
+				 (jde-parse-class-get-exception-handler
+				  constants)))))
+	  (when type
+	    (add-to-list 'catch-types type)))))
     (let ((attributes (jde-parse-class-get-attributes constants)))
       ;; Get the line numbers if there, if not use -1's to iondicate no line number
       (let ((table (when (assoc 'line-number-table attributes)
-                     (cdr (assoc 'line-number-table attributes)))))
-        (list (cons
-               'calls
-               (mapcar (lambda (call)
-                  (if table
-                    ;; The line numbers describe the instruction at
-                    ;; the start of the line, not every instruction
+		     (cdr (assoc 'line-number-table attributes)))))
+	(list (cons
+	       'calls
+	       (mapcar (lambda (call)
+		  (if table
+		    ;; The line numbers describe the instruction at
+		    ;; the start of the line, not every instruction
 
-                    ;; Advance in the table when the next byte
-                    ;; described is higher than the current one
-                    (progn (while (and (cadr table)
-                                       (>= (car call) (caadr table)))
-                             (setq table (cdr table)))
-                           (cons (cdar table) (cdr call)))
-                    (cons -1 (cdr call)))) (nreverse calls)))
-              (cons 'catch-types catch-types))))))
+		    ;; Advance in the table when the next byte
+		    ;; described is higher than the current one
+		    (progn (while (and (cadr table)
+				       (>= (car call) (caadr table)))
+			     (setq table (cdr table)))
+			   (cons (cdar table) (cdr call)))
+		    (cons -1 (cdr call)))) (nreverse calls)))
+	      (cons 'catch-types catch-types))))))
 
 (defun jde-parse-class-get-exception-handler (constants)
   (list (cons 'start-pc (jde-parse-class-get-next-2-bytes))
     (cons 'end-pc (jde-parse-class-get-next-2-bytes))
     (cons 'handler-pc (jde-parse-class-get-next-2-bytes))
     (cons 'catch-type (let ((val (jde-parse-class-get-next-2-bytes)))
-                        (when (> val 0)
-                          (cadr (jde-parse-class-lookup-constant
-                                 (cadr (jde-parse-class-lookup-constant val constants))
-                              constants)))))))
+			(when (> val 0)
+			  (cadr (jde-parse-class-lookup-constant
+				 (cadr (jde-parse-class-lookup-constant val constants))
+			      constants)))))))
 
 (defun jde-parse-class-parse-first-arg (sig)
   (let ((char (char-to-string (string-to-char sig))))
     (cond ((equal char "B") `("byte" . 1))
-          ((equal char "C") `("char" . 1))
-          ((equal char "D") `("double" . 1))
-          ((equal char "F") `("float" . 1))
-          ((equal char "I") `("int" . 1))
-          ((equal char "J") `("long" . 1))
-          ((equal char "L") (let ((endpos (string-match ";" sig)))
-                              (cons (jde-parse-class-slash-to-dot
-                                     (substring sig 1
-                                                endpos))
-                                    (+ 1 endpos))))
-          ((equal char "S") `("short" . 1))
-          ((equal char "Z") `("boolean" . 1))
-          ((equal char "[") (let ((rest (jde-parse-class-parse-first-arg
-                                         (substring sig 1))))
-                              (cons (concat (car rest) "[]") (+ (cdr rest) 1))))
-            (t (error (concat "Could not find char " char))))))
+	  ((equal char "C") `("char" . 1))
+	  ((equal char "D") `("double" . 1))
+	  ((equal char "F") `("float" . 1))
+	  ((equal char "I") `("int" . 1))
+	  ((equal char "J") `("long" . 1))
+	  ((equal char "L") (let ((endpos (string-match ";" sig)))
+			      (cons (jde-parse-class-slash-to-dot
+				     (substring sig 1
+						endpos))
+				    (+ 1 endpos))))
+	  ((equal char "S") `("short" . 1))
+	  ((equal char "Z") `("boolean" . 1))
+	  ((equal char "[") (let ((rest (jde-parse-class-parse-first-arg
+					 (substring sig 1))))
+			      (cons (concat (car rest) "[]") (+ (cdr rest) 1))))
+	    (t (error (concat "Could not find char " char))))))
 
 (defun jde-parse-class-parse-arg-signature (sig)
   (when (> (length sig) 0)
     (let ((arg (jde-parse-class-parse-first-arg sig)))
       (if (> (cdr arg) (length sig))
-        (list (car arg))
-        (cons (car arg) (jde-parse-class-parse-arg-signature
-                         (substring sig (cdr arg))))))))
-                                    
+	(list (car arg))
+	(cons (car arg) (jde-parse-class-parse-arg-signature
+			 (substring sig (cdr arg))))))))
+
 
 (defun jde-parse-class-parse-complete-arg-signature (sig)
   (let* ((match (string-match "(\\(.*\\))\\(.*\\)" sig)))
     (if match
       (let ((args (match-string 1 sig))
-            (return-val (match-string 2 sig)))
-        (list (unless (equal "V" return-val)
-                (car (jde-parse-class-parse-arg-signature return-val)))
-              (jde-parse-class-parse-arg-signature args)))
+	    (return-val (match-string 2 sig)))
+	(list (unless (equal "V" return-val)
+		(car (jde-parse-class-parse-arg-signature return-val)))
+	      (jde-parse-class-parse-arg-signature args)))
       (list nil (jde-parse-class-parse-arg-signature sig)))))
-         
+
 
 (defun jde-parse-class-parse-method-signature (siglist)
   `(,(jde-parse-class-slash-to-dot (car siglist))
     ,(cadr siglist) ,@(jde-parse-class-parse-complete-arg-signature
-                      (nth 2 siglist))))
+		      (nth 2 siglist))))
 
 (defun jde-parse-class-lookup-method (method constants)
   (list (cadr (jde-parse-class-lookup-constant
-               (cadr (jde-parse-class-lookup-constant
-                       (cadr method) constants))
-               constants))
-        (cadr (jde-parse-class-lookup-constant
-               (cadr 
-                (jde-parse-class-lookup-constant (nth 2 method) constants))
-               constants))
-        (cadr (jde-parse-class-lookup-constant
-               (nth 2
-                (jde-parse-class-lookup-constant (nth 2 method) constants))
-               constants))))
+	       (cadr (jde-parse-class-lookup-constant
+		       (cadr method) constants))
+	       constants))
+	(cadr (jde-parse-class-lookup-constant
+	       (cadr
+		(jde-parse-class-lookup-constant (nth 2 method) constants))
+	       constants))
+	(cadr (jde-parse-class-lookup-constant
+	       (nth 2
+		(jde-parse-class-lookup-constant (nth 2 method) constants))
+	       constants))))
 
 (defun get-bit-flags-for-byte (byte flag-vec)
   "Gets the bit flags for BYTE, given the flags that apply to each bit,
-a vector of length 8 (one for each bit).  Nulls in the FLAG-VEC are 
-taken to mean there is no flag for that byte, which causes the byte to be 
+a vector of length 8 (one for each bit).  Nulls in the FLAG-VEC are
+taken to mean there is no flag for that byte, which causes the byte to be
 ignored.
 
 For example: (get-bit-flags-for-byte 6 ['a 'b 'c 'd 'e 'f 'g 'h])
@@ -447,31 +448,31 @@ returns ('f 'g)"
   (let ((flags '()))
     (dotimes (i 8 flags)
       (when (and (aref flag-vec (- 7 i))
-                 (> (logand (expt 2 i)  byte) 0))
-        (add-to-list 'flags (aref flag-vec (- 7 i)))))))
-          
+		 (> (logand (expt 2 i)  byte) 0))
+	(add-to-list 'flags (aref flag-vec (- 7 i)))))))
+
 (defun jde-parse-class-get-access-flags ()
   (do-and-advance-chars 2
     (let ((raw0 (char-int (char-after (point))))
-          (raw1 (char-int (char-after (+ (point) 1)))))
+	  (raw1 (char-int (char-after (+ (point) 1)))))
       (append
        (get-bit-flags-for-byte raw0
-                               [nil nil nil nil 'string 'abstract
-                                    'interface 'native])
+			       [nil nil nil nil 'string 'abstract
+				    'interface 'native])
        (get-bit-flags-for-byte raw1
-                               ['transient 'volatile 'synchronized 'final
-                                           'static 'protected
-                                           'private 'public])))))
+			       ['transient 'volatile 'synchronized 'final
+					   'static 'protected
+					   'private 'public])))))
 
 (defun jde-parse-class-get-version ()
   "Return a list - (major-version minor-version)"
   (list (jde-parse-class-get-2byte 5)
-                  (jde-parse-class-get-2byte 7)))
+		  (jde-parse-class-get-2byte 7)))
 
 (defun jde-parse-class-get-2byte (point)
-  "Gets the value of two bytes (0 - 65535) as an int" 
+  "Gets the value of two bytes (0 - 65535) as an int"
   (let ((b1 (char-int (char-after point)))
-        (b2 (char-int (char-after (+ 1 point)))))
+	(b2 (char-int (char-after (+ 1 point)))))
     (+ (* b1 256) b2)))
 
 (defun jde-parse-class-get-next-2-bytes ()
@@ -480,23 +481,23 @@ returns ('f 'g)"
 
 (defun jde-parse-class-get-4byte (point &optional ignore-large-val)
   (let ((db1 (jde-parse-class-get-2byte point))
-        (db2 (jde-parse-class-get-2byte (+ 2 point))))
+	(db2 (jde-parse-class-get-2byte (+ 2 point))))
     (if (< db1 2047)
       ;; don't go over the maxint in elisp (2047, since we have 1 more db1 could be 65536)
       (+ (* 65536 db1) db2)
       (if ignore-large-val
-        0
-        (error "Class file has a larger 4 byte value then emacs can handle")))))
+	0
+	(error "Class file has a larger 4 byte value then emacs can handle")))))
 
 (defun jde-parse-class-get-next-4-bytes-as-signed (&optional ignore-large-val)
   (let ((db1 (jde-parse-class-get-next-2-bytes))
-        (db2 (jde-parse-class-get-next-2-bytes)))
+	(db2 (jde-parse-class-get-next-2-bytes)))
     (if (> (logand 32768 db1) 0)  ;; if it's high-bit is set, then it's negative.
       (if (> db1 63488)
-        (- (+ 1 (+ (* (- 65535 db1) 65536) (- 65535 db2))))
-        (if ignore-large-val
-          0
-          (error "Class file has an unsigned int who is smaller than emacs can handle")))
+	(- (+ 1 (+ (* (- 65535 db1) 65536) (- 65535 db2))))
+	(if ignore-large-val
+	  0
+	  (error "Class file has an unsigned int who is smaller than emacs can handle")))
       (jde-parse-class-get-4byte (- (point) 4)))))
 
 (defun jde-parse-class-get-next-4-bytes (&optional ignore-large-val)
@@ -507,24 +508,24 @@ returns ('f 'g)"
   "Returns a list of the constant ending location (not inclusive of
 of the constants) and a vector of all constants"
   (let* ((count (- (jde-parse-class-get-2byte 9) 1))
-         (const-vec (make-vector count '())))
+	 (const-vec (make-vector count '())))
     (goto-char 11) ;; start of constants
     (dotimes (i count const-vec)
       (let ((const (jde-parse-class-get-next-constant)))
-        (aset const-vec i const)
-        ;; doubles and longs take up two places on the const table. 
-        (when (or (eq (car const) 'double)
-                  (eq (car const) 'long))
-          (aset const-vec (+ 1 i) nil)
-          (setq i (+ 1 i)))))))
+	(aset const-vec i const)
+	;; doubles and longs take up two places on the const table.
+	(when (or (eq (car const) 'double)
+		  (eq (car const) 'long))
+	  (aset const-vec (+ 1 i) nil)
+	  (setq i (+ 1 i)))))))
 
 (defsubst jde-parse-class-get-long-constant (&optional ignore-large-val)
   (let ((qb1 (jde-parse-class-get-next-4-bytes ignore-large-val))
-        (qb2 (jde-parse-class-get-next-4-bytes ignore-large-val)))
+	(qb2 (jde-parse-class-get-next-4-bytes ignore-large-val)))
     (if (> qb2 0)
       (if ignore-large-val
-        0
-        (error "Class file has a large 8 byte value than emacs can handle"))
+	0
+	(error "Class file has a large 8 byte value than emacs can handle"))
       qb1)))
 
 (defsubst jde-parse-class-get-double-constant ()
@@ -545,9 +546,9 @@ of the constants) and a vector of all constants"
 
 (defsubst jde-parse-class-get-utf8-constant ()
   (let* ((len (jde-parse-class-get-next-2-bytes))
-         (result (encode-coding-string (buffer-substring (point)
-                                                        (+ len (point)))
-                                       jde-parse-class-encoding)))
+	 (result (encode-coding-string (buffer-substring (point)
+							(+ len (point)))
+				       jde-parse-class-encoding)))
     (goto-char (+ len (point)))
     result))
 
@@ -555,27 +556,27 @@ of the constants) and a vector of all constants"
   (let ((const-type (char-int (char-after (point)))))
     (forward-char)
     (cond ((eq const-type 7)
-            `(class ,(jde-parse-class-get-next-2-bytes)))
-          ((eq const-type 9)
-            `(field ,@(jde-parse-class-get-ref-constant)))
-          ((eq const-type 10)
-            `(method ,@(jde-parse-class-get-ref-constant)))
-          ((eq const-type 11)
-            `(interface-method ,@(jde-parse-class-get-ref-constant)))
-          ((eq const-type 8)
-            `(string ,(jde-parse-class-get-next-2-bytes)))
-          ((eq const-type 3)
-            `(integer ,(jde-parse-class-get-next-4-bytes t)))
-          ((eq const-type 4)
-            `(float ,(jde-parse-class-get-float-constant)))
-          ((eq const-type 5)
-            `(long ,(jde-parse-class-get-long-constant t)))
-          ((eq const-type 6)
-            `(double ,(jde-parse-class-get-double-constant)))
-          ((eq const-type 12)
-            `(name-and-type ,@(jde-parse-class-get-nameandtype-constant)))
-          ((eq const-type 1)
-            `(utf8 ,(jde-parse-class-get-utf8-constant))))))
+	    `(class ,(jde-parse-class-get-next-2-bytes)))
+	  ((eq const-type 9)
+	    `(field ,@(jde-parse-class-get-ref-constant)))
+	  ((eq const-type 10)
+	    `(method ,@(jde-parse-class-get-ref-constant)))
+	  ((eq const-type 11)
+	    `(interface-method ,@(jde-parse-class-get-ref-constant)))
+	  ((eq const-type 8)
+	    `(string ,(jde-parse-class-get-next-2-bytes)))
+	  ((eq const-type 3)
+	    `(integer ,(jde-parse-class-get-next-4-bytes t)))
+	  ((eq const-type 4)
+	    `(float ,(jde-parse-class-get-float-constant)))
+	  ((eq const-type 5)
+	    `(long ,(jde-parse-class-get-long-constant t)))
+	  ((eq const-type 6)
+	    `(double ,(jde-parse-class-get-double-constant)))
+	  ((eq const-type 12)
+	    `(name-and-type ,@(jde-parse-class-get-nameandtype-constant)))
+	  ((eq const-type 1)
+	    `(utf8 ,(jde-parse-class-get-utf8-constant))))))
 
 (defconst jde-parse-class-opcode-vec
   [(nop . 1)  ;; 0
@@ -787,7 +788,7 @@ reading a class file we come across bytecode 0, we can just look at
 this vector to see both the name of the instruction, and the size of
 the operation in bytes.  A few opcodes have variable length, so those
 must be calculated at runtime.")
-    
+
 (provide 'jde-parse-class)
 
 ;; $Log: jde-parse-class.el,v $
@@ -832,4 +833,4 @@ must be calculated at runtime.")
 ;; Initial release.
 ;;
 
-;; end of jde-xref.el  
+;; end of jde-xref.el

@@ -1,11 +1,12 @@
 ;;; jde-jdb.el -- Debugger mode for jdb.
-;; $Revision: 1.48 $ $Date: 2005/01/18 05:23:30 $ 
+;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>x
-;; Maintainer: Paul Kinnucan
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 1997, 2000, 2001, 2002, 2003, 2004, 2005 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -26,11 +27,6 @@
 ;; This package interfaces emacs to jdb, the debugger
 ;; distributed as part of JavaSoft's Java
 ;; Development Kit (JDK).
-
-;; Please send bug reports and enhancement suggestions
-;; to Paul Kinnucan at <paulk@mathworks.com>
-
-;; See end of this file for change history.
 
 ;;; Code:
 
@@ -86,14 +82,14 @@ command. Launch the debuggee process."
 	 (not (slot-boundp debugger 'buffer))
 	 (not (oref debugger :buffer))
 	 (not (comint-check-proc (oref debugger :buffer))))
-	(let* ((debuggee  
-                (oref debugger debuggee))
+	(let* ((debuggee
+		(oref debugger debuggee))
 	       (source-directory default-directory)
 	       (working-directory
 		(jde-db-debugger-get-working-dir debugger))
 	       (prog-args (jde-db-debugger-get-prog-args debugger))
 	       (cmd-path (jde-db-cmd-launch-cmd-path this))
-	       (command-string 
+	       (command-string
 		(concat
 		 cmd-path " "
 		 (jde-run-make-arg-string prog-args) "\n\n")))
@@ -107,10 +103,10 @@ command. Launch the debuggee process."
 	(jde-db-jdb-start debugger prog-args command-string)
 
 	(let ((debuggee-status (oref debuggee status)))
-          (oset debuggee-status running-p t)
-          (oset debuggee-status stopped-p t)))
+	  (oset debuggee-status running-p t)
+	  (oset debuggee-status stopped-p t)))
     (progn
-      (message "An instance of %s is running." (oref this :buffer-name))	
+      (message "An instance of %s is running." (oref this :buffer-name))
       (pop-to-buffer (oref this :buffer-name))))))
 
 (defmethod jde-db-cmd-make-command-line ((this jde-jdb-cmd-launch))
@@ -120,7 +116,7 @@ when it is started." nil)
 
 ;; Launch application command
 
-(defclass jde-jdb-cmd-launch-app (jde-jdb-cmd-launch 
+(defclass jde-jdb-cmd-launch-app (jde-jdb-cmd-launch
 				  jde-db-cmd-launch-app) ()
   "Asks jdb to launch the debuggee application.")
 
@@ -141,11 +137,11 @@ when it is started." nil)
 
 (defmethod jde-db-cmd-launch-startup-cmds ((this jde-jdb-cmd-launch-app))
   "If `jde-db-initial-step-p' is nonnil, add a step command to the
-debugger's startup command queue." 
+debugger's startup command queue."
   (if jde-db-initial-step-p
       (let*  ((debugger (oref this debugger))
 	      (step-cmd (oref (oref debugger cmd-set) step-into)))
-	(oset debugger next-cmd 
+	(oset debugger next-cmd
 		    (append (oref debugger next-cmd) (list step-cmd))))))
 
 
@@ -167,7 +163,7 @@ appletviewer."
   (let* ((debugger (oref this :debugger))
 	 (jdb-path (oref debugger :path))
 	 (jdb-dir (file-name-directory jdb-path)))
-    (expand-file-name "appletviewer" jdb-dir))) 
+    (expand-file-name "appletviewer" jdb-dir)))
 
 (defmethod jde-db-cmd-launch-buffer-name ((this jde-jdb-cmd-launch-applet))
   (let* ((debugger (oref this :debugger))
@@ -177,15 +173,15 @@ appletviewer."
 
 (defmethod jde-db-cmd-launch-startup-cmds ((this jde-jdb-cmd-launch-applet))
   "If `jde-db-initial-step-p' is nonnil, add a run command followed by a
-step command to the debugger's startup command queue." 
+step command to the debugger's startup command queue."
   (if jde-db-initial-step-p
       (let*  ((debugger (oref this debugger))
 	      (cmd-set (oref debugger cmd-set))
 	      (run-cmd (oref cmd-set run))
 	      (step-cmd (oref cmd-set step-into)))
-	(oset debugger next-cmd 
-		    (append 
-		     (oref debugger next-cmd) 
+	(oset debugger next-cmd
+		    (append
+		     (oref debugger next-cmd)
 		     (list run-cmd)
 		     (list step-cmd))))))
 
@@ -337,11 +333,11 @@ current stack location."
 "Processes the output of the jdb where
  command, which lists the current stack. An example of the output
  is
-   
+
       [1] jmath.LinearSystem$InnerClass.print (LinearSystem.java:36)
       [2] jmath.LinearSystem.<init> (LinearSystem.java:52)
       [3] jmath.Test.main (Test.java:38)
-   
+
  This method positions the source line cursor at the position that
  matches the current location of the debugger in the program's
  stack (set by the jdb up and down stack commands)."
@@ -349,9 +345,9 @@ current stack location."
 	 (debuggee (oref jdb debuggee)))
     ;; if the stack depth is not set default to 1
     (if (string-equal "" (oref debuggee :stack-depth))
-        (oset debuggee :stack-depth "1"))
-    (if (string-match 
-	 (concat "^  \\[" 
+	(oset debuggee :stack-depth "1"))
+    (if (string-match
+	 (concat "^  \\["
 		 (oref debuggee :stack-depth)
 		 "\\] .*(\\([^\$\n]*\\).*:\\([0-9]*[^[:digit:]]?[0-9]+\\))")
 	 output)
@@ -359,7 +355,7 @@ current stack location."
 	      (class (match-string 1 output))
 	      (line-no (jde-jdb-string-to-int (match-string 2 output)))
 	      (package ""))
-          
+
 	  (if (equal ".java" (substring class -5))
 	      (setq class (substring class 0 -5)))
 
@@ -368,7 +364,7 @@ current stack location."
 	    (and (string-match (jde-jdb-make-qualified-class-name-regexp class) marker)
 		 (setq package
 		       (substring marker (match-beginning 2) (match-end 2)))))
-	  (jde-db-set-debug-cursor 
+	  (jde-db-set-debug-cursor
 	   (if package (concat package class) class)
 	   (concat class ".java") line-no)))
     output))
@@ -387,7 +383,7 @@ breakpoint field.")
   "Creates command line for jdb set breakpoint command."
   (let* ((bps (oref this breakpoints))
 	 (bp (car bps)))
-    (format "stop at %s:%d"  
+    (format "stop at %s:%d"
 	    (oref bp class)
 	    (jde-db-breakpoint-get-line bp))))
 
@@ -405,38 +401,38 @@ on the list."
        (string-match "Unable to set" output))
       (let* ((bps (oref this breakpoints))
 	     (bp (car bps)) file line)
-        (if (not (null bp))
-            (progn
-              (setq file (oref bp file))
-              (setq line (jde-db-breakpoint-get-line bp))
-              (if (string-match "Unable to set breakpoint" output)
-                  (jde-db-delete-breakpoint bp)
-                (if (string-match "Unable to set deferred breakpoint" output)
-                    (if (jde-db-debuggee-running-p)
-                        (let* ((debugger (oref 'jde-db-debugger the-debugger))
-                               (bp-cmd
-                                (oref (oref debugger cmd-set) clear-bp)))    
-                          (oset bp-cmd breakpoints (list bp))
-                          (jde-db-exec-cmd debugger bp-cmd))
-                      (jde-db-delete-breakpoint bp))
-                  (if (string-match "Deferring breakpoint" output)
-                      (progn
-                        (oset bp status 'requested)
-                        (jde-db-mark-breakpoint-requested file line))
-                    (if (string-match "Set breakpoint" output)
-                        (progn
-                          (oset bp status 'active)
-                          (jde-db-mark-breakpoint-active file line))))))
-              (setq bps (cdr bps))
-              (oset this breakpoints bps)
-              (if bps
-                  (let ((jdb (oref this debugger)))
-                    (jde-db-exec-cmd jdb this))))))))
+	(if (not (null bp))
+	    (progn
+	      (setq file (oref bp file))
+	      (setq line (jde-db-breakpoint-get-line bp))
+	      (if (string-match "Unable to set breakpoint" output)
+		  (jde-db-delete-breakpoint bp)
+		(if (string-match "Unable to set deferred breakpoint" output)
+		    (if (jde-db-debuggee-running-p)
+			(let* ((debugger (oref 'jde-db-debugger the-debugger))
+			       (bp-cmd
+				(oref (oref debugger cmd-set) clear-bp)))
+			  (oset bp-cmd breakpoints (list bp))
+			  (jde-db-exec-cmd debugger bp-cmd))
+		      (jde-db-delete-breakpoint bp))
+		  (if (string-match "Deferring breakpoint" output)
+		      (progn
+			(oset bp status 'requested)
+			(jde-db-mark-breakpoint-requested file line))
+		    (if (string-match "Set breakpoint" output)
+			(progn
+			  (oset bp status 'active)
+			  (jde-db-mark-breakpoint-active file line))))))
+	      (setq bps (cdr bps))
+	      (oset this breakpoints bps)
+	      (if bps
+		  (let ((jdb (oref this debugger)))
+		    (jde-db-exec-cmd jdb this))))))))
 
 ;; Clear Breakpoint command
 
 (defclass jde-jdb-cmd-clear-breakpoint (jde-db-cmd-breakpoint) ()
-  "Asks jdb to clear the breakpoint specified by the 
+  "Asks jdb to clear the breakpoint specified by the
 breakpoint field.")
 
 (defmethod initialize-instance ((this jde-jdb-cmd-clear-breakpoint) &rest fields)
@@ -447,7 +443,7 @@ breakpoint field.")
   "Creates command line for jdb clear breakpoint command."
   (let* ((bps (oref this breakpoints))
 	 (bp (car bps)))
-    (format "clear %s:%d"  
+    (format "clear %s:%d"
 	    (oref bp class)
 	    (jde-db-breakpoint-get-line bp))))
 
@@ -470,10 +466,10 @@ on the list."
 
 (defclass jde-jdb-cmd-print (jde-db-cmd)
   ((expr	:initarg :expr
-                :type string
-                :initform ""
-                :documentation
-                "Expression passed to jdb"))
+		:type string
+		:initform ""
+		:documentation
+		"Expression passed to jdb"))
   "Asks jdb to print value of expression at point")
 
 (defmethod initialize-instance ((this jde-jdb-cmd-print) &rest fields)
@@ -482,16 +478,16 @@ on the list."
   (oset this expr ""))
 
 (defmethod jde-db-cmd-init ((this jde-jdb-cmd-print))
-  "The debugger invokes this method before executing the 
+  "The debugger invokes this method before executing the
 command."
   (oset this expr (read-from-minibuffer "expr: " (thing-at-point 'word)
-                                        nil nil 'jde-jdb-cmd-print-history)))
+					nil nil 'jde-jdb-cmd-print-history)))
 
 (defmethod jde-db-cmd-make-command-line ((this jde-jdb-cmd-print))
   "Creates a command line for jdb print command."
   (format "%s %s"
-          (oref this name)
-          (oref this expr)))
+	  (oref this name)
+	  (oref this expr)))
 
 ;; Dump command
 (defclass jde-jdb-cmd-dump (jde-jdb-cmd-print) ()
@@ -512,10 +508,10 @@ command."
 ;; Set command
 (defclass jde-jdb-cmd-set-var (jde-jdb-cmd-print)
   ((value :initarg :value
-          :type string
-          :initform "null"
-          :document
-          "Value to assign to the variable"))
+	  :type string
+	  :initform "null"
+	  :document
+	  "Value to assign to the variable"))
   "Ask jdb to assign new value to a field/variable/array element")
 
 (defmethod initialize-instance ((this jde-jdb-cmd-set-var) &rest fields)
@@ -523,19 +519,19 @@ command."
   (oset this name "set"))
 
 (defmethod jde-db-cmd-init ((this jde-jdb-cmd-set-var))
-  "The debugger invokes this method before executing the 
+  "The debugger invokes this method before executing the
 command."
   (oset this expr (read-from-minibuffer "variable: " (thing-at-point 'word)
-                                        nil nil 'jde-jdb-cmd-print-history))
+					nil nil 'jde-jdb-cmd-print-history))
   (oset this value (read-from-minibuffer "value: " nil
-                                        nil nil '(null))))
+					nil nil '(null))))
 
 (defmethod jde-db-cmd-make-command-line ((this jde-jdb-cmd-set-var))
   "Creates a command line for jdb print command."
   (format "%s %s = %s"
-          (oref this name)
-          (oref this expr)
-          (oref this value)))
+	  (oref this name)
+	  (oref this expr)
+	  (oref this value)))
 
 ;; Locals commands
 (defclass jde-jdb-cmd-locals (jde-jdb-cmd-print) ()
@@ -546,7 +542,7 @@ command."
   (oset this name "locals"))
 
 (defmethod jde-db-cmd-init ((this jde-jdb-cmd-locals))
-  "The debugger invokes this method before executing the 
+  "The debugger invokes this method before executing the
 command."
   (oset this expr ""))
 
@@ -554,26 +550,26 @@ command."
 
 (defclass jde-jdb-cmd-set (jde-db-cmd-set)
   ((print :initarg :print
-          :type jde-jdb-cmd-print
-          :documentation
-          "Asks jdb to print the value of expression at point")
+	  :type jde-jdb-cmd-print
+	  :documentation
+	  "Asks jdb to print the value of expression at point")
    (dump :initarg :dump
-         :type jde-jdb-cmd-dump
-         :documentation
-         "Ask jdb to print all object information from the
+	 :type jde-jdb-cmd-dump
+	 :documentation
+	 "Ask jdb to print all object information from the
 expression at poing")
    (eval :initarg :eval
-         :type jde-jdb-cmd-eval
-         :documentation
-         "Ask jdb to evaluate the expression at point")
+	 :type jde-jdb-cmd-eval
+	 :documentation
+	 "Ask jdb to evaluate the expression at point")
    (set-var :initarg :set-var
-            :type jde-jdb-cmd-set-var
-            :documentation
-            "Ask jdb to assign a new value to the expression at point")
+	    :type jde-jdb-cmd-set-var
+	    :documentation
+	    "Ask jdb to assign a new value to the expression at point")
    (locals :initarg :locals
-         :type jde-jdb-cmd-locals
-         :documentation
-         "Ask jdb to print all local variables in current stack frame")
+	 :type jde-jdb-cmd-locals
+	 :documentation
+	 "Ask jdb to print all local variables in current stack frame")
    )
   "Set of debugger commands implemented by jdb.")
 
@@ -603,20 +599,20 @@ expression at poing")
 	  (jde-jdb-cmd-down "jdb down cmd" :debugger jdb))
     (oset this where
 	  (jde-jdb-cmd-where "jdb where cmd" :debugger jdb))
-    (oset this set-bp 
+    (oset this set-bp
 	  (jde-jdb-cmd-set-breakpoint "jdb set breakpoint" :debugger jdb))
     (oset this clear-bp
 	  (jde-jdb-cmd-clear-breakpoint "jdb clear breakpoint" :debugger jdb))
     (oset this print
-          (jde-jdb-cmd-print "jdb print cmd" :debugger jdb))
+	  (jde-jdb-cmd-print "jdb print cmd" :debugger jdb))
     (oset this dump
-          (jde-jdb-cmd-dump "jdb dump cmd" :debugger jdb))
+	  (jde-jdb-cmd-dump "jdb dump cmd" :debugger jdb))
     (oset this eval
-          (jde-jdb-cmd-eval "jdb eval cmd" :debugger jdb))
+	  (jde-jdb-cmd-eval "jdb eval cmd" :debugger jdb))
     (oset this set-var
-          (jde-jdb-cmd-set-var "jdb set cmd" :debugger jdb))
+	  (jde-jdb-cmd-set-var "jdb set cmd" :debugger jdb))
     (oset this locals
-          (jde-jdb-cmd-locals "jdb locals cmd" :debugger jdb))
+	  (jde-jdb-cmd-locals "jdb locals cmd" :debugger jdb))
     ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -627,7 +623,7 @@ expression at poing")
 (defclass jde-jdb-breakpoint-listener (jde-db-listener)
   ((marker-regexp   :initarg :marker-regexp
 		    :type string
-		    :documentation 
+		    :documentation
 		    "Regular expression for parsing breakpoint messages.")
    (class-index     :initarg :class-index
 		    :type integer
@@ -641,7 +637,7 @@ expression at poing")
 		    "Index of line number parsed by marker-regex")
    (noline-regexp   :initarg :noline-regexp
 		    :type string
-		    :documentation 
+		    :documentation
 		    "Regular expression for parsing breakpoint messages without line numbers.")
    ;; There's no guarantee that Emacs will hand the filter the entire
    ;; marker at once; it could be broken up across several strings.  We
@@ -670,14 +666,14 @@ expression at poing")
   ;; line number at which the breakpoint occurs. The default expression
   ;; matches breakpoint messages emitted by jdb. You may need to change
   ;; the expression to accommodate other debuggers."
-  (oset 
+  (oset
    this
    :marker-regexp
    "^.*: thread=.*, \\(\\(.*[.]\\)*\\)\\([^\$]*\\)\\(\$.*\\)*[.].+(), line=\\([0-9,.]*\\),")
   ;; Regular expression to match a breakpoint message that lacks a line
   ;; number because the breakpoint occurs in a class compiled without deug
   ;; information.
-  (oset 
+  (oset
    this
    :noline-regexp
    "^Breakpoint hit: .*(pc \\([0-9]*\\))"))
@@ -700,7 +696,7 @@ expression at poing")
     ;; from the command sent to the debugger.
     ;; This seems to show up most often with step commands.
     ;;(message "checking string %s" (oref jdb :marker-acc))
-    (if (string-match "^.*: \\([-a-zA-Z0-9_$]+\\[[0-9]+\\] \\)thread=" 
+    (if (string-match "^.*: \\([-a-zA-Z0-9_$]+\\[[0-9]+\\] \\)thread="
 		      (oref this :marker-acc))
 	(oset this :marker-acc
 	      (concat (match-string 1 (oref this :marker-acc))
@@ -714,16 +710,16 @@ expression at poing")
   "Listens for set breakpoint messages."
   (let ((msgs (split-string output "\n")))
     (loop for msg in msgs do
-	  (if (and (string-match 
-                    "^.*Set .*breakpoint \\(.*\\):\\([0-9]+\\)"
-                    msg)
-                   (not (string-match "Unable to set.*" msg)))
-	      (let* ((class (substring 
+	  (if (and (string-match
+		    "^.*Set .*breakpoint \\(.*\\):\\([0-9]+\\)"
+		    msg)
+		   (not (string-match "Unable to set.*" msg)))
+	      (let* ((class (substring
 			     msg
-			     (match-beginning 1) 
+			     (match-beginning 1)
 			     (match-end 1)))
-		     (line (string-to-int 
-			    (substring 
+		     (line (string-to-int
+			    (substring
 			     msg
 			     (match-beginning 2)
 			     (match-end 2))))
@@ -736,12 +732,12 @@ expression at poing")
 (defmethod jde-db-listener-filter-output ((this jde-jdb-breakpoint-listener) input)
   "Filters the output of the debugger."
   (let ((jdb (oref this debugger))
-        (output ""))
+	(output ""))
 
     ;; Accumulate next chunk of debugger output.
     (oset this
-	  :marker-acc (concat 
-		       (oref this :marker-acc) 
+	  :marker-acc (concat
+		       (oref this :marker-acc)
 		       input))
 
     ;; (message (format "<acc-start>%s<acc-end>" (oref this :marker-acc)))
@@ -754,21 +750,21 @@ expression at poing")
 
       ;; (message (concat "jdb output:" input))
       ;; (message (concat "acc = " jde-db-marker-acc))
-    
+
       ;; Process all the complete markers in this chunk.
       (if (string-match marker-regexp (oref this :marker-acc))
 	  ;; Extract the frame position from the marker.
-	  (let ((premarker (substring 
+	  (let ((premarker (substring
 			    (oref this :marker-acc) 0 (match-beginning 0)))
-		(marker (substring (oref this :marker-acc) 
+		(marker (substring (oref this :marker-acc)
 				   (match-beginning 0) (match-end 0)))
 		(rest (substring (oref this :marker-acc) (match-end 0)))
-		(class (substring 
-			(oref this :marker-acc)  
-			(match-beginning marker-regexp-class-index) 
+		(class (substring
+			(oref this :marker-acc)
+			(match-beginning marker-regexp-class-index)
 			(match-end marker-regexp-class-index)))
-		(line-no (jde-jdb-string-to-int 
-			  (substring 
+		(line-no (jde-jdb-string-to-int
+			  (substring
 			   (oref this :marker-acc)
 			   (match-beginning marker-regexp-line-index)
 			   (match-end marker-regexp-line-index))))
@@ -779,8 +775,8 @@ expression at poing")
 		   (setq package
 			 (substring marker (match-beginning 2) (match-end 2))))
 
-               ;; (message "jde-db package: %s. marker = %s" jde-db-last-package marker)
-               ;;(message "case-fold-search = %s" (if case-fold-search "true" "false"))
+	       ;; (message "jde-db package: %s. marker = %s" jde-db-last-package marker)
+	       ;;(message "case-fold-search = %s" (if case-fold-search "true" "false"))
 	      )
 
 	    ;; Insert debugger output into debugger buffer.
@@ -789,7 +785,7 @@ expression at poing")
 	    ;; Set the accumulator to the remaining text.
 	    (oset this :marker-acc rest)
 
-	    (jde-db-set-debug-cursor 
+	    (jde-db-set-debug-cursor
 	     (concat package class) (concat class ".java") line-no)
 
 	    (let* ((debuggee (oref jdb debuggee))
@@ -798,7 +794,7 @@ expression at poing")
 
    ;; Handle case where there is no line number info in current class.
     (if (string-match (oref this noline-regexp) (oref this marker-acc))
-	(let ((premarker (substring 
+	(let ((premarker (substring
 			  (oref this :marker-acc) 0 (match-beginning 0)))
 	      (marker (substring (oref this :marker-acc)
 				 (match-beginning 0) (match-end 0)))
@@ -814,19 +810,19 @@ expression at poing")
     ;; marker-acc until we receive the rest of it.  Since we
     ;; know the full marker regexp above failed, it's pretty simple to
     ;; test for marker starts.
-    (if (string-match "\\(^Breakpoint hit:\\)\\|\\(^Step completed:\\)" 
+    (if (string-match "\\(^Breakpoint hit:\\)\\|\\(^Step completed:\\)"
 		      (oref this :marker-acc))
 	(progn
 	;; Everything before the potential marker start can be output.
-	  (setq output (concat output 
+	  (setq output (concat output
 			       (substring (oref this :marker-acc)
 					  0 (match-beginning 0))))
 
 	  ;; Everything after, we save, to combine with later input.
-	  (oset this 
+	  (oset this
 		:marker-acc
 		(substring (oref this :marker-acc) (match-beginning 0))))
-      (setq output 
+      (setq output
 	    (concat output (oref this :marker-acc)))
       (oset this :marker-acc ""))
 
@@ -852,10 +848,10 @@ expression at poing")
 ;; stack-related code.
 ;;
 ;; Extract the index of the current stack frame from the jdb prompt, where
-;; the prompt is of the form 
+;; the prompt is of the form
 ;;
 ;;   thread[stack_index]
-;; 
+;;
 ;; e.g.,
 ;;
 ;;   main[1]
@@ -867,7 +863,7 @@ expression at poing")
   (let* ((jdb (oref this debugger))
 	 (debuggee (oref jdb debuggee)))
     (if (string-match "^[-a-zA-Z0-9_$ -]+\\[\\([0-9]*,?[0-9]+\\)\\] " output)
-        (oset debuggee :stack-depth (match-string 1 output)))
+	(oset debuggee :stack-depth (match-string 1 output)))
     output))
 
 
@@ -907,8 +903,8 @@ expression at poing")
   ((exec-name       :initarg :exec-name
 		    :type string
 		    :initform "jdb"
-	            :documentation 
-	            "Name of the jdb executable.")
+		    :documentation
+		    "Name of the jdb executable.")
    (path            :initarg :path
 		    :type string
 		    :initform "jdb"
@@ -929,7 +925,7 @@ expression at poing")
   (oset this cmd-set (jde-jdb-cmd-set "jdb commands" :debugger this))
 
   (oset this bp-listener
-   (jde-jdb-breakpoint-listener 
+   (jde-jdb-breakpoint-listener
     "jdb breakpoint listener"
     :debugger this))
 
@@ -937,22 +933,22 @@ expression at poing")
 
   (jde-db-add-listener
    this
-   (jde-jdb-stack-listener 
+   (jde-jdb-stack-listener
     "jdb stack listener"
     :debugger this)))
 
 (defmethod jde-db-create-debuggee-app ((this jde-db-jdb) main-class)
-  (oset 
-   this 
-   :debuggee (jde-jdb-debuggee-app 
-	      (concat "Application: " main-class) 
+  (oset
+   this
+   :debuggee (jde-jdb-debuggee-app
+	      (concat "Application: " main-class)
 	      :main-class main-class)))
 
 (defmethod jde-db-create-debuggee-applet ((this jde-db-jdb) applet-doc)
-  (oset 
+  (oset
    this
-   :debuggee (jde-jdb-debuggee-applet 
-	      (concat "Applet: " applet-doc) 
+   :debuggee (jde-jdb-debuggee-applet
+	      (concat "Applet: " applet-doc)
 	      :doc applet-doc)))
 
 (defmethod jde-db-jdb-start ((this jde-db-jdb) prog-args cmdstr)
@@ -984,10 +980,10 @@ expression at poing")
 		   (oref this :buffer-name)
 		   (oref this :path)
 		   nil
-		   prog-args))	  
+		   prog-args))
 
       (oset this process
-	    (get-buffer-process (oref this buffer)))	  
+	    (get-buffer-process (oref this buffer)))
 
       (cd source-directory)
 
@@ -1011,12 +1007,12 @@ expression at poing")
 	     (connector (oref debuggee connector))
 	     (working-directory
 	      (jde-db-debugger-get-working-dir this))
-	     (prog-args 
+	     (prog-args
 	      (if (typep connector 'jde-db-listen-connector)
 		  (if (typep connector 'jde-db-socket-connector)
 		      (list
 		       "-connect"
-		       (format 
+		       (format
 			"com.sun.jdi.SocketListen:port=%s"
 			(oref connector port)))
 		    (if (typep connector 'jde-db-shared-memory-connector)
@@ -1038,7 +1034,7 @@ expression at poing")
 				host port))
 			  (list
 			   "-connect"
-			   (format 
+			   (format
 			    "com.sun.jdi.SocketAttach:port=%s"
 			    port))))
 		    (if (typep connector 'jde-db-shared-memory-connector)
@@ -1048,18 +1044,18 @@ expression at poing")
 			  "com.sun.jdi.SharedMemoryAttach:name=%s"
 			  (oref connector name)))
 		      (error "Invalid connector type."))))))
-	     (command-string 
+	     (command-string
 	      (format "%s %s\n\n"
-	       (oref this :path)  
+	       (oref this :path)
 	       (mapconcat (lambda (x) x) prog-args " "))))
 
-	(oset 
-	 this 
-	 :buffer-name 
+	(oset
+	 this
+	 :buffer-name
 	 (if (typep connector 'jde-db-shared-memory-connector)
 	     (format "*debug %s* debugee-shmem-name" (oref connector name))
-	   (format 
-	    "*debug %s:%s*" 
+	   (format
+	    "*debug %s:%s*"
 	    (if (or (typep connector 'jde-db-listen-connector)
 		    (not (oref connector port)))
 		"localhost" (oref connector host))
@@ -1071,27 +1067,27 @@ expression at poing")
 	;; by the user before launching the application.
 	(if jde-db-breakpoints
 	    (let ((bp-cmd (oref (oref this cmd-set) set-bp)))
-	      (oset 
-	       bp-cmd 
+	      (oset
+	       bp-cmd
 	       breakpoints
 	       (mapcar (lambda (assoc-x) (cdr assoc-x)) jde-db-breakpoints))
 
-	      (oset this next-cmd 
+	      (oset this next-cmd
 		    (append (oref this next-cmd) (list bp-cmd)))))
 
 	(jde-db-jdb-start this prog-args command-string)
 
 	(let* ((debuggee (oref this debuggee))
-               (debuggee-status (oref debuggee status)))
-          (oset debuggee-status running-p t)
-          (oset debuggee-status stopped-p t)))
+	       (debuggee-status (oref debuggee status)))
+	  (oset debuggee-status running-p t)
+	  (oset debuggee-status stopped-p t)))
     (progn
-      (message "An instance of %s is running." (oref this :buffer-name))	
+      (message "An instance of %s is running." (oref this :buffer-name))
       (pop-to-buffer (oref this :buffer-name)))))
 
 
 (defmethod jde-db-notify-process-exit ((this jde-db-jdb) msg)
-  "The default debugger process sentinel invokes this method 
+  "The default debugger process sentinel invokes this method
 when the jdb process terminates."
   (call-next-method)
   (let* ((debuggee (oref this debuggee))
@@ -1109,18 +1105,18 @@ when the jdb process terminates."
 (defmethod jde-db-debugger-get-prog-args ((this jde-db-jdb))
   (cond
    ((typep (oref this debuggee) 'jde-db-debuggee-app)
-    (append 
+    (append
      (jde-db-get-vm-args this)
      (jde-db-get-vm-args-from-user)
      (list (oref (oref this debuggee) main-class))
      jde-db-option-application-args
      (jde-db-get-app-args-from-user)))
    ((typep (oref this debuggee) 'jde-db-debuggee-applet)
-    (list "-debug" 
+    (list "-debug"
 	  (oref (oref this debuggee) doc)))
    (t
     (error "Unrecognized jdb debuggee type."))))
-    
+
 
 
 
@@ -1196,7 +1192,7 @@ current project."
   (let (jdb)
     (cond
      ((string= (car jde-debugger) "jdb")
-      (cond 
+      (cond
        ((and (< (jde-java-major-version) 2)
 	     (< (jde-java-minor-version) 2))
 	(setq jdb (jde-db-jdb-1-1 "jdb 1.1")))
@@ -1204,17 +1200,17 @@ current project."
 	     (= (jde-java-minor-version) 3))
 	(setq jdb (jde-db-jdb-1-3 "jdb 1.3")))
        (t
-	(setq jdb (jde-db-jdb-1-4 "jdb 1.4")))))       
+	(setq jdb (jde-db-jdb-1-4 "jdb 1.4")))))
      ((string= (car jde-debugger) "old jdb")
       (if (and (< (jde-java-major-version) 2)
 	       (< (jde-java-minor-version) 2))
 	  (setq jdb (jde-db-jdb-1-1 "jdb 1.1"))
 	(setq jdb (jde-db-old-jdb "old jdb"))))
      (t
-      (error "%s is not a valid jdb debugger choice." 
+      (error "%s is not a valid jdb debugger choice."
 	     (car jde-debugger))))
-    (oset 
-     jdb 
+    (oset
+     jdb
      :path (jde-get-jdk-prog (oref jdb :exec-name)))
     jdb))
 
@@ -1244,7 +1240,7 @@ starts MyClass in debugger server mode at the socket address
 4444. See jdb in the tools section of the JDK documentation for
 more information on these arguments.
 
-Selecting the Server mode option of the `jde-run-option-debug' customization 
+Selecting the Server mode option of the `jde-run-option-debug' customization
 variable causes the JDEE to specify the appropriate command-line
 arguments when launching the debuggee process.
 
@@ -1263,10 +1259,10 @@ is nil, this command prompts you to enter the address."
 	       "connector"
 	       :host host
 	       :port port))
-	     (debuggee 
-	      (jde-jdb-debuggee-app 
+	     (debuggee
+	      (jde-jdb-debuggee-app
 	      "debuggee"
-	      :main-class (format 
+	      :main-class (format
 			   "Attached to socket %s:%s"
 			   (if host host "localhost")
 			   port)
@@ -1295,7 +1291,7 @@ starts MyClass in debugger server mode, specifying \"javadebug\" as
 the name of the shared memory transport. See jdb in the tools section
 of the JDK documentation for more information on these arguments.
 
-Selecting the Server mode option of the `jde-run-option-debug' customization 
+Selecting the Server mode option of the `jde-run-option-debug' customization
 variable causes the JDEE to specify the appropriate command-line
 arguments when launching the debuggee process.
 
@@ -1303,7 +1299,7 @@ The attach command connects the debugger to the debuggee at the
 address specified by `jde-db-option-connect-shared-memory', or, if
 this variable is nil, this command prompts you to enter a name."
   (interactive)
-  (assert 
+  (assert
    (eq system-type 'windows-nt)
    "The debugger does not support shared memory connections on this platform.")
   (let ((shmem-name (jde-jdb-get-shared-memory-name)))
@@ -1314,10 +1310,10 @@ this variable is nil, this command prompts you to enter a name."
 	      (jde-db-shared-memory-attach-connector
 	       "connector"
 	       :name shmem-name))
-	     (debuggee 
-	      (jde-jdb-debuggee-app 
+	     (debuggee
+	      (jde-jdb-debuggee-app
 	       "debuggee"
-	       :main-class (format 
+	       :main-class (format
 			    "Attached via shared memory: %s."
 			    shmem-name)
 	       :connector connector)))
@@ -1341,11 +1337,11 @@ vm in the appropriate mode, e.g.,
 
 java -Xdebug -Xrunjdwp:transport=dt_socket,address=4444,server=n,suspend=n MyClass
 
-starts MyClass in debugger client mode at the socket port 4444. See jdb in 
+starts MyClass in debugger client mode at the socket port 4444. See jdb in
 the tools section of the JDK documentation for
 more information.
 
-Selecting the Client mode option of the `jde-run-option-debug' customization 
+Selecting the Client mode option of the `jde-run-option-debug' customization
 variable causes the JDEE to specify the appropriate command-line
 arguments when launching the debuggee process.
 
@@ -1364,10 +1360,10 @@ address."
 	   (jde-db-socket-listen-connector
 	       "connector"
 	       :port port))
-	 (debuggee 
-	  (jde-jdb-debuggee-app 
+	 (debuggee
+	  (jde-jdb-debuggee-app
 	   "debuggee"
-          :main-class (concat "Listening at port " port)
+	  :main-class (concat "Listening at port " port)
 	  :connector connector)))
     (oset debugger the-debugger debugger)
     (oset debugger :debuggee debuggee)
@@ -1389,13 +1385,13 @@ starts MyClass in debugger client mode at the shared memory address
 javadebug. See jdb in the tools section of the JDK documentation for
 more information.
 
-Selecting the Client mode option of the `jde-run-option-debug' customization 
+Selecting the Client mode option of the `jde-run-option-debug' customization
 variable causes the JDEE to specify the appropriate command-line
 arguments when launching the debuggee process.
 
 The listen command listens for the debugger at the
 address specified by `jde-db-option-connect-shared-memory'. If this variable
-is nil, this command prompts you to enter the address that you plan to start 
+is nil, this command prompts you to enter the address that you plan to start
 the debuggee process at (e.g., jdbconn)."
   (interactive)
   (assert
@@ -1407,10 +1403,10 @@ the debuggee process at (e.g., jdbconn)."
 	   (jde-db-shared-memory-listen-connector
 	       "connector"
 	       :name name))
-	 (debuggee 
-	  (jde-jdb-debuggee-app 
+	 (debuggee
+	  (jde-jdb-debuggee-app
 	   "debuggee"
-          :main-class (concat "Listening to " name)
+	  :main-class (concat "Listening to " name)
 	  :connector connector)))
     (oset debugger the-debugger debugger)
     (oset debugger :debuggee debuggee)
@@ -1426,17 +1422,17 @@ the debuggee process at (e.g., jdbconn)."
     (if (and (oref debugger running-p)
 	     (oref debuggee-status stopped-p))
 	(let* ((cmd-set (oref debugger cmd-set))
-               cmd)
-          (if (string= "print" key)
-              (setq cmd (oref cmd-set print))
-            (if (string= "dump" key)
-                (setq cmd (oref cmd-set dump))
-              (if (string= "eval" key)
-                  (setq cmd (oref cmd-set eval))
-                (if (string= "set" key)
-                    (setq cmd (oref cmd-set set-var))
-                  (if (string= "locals" key)
-                      (setq cmd (oref cmd-set locals)))))))
+	       cmd)
+	  (if (string= "print" key)
+	      (setq cmd (oref cmd-set print))
+	    (if (string= "dump" key)
+		(setq cmd (oref cmd-set dump))
+	      (if (string= "eval" key)
+		  (setq cmd (oref cmd-set eval))
+		(if (string= "set" key)
+		    (setq cmd (oref cmd-set set-var))
+		  (if (string= "locals" key)
+		      (setq cmd (oref cmd-set locals)))))))
 	  (jde-db-exec-cmd debugger cmd))
       (let ((class (oref debuggee main-class)))
 	(error "Application %s is not stopped" class)))))
@@ -1464,21 +1460,21 @@ the debuggee process at (e.g., jdbconn)."
 (defun jde-jdb-help ()
   (interactive)
   (let* ((jde-dir (jde-find-jde-doc-directory))
-         (jdb-ug-path
-          (if jde-dir
-	      (expand-file-name "doc/html/jdb-ug/jdb-ug-frame.html" jde-dir))))      
+	 (jdb-ug-path
+	  (if jde-dir
+	      (expand-file-name "doc/html/jdb-ug/jdb-ug-frame.html" jde-dir))))
     (if (and
-         jdb-ug-path
-         (file-exists-p jdb-ug-path))
-        (browse-url (concat "file://" (jde-convert-cygwin-path jdb-ug-path))
-                    (if (boundp 'browse-url-new-window-flag)
+	 jdb-ug-path
+	 (file-exists-p jdb-ug-path))
+	(browse-url (concat "file://" (jde-convert-cygwin-path jdb-ug-path))
+		    (if (boundp 'browse-url-new-window-flag)
 			'browse-url-new-window-flag
 		      browse-url-new-window-p))
       (signal 'error '("Cannot find jdb user guide.")))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                                                                            ;; 
+;;                                                                            ;;
 ;; Debug Commands                                                             ;;
 ;;                                                                            ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1487,18 +1483,18 @@ the debuggee process at (e.g., jdbconn)."
 (defvar jde-jdb-emacs-menu-spec
   (list "Jdb"
 
-	["Step Over"                  
+	["Step Over"
 	     jde-debug-step-over
 	     :active (jde-db-debuggee-stopped-p)
 	     :help "Step over the next method."]
-	  
 
-	["Step Into"                  
+
+	["Step Into"
 	 jde-debug-step-into
 	 :active (jde-db-debuggee-stopped-p)
 	 :help "Step into the next method."]
 
-	["Step Out"                  
+	["Step Out"
 	 jde-debug-step-out
 	 :active (jde-db-debuggee-stopped-p)
 	 :help "Step out of the current method."]
@@ -1512,8 +1508,8 @@ the debuggee process at (e.g., jdbconn)."
 			   (debuggee-status (oref debuggee status)))
 		      (and (oref debugger running-p)
 			   (not (oref debuggee-status running-p)))))
-			
-	 :included (or 
+
+	 :included (or
 		    (not (slot-boundp 'jde-db-debugger 'the-debugger))
 		    (let* ((debugger (oref 'jde-db-debugger the-debugger))
 			   (debuggee (oref debugger debuggee))
@@ -1522,9 +1518,9 @@ the debuggee process at (e.g., jdbconn)."
 			  (not (oref debuggee-status running-p)))))
 	 :help "Start the current program."]
 
-        ["Continue"                   
-	 jde-debug-cont 
-	 :active   (or 
+	["Continue"
+	 jde-debug-cont
+	 :active   (or
 		    (jde-db-debuggee-stopped-p)
 		    (jde-db-debuggee-suspended-p))
 
@@ -1538,67 +1534,67 @@ the debuggee process at (e.g., jdbconn)."
 
 	"-"
 
-        ["Toggle Breakpoint"          
-	 jde-debug-toggle-breakpoint 
+	["Toggle Breakpoint"
+	 jde-debug-toggle-breakpoint
 	 :active t
 	 :help "Set (or remove) a breakpoint at the current line."]
 
-        ["Clear Breakpoints"          
-	 jde-debug-clear-breakpoints 
+	["Clear Breakpoints"
+	 jde-debug-clear-breakpoints
 	 :active  jde-db-breakpoints
 	 :help "Remove all breakpoints."]
 
-        ["List Breakpoints"
-         jde-debug-list-breakpoints
+	["List Breakpoints"
+	 jde-debug-list-breakpoints
 	 :active  jde-db-breakpoints
 	 :help "Display a list of breakpoints."]
 
 	"-"
 
 	(list
-         "Display"
-         
-         ["Expression"                  
-          jde-jdb-print 
+	 "Display"
+
+	 ["Expression"
+	  jde-jdb-print
 	  :active  (jde-db-debuggee-stopped-p)
 	  :help "Evaluate an expression and display the results."]
-          
-         ["Object"
-          jde-jdb-dump
+
+	 ["Object"
+	  jde-jdb-dump
 	  :active  (jde-db-debuggee-stopped-p)
 	  :help "Display the fields of an object referenced by a variable."]
 
 
-         ["Locals"
-          jde-jdb-locals
+	 ["Locals"
+	  jde-jdb-locals
 	  :active  (jde-db-debuggee-stopped-p)
 	  :help "Display the variables in scope at the current line."]
-         )
+	 )
 
-         ["Set Variable"
-          jde-jdb-set
+	 ["Set Variable"
+	  jde-jdb-set
 	  :active  (jde-db-debuggee-stopped-p)
 	  :help "Change the value of an in-scope variable."]
-          
-        (list
+
+	(list
 	 "Stack"
 
-	 ["Up"                        
+	 ["Up"
 	  jde-debug-up
 	  :active  (jde-db-debuggee-stopped-p)
 	  :help "Move the debug cursor up the method call stack."]
 
-	 ["Down"                      
+	 ["Down"
 	  jde-debug-down
 	  :active (and
 		   (jde-db-debuggee-stopped-p)
 		   (let* ((debugger (oref 'jde-db-debugger the-debugger))
 			  (debuggee (oref debugger debuggee)))
 		     (> (jde-jdb-string-to-int
-                         (oref debuggee :stack-depth)) 1)))
+			 (oref debuggee :stack-depth)) 1)))
 	  :help "Move the debug cursor down the method call stack." ]
 
-	 ["Where"                      
+	 ["Where"
 	  jde-debug-where
 	  :active (jde-db-debuggee-stopped-p)
 	  :help "Display the call stack."]
@@ -1627,16 +1623,16 @@ the debuggee process at (e.g., jdbconn)."
 		   (eq system-type 'windows-nt)
 		   (not (jde-db-debuggee-running-p)))
 	  :help "Listen in shared memory for an external process."]
-	 )	 
+	 )
 	"-"
 
-	["Preferences"                
-	 jde-bug-show-preferences 
+	["Preferences"
+	 jde-bug-show-preferences
 	 :active nil
 	 :help "Not yet implemented."]
 
 	"-"
-	["Help"                       
+	["Help"
 	 jde-jdb-help
 	 :active t
 	 :help "Display the JDEE's jdb user's guide in an HTML browser."]
@@ -1646,17 +1642,17 @@ the debuggee process at (e.g., jdbconn)."
 (defvar jde-jdb-xemacs-menu-spec
   (list "Jdb"
 
-	["Step Over"                  
+	["Step Over"
 	     jde-debug-step-over
 	     :active (jde-db-debuggee-stopped-p)]
-	  
 
-	["Step Into"                  
+
+	["Step Into"
 	 jde-debug-step-into
 	 :active (jde-db-debuggee-stopped-p)
 	 ]
 
-	["Step Out"                  
+	["Step Out"
 	 jde-debug-step-out
 	 :active (jde-db-debuggee-stopped-p)]
 
@@ -1669,8 +1665,8 @@ the debuggee process at (e.g., jdbconn)."
 			   (debuggee-status (oref debuggee status)))
 		      (and (oref debugger running-p)
 			   (not (oref debuggee-status running-p)))))
-			
-	 :included (or 
+
+	 :included (or
 		    (not (slot-boundp 'jde-db-debugger 'the-debugger))
 		    (let* ((debugger (oref 'jde-db-debugger the-debugger))
 			   (debuggee (oref debugger debuggee))
@@ -1678,9 +1674,9 @@ the debuggee process at (e.g., jdbconn)."
 		      (or (not (oref debugger running-p))
 			  (not (oref debuggee-status running-p)))))]
 
-        ["Continue"                   
-	 jde-debug-cont 
-	 :active   (or 
+	["Continue"
+	 jde-debug-cont
+	 :active   (or
 		    (jde-db-debuggee-stopped-p)
 		    (jde-db-debuggee-suspended-p))
 
@@ -1692,57 +1688,57 @@ the debuggee process at (e.g., jdbconn)."
 
 	"-"
 
-        ["Toggle Breakpoint"          
-	 jde-debug-toggle-breakpoint 
+	["Toggle Breakpoint"
+	 jde-debug-toggle-breakpoint
 	 t]
 
-        ["Clear Breakpoints"          
-	 jde-debug-clear-breakpoints 
+	["Clear Breakpoints"
+	 jde-debug-clear-breakpoints
 	 jde-db-breakpoints]
 
-        ["List Breakpoints"
-         jde-debug-list-breakpoints
-         jde-db-breakpoints]
+	["List Breakpoints"
+	 jde-debug-list-breakpoints
+	 jde-db-breakpoints]
 	"-"
 
 	(list
-         "Display"
-         
-         ["Expression"                  
-          jde-jdb-print 
+	 "Display"
+
+	 ["Expression"
+	  jde-jdb-print
 	  :active  (jde-db-debuggee-stopped-p)]
-          
-         ["Object"
-          jde-jdb-dump
+
+	 ["Object"
+	  jde-jdb-dump
 	  :active  (jde-db-debuggee-stopped-p)]
 
 
-         ["Locals"
-          jde-jdb-locals
+	 ["Locals"
+	  jde-jdb-locals
 	  :active  (jde-db-debuggee-stopped-p)]
-         )
+	 )
 
-         ["Set Variable"
-          jde-jdb-set
+	 ["Set Variable"
+	  jde-jdb-set
 	  :active  (jde-db-debuggee-stopped-p)]
-          
-        (list
+
+	(list
 	 "Stack"
 
-	 ["Up"                        
+	 ["Up"
 	  jde-debug-up
 	  :active  (jde-db-debuggee-stopped-p)]
 
-	 ["Down"                      
+	 ["Down"
 	  jde-debug-down
 	  :active (and
 		   (jde-db-debuggee-stopped-p)
 		   (let* ((debugger (oref 'jde-db-debugger the-debugger))
 			  (debuggee (oref debugger debuggee)))
 		     (> (jde-jdb-string-to-int
-                         (oref debuggee :stack-depth)) 1)))]
+			 (oref debuggee :stack-depth)) 1)))]
 
-	 ["Where"                      
+	 ["Where"
 	  jde-debug-where
 	  :active (jde-db-debuggee-stopped-p)]
 
@@ -1767,21 +1763,21 @@ the debuggee process at (e.g., jdbconn)."
 		   (eq system-type 'windows-nt)
 		   (not (jde-db-debuggee-running-p)))]
 
-	 )	 
+	 )
 	"-"
-	["Preferences"                
+	["Preferences"
 	 jde-bug-show-preferences nil]
 	"-"
-	["Help"                       
+	["Help"
 	 jde-jdb-help t]
 	)
   "Defines the JDE's menu of jdb commands.")
 
-  
+
 (defvar jde-jdb-mode-map
   (let ((km (make-sparse-keymap)))
     (easy-menu-define jde-jdb-menu km "Jdb Minor Mode Menu"
-                      jde-jdb-emacs-menu-spec)
+		      jde-jdb-emacs-menu-spec)
     km)
   "Keymap for Jdb minor mode.")
 
@@ -1796,18 +1792,18 @@ With prefix argument ARG, turn on if positive, otherwise off..
 \\{jde-jdb-mode-map}"
   (interactive
    (list (or current-prefix-arg
-             (if jde-jdb-minor-mode 0 1))))
+	     (if jde-jdb-minor-mode 0 1))))
 
   (setq jde-jdb-minor-mode
-        (if arg
-            (>
-             (prefix-numeric-value arg)
-             0)
-          (not jde-jdb-minor-mode)))
+	(if arg
+	    (>
+	     (prefix-numeric-value arg)
+	     0)
+	  (not jde-jdb-minor-mode)))
 
   (if jde-jdb-minor-mode
       (if (featurep 'xemacs)
-            (easy-menu-add jde-jdb-xemacs-menu-spec jde-jdb-mode-map))
+	    (easy-menu-add jde-jdb-xemacs-menu-spec jde-jdb-mode-map))
     (if (featurep 'xemacs)
       (easy-menu-remove jde-jdb-xemacs-menu-spec))))
 
@@ -1824,14 +1820,14 @@ With prefix argument ARG, turn on if positive, otherwise off..
 	(cons "[?\C-c ?\C-a ?\C-b]" 'jde-debug-toggle-breakpoint)
 	(cons "[?\C-c ?\C-a ?\C-u]" 'jde-debug-up)
 	(cons "[?\C-c ?\C-a ?\C-d]" 'jde-debug-down)
-        (cons "[?\C-c ?\C-a ?\C-p]" 'jde-jdb-print)
-        (cons "[?\C-c ?\C-a ?\C-d]" 'jde-jdb-dump)
-        (cons "[?\C-c ?\C-a ?\C-e]" 'jde-jdb-eval)
-        (cons "[?\C-c ?\C-a ?\C-v]" 'jde-jdb-set)
-        (cons "[?\C-c ?\C-a ?\C-l]" 'jde-jdb-locals))
+	(cons "[?\C-c ?\C-a ?\C-p]" 'jde-jdb-print)
+	(cons "[?\C-c ?\C-a ?\C-d]" 'jde-jdb-dump)
+	(cons "[?\C-c ?\C-a ?\C-e]" 'jde-jdb-eval)
+	(cons "[?\C-c ?\C-a ?\C-v]" 'jde-jdb-set)
+	(cons "[?\C-c ?\C-a ?\C-l]" 'jde-jdb-locals))
   "*Specifies key bindings for jdb debug commands.
 The value of this variable is an association list. The car of
-each element specifies a key sequence. The cdr specifies 
+each element specifies a key sequence. The cdr specifies
 an interactive command that the key sequence executes. To enter
 a key with a modifier, type C-q followed by the desired modified
 keystroke. For example, to enter C-s (Control s) as the key to be
@@ -1847,7 +1843,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 	  (if (and
 	       (boundp 'jde-jdb-key-bindings)
 	       jde-jdb-key-bindings)
-	      (mapc 
+	      (mapc
 	       (lambda (binding)
 		 (let ((key (car binding))
 		       (fcn (cdr binding)))
@@ -1856,7 +1852,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 		   (define-key jde-jdb-mode-map key nil)))
 	       jde-jdb-key-bindings))
 	  ;; Map new key bindings.
-	  (mapc 
+	  (mapc
 	   (lambda (binding)
 	     (let ((key (car binding))
 		   (fcn (cdr binding)))

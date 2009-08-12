@@ -1,11 +1,12 @@
 ;;; jde-compile.el -- Integrated Development Environment for Java.
-;; $Revision: 1.65 $ $Date: 2005/04/06 03:03:07 $ 
+;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
-;; Maintainer: Paul Kinnucan
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 1997, 1998, 2001, 2002, 2003, 2004, 2005, 2008 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -24,7 +25,7 @@
 
 ;;; Commentary:
 
-;; This is one of a set of packages that make up the 
+;; This is one of a set of packages that make up the
 ;; Java Development Environment (JDE) for Emacs. See the
 ;; JDE User's Guide for more information.
 
@@ -72,16 +73,16 @@ environment, specify the path of the jikes executable."
 	   (item "javac server")
 	   (item "javac")
 	   (item "jikes"))
-	  (file 
+	  (file
 	   :tag "Path")))
-	   
-	   
+
+
 (defcustom jde-read-compile-args nil
 "*Specify whether to prompt for additional compiler arguments.
 If this variable is non-nil, the jde-compile command prompts
 you to enter additional compiler arguments in the minibuffer.
 These arguments are appended to those specified by customization
-variables. The JDE maintains a history list of arguments 
+variables. The JDE maintains a history list of arguments
 entered in the minibuffer."
   :group 'jde-project
   :type 'boolean)
@@ -93,38 +94,38 @@ entered in the minibuffer."
 "History of compiler arguments entered in the minibuffer.")
 
 ;; (makunbound 'jde-compile-finish-hook)
-(defcustom jde-compile-finish-hook 
-  '(jde-compile-finish-kill-buffer 
+(defcustom jde-compile-finish-hook
+  '(jde-compile-finish-kill-buffer
     jde-compile-finish-refresh-speedbar
     jde-compile-finish-update-class-info)
-  "List of functions to be invoked when compilation of a 
+  "List of functions to be invoked when compilation of a
 Java source file terminates. Each function should accept
-two arguments: the compilation buffer and a string 
+two arguments: the compilation buffer and a string
 describing how the compilation finished."
   :group 'jde
   :type 'hook)
 
-(defcustom jde-compile-option-hide-classpath nil 
+(defcustom jde-compile-option-hide-classpath nil
   "Substitute the classpath in the compilation window for
 ..."
   :group 'jde-compile-options
   :type 'boolean)
 
-(defun jde-compile-update-class-list () 
+(defun jde-compile-update-class-list ()
   (let ((class-dir
 	 (if (string= jde-compile-option-directory "")
 	     (expand-file-name ".")
-	   (jde-normalize-path 
-	    jde-compile-option-directory 
+	   (jde-normalize-path
+	    jde-compile-option-directory
 	    'jde-compile-option-directory))))
     (message (concat "Updating class list for " class-dir))
     (jde-jeval (concat
-		"jde.util.JdeUtilities.updateClassList(\"" 
+		"jde.util.JdeUtilities.updateClassList(\""
 		class-dir
 	       "\");"))
     (message "Updating class list...done.")))
 
-(defun jde-compile-finish-update-class-info (buf msg) 
+(defun jde-compile-finish-update-class-info (buf msg)
   "Flush the classinfo cache and update the class list used by
 JDEE wizards at the end of compilation.  Flush the entire cache as we
 don't know which classes were recompiled."
@@ -143,7 +144,7 @@ don't know which classes were recompiled."
 	      (jde-compile-update-class-list))))
     (error nil)))
 
-(defun jde-compile-finish-refresh-speedbar (buf msg) 
+(defun jde-compile-finish-refresh-speedbar (buf msg)
   "Refresh speedbar at the end of a compilation."
   (if (and (frame-live-p speedbar-frame)
 	    (frame-visible-p speedbar-frame))
@@ -155,7 +156,7 @@ don't know which classes were recompiled."
   :group 'jde-compile-options
   :type 'boolean)
 
-(defun jde-compile-kill-buffer (buf) 
+(defun jde-compile-kill-buffer (buf)
   (if jde-compile-enable-kill-buffer
       (progn
 	(delete-windows-on buf)
@@ -167,17 +168,17 @@ don't know which classes were recompiled."
   "Removes the jde-compile window after a few seconds if no errors."
   (save-excursion
     (set-buffer buf)
-    (if (null (or (string-match ".*exited abnormally.*" msg) 
-                  (string-match ".*BUILD FAILED.*" (buffer-string))))
-        ;;no errors, make the compilation window go away in a few seconds
-        (lexical-let ((compile-buffer buf))
-          (run-at-time
-           "2 sec" nil 'jde-compile-kill-buffer
-           compile-buffer)
-          (message "No compilation errors"))
+    (if (null (or (string-match ".*exited abnormally.*" msg)
+		  (string-match ".*BUILD FAILED.*" (buffer-string))))
+	;;no errors, make the compilation window go away in a few seconds
+	(lexical-let ((compile-buffer buf))
+	  (run-at-time
+	   "2 sec" nil 'jde-compile-kill-buffer
+	   compile-buffer)
+	  (message "No compilation errors"))
       ;;there were errors, so jump to the first error
       (if jde-compile-jump-to-first-error (next-error 1)))))
-  
+
 
 (defcustom jde-compile-option-command-line-args nil
   "*Specify options as a string of command-line arguments.
@@ -215,11 +216,11 @@ for example, javac -cp \"*.jar\" MyClass.java."
 (defcustom jde-compile-option-sourcepath nil
 "*Specify the source code path to search for class or interface definitions.
 
-As with the user class path, source path entries  can be directories, JAR 
-archives, or ZIP archives. If packages are used, the local path name within 
-the directory or archive must reflect the package name. 
+As with the user class path, source path entries  can be directories, JAR
+archives, or ZIP archives. If packages are used, the local path name within
+the directory or archive must reflect the package name.
 
-Note that classes found through the classpath are subject to automatic 
+Note that classes found through the classpath are subject to automatic
 recompilation if their sources are found."
   :group 'jde-compile-options
   :type '(repeat (file :tag "Path")))
@@ -228,19 +229,19 @@ recompilation if their sources are found."
   "*Specifies the root directory of the class file hierarchy.
 The compiler places compiled classes in the specified
 directory. For example, specifying the class
-directory as: 
-  
+directory as:
+
   C:\\users\\dac\\classes
 
 causes the class files for the classes in the MyProgram.java source
-file to be saved in the directory C:\\users\\dac\\classes. If your class 
+file to be saved in the directory C:\\users\\dac\\classes. If your class
 is in the package demos\\awt, the class files would be placed in directory
 C:\\users\\dac\\classes\\demos\\awt."
   :group 'jde-compile-options
   :type 'directory)
 
 (defcustom jde-compile-option-deprecation nil
-  "*Warn use or override of a deprecated member or class. 
+  "*Warn use or override of a deprecated member or class.
 A member or class is deprecated if its documentation comment contains
 the @deprecated tag. The compiler will emit a warning at the end of
 compilation whether or not the deprecation option is on; this option
@@ -255,7 +256,7 @@ option is on and the source file is out of date.
   :type 'boolean)
 
 
-(defcustom jde-compile-option-debug 
+(defcustom jde-compile-option-debug
   (list "selected" (list t nil nil))
   "*Include debug information in classes.
 The compiler includes line number information by default.
@@ -269,8 +270,8 @@ may not exist and code may appear to move or not be executed at all.
 The JDK 1.1.x versions of javac do not support inclusion of selected
 debug information."
   :group 'jde-compile-options
-  :type '(list 
-	  (radio-button-choice 
+  :type '(list
+	  (radio-button-choice
 	   :format "%t \n%v"
 	   :tag "Debug info to include in class:"
 	   (const "all")
@@ -285,12 +286,12 @@ debug information."
 		     :tag "Variables")
 	   (checkbox :format "%[%v%] %t \n"
 		     :tag "Source")))
-	   
+
 )
 
 
 (defcustom jde-compile-option-optimize nil
-"*Directs the compiler to try to generate faster code. 
+"*Directs the compiler to try to generate faster code.
 This may slow down compilation, make larger class files, and/or make
 it difficult to debug.
 
@@ -316,7 +317,7 @@ files only depended on by already up-to-date class files.
 
 Note: if you are using a compiler other than post JDK 1.1.6 versions
 of javac, you may need to specify the command-line switch used by
-the compiler to specify dependency checking. See 
+the compiler to specify dependency checking. See
 `jde-compile-option-depend-switch' for more information."
   :group 'jde-compile-options
   :type 'boolean)
@@ -332,8 +333,8 @@ from the following options:
   +F        Check everything except jar and zip files (jikes only)
   +U        Check everything including jar and zip files (jikes only)"
   :group 'jde-compile-options
-  :type '(list 
-	  (radio-button-choice 
+  :type '(list
+	  (radio-button-choice
 	   :format "%t \n%v"
 	   :tag "Select -Xdepend (javac) or -depend (jikes):"
 	   (const "-Xdepend")
@@ -371,12 +372,12 @@ warnings."
   :type '(repeat (string :tag "Name")))
 
 ;;(makunbound 'jde-compile-option-annotation-processing)
-(defcustom jde-compile-option-annotation-processing 
+(defcustom jde-compile-option-annotation-processing
   (list "compile and process annotations")
 "*Controls whether annotation processing and/or compilation is done."
   :group 'jde-compile-options
   :type '(list
-	  (radio-button-choice 
+	  (radio-button-choice
 	   :format "%t \n%v"
 	   :tag "Processing:"
 	   (const "compile and process annotations")
@@ -390,9 +391,9 @@ interpreted by javac directly, but are made available for use by
 individual processors. key should be one or more identifiers
 separated by \".\"."
   :group 'jde-compile-options
-  :type '(repeat 
+  :type '(repeat
 	  (cons :tag "Option"
-	   (string :tag "Key") 
+	   (string :tag "Key")
 	   (string :tag "Value"))))
 
 (defcustom jde-compile-option-encoding ""
@@ -403,31 +404,31 @@ is used."
   :type 'string)
 
 ;;(makunbound 'jde-compile-option-implicit)
-(defcustom jde-compile-option-implicit 
+(defcustom jde-compile-option-implicit
   (list "Generate and warn")
-"*Specify whether to generate class files for source files loaded in 
+"*Specify whether to generate class files for source files loaded in
 order to get type information needed to compile and/or process
 annotations in other files. Options are:
 
   * Generate and warn
 
     Generate class files for source files loaded to get type info for other files.
-    Do not generate class files for source files needed only to process 
+    Do not generate class files for source files needed only to process
     annotations. Instead issue a warning.
 
   * Generate and do not warn
 
     Generate class files for source files needed to compile other files. Do
     not generate class files for source needed for processing annotions
-    in other files and do not warn that class files are not generated. 
+    in other files and do not warn that class files are not generated.
 
   * Do not generate
 
-    Do not generate class files for implicitly loaded source files. 
+    Do not generate class files for implicitly loaded source files.
 "
   :group 'jde-compile-options
   :type '(list
-	  (radio-button-choice 
+	  (radio-button-choice
 	   :format "%t \n%v"
 	   :tag "Processing:"
 	   (const "Generate and warn")
@@ -440,9 +441,9 @@ annotations in other files. Options are:
 "*Enables JDK version-specific features to be used in
 source files.
 
-  1.3 	  The compiler does not support assertions
-  
-  1.4     The compiler accepts code containing assertions. 
+  1.3	  The compiler does not support assertions
+
+  1.4     The compiler accepts code containing assertions.
 
   1.5     Enables 1.5-specific features.
 
@@ -460,7 +461,7 @@ source files.
    starting with J2SDK 1.4."
   :group 'jde-compile-options
   :type '(list
-	  (radio-button-choice 
+	  (radio-button-choice
 	   :format "%t \n%v"
 	   :tag "Source release:"
 	   (const "default")
@@ -472,32 +473,32 @@ source files.
 ;;(makunbound 'jde-compile-option-target)
 (defcustom jde-compile-option-target (list "1.1")
 "*Generate class files that will work on VMs with the specified version.
- 
+
 The default is to generate class files to be compatible with both
-1.1 and 1.2 VMs. The versions supported by javac in JDK1.2 are: 
+1.1 and 1.2 VMs. The versions supported by javac in JDK1.2 are:
 
-  1.1     Ensure that generated class files will be compatible 
-          with 1.1 and 1.2 VMs. This is the default.
-  
-  1.2     Generate class files that will run on 1.2 VMs, but 
-          not on 1.1 VMs.
+  1.1     Ensure that generated class files will be compatible
+	  with 1.1 and 1.2 VMs. This is the default.
 
-  1.3     Generate class files that will run on VMs in the 
-          Java 2 SDK, v 1.3 and later, but will not run 
-          on 1.1 or 1.2 VMs
+  1.2     Generate class files that will run on 1.2 VMs, but
+	  not on 1.1 VMs.
+
+  1.3     Generate class files that will run on VMs in the
+	  Java 2 SDK, v 1.3 and later, but will not run
+	  on 1.1 or 1.2 VMs
 
   1.4     Generate class files that are compatible only with
-          1.4 VMs.
+	  1.4 VMs.
 
 By default, classes are compiled against the bootstrap and extension classes
-of the JDK that javac shipped with. But javac also supports cross-compiling, 
-where classes are compiled against a bootstrap and extension classes of a 
-different Java platform implementation. It is important to use 
-`jde-compile-option-bootclasspath' and `jde-compile-option-extdirs' when 
+of the JDK that javac shipped with. But javac also supports cross-compiling,
+where classes are compiled against a bootstrap and extension classes of a
+different Java platform implementation. It is important to use
+`jde-compile-option-bootclasspath' and `jde-compile-option-extdirs' when
 cross-compiling."
   :group 'jde-compile-options
   :type '(list
-	  (radio-button-choice 
+	  (radio-button-choice
 	   :format "%t \n%v"
 	   :tag "Target VM:"
 	   (const "1.1")
@@ -507,13 +508,13 @@ cross-compiling."
 
 (defcustom jde-compile-option-bootclasspath nil
 "*Cross-compile against the specified set of boot classes.
-As with the user class path, boot class path entries can be 
+As with the user class path, boot class path entries can be
 directories, JAR archives, or ZIP archives."
   :group 'jde-compile-options
   :type '(repeat (file :tag "Path")))
 
 (defcustom jde-compile-option-extdirs nil
-"*Cross-compile against the specified extension directories. 
+"*Cross-compile against the specified extension directories.
 Each JAR archive in the specified directories is searched for class files."
   :group 'jde-compile-options
   :type '(repeat (file :tag "Path")))
@@ -558,13 +559,13 @@ buffer."
 
   (bsh-compilation-buffer-create-native-buffer this)
 
-  (oset 
-   this 
+  (oset
+   this
    filter
    (lexical-let ((this-buf this))
      (lambda (process output)
        (bsh-compilation-buffer-filter this-buf process output))))
-    
+
   (oset this process (get-buffer-process (oref this buffer)))
 
   ;; Make sure this buffer is not associated with a compiler process that is
@@ -604,9 +605,9 @@ buffer."
 		     :documentation
 		     "Path of the compiler executable.")
    (buffer           :initarg :buffer
-	             :type bsh-compilation-buffer
-	             :documentation
-	             "Compilation buffer")
+		     :type bsh-compilation-buffer
+		     :documentation
+		     "Compilation buffer")
    (window           :initarg :window
 		     :type window
 		     :documentation
@@ -635,7 +636,7 @@ buffer."
 	(list
 	 "-classpath"
 	 (jde-build-classpath
-	  classpath 
+	  classpath
 	  symbol)
 	 ))))
 
@@ -653,7 +654,7 @@ buffer."
   (if jde-compile-option-bootclasspath
       (list
        "-bootclasspath"
-       (jde-build-classpath jde-compile-option-bootclasspath 
+       (jde-build-classpath jde-compile-option-bootclasspath
 			    'jde-compile-option-bootclasspath))))
 
 (defmethod jde-compile-extdirs-arg ((this jde-compile-compiler))
@@ -661,14 +662,14 @@ buffer."
   (if jde-compile-option-extdirs
       (list
        "-extdirs"
-       (jde-build-classpath 
+       (jde-build-classpath
 	jde-compile-option-extdirs
 	'jde-compile-option-extdirs))))
 
 
 (defmethod jde-compile-encoding-arg ((this jde-compile-compiler))
   (if (not (string= jde-compile-option-encoding ""))
-      (list 
+      (list
        "-encoding"
        jde-compile-option-encoding)))
 
@@ -693,8 +694,8 @@ buffer."
      ((and
        (string= include-option "selected")
        (or lines vars src))
-      (list 
-       (concat 
+      (list
+       (concat
 	"-g:"
 	(if lines
 	    (if (or vars src) "lines,"
@@ -763,7 +764,7 @@ buffer."
   "Get compiler source argument for this compiler."
   (let ((source (car jde-compile-option-source)))
     (if (not (string= source "default"))
-        (list "-source" source))))
+	(list "-source" source))))
 
 (defmethod jde-compile-get-args ((this jde-compile-compiler))
   (append
@@ -790,7 +791,7 @@ buffer."
   (let* ((outbuf (oref (oref this buffer) buffer))
 	 (compiler-path (oref this :path))
 	 (source-file (file-name-nondirectory buffer-file-name))
-         (flag nil)
+	 (flag nil)
 	 (args (append
 		(jde-compile-get-args this)
 		(oref this :interactive-args)
@@ -804,23 +805,23 @@ buffer."
 	(insert (concat
 	       compiler-path
 	       " "
-               (mapconcat (lambda (x) 
-                            (if (and flag
-                                     jde-compile-option-hide-classpath)
-                                (progn
-                                  (setq flag nil)
-                                  "...")
-                              (if (not (string= x "-classpath"))
-                                  x
-                                (progn
-                                  (setq flag t)
-                                  x)))) args " ")
+	       (mapconcat (lambda (x)
+			    (if (and flag
+				     jde-compile-option-hide-classpath)
+				(progn
+				  (setq flag nil)
+				  "...")
+			      (if (not (string= x "-classpath"))
+				  x
+				(progn
+				  (setq flag t)
+				  x)))) args " ")
 	       "\n\n")))
 
       (let* ((process-environment (cons "EMACS=t" process-environment))
 	     (w32-quote-process-args ?\")
 	     (win32-quote-process-args ?\") ;; XEmacs
-	     (proc (apply 'start-process 
+	     (proc (apply 'start-process
 			  (downcase mode-name)
 			  outbuf
 			  compiler-path
@@ -836,10 +837,10 @@ buffer."
 	   (args
 	    (append
 	    (jde-compile-get-args this)))
-	   (source-path 
+	   (source-path
 	    (jde-normalize-path buffer-file-name))
 	   (arg-array (concat "new String[] {\"" source-path "\"")))
-    
+
     (if args
 	(setq arg-array
 	      (concat
@@ -852,15 +853,15 @@ buffer."
 		","))))
 
       (setq arg-array (concat arg-array "}"))
-     
+
       (save-excursion
 	(set-buffer (oref (oref this buffer) buffer))
 
 	(let* ((inhibit-read-only t)
 	       flag
 	       (arg-string
-		(mapconcat 
-		 (lambda (x) 
+		(mapconcat
+		 (lambda (x)
 		   (if (and flag
 			    jde-compile-option-hide-classpath)
 		       (progn
@@ -881,12 +882,12 @@ buffer."
 	    (bsh-launch (oref 'jde-bsh the-bsh))
 	    (bsh-eval (oref 'jde-bsh the-bsh) (jde-create-prj-values-str))))
 
-      (bsh-buffer-eval 
+      (bsh-buffer-eval
        (oref 'jde-bsh the-bsh)
        (concat
 	(format
 	 "jde.util.CompileServer.compile(%s);"
-	 arg-array) 
+	 arg-array)
 	"\n")
        (oref this buffer))))
 
@@ -904,7 +905,7 @@ buffer."
   (if (oref this :use-server-p)
       (oset this buffer (jde-compile-server-buffer "compilation buffer"))
     (oset this buffer (jde-compile-exec-buffer "compilation buffer")))
-  
+
 
   ;; Pop to compilation buffer.
   (let* ((outbuf (oref (oref this buffer) buffer))
@@ -914,8 +915,8 @@ buffer."
 
     (if (not jde-xemacsp)
 	(if compilation-process-setup-function
-	  (funcall compilation-process-setup-function)))     
-    
+	  (funcall compilation-process-setup-function)))
+
     (jde-compile-launch this)
 
     (setq compilation-last-buffer outbuf)))
@@ -931,7 +932,7 @@ buffer."
   (call-next-method)
 
   ;; Set compiler name.
-  (oset this name "javac")  
+  (oset this name "javac")
 
 )
 
@@ -939,7 +940,7 @@ buffer."
 ;;                                                                            ;;
 ;; JDK 1.1 Compiler                                                           ;;
 ;;                                                                            ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass jde-compile-javac-11 (jde-compile-compiler)
   ()
   "Class of JDK 1.1 javac compilers.")
@@ -985,7 +986,7 @@ buffer."
 ;;                                                                            ;;
 ;; JDK 1.2 Compiler                                                           ;;
 ;;                                                                            ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass jde-compile-javac-12 (jde-compile-compiler)
   ()
   "Class of JDK 1.2 javac compilers.")
@@ -1008,7 +1009,7 @@ buffer."
 ;;                                                                            ;;
 ;; JDK 1.3 Compiler                                                           ;;
 ;;                                                                            ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass jde-compile-javac-13 (jde-compile-javac-12)
   ()
   "Class of JDK 1.3 javac compilers.")
@@ -1026,7 +1027,7 @@ buffer."
 ;;                                                                            ;;
 ;; JDK 1.4 Compiler                                                           ;;
 ;;                                                                            ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass jde-compile-javac-14 (jde-compile-javac-13)
   ()
   "Class of JDK 1.4 javac compilers.")
@@ -1044,7 +1045,7 @@ buffer."
 ;;                                                                            ;;
 ;; J2SDK 1.5 Compiler                                                         ;;
 ;;                                                                            ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass jde-compile-javac-15 (jde-compile-javac-14)
   ()
   "Class of J2SDK 1.5 javac compilers.")
@@ -1062,7 +1063,7 @@ buffer."
 ;;                                                                            ;;
 ;; J2SDK 1.6 Compiler                                                         ;;
 ;;                                                                            ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass jde-compile-javac-16 (jde-compile-javac-15)
   ()
   "Class of JDK 1.6 javac compilers.")
@@ -1080,8 +1081,8 @@ buffer."
   (if jde-compile-option-annotation-processors
     (list
      "-processor"
-     (mapconcat 'identity 
-		jde-compile-option-annotation-processors 
+     (mapconcat 'identity
+		jde-compile-option-annotation-processors
 		","))))
 
 (defmethod jde-compile-annotation-processing-arg ((this jde-compile-javac-16))
@@ -1140,7 +1141,7 @@ buffer."
 ;;                                                                            ;;
 ;; Jikes Compiler                                                             ;;
 ;;                                                                            ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass jde-compile-jikes (jde-compile-compiler)
   ()
   "Class of jikes compilers.")
@@ -1179,9 +1180,9 @@ buffer."
 (defmethod jde-compile-classpath-arg ((this jde-compile-jikes))
   "Returns the classpath argument for this compiler."
   (let ((classpath (call-next-method))
-        (rt        (expand-file-name "jre/lib/rt.jar" (jde-get-jdk-dir))))
+	(rt        (expand-file-name "jre/lib/rt.jar" (jde-get-jdk-dir))))
     (if (file-exists-p rt)
-        (if classpath
+	(if classpath
 	    (or (string-match "jre/lib/rt\.jar" (cadr classpath))
 		(setcar (cdr classpath)
 			(concat (cadr classpath)
@@ -1226,30 +1227,30 @@ buffer."
 	 (jdk-major-version (nth 0 jdk-split-version))
 	 (jdk-minor-version (nth 1 jdk-split-version))
 	 (compiler
-	  (find-if 
+	  (find-if
 	   (lambda (compiler-x)
 	     (let* ((compiler-split-version (split-string (oref compiler-x :version) "[.]"))
 		    (compiler-major-version (nth 0 compiler-split-version))
 		    (compiler-minor-version (nth 1 compiler-split-version)))
-	       (and 
+	       (and
 		(string= jdk-major-version compiler-major-version)
 		(string= jdk-minor-version compiler-minor-version))))
 	   jde-compile-javac-compilers)))
     (unless compiler
       (let ((latest-javac (car (last jde-compile-javac-compilers))))
 	(if
-	    (yes-or-no-p 
+	    (yes-or-no-p
 	     (format "The JDE does not recognize JDK %s javac. Assume JDK %s javac?"
 		     jdk-version (oref latest-javac :version)))
 	    (setq compiler latest-javac))))
-    (if compiler 
+    (if compiler
 	(if (string= (car jde-compiler) "javac server")
 	    (oset compiler :use-server-p t)
 	  (progn
 	    (oset compiler :use-server-p nil)
-	    (oset compiler 
-		  :path 
-		  (let ((compiler-path 
+	    (oset compiler
+		  :path
+		  (let ((compiler-path
 			 (substitute-in-file-name (nth 1 jde-compiler))))
 		    (if (string= compiler-path "")
 			(setq compiler-path (jde-get-jdk-prog 'javac))
@@ -1258,10 +1259,10 @@ buffer."
 			(error (format "Invalid compiler path %s"
 				       compiler-path)))))))))
     compiler))
-	   
-	     
+
+
 (defun jde-compile-get-jikes ()
-  (let ((compiler-path 
+  (let ((compiler-path
 		(substitute-in-file-name (nth 1 jde-compiler))))
 
     (if (string= compiler-path "")
@@ -1269,15 +1270,15 @@ buffer."
 	    (setq compiler-path "jikes")
 	  (error "Cannot find jikes."))
       (unless
-          (or
-           (file-exists-p
-            (if (and
-                 (eq system-type 'windows-nt)
-                 (not (string-match "[.]exe$" compiler-path)))
-                (concat compiler-path ".exe")
-              compiler-path))
-           (executable-find compiler-path))
-        (error "Invalid compiler path: %s" compiler-path)))
+	  (or
+	   (file-exists-p
+	    (if (and
+		 (eq system-type 'windows-nt)
+		 (not (string-match "[.]exe$" compiler-path)))
+		(concat compiler-path ".exe")
+	      compiler-path))
+	   (executable-find compiler-path))
+	(error "Invalid compiler path: %s" compiler-path)))
 
   (jde-compile-jikes
      "Jikes"
@@ -1288,14 +1289,14 @@ buffer."
   "Get a compiler object that represents the compiler specified
 by `jde-compiler'."
   (let ((compiler-name (car jde-compiler)))
-    (cond 
+    (cond
      ((string-match "javac" compiler-name)
        (jde-compile-get-javac))
      ((string-match "jikes" compiler-name)
       (jde-compile-get-jikes))
      (t
       (error "The JDEE does not support a compiler named %s" compiler-name)))))
-     
+
 
 ;;;###autoload
 (defun jde-set-compile-options (options)
@@ -1322,7 +1323,7 @@ uses the compiler executable specified by
 
   (if jde-read-compile-args
       (setq jde-interactive-compile-args
-	      (read-from-minibuffer 
+	      (read-from-minibuffer
 	       "Compile args: "
 	       jde-interactive-compile-args
 	       nil nil
@@ -1335,7 +1336,7 @@ uses the compiler executable specified by
     ;; which seems not to be supported--at least on
     ;; the PC.
     (if (and (eq system-type 'windows-nt)
-	     (not jde-xemacsp))	
+	     (not jde-xemacsp))
 	(let ((temp last-nonmenu-event))
 	  ;; The next line makes emacs think that jde-compile
 	  ;; was invoked from the minibuffer, even when it
@@ -1345,22 +1346,22 @@ uses the compiler executable specified by
 	  (setq last-nonmenu-event temp))
       (save-some-buffers (not compilation-ask-about-save) nil))
 
-    (setq compilation-finish-function 
-      (lambda (buf msg) 
+    (setq compilation-finish-function
+      (lambda (buf msg)
 	(run-hook-with-args 'jde-compile-finish-hook buf msg)
 	(setq compilation-finish-function nil)))
 
     (let ((compiler (jde-compile-get-the-compiler)))
       (if compiler
 	  (progn
-	    (oset compiler 
-		  :interactive-args 
+	    (oset compiler
+		  :interactive-args
 		  (if (and jde-interactive-compile-args
 			   (not (string= jde-interactive-compile-args "")))
 		      (split-string jde-interactive-compile-args " ")))
 	    (jde-compile-compile compiler))
 	(error "Unknown compiler. Aborting compilation."))))
-    
+
 
 
 (provide 'jde-compile)

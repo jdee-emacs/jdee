@@ -2,10 +2,11 @@
 ;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
-;; Maintainer: Paul Kinnucan
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 1997, 1998, 2000, 2001, 2002, 2003, 2004 Paul Kinnucan.
+;; Copyright (C) 2009 Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -71,7 +72,7 @@ size."
   "The end of the region where the last completion was inserted.")
 
 (defvar jde-parse-primitive-types '("byte" "char" "double" "float"
-				       "int" "long" "short" "boolean")
+				    "int" "long" "short" "boolean")
   "Primitive Java types.")
 
 (defvar jde-parse-attempted-to-import nil
@@ -115,20 +116,16 @@ match `jde-auto-parse-max-buffer-size' threshold."
 ;;; Compatibility
 (eval-when (compile)
   (if (featurep 'xemacs)
-
       ;; XEmacs
       (defsubst jde-auto-parse-delay ()
 	"Return the time in seconds before auto-parse triggering."
 	;; Wake up the timer driver so it updates timer value
 	(itimer-driver-wakeup)
 	(itimer-value jde-auto-parse-buffer-timer))
-
     ;; GNU Emacs
     (defsubst jde-auto-parse-delay ()
       "Return the time in seconds before auto-parse triggering."
-      (- (timer-until jde-auto-parse-buffer-timer (current-time))))
-
-    ))
+      (- (timer-until jde-auto-parse-buffer-timer (current-time))))))
 
 (defun jde-parse-buffer-changed-hook (begin end length)
   "Hook run when Semantic detects a change in the current buffer.

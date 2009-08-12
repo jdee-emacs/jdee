@@ -1,10 +1,12 @@
 ;;; jde-compat.el -- Integrated Development Environment for Java.
+;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
-;; Maintainer: Paul Kinnucan
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 1997, 1998, 2001, 2002, 2003, 2004 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -22,7 +24,7 @@
 ;; Boston, MA 02111-1307, USA.
 
 ;;; Commentary:
-;; 
+;;
 ;; This library is intended to eliminate compiler warnings caused
 ;; by reference to variables that are defined only in Emacs or
 ;; only in XEmacs or in a particular version of either.
@@ -39,7 +41,7 @@
 (defconst jde-emacs21p (and (string-match "\\bEmacs\\b" (emacs-version))
 			    (>= emacs-major-version 21)))
 
-;; Define XEmacs- and Emacs-only variables 
+;; Define XEmacs- and Emacs-only variables
 ;; and functions to avoid compiler warnings.
   (if jde-xemacsp
       (progn
@@ -91,7 +93,7 @@
       (defun extent-start-position (&rest args))))
 
 
-;; Define XEmacs- and Emacs-only variables 
+;; Define XEmacs- and Emacs-only variables
 ;; and functions to avoid compiler warnings.
 (if (not jde-xemacsp)
     (defun make-event (&rest args)))
@@ -131,7 +133,7 @@
 
 (provide 'jde-compat)
 
-;; Change History 
+;; Change History
 
 ;;
 ;; $Log: jde-compat.el,v $

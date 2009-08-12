@@ -1,11 +1,12 @@
 ;;; jde-util.el -- JDE utilities.
-;; $Revision: 1.19.2.2 $ $Date: 2006/03/08 12:09:08 $ 
+;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
-;; Maintainer: Paul Kinnucan
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 2001-2006 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -28,8 +29,8 @@
 ;; required by multiple JDE packages. You should not put any macros,
 ;; functions, or classes in this package that require other
 ;; JDE packages.
-;; 
-;; This is one of a set of packages that make up the 
+;;
+;; This is one of a set of packages that make up the
 ;; Java Development Environment (JDE) for Emacs. See the
 ;; JDE User's Guide for more information.
 
@@ -73,7 +74,7 @@
 (defmacro jde-assert-source-buffer ()
   "Asserts that the current buffer is a
 Java source or a debug buffer."
-  '(assert  (eq major-mode 'jde-mode) nil 
+  '(assert  (eq major-mode 'jde-mode) nil
     "This command works only in a Java source or debug buffer."))
 
 
@@ -95,7 +96,7 @@ Unless optional argument INPLACE is non-nil, return a new string."
       "Replace REGEXP with NEWTEXT in STRIng."
       (if (string-match regexp string)
 	  (replace-match newtext nil nil string)
-	string)))                      
+	string)))
 
 
 (defun jde-get-line-at-point (&optional pos)
@@ -120,21 +121,21 @@ for FILE, but proper EOL-conversion and charcater interpretation is done!"
   (let ((exp-filename (make-symbol "exp-filename")))
     `(let ((,exp-filename (expand-file-name ,file)))
        (if (and (file-exists-p ,exp-filename)
-                (file-readable-p ,exp-filename))
-           (with-temp-buffer
-             (insert-file-contents ,exp-filename)
-             (goto-char (point-min))
-             ,@body)
-         nil))))
+		(file-readable-p ,exp-filename))
+	   (with-temp-buffer
+	     (insert-file-contents ,exp-filename)
+	     (goto-char (point-min))
+	     ,@body)
+	 nil))))
 
 (defmacro jde-normalize-paths (pathlist &optional symbol)
   "Normalize all paths of the list PATHLIST and returns a list with the
 expanded paths."
   `(mapcar (lambda (path)
-             (jde-normalize-path path ,symbol))
-           ,pathlist))
+	     (jde-normalize-path path ,symbol))
+	   ,pathlist))
 
-(defun jde-remove-inner-class (class) 
+(defun jde-remove-inner-class (class)
   "Removes the inner class name for the class"
   (car (split-string class "[$]")))
 
@@ -148,7 +149,7 @@ file's path. If it finds the source file in an archive, it returns a
 buffer containing the contents of the file. If this function does not
 find the source for the class, it returns nil."
   (let* ((verified-name (jde-parse-class-exists class))
-         (outer-class (jde-remove-inner-class verified-name))
+	 (outer-class (jde-remove-inner-class verified-name))
 	 (file (concat
 		(jde-parse-get-unqualified-name outer-class)
 		".java"))
@@ -165,14 +166,14 @@ find the source for the class, it returns nil."
 		    (if buffer
 			  (throw 'found buffer)
 		      (let* ((pkg-path (subst-char-in-string ?. ?/ package))
-			     (class-file-name (concat  pkg-path "/" file)) 
+			     (class-file-name (concat  pkg-path "/" file))
 			     success)
 		      (setq buffer (get-buffer-create bufname))
 		      (save-excursion
 			(set-buffer buffer)
 			(setq buffer-file-name (expand-file-name (concat path ":" class-file-name)))
-			(setq buffer-file-truename file)			
-			(let ((exit-status 
+			(setq buffer-file-truename file)
+			(let ((exit-status
 			       (archive-extract-by-stdout path class-file-name archive-zip-extract)))
 			  (if (and (numberp exit-status) (= exit-status 0))
 			      (progn
@@ -193,7 +194,7 @@ find the source for the class, it returns nil."
 			 (file-path (expand-file-name file pkg-dir)))
 		    (if (file-exists-p file-path)
 			(throw 'found file-path))))))))))
-    
+
 
 (defun jde-find-class-source (class &optional other-window)
   "*Find the source file for a specified class.
@@ -218,7 +219,7 @@ If it finds the source file, it opens the file in a buffer."
 			(beginning-of-buffer)
 			(senator-parse)
 			(senator-re-search-forward (concat "\\b" inner-class "\\b") nil t)))))))
-      (message "JDE error: Could not find source for \"%s\" in this 
+      (message "JDE error: Could not find source for \"%s\" in this
 project's source path. See `jde-sourcepath' for more information." class))))
 
 
@@ -226,24 +227,24 @@ project's source path. See `jde-sourcepath' for more information." class))))
 (defun jde-root()
   "Return the path of the root directory of this JDEE
 installation. The root directory is the parent of the
-directory that contains the JDEE's Lisp files. On 
+directory that contains the JDEE's Lisp files. On
 Emacs and on XEmacs installations that use the
 JDEE distributable, the root directory is the root
 directory that results from unpacking the distributable.
-On installations based on the version of the JDEE 
-packaged with XEmacs, the root directory is 
+On installations based on the version of the JDEE
+packaged with XEmacs, the root directory is
 xemacs-packages/lisp."
   (let ((directory-sep-char ?/))
-    (expand-file-name 
-	     "../" 
+    (expand-file-name
+	     "../"
 	     (file-name-directory (locate-library "jde")))))
 
 (defun jde-find-jde-data-directory ()
   "Return the path of the JDE data directory.
 Returns the path of the directory containing the
-JDE java and documentation directories;  nil if the 
+JDE java and documentation directories;  nil if the
 directory cannot be found. If XEmacs, returns the location of
-the data directory in the XEmacs distribution hierarchy. On all other Emacs versions, 
+the data directory in the XEmacs distribution hierarchy. On all other Emacs versions,
 the JDE expects to find the documentation and Java class directories
 in the same directory that contains the JDE lisp directory."
   (let ((directory-sep-char ?/))
@@ -256,33 +257,33 @@ in the same directory that contains the JDE lisp directory."
 "Get the location used by the host system to store temporary files."
   (or (if (boundp 'temporary-file-directory) temporary-file-directory)
       (if (fboundp 'temp-directory) (temp-directory)
-        (if (member system-type '(cygwin32 cygwin))
-            (jde-cygwin-path-converter-cygpath (temp-directory))
-          (temp-directory)))))
+	(if (member system-type '(cygwin32 cygwin))
+	    (jde-cygwin-path-converter-cygpath (temp-directory))
+	  (temp-directory)))))
 
 (defun jde-get-java-source-buffers ()
   "Return a list of Java source buffers open in the current session."
-  (delq 
-   nil 
-   (mapcar 
+  (delq
+   nil
+   (mapcar
     #'(lambda (buffer)
 	(with-current-buffer buffer
 	  (if (eq major-mode 'jde-mode)
 	      buffer)))
     (buffer-list))))
 
-(defun jde-get-project-source-buffers (&optional project-file) 
+(defun jde-get-project-source-buffers (&optional project-file)
   "Return a list of the Java source buffers belonging to the project
 whose project file is PROJECT-FILE. If PROJECT-FILE is not specified,
 this function returns the buffers belonging to the project in the
 currently selected source buffer."
-  (let ((proj-file 
+  (let ((proj-file
 	 (or project-file
 	     (if (boundp 'jde-current-project)
 		 jde-current-project))))
-    (delq 
-     nil 
-     (mapcar 
+    (delq
+     nil
+     (mapcar
       (lambda (buffer)
 	(with-current-buffer buffer
 	 (if (equal jde-buffer-project-file proj-file)
@@ -291,20 +292,20 @@ currently selected source buffer."
 
 (defun jde-get-visible-source-buffers ()
   "Return a list of visible Java source buffers."
-  (delq nil (mapcar #'(lambda (buffer) 
-                        (if (get-buffer-window buffer 'visible)
-                            buffer))
-                    (jde-get-java-source-buffers))))
+  (delq nil (mapcar #'(lambda (buffer)
+			(if (get-buffer-window buffer 'visible)
+			    buffer))
+		    (jde-get-java-source-buffers))))
 
 (defun jde-get-selected-source-buffer ()
   (with-current-buffer (window-buffer (selected-window))
     (if (eq major-mode 'jde-mode)
-        (current-buffer))))
+	(current-buffer))))
 
 
 (provide 'jde-util)
 
-;; Change History 
+;; Change History
 
 ;;
 ;; $Log: jde-util.el,v $
@@ -380,4 +381,3 @@ currently selected source buffer."
 ;;
 
 ;; End of jde-util.el
-

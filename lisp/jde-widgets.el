@@ -1,11 +1,12 @@
 ;;; jde-widgets.el -- Custom-style widgets used by the JDE
-;; $Revision: 1.26 $ $Date: 2004/06/03 02:21:13 $ 
+;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
-;; Maintainer: Paul Kinnucan
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 1997-2004 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -23,17 +24,6 @@
 ;; Boston, MA 02111-1307, USA.
 
 ;;; Commentary:
-
-;; This is one of a set of packages that make up the 
-;; Java Development Environment (JDE) for Emacs. See the
-;; JDE User's Guide for more information.
-
-;; The latest version of the JDE is available at
-;; <URL:http://sunsite.auc.dk/jde/>
-;; <URL:http://www.geocities.com/SiliconValley/Lakes/1506/>
-
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Kinnucan at paulk@mathworks.com.
 
 ;;; Code:
 
@@ -104,24 +94,24 @@
 	   (insert (widget-get widget :prefix-empty) tag "\n"))
 	  (open
 	   ;; Open node.
-	   (push 
+	   (push
 	    (widget-create-child-and-convert widget 'jde-widget-tree-close-button)
 		buttons)
 	   (insert "-\\ " tag "\n")
 	   (let ((prefix (concat (widget-get widget :prefix)
 				(widget-get widget :prefix-extra)))
 		entry)
-	     (while entries 
+	     (while entries
 	       (setq entry (car entries)
 		     entries (cdr entries))
 	       (insert prefix)
 	       (push (if entries
-			(widget-create-child-and-convert widget entry 
+			(widget-create-child-and-convert widget entry
 							  :prefix prefix
 							  :prefix-extra " | ")
 		       ;; Last entry uses a different prefix.
-		       (widget-create-child-and-convert 
-			widget entry 
+		       (widget-create-child-and-convert
+			widget entry
 			:prefix prefix
 			:prefix-empty " `--- "))
 		     children))))
@@ -138,23 +128,23 @@
 
 (defun test-tree ()
   (interactive)
-  (switch-to-buffer "*Tree Example*")  
+  (switch-to-buffer "*Tree Example*")
   (kill-all-local-variables)
-  ;; (make-local-variable 'widget-example-repeat)  
+  ;; (make-local-variable 'widget-example-repeat)
   (let ((inhibit-read-only t))
-    (erase-buffer))  
-  (let ((all (overlay-lists)))  
-    (mapcar 'delete-overlay (car all))    (mapcar 'delete-overlay (cdr all))) 
+    (erase-buffer))
+  (let ((all (overlay-lists)))
+    (mapcar 'delete-overlay (car all))    (mapcar 'delete-overlay (cdr all)))
 
   (widget-insert "Test tree widget. \n\n")
 
 ;   (setq tree (widget-create 'tree
-; 			:tag "Foo"
-; 			'(tree :tag "First")
-; 			'(tree :tag "Second"
-; 			       :value nil
-; 			       (tree :tag "Nested"))
-; 			'(tree :tag "Third")))
+;			:tag "Foo"
+;			'(tree :tag "First")
+;			'(tree :tag "Second"
+;			       :value nil
+;			       (tree :tag "Nested"))
+;			'(tree :tag "Third")))
 
   (setq tree (widget-create 'jde-widget-tree
 		  :tag "<test.Foo:139>"
@@ -163,41 +153,41 @@
 		  '(jde-widget-tree :tag "a  double 5.5")
 		  '(jde-widget-tree :tag "s  S      <test.S:145>"
 			 (jde-widget-tree :tag "b   boolean  true"))))
-	 
-;   (let*  ((threads 
-; 	  (list 
-; 	   (list "ThreadGroup" 189 "system"
-; 		 (list
-; 		  (list "Thread" 190 "Signal dispatcher" "runnable" "suspended by debugger")
-; 		  (list "Thread" 191 "Reference Handler" "waiting" "suspended by debugger")
-; 		  (list "Thread" 192 "Finalizer" "waiting" "suspended by debugger")))
-; 	   (list "ThreadGroup" 193 "main" 
-; 		 (list
-; 		  (list "Thread" 1 "main" "runnable" "suspended at breakpoint")) 
-; 		 nil)))
-; 	 (tree (jde-dbs-map-threads-to-tree threads)))
-		 
-			  
+
+;   (let*  ((threads
+;	  (list
+;	   (list "ThreadGroup" 189 "system"
+;		 (list
+;		  (list "Thread" 190 "Signal dispatcher" "runnable" "suspended by debugger")
+;		  (list "Thread" 191 "Reference Handler" "waiting" "suspended by debugger")
+;		  (list "Thread" 192 "Finalizer" "waiting" "suspended by debugger")))
+;	   (list "ThreadGroup" 193 "main"
+;		 (list
+;		  (list "Thread" 1 "main" "runnable" "suspended at breakpoint"))
+;		 nil)))
+;	 (tree (jde-dbs-map-threads-to-tree threads)))
+
+
 ;  (apply 'widget-create tree))
-    
+
   (use-local-map widget-keymap)
   (widget-setup))
 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                                                                            ;; 
+;;                                                                            ;;
 ;; Dynamic tree widget                                                        ;;
 ;;                                                                            ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define-widget 'jde-widget-dtree 'default
   "A widget whose nodes are generated on demand.
-The first time the user expands the tree, the tree invokes a function that 
-generates the nodes. The tree then caches the nodes. 
+The first time the user expands the tree, the tree invokes a function that
+generates the nodes. The tree then caches the nodes.
 Thereafter, the node uses the cached nodes when the
-user closes and then reopens the tree. Use the syntax 
-(widget-create 'jde-widget-dtree :tag NAME :node-fcn NODE-FUNCTION) 
+user closes and then reopens the tree. Use the syntax
+(widget-create 'jde-widget-dtree :tag NAME :node-fcn NODE-FUNCTION)
 to create the widget where NAME is the tree name and NODE-FUNCTION
 is a function that takes one argument, the tree itself, and
 returns a list of widgets that are the nodes of the expanded
@@ -230,7 +220,7 @@ tree."
 	  (if nodes
 	      (widget-put widget :nodes nodes)
 	    (widget-put widget :has-nodes nil)))
-	
+
 	(while nodes
 	  (setq node (car nodes)
 		nodes (cdr nodes))
@@ -255,13 +245,13 @@ tree."
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                                                                            ;; 
+;;                                                                            ;;
 ;; Java object widget                                                         ;;
 ;;                                                                            ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun jde-test-get-fields (process object-id)
-  (list 
+  (list
    (cons (list "sum" "double") (list "double" 0.0))
    (cons (list "r" "int") (list "int" 1))
    (cons (list "z" "java.lang.String") (list "java.lang.String" 229 nil))
@@ -278,44 +268,44 @@ tree."
      ((typep var-value 'jde-dbs-java-udci)
       (setq var-tag (format "%s [id: %d]" var-tag (oref var-value :id)))
       (if (string= (oref var-value :jtype) "java.lang.String")
-	  (let* ((cmd (jde-dbs-get-string 
+	  (let* ((cmd (jde-dbs-get-string
 		       "get string"
 		       :process process
 		       :object-id (oref var-value id)))
 		 (str-val (jde-dbs-cmd-exec cmd)))
 	    (list 'tree-widget
-                  :tag var-tag
-                  :node-name var-tag
-                  :open (jde-dbo-locals-open-p var-tag)
-                  :value t
-                  (list 'tree-widget :tag str-val)))
+		  :tag var-tag
+		  :node-name var-tag
+		  :open (jde-dbo-locals-open-p var-tag)
+		  :value t
+		  (list 'tree-widget :tag str-val)))
 	(list 'jde-widget-java-obj
-              :tag var-tag
-              :node-name var-tag
-              :open (jde-dbo-locals-open-p var-tag)
+	      :tag var-tag
+	      :node-name var-tag
+	      :open (jde-dbo-locals-open-p var-tag)
 	      :process process
-              :object-id (oref var-value :id))))
+	      :object-id (oref var-value :id))))
      ((typep var-value 'jde-dbs-java-array)
       (setq var-tag (format "%s [id: %d]" var-tag (oref var-value :id)))
       (list 'jde-widget-java-array
-            :tag var-tag
-            :node-name var-tag
-            :open (jde-dbo-locals-open-p var-tag)
+	    :tag var-tag
+	    :node-name var-tag
+	    :open (jde-dbo-locals-open-p var-tag)
 	    :process process :object var-value))
      ((typep var-value 'jde-dbs-java-primitive)
       (list 'tree-widget
-            :tag var-tag
-            :node-name var-tag
-            :open (jde-dbo-locals-open-p var-tag)
-            :value t
-	    (list 'tree-widget 
+	    :tag var-tag
+	    :node-name var-tag
+	    :open (jde-dbo-locals-open-p var-tag)
+	    :value t
+	    (list 'tree-widget
 		  :tag (format "%s" (oref var-value value)))))
      ((typep var-value 'jde-dbs-java-null)
       (list 'tree-widget
-            :tag var-tag
-            :node-name var-tag
-            :open (jde-dbo-locals-open-p var-tag)
-            :value t
+	    :tag var-tag
+	    :node-name var-tag
+	    :open (jde-dbo-locals-open-p var-tag)
+	    :value t
 	    (list 'tree-widget :tag "null")))
      (t
       (error "Unidentified type of local variable: %s" var-tag)))))
@@ -336,11 +326,11 @@ tree."
 	   field
 	   nodes)
       (while fields
-	(setq field (car fields) fields (cdr fields)) 
+	(setq field (car fields) fields (cdr fields))
 	(setq field (cdr field))
-	(push 
+	(push
 	 (jde-widget-java-var-to-tree process field)
-	 nodes)) 
+	 nodes))
       nodes)))
 
 (define-widget 'jde-widget-java-obj 'tree-widget
@@ -349,8 +339,8 @@ This widget is essentially a tree node whose entries are the fields
 of the corresponding object. The first time the user expands the node,
 the node retrieves the fields of the object from the debugger and
 caches them. Thereafter, the node uses the cached values when the
-user closes and then reopens the node. Use the syntax 
-(widget-create 'jde-widget-java-obj 
+user closes and then reopens the node. Use the syntax
+(widget-create 'jde-widget-java-obj
 :tag NAME :process PROCESS :object-id OBJ-ID) to create the widget where
 NAME is the object's name, PROCESS is the process in which
 the object exists, and  ID is the debugger id for the object."
@@ -362,35 +352,35 @@ the object exists, and  ID is the debugger id for the object."
   (cond
      ((typep element 'jde-dbs-java-udci)
       (if (string= (oref element :jtype) "java.lang.String")
-	  (let* ((cmd (jde-dbs-get-string 
+	  (let* ((cmd (jde-dbs-get-string
 		       "get string"
 		       :process process
 		       :object-id (oref element id)))
 		 (str-val (jde-dbs-cmd-exec cmd)))
 	    (list 'tree-widget
-                  :tag (format "[%d] %s" index str-val)
-                  :node-name (format "[%d] %s" index str-val)
-                  :open (jde-dbo-locals-open-p (format "[%d] %s" index str-val))
-                  ))
-	(list 'jde-widget-java-obj 
+		  :tag (format "[%d] %s" index str-val)
+		  :node-name (format "[%d] %s" index str-val)
+		  :open (jde-dbo-locals-open-p (format "[%d] %s" index str-val))
+		  ))
+	(list 'jde-widget-java-obj
 	      :tag (format "[%d] %s" index (oref element jtype))
-              :node-name (format "[%d] %s" index (oref element jtype))
-              :open (jde-dbo-locals-open-p (format "[%d] %s" index (oref element jtype)))
+	      :node-name (format "[%d] %s" index (oref element jtype))
+	      :open (jde-dbo-locals-open-p (format "[%d] %s" index (oref element jtype)))
 	      :process process
-              :object-id (oref element id))))
+	      :object-id (oref element id))))
      ((typep element 'jde-dbs-java-array)
-      (list 'jde-widget-java-array 
+      (list 'jde-widget-java-array
 	    :tag (format "[%d] %s" index (oref element jtype))
-            :node-name (format "[%d] %s" index (oref element jtype))
-            :open (jde-dbo-locals-open-p (format "[%d] %s" index (oref element jtype)))
+	    :node-name (format "[%d] %s" index (oref element jtype))
+	    :open (jde-dbo-locals-open-p (format "[%d] %s" index (oref element jtype)))
 	    :process process
-            :object element))
+	    :object element))
      ((typep element 'jde-dbs-java-primitive)
       (list 'tree-widget :tag (format "[%d] %s"  index (oref element value))))
      ((typep element 'jde-dbs-java-null)
       (list 'tree-widget :tag (format "[%d] null" index)))
      (t
-      (error "Unidentified type of object: <%s|%s>" (oref element jtype) 
+      (error "Unidentified type of object: <%s|%s>" (oref element jtype)
 	     (oref element id)))))
 
 (defun jde-widget-java-array-get-elements (array-widget)
@@ -401,20 +391,20 @@ the object exists, and  ID is the debugger id for the object."
 	   cmd array-length)
 
       (setq cmd
-	    (jde-dbs-get-array 
+	    (jde-dbs-get-array
 	     (format "get_array_length %d" (oref array id))
 	     :process process
 	     :array array))
-      (jde-dbs-cmd-exec cmd) 
+      (jde-dbs-cmd-exec cmd)
 
       (setq array-length
 	    (if (slot-boundp array 'length)
 		(oref array length)
 	      0))
-    
+
       (when (> array-length 0)
 	(setq cmd
-	      (jde-dbs-get-array 
+	      (jde-dbs-get-array
 	       (format "get_array_elements %d" (oref array id))
 	       :process process
 	       :array array
@@ -423,14 +413,14 @@ the object exists, and  ID is the debugger id for the object."
 	(jde-dbs-cmd-exec cmd)
 	(let ((elements (oref array elements))
 	      element
-	      nodes 
+	      nodes
 	      (index 0))
 	  (while elements
-	    (setq element (car elements) elements (cdr elements)) 
-	    (setq nodes 
-		  (append nodes 
+	    (setq element (car elements) elements (cdr elements))
+	    (setq nodes
+		  (append nodes
 			  (list (jde-widget-java-array-element-to-tree process element index))))
-	    (setq index (1+ index))) 
+	    (setq index (1+ index)))
 	  nodes)))))
 
 (define-widget 'jde-widget-java-array 'tree-widget
@@ -441,19 +431,19 @@ expand button causes the widget to display the values of the array."
 
 (defun test-obj ()
   (interactive)
-  (switch-to-buffer "*Java Object Example*")  
+  (switch-to-buffer "*Java Object Example*")
   (kill-all-local-variables)
-  ;; (make-local-variable 'widget-example-repeat)  
+  ;; (make-local-variable 'widget-example-repeat)
   (let ((inhibit-read-only t))
-    (erase-buffer))  
-  (let ((all (overlay-lists)))  
-    (mapcar 'delete-overlay (car all))    (mapcar 'delete-overlay (cdr all))) 
+    (erase-buffer))
+  (let ((all (overlay-lists)))
+    (mapcar 'delete-overlay (car all))    (mapcar 'delete-overlay (cdr all)))
 
   (widget-insert "Test object tree. \n\n")
 
   (widget-create 'jde-widget-java-obj :tag "jmath.System s"   :process "process" :object-id 1)
   (widget-create 'jde-widget-java-obj :tag "java.awt.Frame frame1" :process "process" :object-id 1)
-    
+
   (use-local-map widget-keymap)
   (widget-setup))
 
@@ -508,25 +498,25 @@ expand button causes the widget to display the values of the array."
 	entry children buttons)
     (cond (open-widget-p
 	   ;; Wrap widgets in this tree in a group widget
-           ;; to ensure proper formatting.
+	   ;; to ensure proper formatting.
 	   (let ((group-type
 		  (list 'group :args entries))
-		 group-widget) 
-	   (push 
-	    (widget-create-child-and-convert 
-	     widget 
+		 group-widget)
+	   (push
+	    (widget-create-child-and-convert
+	     widget
 	     'jde-widget-option-tree-close-button)
 		buttons)
-	   (insert "-\\ " tag "\n")	   
+	   (insert "-\\ " tag "\n")
 	   (push (widget-create-child-and-convert widget group-type) children)))
 	  (t
-	   (push (widget-create 'jde-widget-option-tree-open-button 
+	   (push (widget-create 'jde-widget-option-tree-open-button
 			  :parent widget)
 		 buttons)
 	   (insert "-- " tag "\n")))
     (widget-put widget :children children)
     (widget-put widget :buttons buttons)))
-    
+
 
 (define-widget 'jde-widget-option-tree 'default
   "A panel containing widgets."
@@ -539,17 +529,17 @@ expand button causes the widget to display the values of the array."
 
 (defun test-option-tree ()
   (interactive)
-  (switch-to-buffer "*Panel Example*")  
+  (switch-to-buffer "*Panel Example*")
   (kill-all-local-variables)
   (let ((inhibit-read-only t))
-    (erase-buffer))  
-  (let ((all (overlay-lists)))  
-    (mapcar 'delete-overlay (car all))    
-    (mapcar 'delete-overlay (cdr all))) 
+    (erase-buffer))
+  (let ((all (overlay-lists)))
+    (mapcar 'delete-overlay (car all))
+    (mapcar 'delete-overlay (cdr all)))
 
   (widget-insert "Test panel widget. \n\n")
 
-  (let ((panel (widget-create 
+  (let ((panel (widget-create
 		'jde-widget-option-tree
 		:tag "Compile Options"
 		'(cons :tag "Debugger Options"
@@ -566,7 +556,7 @@ expand button causes the widget to display the values of the array."
 					      (const "Executable")
 					      (const "Class"))))
 		  '(repeat (string :tag "Path"))
-		  '(editable-field :tag "classpath" 
+		  '(editable-field :tag "classpath"
 				  :format "  %t:  %v\n  %h \n\n"
 				  :size 40
 				  :doc "Name of project.")

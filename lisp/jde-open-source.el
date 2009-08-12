@@ -1,12 +1,12 @@
 ;; jde-open-source.el -- Open class source files
-;;
-;; $Revision: 1.15 $
+;; $Id$
 ;;
 ;; Author: Klaus Berndl
 
 ;; Keywords: java, open files
 
 ;; Copyright (C) 2002, 2003, 2004 Klaus Berndl
+;; Copyright (C) 2009 by Paul Landes
 
 ;; This package follows the GNU General Public Licence (GPL), see the
 ;; COPYING file that comes along with GNU Emacs. This is free software,
@@ -68,12 +68,12 @@ for FILE, but proper EOL-conversion and charcater interpretation is done!"
   (let ((exp-filename (make-symbol "exp-filename")))
     `(let ((,exp-filename (expand-file-name ,file)))
        (if (and (file-exists-p ,exp-filename)
-                (file-readable-p ,exp-filename))
-           (with-temp-buffer
-             (insert-file-contents ,exp-filename)
-             (goto-char (point-min))
-             ,@body)
-         nil))))
+		(file-readable-p ,exp-filename))
+	   (with-temp-buffer
+	     (insert-file-contents ,exp-filename)
+	     (goto-char (point-min))
+	     ,@body)
+	 nil))))
 
 (defun jde-open-get-class-to-open (pair parsed-symbol)
   "Evaluates PARSE-SYMBOL to check if it is a variable name or a class name.
@@ -81,20 +81,20 @@ If this fails point is on a method or an attribute of a class in the current
 buffer or in a superclass. In this cases we check first if the parsed-symbol
 is a possible member of the current class(\"this\") and if this fails it
 checks if it is a member of the base class(\"super\")."
- (if (and (stringp (car pair)) 
+ (if (and (stringp (car pair))
 	  (> (length (car pair)) 0))
      ;; if we got a pair all should work fine.
      (jde-parse-eval-type-of (car pair))
-   (or (condition-case () 
+   (or (condition-case ()
 	   (jde-parse-eval-type-of parsed-symbol)
-         (error nil))
-       (if (jde-parse-find-completion-for-pair 
+	 (error nil))
+       (if (jde-parse-find-completion-for-pair
 	    `("this" ,parsed-symbol) nil jde-complete-private)
-           (jde-parse-eval-type-of "this")
-         nil)
-       (if (jde-parse-find-completion-for-pair 
+	   (jde-parse-eval-type-of "this")
+	 nil)
+       (if (jde-parse-find-completion-for-pair
 	    `("super" ,parsed-symbol) nil jde-complete-private)
-           (jde-parse-eval-type-of "super")
+	   (jde-parse-eval-type-of "super")
 	 nil))))
 
 
@@ -106,12 +106,12 @@ checks if it is a member of the base class(\"super\")."
        (fboundp 'jde-parse-find-completion-for-pair)))
 
 
-(defun jde-open-jump-to-class (parsed-symbol class-name) 
+(defun jde-open-jump-to-class (parsed-symbol class-name)
   "Place the cursor in the parsed variable"
   (let* (tags super-class (first-time t))
     (search-forward "{" nil t)
     (setq tags (semantic-tag-type-superclasses
-                  (semantic-current-tag-of-class 'type)))
+		  (semantic-current-tag-of-class 'type)))
     (setq super-class (car tags))
     (message "Superclass of %s is %s" class-name super-class)
     ;; Now let´s jump to the thing-of-interest. If this is a
@@ -126,30 +126,30 @@ checks if it is a member of the base class(\"super\")."
       (setq parsed-symbol (concat "\\b" parsed-symbol "\\b"))
       (while (not (senator-re-search-forward parsed-symbol nil t))
 	(message "Could not find %s in %s" parsed-symbol (buffer-name))
-        ;; searching for the thing-of-interest has failed 
-        ;; let's try in the base class
-          (progn
-            (if (not super-class)
-                (error "Method not found"))
-            (let ((jde-open-cap-ff-function-temp-override 'find-file))
-              (jde-show-superclass-source-2 tags))
-            (goto-char (point-min))
-            (senator-parse)
-            (search-forward "{" nil t)
-            (setq tags (semantic-tag-type-superclasses
-                          (semantic-current-tag-of-class 'type)))
-            ;;if it is the first time try in the class definition
-            ;;itself.
-            (if first-time
-                (progn 
-                  (setq first-time nil)
-                  (senator-re-search-forward
-                   (progn
-                     (string-match ".*\\.\\([^.]+\\)$"
-                                   (concat "." class-name))
-                     (match-string 1 (concat "." class-name)))
-                   nil t)))
-            (setq super-class (car tags)))))))
+	;; searching for the thing-of-interest has failed
+	;; let's try in the base class
+	  (progn
+	    (if (not super-class)
+		(error "Method not found"))
+	    (let ((jde-open-cap-ff-function-temp-override 'find-file))
+	      (jde-show-superclass-source-2 tags))
+	    (goto-char (point-min))
+	    (senator-parse)
+	    (search-forward "{" nil t)
+	    (setq tags (semantic-tag-type-superclasses
+			  (semantic-current-tag-of-class 'type)))
+	    ;;if it is the first time try in the class definition
+	    ;;itself.
+	    (if first-time
+		(progn
+		  (setq first-time nil)
+		  (senator-re-search-forward
+		   (progn
+		     (string-match ".*\\.\\([^.]+\\)$"
+				   (concat "." class-name))
+		     (match-string 1 (concat "." class-name)))
+		   nil t)))
+	    (setq super-class (car tags)))))))
 
 (defun jde-open-class-at-event (event)
   "Like `jde-open-class-at-point', but is mouse-bindable.
@@ -170,54 +170,54 @@ $CLASSPATH, then in the current directory."
   (interactive)
   (if (jde-open-functions-exist)
       (let* ((old-point (if position
-                            (prog1
-                                (point)
-                              (goto-char position))))
-             (thing-of-interest (thing-at-point 'symbol))
-             (pair (save-excursion 
-                     (end-of-thing 'symbol)
-                     (jde-parse-java-variable-at-point)))
-             (class-to-open (jde-open-get-class-to-open
-                             pair thing-of-interest)))
-        (if old-point
-            (goto-char old-point))
-        (if (and class-to-open 
-                 (stringp class-to-open))
-            ;; Handle the case where the definition of the symbol is in the current buffer.
-            (let ((pos 
-                   (and 
-                    (string= (car pair) "")
-                    (jde-parse-find-declaration-of thing-of-interest))))
-              (ring-insert find-tag-marker-ring (point-marker))
-              (if pos
-                  (goto-char pos)
-                ;; Handle the case where the definition is in another buffer or an 
-                ;; unopened source file.
-                (let ((source 
-                       (jde-find-class-source-file class-to-open)))
-                  (if source
-                      ;; we have found the source file. So let´s open it and
-                      ;; then jump to the thing-of-interest
-                      (progn
-                        (if (typep source 'buffer)
-                            (let ((pop-up-frames t)) 
-                              (set-buffer source)
-                              (display-buffer source)
-                              ;; (jde-mode)
-                              ;; (semantic-new-buffer-fcn)
-                              ;; (semantic-fetch-tags)
-                              )
-                          ;; (switch-to-buffer source)
-                          ;; (pop-to-buffer source other-window)
-                          ;; if the current buffer contains java-file-name do not try to
-                          ;; open the file
-                          (if (not (string-equal (buffer-file-name) source))
-                              (funcall (or jde-open-cap-ff-function-temp-override
-                                           jde-open-class-at-point-find-file-function)
-                                       source)))
-                        (jde-open-jump-to-class thing-of-interest class-to-open))
-                    (message "Can not find the source for \"%s\"." class-to-open)))))
-          (message "Cannot determine the class of \"%s\"." thing-of-interest)))
+			    (prog1
+				(point)
+			      (goto-char position))))
+	     (thing-of-interest (thing-at-point 'symbol))
+	     (pair (save-excursion
+		     (end-of-thing 'symbol)
+		     (jde-parse-java-variable-at-point)))
+	     (class-to-open (jde-open-get-class-to-open
+			     pair thing-of-interest)))
+	(if old-point
+	    (goto-char old-point))
+	(if (and class-to-open
+		 (stringp class-to-open))
+	    ;; Handle the case where the definition of the symbol is in the current buffer.
+	    (let ((pos
+		   (and
+		    (string= (car pair) "")
+		    (jde-parse-find-declaration-of thing-of-interest))))
+	      (ring-insert find-tag-marker-ring (point-marker))
+	      (if pos
+		  (goto-char pos)
+		;; Handle the case where the definition is in another buffer or an
+		;; unopened source file.
+		(let ((source
+		       (jde-find-class-source-file class-to-open)))
+		  (if source
+		      ;; we have found the source file. So let´s open it and
+		      ;; then jump to the thing-of-interest
+		      (progn
+			(if (typep source 'buffer)
+			    (let ((pop-up-frames t))
+			      (set-buffer source)
+			      (display-buffer source)
+			      ;; (jde-mode)
+			      ;; (semantic-new-buffer-fcn)
+			      ;; (semantic-fetch-tags)
+			      )
+			  ;; (switch-to-buffer source)
+			  ;; (pop-to-buffer source other-window)
+			  ;; if the current buffer contains java-file-name do not try to
+			  ;; open the file
+			  (if (not (string-equal (buffer-file-name) source))
+			      (funcall (or jde-open-cap-ff-function-temp-override
+					   jde-open-class-at-point-find-file-function)
+				       source)))
+			(jde-open-jump-to-class thing-of-interest class-to-open))
+		    (message "Can not find the source for \"%s\"." class-to-open)))))
+	  (message "Cannot determine the class of \"%s\"." thing-of-interest)))
     (message "You need JDEE >= 2.2.6 and Senator to use this command.")))
 
 (defun jde-open-class-source ( &optional unqual-class )
@@ -228,21 +228,21 @@ for this variable in your .emacs file to accommodate source files that are
 not associated with any project."
   (interactive)
   (condition-case err
-      (let* ((unqualified-name 
- 	      (or unqual-class
+      (let* ((unqualified-name
+	      (or unqual-class
 		  (read-from-minibuffer "Class: " (thing-at-point 'symbol))))
- 	     (class-names 
- 	      ;;expand the names into full names, or a list of names
- 	      (jde-jeval-r 
- 	       (concat 
- 		"jde.util.JdeUtilities.getQualifiedName(\"" 
- 		unqualified-name "\");"))))
- 	;;Check return value of QualifiedName
- 	(if (or (eq class-names nil)
+	     (class-names
+	      ;;expand the names into full names, or a list of names
+	      (jde-jeval-r
+	       (concat
+		"jde.util.JdeUtilities.getQualifiedName(\""
+		unqualified-name "\");"))))
+	;;Check return value of QualifiedName
+	(if (or (eq class-names nil)
 		(not (listp class-names)))
- 	    (error "Cannot find %s" unqualified-name))
-        (ring-insert find-tag-marker-ring (point-marker))
-	;; Turn off switching project settings to avoid 
+	    (error "Cannot find %s" unqualified-name))
+	(ring-insert find-tag-marker-ring (point-marker))
+	;; Turn off switching project settings to avoid
 	;; resetting jde-sourcepath.
 	(let ((old-value jde-project-context-switching-enabled-p))
 	  (setq jde-project-context-switching-enabled-p nil)
@@ -251,7 +251,7 @@ not associated with any project."
 	      ;;then show it
 	      (progn(other-window 1)
 		    (jde-find-class-source (car class-names)))
-	     	  ;;else let the user choose
+		  ;;else let the user choose
 	    (let ((class (efc-query-options class-names "Which class?")))
 		  (if class
 		      (jde-find-class-source class))))
@@ -265,21 +265,21 @@ not associated with any project."
 (defun jde-show-superclass-source-2 (tags)
   (if tags
       (if (= (length tags) 1)
-          (jde-show-class-source (car tags))
-        (let ((parent (efc-query-options tags "Which super class?")))
-          (if parent
-              (jde-show-class-source parent))))
+	  (jde-show-class-source (car tags))
+	(let ((parent (efc-query-options tags "Which super class?")))
+	  (if parent
+	      (jde-show-class-source parent))))
     (error "Superclass not available")))
 
-(defun jde-show-superclass-source () 
+(defun jde-show-superclass-source ()
   "Show the source for the parent of the class at point."
   (interactive)
   (let ((tags (semantic-tag-type-superclasses
 		 (semantic-current-tag-of-class 'type))))
     (jde-show-superclass-source-2 tags)))
 ;; Thanks to Sandip Chitale <sandip.chitale@blazesoft.com>
-    
-(defun jde-show-interface-source () 
+
+(defun jde-show-interface-source ()
   "Show the source for the interface implemented by the class at point.
 If the class implements more than one interface, this command prompts
 you to select one of the interfaces to show."
@@ -290,7 +290,7 @@ you to select one of the interfaces to show."
 	(if (= (length tags) 1)
 	    (jde-show-class-source (car tags))
 	  (let ((interface (efc-query-options tags "Which interface?")))
-	    (if interface 
+	    (if interface
 		(jde-show-class-source interface)))))))
 
 

@@ -1,12 +1,14 @@
 ;;; jdecompletion.el -- Smart completion for the JDE
+;; $Id$
 
 ;; Author: Rodrigo Reyes <reyes@chez.com>
 ;; Maintainer: Rodrigo Reyes
 ;; Keywords: java, intellisense, completion
 
 ;; Copyright (C) 1999 Rodrigo Reyes
+;; Copyright (C) 2009 by Paul Landes
 
-;; This package follows the GNU General Public Licence (GPL), see the 
+;; This package follows the GNU General Public Licence (GPL), see the
 ;; COPYING file that comes along with GNU Emacs. This is free software,
 ;; you can redistribute it and/or modify it under the GNU GPL terms.
 ;;
@@ -14,7 +16,7 @@
 ;;
 ;;; Commentary:
 
-;; This is one of a set of packages that make up the 
+;; This is one of a set of packages that make up the
 ;; Java Development Environment (JDE) for Emacs. See the
 ;; JDE User's Guide for more information.
 
@@ -66,7 +68,7 @@ information about this completion.")
 "An index to an element in prf2-current-list. This is used to
 cycle the list.")
 
-(defvar prf2-current-beginning (make-marker) 
+(defvar prf2-current-beginning (make-marker)
 "The beginning of the region where the last completion was inserted.")
 
 (defvar prf2-current-end (make-marker)
@@ -80,7 +82,7 @@ resulting list. It impliciyly adds the java.lang.* package."
   (save-excursion
     (beginning-of-buffer)
     (let (lst first second)
-      (while (not (null 		 
+      (while (not (null
 		   (re-search-forward "import[ \t\n\r]+\\(\\([a-zA-Z0-9]+[.]\\)+\\)\\([*]\\|[a-zA-Z0-9]+\\)" nil t) ))
 	(setq first (match-string 1))
 	(setq second (match-string 3))
@@ -101,7 +103,7 @@ for the VARNAME variable."
   (if (looking-at (concat "\\([A-Za-z_.]+\\)[ \t\n\r]+" varname "[ \t\n\r]*[;=]"))
       (match-string 1)
     nil)))
-  
+
 (defun prf2-declared-type-of (name)
 "Find in the current buffer the java type of the variable NAME.  The
 function returns a string containing the name of the class, or nil
@@ -145,12 +147,12 @@ packages otherwise."
       (setq tmp (car importlist))
       (setq shortname (car (cdr tmp)))
       (setq fullname (concat (car tmp) name))
-      (cond 
+      (cond
        ((string= "*" shortname)
 	(setq result importlist))
        ((string= name shortname)
 	(setq result fullname))
-       (t 
+       (t
 	(setq importlist (cdr importlist)))))
     result))
 
@@ -161,13 +163,13 @@ possible completion, and the cdr gives additional informations on the
 car."
   (let ((guessed (prf2-guess-type-of name)) result)
     (if (stringp guessed)
-	(setq result (bsh-eval 
-                      (oref 'jde-bsh the-bsh)
+	(setq result (bsh-eval
+		      (oref 'jde-bsh the-bsh)
 		      (concat "jde.util.Completion.getClassInfo(\"" guessed "\");")))
       (if (not (null name))
 	  (setq result (bsh-eval
-                        (oref 'jde-bsh the-bsh)
-                        (prf2-get-classinfo-javacode name guessed)))))
+			(oref 'jde-bsh the-bsh)
+			(prf2-get-classinfo-javacode name guessed)))))
     (if (not (null result))
 	(eval (read result))
       nil)))
@@ -179,12 +181,12 @@ jde.util.Completion.getClassInfo function with the short java class
 name NAME and the package list IMPORT where to look at."
   (interactive)
   (save-excursion
-    (concat "{ " 
+    (concat "{ "
 	      "String[] lst = new String[" (length import) "];\n"
 	      (let ((count -1))
-		(mapconcat (function (lambda (x) 
+		(mapconcat (function (lambda (x)
 				       (setq count (+ 1 count))
-					   (concat "lst[" count "]=\"" 
+					   (concat "lst[" count "]=\""
 						   (car (nth count import)) "\";\n")))
 			   import
 			   " "))
@@ -197,12 +199,12 @@ name NAME and the package list IMPORT where to look at."
 A '.' is  part of a name."
   (interactive)
   (save-excursion
-    (let (start varname curcar found 
-		(original-point (point)) 
+    (let (start varname curcar found
+		(original-point (point))
 		intermediate-point beg-point)
       (setq curcar (char-before))
       (while (null found)
-	(cond 
+	(cond
 	 ((or (and (>= curcar ?a) (<= curcar ?z))
 		    (and (>= curcar ?A) (<= curcar ?Z))
 		    (member curcar '(?_)))
@@ -215,7 +217,7 @@ A '.' is  part of a name."
       ;;
       (setq intermediate-point (point))
       (if (not (eq t found))
-	  (progn 
+	  (progn
 	    (setq curcar (char-before))
 	    (while (or (and (>= curcar ?a) (<= curcar ?z))
 		       (and (>= curcar ?A) (<= curcar ?Z))
@@ -238,7 +240,7 @@ jde.util.Completion.getClassInfo function."
     (while (not (null tmp))
       (setq result (append (list (list (car tmp))) result))
       (setq tmp (cdr tmp)))
-    ;; get the methods 
+    ;; get the methods
     (setq tmp (nth 2 classinfo))
     (while (not (null tmp))
       (setq result (append (list (list (concat (car (car tmp))"(")
@@ -295,13 +297,13 @@ jde.util.Completion.getClassInfo function."
 	 (>= (point) (marker-position prf2-current-beginning))
 	 (<= (point) (marker-position prf2-current-end))
 	 (eq last-command this-command))
-	(progn  
+	(progn
 	  (prf2-complete-cycle))
-      (let* ((pair (prf2-java-variable-at-point)) 
+      (let* ((pair (prf2-java-variable-at-point))
 	     txt classinfo fulllist
 	     )
 	(if (not (null pair))
-	    (progn 
+	    (progn
 	      (setq classinfo (prf2-get-classinfo (prf2-declared-type-of (car pair))))
 	      (setq fulllist (prf2-build-completion-list classinfo))
 	      (setq prf2-current-list (prf2-all-completions (car (cdr pair)) fulllist))

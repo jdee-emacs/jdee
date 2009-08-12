@@ -1,3 +1,6 @@
+;; setnu - line numbering in buffer
+;; $Id$
+
 ;;; This works better under XEmacs, because it can use the left
 ;;; margin for the line number glyphs, but it will work under Emacs
 ;;; also.
@@ -61,8 +64,8 @@ passed with spaces.  The value of the symbol is a glyph that can
 be made the begin glyph of an extent to display as a line number.")
 
 (defvar setnu-begin-glyph-property (if (fboundp 'extent-property)
-                       'begin-glyph
-                     'before-string)
+		       'begin-glyph
+		     'before-string)
   "Property name to use to set the begin glyph of an extent.")
 
 (defvar setnu-line-number-format (if setnu-running-under-xemacs "%4d" "%4d  ")
@@ -83,10 +86,10 @@ margin of each line."
   (let ((oldmode (not (not setnu-mode)))
     (inhibit-quit t))
     (setq setnu-mode (or (and arg (> (prefix-numeric-value arg) 0))
-             (and (null arg) (null setnu-mode))))
+	     (and (null arg) (null setnu-mode))))
     (if (not (eq oldmode setnu-mode))
     (if setnu-mode
-        (setnu-mode-on)
+	(setnu-mode-on)
       (setnu-mode-off)))))
 
 (defun turn-on-setnu-mode ()
@@ -180,23 +183,23 @@ Sets up the extents associated with setnu-mode."
     (unwind-protect
     (save-excursion
       (save-restriction
-        (widen)
-        (goto-char (point-min))
-        (setq start (point))
-        (while (not done)
-          (setq done (null (search-forward "\n" nil 0)))
-          (setq e (setnu-make-setnu-extent start (point)))
-          (if (null setnu-start-extent)
-          (setq setnu-start-extent e
-            curr-e e)
-        (setnu-set-extent-property curr-e 'setnu-next-extent e)
-        (setnu-set-extent-property e 'setnu-prev-extent curr-e)
-        (setq curr-e e))
-          (setq numstr (format setnu-line-number-format n))
-          (setnu-set-extent-property e 'line-number numstr)
-          (setnu-set-extent-begin-glyph e (setnu-number-glyph numstr))
-          (setq n (1+ n)
-            start (point)))))
+	(widen)
+	(goto-char (point-min))
+	(setq start (point))
+	(while (not done)
+	  (setq done (null (search-forward "\n" nil 0)))
+	  (setq e (setnu-make-setnu-extent start (point)))
+	  (if (null setnu-start-extent)
+	  (setq setnu-start-extent e
+	    curr-e e)
+	(setnu-set-extent-property curr-e 'setnu-next-extent e)
+	(setnu-set-extent-property e 'setnu-prev-extent curr-e)
+	(setq curr-e e))
+	  (setq numstr (format setnu-line-number-format n))
+	  (setnu-set-extent-property e 'line-number numstr)
+	  (setnu-set-extent-begin-glyph e (setnu-number-glyph numstr))
+	  (setq n (1+ n)
+	    start (point)))))
       (store-match-data match-data))))
 
 (defun setnu-before-change-function (start end)
@@ -211,48 +214,48 @@ the line number extents accordingly."
       end-e saved-next e ee)
       (unwind-protect
       (save-excursion
-        (save-restriction
-          (widen)
-          (goto-char start)
-          (if (search-forward "\n" end t)
-          (progn
-            (setq start-e (setnu-extent-at-create start nil)
-              saved-next (setnu-extent-property
-                      start-e
-                      'setnu-next-extent))
-            (setq end-e (setnu-extent-at-create end nil))
-            (setnu-set-extent-endpoints
-             start-e
-             (setnu-extent-start-position start-e)
-             (setnu-extent-end-position end-e))
-            (setnu-set-extent-property
-             start-e 'setnu-next-extent
-             (setnu-extent-property end-e 'setnu-next-extent))))
-          (if start-e
-          (progn
-            (setq e (setnu-extent-property start-e 'setnu-next-extent)
-              ee saved-next)
-            (while (and e (setnu-extent-property e 'setnu-next-extent))
-              (setq e (setnu-extent-property e 'setnu-next-extent)
-                ee (setnu-extent-property ee 'setnu-next-extent)))
-            (while (and e (not (eq ee start-e)))
-              (setnu-set-extent-begin-glyph
-               e (setnu-extent-property ee setnu-begin-glyph-property))
-              (setnu-set-extent-property
-               e 'line-number (setnu-extent-property ee 'line-number))
-              (setq e (setnu-extent-property e 'setnu-prev-extent)
-                ee (setnu-extent-property ee 'setnu-prev-extent)))
-            (setq end-e (setnu-extent-property start-e
-                               'setnu-next-extent))
-            (and end-e
-             (setnu-set-extent-property end-e
-                            'setnu-prev-extent
-                            start-e))
-            (setq e saved-next)
-            (while (not (eq e end-e))
-              (setq ee e
-                e (setnu-extent-property e 'setnu-next-extent))
-              (setnu-delete-extent ee))))))
+	(save-restriction
+	  (widen)
+	  (goto-char start)
+	  (if (search-forward "\n" end t)
+	  (progn
+	    (setq start-e (setnu-extent-at-create start nil)
+	      saved-next (setnu-extent-property
+		      start-e
+		      'setnu-next-extent))
+	    (setq end-e (setnu-extent-at-create end nil))
+	    (setnu-set-extent-endpoints
+	     start-e
+	     (setnu-extent-start-position start-e)
+	     (setnu-extent-end-position end-e))
+	    (setnu-set-extent-property
+	     start-e 'setnu-next-extent
+	     (setnu-extent-property end-e 'setnu-next-extent))))
+	  (if start-e
+	  (progn
+	    (setq e (setnu-extent-property start-e 'setnu-next-extent)
+	      ee saved-next)
+	    (while (and e (setnu-extent-property e 'setnu-next-extent))
+	      (setq e (setnu-extent-property e 'setnu-next-extent)
+		ee (setnu-extent-property ee 'setnu-next-extent)))
+	    (while (and e (not (eq ee start-e)))
+	      (setnu-set-extent-begin-glyph
+	       e (setnu-extent-property ee setnu-begin-glyph-property))
+	      (setnu-set-extent-property
+	       e 'line-number (setnu-extent-property ee 'line-number))
+	      (setq e (setnu-extent-property e 'setnu-prev-extent)
+		ee (setnu-extent-property ee 'setnu-prev-extent)))
+	    (setq end-e (setnu-extent-property start-e
+			       'setnu-next-extent))
+	    (and end-e
+	     (setnu-set-extent-property end-e
+			    'setnu-prev-extent
+			    start-e))
+	    (setq e saved-next)
+	    (while (not (eq e end-e))
+	      (setq ee e
+		e (setnu-extent-property e 'setnu-next-extent))
+	      (setnu-delete-extent ee))))))
     (store-match-data match-data)))))
 
 (defun setnu-after-change-function (start end length)
@@ -268,61 +271,61 @@ the line number extents accordingly."
       start-e e saved-end saved-next n numstr)
       (unwind-protect
       (save-excursion
-        (save-restriction
-          (widen)
-          (setq start-e (setnu-extent-at-create start nil))
-          (if (< (setnu-extent-end-position start-e) (point))
-          ;; bogus!  insertion didn't put the text into
-          ;; the extent because,
-          ;; a. the extent was zero length or
-          ;; b. this is FSF Emacs which means chars
-          ;;    inserted at the end position of an extent
-          ;;    are not inserted into the extent.
-          (setnu-set-extent-endpoints
-           start-e
-           (setnu-extent-start-position start-e)
-           end))
-          (setq saved-next (setnu-extent-property start-e
-                              'setnu-next-extent)
-            saved-end (setnu-extent-end-position start-e)
-            e start-e)
-          (goto-char start)
-          (while (search-forward "\n" end 0)
-        (setnu-set-extent-endpoints e
-                        (setnu-extent-start-position e)
-                        (point))
-        (setq ee (setnu-make-setnu-extent (point) (point)))
-        (setnu-set-extent-property e 'setnu-next-extent ee)
-        (setnu-set-extent-property ee 'setnu-prev-extent e)
-        (setq e ee new-lines (1+ new-lines)))
-          (if ee
-          (progn
-            (setnu-set-extent-endpoints
-             e (setnu-extent-start-position e) saved-end)
-            (setnu-set-extent-property e 'setnu-next-extent saved-next)
-            (and saved-next
-             (setnu-set-extent-property
-              saved-next 'setnu-prev-extent e))
-            (setq e (setnu-extent-property start-e 'setnu-next-extent)
-              ee saved-next)
-            (while ee
-              (setnu-set-extent-begin-glyph
-               e (setnu-extent-property ee setnu-begin-glyph-property))
-              (setnu-set-extent-property
-               e 'line-number (setnu-extent-property ee 'line-number))
-              (setq e (setnu-extent-property e 'setnu-next-extent)
-                ee (setnu-extent-property ee 'setnu-next-extent)))
-            (setq n (1+ (string-to-int
-                 (setnu-extent-property
-                  (setnu-extent-property e 'setnu-prev-extent)
-                  'line-number))))
-            (while e
-              (setq numstr (format setnu-line-number-format n))
-              (setnu-set-extent-property e 'line-number numstr)
-              (setnu-set-extent-begin-glyph
-               e (setnu-number-glyph numstr))
-              (setq e (setnu-extent-property e 'setnu-next-extent)
-                n (1+ n)))))))
+	(save-restriction
+	  (widen)
+	  (setq start-e (setnu-extent-at-create start nil))
+	  (if (< (setnu-extent-end-position start-e) (point))
+	  ;; bogus!  insertion didn't put the text into
+	  ;; the extent because,
+	  ;; a. the extent was zero length or
+	  ;; b. this is FSF Emacs which means chars
+	  ;;    inserted at the end position of an extent
+	  ;;    are not inserted into the extent.
+	  (setnu-set-extent-endpoints
+	   start-e
+	   (setnu-extent-start-position start-e)
+	   end))
+	  (setq saved-next (setnu-extent-property start-e
+			      'setnu-next-extent)
+	    saved-end (setnu-extent-end-position start-e)
+	    e start-e)
+	  (goto-char start)
+	  (while (search-forward "\n" end 0)
+	(setnu-set-extent-endpoints e
+			(setnu-extent-start-position e)
+			(point))
+	(setq ee (setnu-make-setnu-extent (point) (point)))
+	(setnu-set-extent-property e 'setnu-next-extent ee)
+	(setnu-set-extent-property ee 'setnu-prev-extent e)
+	(setq e ee new-lines (1+ new-lines)))
+	  (if ee
+	  (progn
+	    (setnu-set-extent-endpoints
+	     e (setnu-extent-start-position e) saved-end)
+	    (setnu-set-extent-property e 'setnu-next-extent saved-next)
+	    (and saved-next
+	     (setnu-set-extent-property
+	      saved-next 'setnu-prev-extent e))
+	    (setq e (setnu-extent-property start-e 'setnu-next-extent)
+	      ee saved-next)
+	    (while ee
+	      (setnu-set-extent-begin-glyph
+	       e (setnu-extent-property ee setnu-begin-glyph-property))
+	      (setnu-set-extent-property
+	       e 'line-number (setnu-extent-property ee 'line-number))
+	      (setq e (setnu-extent-property e 'setnu-next-extent)
+		ee (setnu-extent-property ee 'setnu-next-extent)))
+	    (setq n (1+ (string-to-int
+		 (setnu-extent-property
+		  (setnu-extent-property e 'setnu-prev-extent)
+		  'line-number))))
+	    (while e
+	      (setq numstr (format setnu-line-number-format n))
+	      (setnu-set-extent-property e 'line-number numstr)
+	      (setnu-set-extent-begin-glyph
+	       e (setnu-number-glyph numstr))
+	      (setq e (setnu-extent-property e 'setnu-next-extent)
+		n (1+ n)))))))
     (store-match-data match-data)))))
 
 (defun setnu-number-glyph (number-string)
@@ -348,51 +351,51 @@ the line number extents accordingly."
      "Finds the setnu extent at the position POS in the buffer BUF."
      (catch 'done
        (save-excursion
-         (and buf (set-buffer buf))
-         (let ((o-list (overlays-in pos (1+ pos))))
-           (while o-list
-         (if (overlay-get (car o-list) 'setnu)
-             (throw 'done (car o-list)))
-         (setq o-list (cdr o-list)))
-           nil )))))
+	 (and buf (set-buffer buf))
+	 (let ((o-list (overlays-in pos (1+ pos))))
+	   (while o-list
+	 (if (overlay-get (car o-list) 'setnu)
+	     (throw 'done (car o-list)))
+	 (setq o-list (cdr o-list)))
+	   nil )))))
       ((fboundp 'overlays-at)
        (defun setnu-extent-at (pos buf)
      "Finds the setnu extent at the position POS in the buffer BUF."
      (catch 'done
        (save-excursion
-         (and buf (set-buffer buf))
-         (let ((o-list (overlays-at pos)) o-lists)
-           ;; search what overlays-at returns first.  for all
-           ;; but zero length extents this will return the
-           ;; extent we want.
-           (while o-list
-         (if (overlay-get (car o-list) 'setnu)
-             (throw 'done (car o-list)))
-         (setq o-list (cdr o-list)))
-           ;; No luck.  Search the lists returned by
-           ;; overlay-lists.  Use overlays-recenter so we only
-           ;; have to search the `before' lobe of the return
-           ;; value.
-           (overlay-recenter (1- pos))
-           (setq o-lists (overlay-lists))
-           (setq o-list (cdr o-lists))
-           (while o-list
-         (if (and (overlay-get (car o-list) 'setnu)
-              (or (and (= pos (overlay-start (car o-list)))
-                   (= pos (overlay-end (car o-list))))
-                  (and (>= pos (overlay-start (car o-list)))
-                   (< pos (overlay-end (car o-list))))))
-             (throw 'done (car o-list)))
-         (setq o-list (cdr o-list)))
-           nil )))))
+	 (and buf (set-buffer buf))
+	 (let ((o-list (overlays-at pos)) o-lists)
+	   ;; search what overlays-at returns first.  for all
+	   ;; but zero length extents this will return the
+	   ;; extent we want.
+	   (while o-list
+	 (if (overlay-get (car o-list) 'setnu)
+	     (throw 'done (car o-list)))
+	 (setq o-list (cdr o-list)))
+	   ;; No luck.  Search the lists returned by
+	   ;; overlay-lists.  Use overlays-recenter so we only
+	   ;; have to search the `before' lobe of the return
+	   ;; value.
+	   (overlay-recenter (1- pos))
+	   (setq o-lists (overlay-lists))
+	   (setq o-list (cdr o-lists))
+	   (while o-list
+	 (if (and (overlay-get (car o-list) 'setnu)
+	      (or (and (= pos (overlay-start (car o-list)))
+		   (= pos (overlay-end (car o-list))))
+		  (and (>= pos (overlay-start (car o-list)))
+		   (< pos (overlay-end (car o-list))))))
+	     (throw 'done (car o-list)))
+	 (setq o-list (cdr o-list)))
+	   nil )))))
        ((fboundp 'map-extents)
     (defun setnu-extent-at (pos buf)
       "Finds the setnu extent at the position POS in the buffer BUF."
       (map-extents (function (lambda (e maparg)
-                   (if (setnu-extent-property e 'setnu)
-                       e
-                     nil)))
-               buf pos pos)))
+		   (if (setnu-extent-property e 'setnu)
+		       e
+		     nil)))
+	       buf pos pos)))
        (t (error "can't find overlays-in, overlays-at, or map-extents!")))
 
 (defun setnu-extent-at-create (pos buf)
@@ -407,46 +410,46 @@ it is created based on where the extent failed to be found."
     (beginning-of-line)
     (setq e (setnu-extent-at (point) buf))
     (cond (e
-           ;; found one.  extend it to cover this whole line.
-           ;; this takes care of zero length extents that
-           ;; might exist at bob or eob that can't be
-           ;; inserted into.
-           (setq beg (point))
-           (forward-line 1)
-           (setnu-set-extent-endpoints e beg (point))
-           e )
-          ((bobp)
-           ;; we are at bob and there's no extent.
-           ;;
-           ;; this is because the extent that was there got
-           ;; detached because all the text in the buffer was
-           ;; deleted.  so we create a new extent and make it
-           ;; contain the whole buffer, since there can be no
-           ;; other attached extents.
-           (setq e (setnu-make-setnu-extent (point-min) (point-max))
-             numstr (format setnu-line-number-format 1))
-           (setnu-set-extent-property e 'line-number numstr)
-           (setnu-set-extent-begin-glyph e (setnu-number-glyph numstr))
-           (setq setnu-start-extent e)
-           e )
-          (t
-           ;; we must be at eob and there's no extent.
-           ;;
-           ;; this is because the extent that was there
-           ;; shrank to zero length and was detached.  create
-           ;; a new extent that contains all text from point
-           ;; to pos.
-           (setq e (setnu-make-setnu-extent (point) pos))
-           (setq ee (setnu-extent-at (1- (point)) buf))
-           (setnu-set-extent-property e 'setnu-prev-extent ee)
-           (setnu-set-extent-property ee 'setnu-next-extent e)
-           (setq numstr
-             (format setnu-line-number-format
-                 (1+ (string-to-int
-                  (setnu-extent-property ee 'line-number)))))
-           (setnu-set-extent-property e 'line-number numstr)
-           (setnu-set-extent-begin-glyph e (setnu-number-glyph numstr))
-           e ))))))
+	   ;; found one.  extend it to cover this whole line.
+	   ;; this takes care of zero length extents that
+	   ;; might exist at bob or eob that can't be
+	   ;; inserted into.
+	   (setq beg (point))
+	   (forward-line 1)
+	   (setnu-set-extent-endpoints e beg (point))
+	   e )
+	  ((bobp)
+	   ;; we are at bob and there's no extent.
+	   ;;
+	   ;; this is because the extent that was there got
+	   ;; detached because all the text in the buffer was
+	   ;; deleted.  so we create a new extent and make it
+	   ;; contain the whole buffer, since there can be no
+	   ;; other attached extents.
+	   (setq e (setnu-make-setnu-extent (point-min) (point-max))
+	     numstr (format setnu-line-number-format 1))
+	   (setnu-set-extent-property e 'line-number numstr)
+	   (setnu-set-extent-begin-glyph e (setnu-number-glyph numstr))
+	   (setq setnu-start-extent e)
+	   e )
+	  (t
+	   ;; we must be at eob and there's no extent.
+	   ;;
+	   ;; this is because the extent that was there
+	   ;; shrank to zero length and was detached.  create
+	   ;; a new extent that contains all text from point
+	   ;; to pos.
+	   (setq e (setnu-make-setnu-extent (point) pos))
+	   (setq ee (setnu-extent-at (1- (point)) buf))
+	   (setnu-set-extent-property e 'setnu-prev-extent ee)
+	   (setnu-set-extent-property ee 'setnu-next-extent e)
+	   (setq numstr
+	     (format setnu-line-number-format
+		 (1+ (string-to-int
+		  (setnu-extent-property ee 'line-number)))))
+	   (setnu-set-extent-property e 'line-number numstr)
+	   (setnu-set-extent-begin-glyph e (setnu-number-glyph numstr))
+	   e ))))))
 
 (add-hook 'before-change-functions 'setnu-before-change-function)
 (add-hook 'after-change-functions 'setnu-after-change-function)

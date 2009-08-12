@@ -1,11 +1,12 @@
 ;;; jde-gen.el -- Integrated Development Environment for Java.
-;; $Revision: 1.86 $ 
+;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
-;; Maintainer: Paul Kinnucan
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 1997, 1998, 2000, 2001, 2002, 2003, 2004 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -56,18 +57,18 @@ Note: According to the Java Code Convention [section 6.4], this value should
 (defun jde-gen-delete-preceding-whitespace ()
   "Delete any syntactical whitespace (including newlines)
 before point."
-  (while (and (not (bobp)) 
-	      (or (bolp) 
+  (while (and (not (bobp))
+	      (or (bolp)
 		  (re-search-backward "\\s-\\=" nil t)))
     (delete-char -1)))
 
 (defun jde-gen-extract-ids-from-params (params)
   "Given a parameter lsit \"Type1 id1, Type2, id2, ...\" extract the
 ids and return as \"id1, id2, ...\"."
-  (mapconcat 
-   (lambda (arg) 
-     (nth 1 (split-string 
-	     (replace-in-string 
+  (mapconcat
+   (lambda (arg)
+     (nth 1 (split-string
+	     (replace-in-string
 	      (replace-in-string arg "^[ \t\n\f\l]+" "")
 	      "[ \t\n\f\l]+$" ""))))
    (split-string params "[,]") ", "))
@@ -124,7 +125,7 @@ variable `jde-gen-buffer-boilerplate'."
 (defun jde-gen-get-extend-class ()
   (let ((super-class (read-from-minibuffer "extends: ")))
     (if (not (string= super-class ""))
-	(progn 
+	(progn
 	  (jde-import-find-and-import super-class)
 	  (concat "extends " super-class " ")))))
 
@@ -147,21 +148,21 @@ Note that anonymous classes are implicitly final."
   "Inserts the final modifier depending on `jde-gen-final-arguments'."
   (if jde-gen-final-arguments
       (let ((comma nil)
-            (arg-list (split-string method-args ",")))
-        (setq method-args "")
-        (mapcar
-         (lambda (arg)
-           (if (string-match "\\<final\\>" arg)
-               (setq method-args (concat method-args comma arg))
-             (setq method-args
-                   (concat method-args 
-                           comma
-                           (if (string-match "^[ \t]" arg) " ")
-                           "final"
-                           (if (string-match "^[^ \t]" arg) " ")
-                           arg)))
-           (setq comma ","))
-         arg-list)))
+	    (arg-list (split-string method-args ",")))
+	(setq method-args "")
+	(mapcar
+	 (lambda (arg)
+	   (if (string-match "\\<final\\>" arg)
+	       (setq method-args (concat method-args comma arg))
+	     (setq method-args
+		   (concat method-args
+			   comma
+			   (if (string-match "^[ \t]" arg) " ")
+			   "final"
+			   (if (string-match "^[^ \t]" arg) " ")
+			   arg)))
+	   (setq comma ","))
+	 arg-list)))
   method-args)
 
 (defun jde-gen-final-method-modifier (method-modifiers)
@@ -171,28 +172,28 @@ Note that anonymous classes are implicitly final."
     ;; Java Language specification, section 15.9.5.
     ;; http://java.sun.com/docs/books/jls/second_edition/html/classes.doc.html
     (unless (or (member "final" class-info) ; explicit final modifier?
-                (save-excursion
-                  (and class-info
-                       (goto-char (cdar class-info))
-                       (looking-at "new")))) ; anonymous class?
+		(save-excursion
+		  (and class-info
+		       (goto-char (cdar class-info))
+		       (looking-at "new")))) ; anonymous class?
       (if (and jde-gen-final-methods
-               (not (string-match "final" method-modifiers))
-               (not (string-match "private" method-modifiers))
-               (not (string-match "abstract" method-modifiers)))
-          ;; Find correct position according to
-          ;; Java Language specification, section 8.4.3.
-          ;; http://java.sun.com/docs/books/jls/second_edition/html/classes.doc.html
-          (let* ((pos (max (if (string-match "public" method-modifiers) (match-end 0) 0)
-                           (if (string-match "protected" method-modifiers) (match-end 0) 0)
-                           (if (string-match "static" method-modifiers) (match-end 0) 0)))
-                 (left (substring method-modifiers 0 pos))
-                 (right (substring method-modifiers pos)))
-            (setq method-modifiers (concat
-                             left
-                             (if (> (length left) 0) " ")
-                             "final"
-                             (if (and (= (length left) 0) (> (length right) 0)) " ")
-                             right))))))
+	       (not (string-match "final" method-modifiers))
+	       (not (string-match "private" method-modifiers))
+	       (not (string-match "abstract" method-modifiers)))
+	  ;; Find correct position according to
+	  ;; Java Language specification, section 8.4.3.
+	  ;; http://java.sun.com/docs/books/jls/second_edition/html/classes.doc.html
+	  (let* ((pos (max (if (string-match "public" method-modifiers) (match-end 0) 0)
+			   (if (string-match "protected" method-modifiers) (match-end 0) 0)
+			   (if (string-match "static" method-modifiers) (match-end 0) 0)))
+		 (left (substring method-modifiers 0 pos))
+		 (right (substring method-modifiers pos)))
+	    (setq method-modifiers (concat
+			     left
+			     (if (> (length left) 0) " ")
+			     "final"
+			     (if (and (= (length left) 0) (> (length right) 0)) " ")
+			     right))))))
   method-modifiers)
 
 (defmacro jde-gen-save-excursion (&rest body)
@@ -205,9 +206,9 @@ without having mutual interference of those templates.
 Returns nil."
   `(progn
      (let ((tempo-marks)
-           (tempo-named-insertions)
-           (tempo-region-start (make-marker))
-           (tempo-region-stop (make-marker)))
+	   (tempo-named-insertions)
+	   (tempo-region-start (make-marker))
+	   (tempo-region-stop (make-marker)))
        (progn ,@body))
      nil))
 
@@ -231,8 +232,8 @@ Removes indentation if the current line contains only whitespaces.
 The purpose of this function is to avoid trailing whitespaces
 in generated java code. Returns nil."
   (if (save-excursion
-        (beginning-of-line)
-        (looking-at "\\s-+$"))
+	(beginning-of-line)
+	(looking-at "\\s-+$"))
       (replace-match ""))
   (if (not (and (bolp) (eolp)))
       (c-indent-line))
@@ -249,9 +250,9 @@ Indentation and trailing whitespace of surrounding non-blank lines will stay unc
 Returns nil."
   (interactive "*")
   (if (or (bolp) (eolp)
-          (save-excursion
-            (beginning-of-line)
-            (looking-at "\\s-*$")))
+	  (save-excursion
+	    (beginning-of-line)
+	    (looking-at "\\s-*$")))
       (delete-region
        (+ (point) (skip-chars-backward " \t\n") (skip-chars-forward  " \t"))
        (+ (point) (skip-chars-forward  " \t\n") (skip-chars-backward " \t"))))
@@ -263,11 +264,11 @@ Returns nil."
   nil)
 
 ; In order to avoid problems with recursive tempo-template invocations
-; interface generation has been split in two parts. 
+; interface generation has been split in two parts.
 ; jde-gen-get-interface-implementation prompts for the
 ; interface and stores point-marker and interface name in buffer local
 ; variables.  jde-gen-insert-interface-implementation is invoked after
-; the template for class or inner class and generates the interface 
+; the template for class or inner class and generates the interface
 ; implementation.
 
 (defvar jde-gen-interface-to-gen nil
@@ -288,13 +289,13 @@ it sets this variable to nil. If INSERT-IMMEDIATELY is non-nil,
 and jde-gen-interface-to-gen will be set to nil."
   (let ((interface (read-from-minibuffer "implements: ")))
     (if (not (string= interface ""))
-        (progn
-          (setq jde-gen-interface-to-gen
-                (cons (point-marker) interface))
-          (if insert-immediately
-              (progn
-                (jde-gen-insert-interface-implementation)
-                (setq jde-gen-interface-to-gen nil))))
+	(progn
+	  (setq jde-gen-interface-to-gen
+		(cons (point-marker) interface))
+	  (if insert-immediately
+	      (progn
+		(jde-gen-insert-interface-implementation)
+		(setq jde-gen-interface-to-gen nil))))
       (setq jde-gen-interface-to-gen nil)))
   nil) ;; must return nil to prevent template insertion.
 
@@ -333,11 +334,11 @@ For example, if set to a single space [\" \"], then a generated method might
 look like:
 
     void setXxxx () {
-                ^
+		^
 If not set, the same generated method would look like:
 
     void setXxxx() {
-                ^
+		^
 Note: According to the Java Code Convention [section 6.4], this value should
       be the empty string."
   :group 'jde-gen
@@ -351,11 +352,11 @@ For example, if set to a single space [\" \"], then a generated method might
 look like:
 
     void setXxxx( boolean newValue ) {
-                 ^                ^
+		 ^                ^
 If not set, the same generated method would look like:
 
     void setXxxx(boolean newValue) {
-                 ^              ^
+		 ^              ^
 Note: According to the Java Code Convention [section 6.4], this value should
       be the empty string."
   :group 'jde-gen
@@ -368,11 +369,11 @@ argument list for a method call or definition.  For example, if set to
 a single space [\" \"], then a generated method might look like:
 
     void setXxxx(boolean newValue) {
-                                  ^
+				  ^
 If not set, the same generated method would look like:
 
     void setXxxx(boolean newValue){
-                                  ^
+				  ^
 Note: According to the Java Code Convention [section 6.4], this value should
       be a single space."
   :group 'jde-gen
@@ -449,26 +450,26 @@ If a parameter to this function is empty or nil, then it is omitted
     (setq access (jde-gen-final-method-modifier access)))
 (let ((sig
        (concat
-        (if (> (length access) 0)
-            (concat access " ")
-          ());; if no access (e.g. "public static"), then nothing
-        (if (> (length type) 0)
-            (concat type " ")
-          ());; if no type (e.g. "boolean" or "void"), then nothing
-        name
-        jde-gen-method-signature-padding-1
-        "("
-        (if (> (length arglist) 0)
-            (concat jde-gen-method-signature-padding-2 (jde-gen-final-argument-modifier arglist)
-                    jde-gen-method-signature-padding-2 )
-          ())
-        ")"
-        (if (> (length throwslist) 0)
-            (concat " throws " throwslist)
-          ())
-        (if jde-gen-k&r
-            jde-gen-method-signature-padding-3
-          ()))))
+	(if (> (length access) 0)
+	    (concat access " ")
+	  ());; if no access (e.g. "public static"), then nothing
+	(if (> (length type) 0)
+	    (concat type " ")
+	  ());; if no type (e.g. "boolean" or "void"), then nothing
+	name
+	jde-gen-method-signature-padding-1
+	"("
+	(if (> (length arglist) 0)
+	    (concat jde-gen-method-signature-padding-2 (jde-gen-final-argument-modifier arglist)
+		    jde-gen-method-signature-padding-2 )
+	  ())
+	")"
+	(if (> (length throwslist) 0)
+	    (concat " throws " throwslist)
+	  ())
+	(if jde-gen-k&r
+	    jde-gen-method-signature-padding-3
+	  ()))))
   sig))
 
 ;;(makunbound 'jde-gen-class-buffer-template)
@@ -1235,15 +1236,15 @@ Setting this variable defines a template instantiation command
 This command a makefile for jde project using template generated by `jde-gen-makefile'."
   (interactive)
   (let* ((default-directory
-           (file-name-directory
-            (if (string= jde-current-project "")
-                (or (jde-find-project-file ".") (expand-file-name "./prj.el"))
-              jde-current-project)))
-         (file (read-file-name "Makefile " default-directory "Makefile")))
+	   (file-name-directory
+	    (if (string= jde-current-project "")
+		(or (jde-find-project-file ".") (expand-file-name "./prj.el"))
+	      jde-current-project)))
+	 (file (read-file-name "Makefile " default-directory "Makefile")))
     (if (file-directory-p file)
-        (setq file (concat file "/Makefile")))
+	(setq file (concat file "/Makefile")))
     (when (or (not (file-exists-p file))
-              (yes-or-no-p "Makefile exist, do you want to overwrite it? "))
+	      (yes-or-no-p "Makefile exist, do you want to overwrite it? "))
       (find-file file)
       (makefile-mode)
       (delete-region (point-min) (point-max))
@@ -1339,20 +1340,20 @@ Setting this variable defines a template instantiation command
 This command a makefile for jde project using template generated by `jde-gen-ant-buildfile'."
   (interactive)
   (let* ((default-directory
-           (file-name-directory
-            (if (string= jde-current-project "")
-                (or (jde-find-project-file ".") (expand-file-name "./prj.el"))
-              jde-current-project)))
-         (jde-ant-buildfile (or (and (boundp 'jde-ant-buildfile) jde-ant-buildfile)
-                             "build.xml"))
-         (file (read-file-name
-                (concat jde-ant-buildfile " ")
-                default-directory
-                jde-ant-buildfile)))
+	   (file-name-directory
+	    (if (string= jde-current-project "")
+		(or (jde-find-project-file ".") (expand-file-name "./prj.el"))
+	      jde-current-project)))
+	 (jde-ant-buildfile (or (and (boundp 'jde-ant-buildfile) jde-ant-buildfile)
+			     "build.xml"))
+	 (file (read-file-name
+		(concat jde-ant-buildfile " ")
+		default-directory
+		jde-ant-buildfile)))
     (if (file-directory-p file)
-        (setq file (concat file "/" jde-ant-buildfile)))
+	(setq file (concat file "/" jde-ant-buildfile)))
     (when (or (not (file-exists-p file))
-              (yes-or-no-p "Buildfile exist, do you want to overwrite it? "))
+	      (yes-or-no-p "Buildfile exist, do you want to overwrite it? "))
       (find-file file)
       (delete-region (point-min) (point-max))
       (jde-gen-ant-buildfile))))
@@ -2443,9 +2444,9 @@ command, `jde-gen-main-method', as a side-effect."
 	     "ejb-entity-bean"
 	     (jde-gen-read-template val)
 	     nil
-	     "Adds an implementation of the EJB Entity Bean interface to the 
+	     "Adds an implementation of the EJB Entity Bean interface to the
 class in the current buffer at the current point in the buffer. Before invoking
-this command,  position point at the point in the buffer where you want the first 
+this command,  position point at the point in the buffer where you want the first
 Entity Bean method to appear. Use `jde-ejb-entity-bean-buffer' to create a complete
 skeleton entity bean implementation from scratch."))
 	  (set-default sym val)))
@@ -2552,30 +2553,30 @@ skeleton entity bean implementation from scratch."))
 	     "ejb-session-bean"
 	     (jde-gen-read-template val)
 	     nil
-	     "Adds an implementation of the EJB Session Bean interface to the 
+	     "Adds an implementation of the EJB Session Bean interface to the
 class in the current buffer at the current point in the buffer. Before invoking
-this command,  position point at the point in the buffer where you want the first 
+this command,  position point at the point in the buffer where you want the first
 Session Bean method to appear. Use `jde-ejb-session-bean-buffer' to create a complete
 skeleton session bean implementation from scratch."))
 	  (set-default sym val)))
 
 
-	
-;; (makunbound 'jde-gen-method-javadoc-comment)	
+
+;; (makunbound 'jde-gen-method-javadoc-comment)
 (defcustom jde-gen-method-javadoc-comment "template"
   "Specifies the type of javadoc comment generated by
 the `jde-gen-method-template'. The choices are
 
-   * Template 
+   * Template
 
      Uses `jde-javadoc-autodoc-at-line' function to generate
      the documentation.
 
    * Inherit
 
-     Generates a javadoc comment containing only the 
+     Generates a javadoc comment containing only the
      javadoc (@inheritDoc) tag. This tag causes javadoc
-     to copy the javadoc comment from the abstract 
+     to copy the javadoc comment from the abstract
      method that the generated method implements but
      only if the javadoc for the abstract method is
      also being generated.
@@ -2592,7 +2593,7 @@ the `jde-gen-method-template'. The choices are
 	  (const :tag "Inherit Tag" "inherit")
 	  (const :tag "None" "none")))
 
-  
+
 ;; (makunbound 'jde-gen-method-template)
 (defcustom jde-gen-method-template
   '(
@@ -2661,33 +2662,33 @@ line, else on the next line before the comparison.  With
 `jde-gen-equals-trailing-and-operators' set to nil:
 
     return (a == o.a)
-        && (b == o.b)
-        && (s == null ? o.s == null : s.equals(o.s));
+	&& (b == o.b)
+	&& (s == null ? o.s == null : s.equals(o.s));
 
 Or, with `jde-gen-equals-trailing-and-operators' set to t:
 
     return (a == o.a) &&
-        (b == o.b) &&
-        (s == null ? o.s == null : s.equals(o.s));
+	(b == o.b) &&
+	(s == null ? o.s == null : s.equals(o.s));
 "
   :group 'jde-gen
   :type 'boolean)
 
 ;;;###autoload
 (defcustom jde-gen-equals-parens-around-expression nil
-  "Specifies whether the generated equals expression should be 
+  "Specifies whether the generated equals expression should be
 surrounded by parentheses.
 With `jde-gen-equals-trailing-and-operators' set to nil:
 
     return ((a == o.a)
-            && (b == o.b)
-            && (s == null ? o.s == null : s.equals(o.s)));
+	    && (b == o.b)
+	    && (s == null ? o.s == null : s.equals(o.s)));
 
 Or, with `jde-gen-equals-trailing-and-operators' set to t:
 
     return ((a == o.a) &&
-            (b == o.b) &&
-            (s == null ? o.s == null : s.equals(o.s)));
+	    (b == o.b) &&
+	    (s == null ? o.s == null : s.equals(o.s)));
 "
   :group 'jde-gen
   :type 'boolean)
@@ -2746,24 +2747,24 @@ is then used instead of the result of `semantic-current-tag'.
 
 Example:
     class Bean {
-        int a;
-        long b;
-        String s;
-    } 
+	int a;
+	long b;
+	String s;
+    }
 
 Result:
     Bean o = (Bean) obj;
 
     return (a == o.a)
-        && (b == o.b)
-        && (s == null ? o.s == null : s.equals(o.s));
+	&& (b == o.b)
+	&& (s == null ? o.s == null : s.equals(o.s));
 
 Or, with `jde-gen-equals-trailing-and-operators' set to t:
     Bean o = (Bean) obj;
 
     return (a == o.a) &&
-        (b == o.b) &&
-        (s == null ? o.s == null : s.equals(o.s));
+	(b == o.b) &&
+	(s == null ? o.s == null : s.equals(o.s));
 "
   (interactive)
   (let* ((parm (or parm-name "obj"))
@@ -3039,7 +3040,7 @@ This uses the ToStringBuilder class from the jakarta commons lang project.
     "\"* Constructs a new <code>\" (jde-parse-get-buffer-unqualified-class) \"</code> with\" '>'n"
     "\"* <code>null</code> as its detail message.\" '>'n"
     "'> (jde-javadoc-insert-end-block)"
-    "(jde-gen-method-signature \"public\" nil (jde-parse-get-buffer-unqualified-class) nil)" 
+    "(jde-gen-method-signature \"public\" nil (jde-parse-get-buffer-unqualified-class) nil)"
     "(jde-gen-electric-brace)"
     "\"}\"'>'n"
     ;; leave a blank line with no indentation
@@ -3052,7 +3053,7 @@ This uses the ToStringBuilder class from the jakarta commons lang project.
     "'> (jde-javadoc-insert-empty-line)"
     "\"* @param message the detail message string.\" '> 'n"
     "'> (jde-javadoc-insert-end-block)"
-    "(jde-gen-method-signature \"public\" nil (jde-parse-get-buffer-unqualified-class) \"String message\")" 
+    "(jde-gen-method-signature \"public\" nil (jde-parse-get-buffer-unqualified-class) \"String message\")"
     "(jde-gen-electric-brace)"
     "\"super(message);\" '> 'n"
     "\"}\" '> 'n"
@@ -3069,7 +3070,7 @@ This uses the ToStringBuilder class from the jakarta commons lang project.
     "\"* @param cause the causing throwable. A null value is permitted\" '> 'n"
     "\"*     and indicates that the cause is nonexistent or unknown.\" '> 'n"
     "'> (jde-javadoc-insert-end-block)"
-    "(jde-gen-method-signature \"public\" nil (jde-parse-get-buffer-unqualified-class) \"Throwable cause\")" 
+    "(jde-gen-method-signature \"public\" nil (jde-parse-get-buffer-unqualified-class) \"Throwable cause\")"
     "(jde-gen-electric-brace)"
     "\"super(cause == null ? (String) null : cause.toString());\" '> 'n"
     "\"initCause(cause);\" '> 'n"
@@ -3086,7 +3087,7 @@ This uses the ToStringBuilder class from the jakarta commons lang project.
     "\"* @param cause the causing throwable. A null value is permitted\" '> 'n"
     "\"*     and indicates that the cause is nonexistent or unknown.\" '> 'n"
     "'> (jde-javadoc-insert-end-block)"
-    "(jde-gen-method-signature \"public\" nil (jde-parse-get-buffer-unqualified-class) \"String message,Throwable cause\")" 
+    "(jde-gen-method-signature \"public\" nil (jde-parse-get-buffer-unqualified-class) \"String message,Throwable cause\")"
     "(jde-gen-electric-brace)"
     "\"super(message);\" '> 'n"
     "\"initCause(cause);\" '> 'n"
@@ -3127,15 +3128,15 @@ It then moves the point to the location of the first method."
 	(cons "toString Method (Apache)" 'jde-gen-tostring-method)
 	(cons "Equals Method" 'jde-gen-equals-method)
 	(cons "Hash Code Method" 'jde-gen-hashcode-method)
-        (cons "Deep clone" 'jde-gen-deep-clone)
+	(cons "Deep clone" 'jde-gen-deep-clone)
 	(cons "Action Listener" 'jde-gen-action-listener)
-        (cons "Change Listener" 'jde-gen-change-listener)
+	(cons "Change Listener" 'jde-gen-change-listener)
 	(cons "Window Listener" 'jde-gen-window-listener)
 	(cons "Mouse Listener" 'jde-gen-mouse-listener)
 	(cons "Mouse Motion Listener" 'jde-gen-mouse-motion-listener)
 	(cons "Inner Class" 'jde-gen-inner-class)
 	(cons "println" 'jde-gen-println)
-        (cons "beep" 'jde-gen-beep)
+	(cons "beep" 'jde-gen-beep)
 	(cons "property change support" 'jde-gen-property-change-support)
 	(cons "EJB Entity Bean" 'jde-gen-entity-bean)
 	(cons "EJB Session Bean" 'jde-gen-session-bean)
@@ -3191,8 +3192,8 @@ list bound to `jde-gen-abbrev-templates'. "
     (defalias (intern template-name)
       (tempo-define-template
        template-name
-       template 
-       abbrev 
+       template
+       abbrev
        (format "JDE template for %s control flow abbreviation." abbrev)
        'jde-gen-abbrev-templates))))
 
@@ -3425,10 +3426,10 @@ Note: `tempo-interactive' must be set to a non-nil value to be prompted
   :group 'jde-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-          (jde-gen-define-abbrev-template
+	  (jde-gen-define-abbrev-template
 	   "foriter"
 	   (jde-gen-read-template val))
-          (set-default sym val)))
+	  (set-default sym val)))
 
 (defcustom jde-gen-cflow-switch
   '(
@@ -3602,22 +3603,22 @@ This function does nothing, if point is in a comment or string.
 Returns t, if the template has been inserted, otherwise nil."
   (unless (jde-parse-comment-or-quoted-p)
     (let* ((abbrev-start
-            (or abbrev-start-location
-                (save-excursion (re-search-backward "\\<.*\\="))))
-           (abbrev
-            (buffer-substring-no-properties abbrev-start (point)))
-           (template (assoc-string abbrev jde-gen-abbrev-templates t)))
+	    (or abbrev-start-location
+		(save-excursion (re-search-backward "\\<.*\\="))))
+	   (abbrev
+	    (buffer-substring-no-properties abbrev-start (point)))
+	   (template (assoc-string abbrev jde-gen-abbrev-templates t)))
       (if template
-          (progn
-            (delete-backward-char (length abbrev))
-            ;; Following let avoids infinite expansion.
-            ;; Infinite expansions could be caused by
-            ;; (newline) in templates.
-            ;; e.g. "else" (newline)
-            (let (local-abbrev-table)
-              (funcall (cdr template)))
-            t) ; don't insert self-inserting input character that triggered the expansion.
-        (error "Template for abbreviation %s not found!" abbrev)))))
+	  (progn
+	    (delete-backward-char (length abbrev))
+	    ;; Following let avoids infinite expansion.
+	    ;; Infinite expansions could be caused by
+	    ;; (newline) in templates.
+	    ;; e.g. "else" (newline)
+	    (let (local-abbrev-table)
+	      (funcall (cdr template)))
+	    t) ; don't insert self-inserting input character that triggered the expansion.
+	(error "Template for abbreviation %s not found!" abbrev)))))
 
 ;; The following enables the hook to control the treatment of the
 ;; self-inserting input character that triggered the expansion.
@@ -3652,35 +3653,35 @@ Returns t, if the template has been inserted, otherwise nil."
    (insert "public class Test {\n\n}")
    (backward-char 2)
    (loop for flags in '((t . t) (t . nil) (nil . t) (nil . nil)) do
-         (let ((jde-gen-k&r (car flags))
-               (jde-gen-comments (cdr flags)))
-           (insert (format "/**** jde-gen-comments: %S jde-gen-k&r: %S ****/\n\n"
-                           jde-gen-comments jde-gen-k&r))
-           (loop for abbrev in
-                 '(("if"      (clause . "true"))
-                   ("else")
-                   ("ife"     (clause . "true"))
-                   ("eif"     (clause . "true"))
-                   ("while"   (clause . "true"))
-                   ("for"     (clause . "int i = 0; i < 10; i++"))
-                   ("fori"    (var . "i") (upper-bound . "10"))
-                   ("foriter" (var . "iter") (coll . "list"))
-                   ("switch"  (clause . "digit") (first-value . "1"))
-                   ("case"    (value . "2"))
-                   ("try"     (clause . "Exception"))
-                   ("catch"   (clause . "Exception"))
-                   ("tryf"    (clause . "Exception"))
-                   ("finally"))
-                 do
-                 (let (insertations
-                       (abbrev-start-location (point)))
-                   (insert (car abbrev))
-                   (while (setq abbrev (cdr abbrev))
-                     (setq insertations (car abbrev))
-                     (tempo-save-named (car insertations) (cdr insertations)))
-                   (jde-gen-abbrev-hook)
-                   (goto-char (- (point-max) 2))
-                   (insert "\n"))))))
+	 (let ((jde-gen-k&r (car flags))
+	       (jde-gen-comments (cdr flags)))
+	   (insert (format "/**** jde-gen-comments: %S jde-gen-k&r: %S ****/\n\n"
+			   jde-gen-comments jde-gen-k&r))
+	   (loop for abbrev in
+		 '(("if"      (clause . "true"))
+		   ("else")
+		   ("ife"     (clause . "true"))
+		   ("eif"     (clause . "true"))
+		   ("while"   (clause . "true"))
+		   ("for"     (clause . "int i = 0; i < 10; i++"))
+		   ("fori"    (var . "i") (upper-bound . "10"))
+		   ("foriter" (var . "iter") (coll . "list"))
+		   ("switch"  (clause . "digit") (first-value . "1"))
+		   ("case"    (value . "2"))
+		   ("try"     (clause . "Exception"))
+		   ("catch"   (clause . "Exception"))
+		   ("tryf"    (clause . "Exception"))
+		   ("finally"))
+		 do
+		 (let (insertations
+		       (abbrev-start-location (point)))
+		   (insert (car abbrev))
+		   (while (setq abbrev (cdr abbrev))
+		     (setq insertations (car abbrev))
+		     (tempo-save-named (car insertations) (cdr insertations)))
+		   (jde-gen-abbrev-hook)
+		   (goto-char (- (point-max) 2))
+		   (insert "\n"))))))
 
 
 
@@ -3696,12 +3697,12 @@ BEG and END are modified so the region only contains complete lines."
   (interactive "r")
   (jde-gen-generic-wrapper beg end "try" "finally"))
 
-(defun jde-gen-if-wrapper (beg end) 
+(defun jde-gen-if-wrapper (beg end)
   "Wraps the region from beg to end into an if block."
   (interactive "r")
   (jde-gen-generic-wrapper beg end "if"))
 
-(defun jde-gen-if-else-wrapper (beg end) 
+(defun jde-gen-if-else-wrapper (beg end)
   "Wraps the region from beg to end into an if block."
   (interactive "r")
   (jde-gen-generic-wrapper beg end "if" "else"))
@@ -3725,44 +3726,44 @@ complete lines."
     (beginning-of-line)
     (insert expr1)
     (if (string= expr1 "if")
-        (insert (concat jde-gen-conditional-padding-1
-                        "(" jde-gen-conditional-padding-2 ")")))
+	(insert (concat jde-gen-conditional-padding-1
+			"(" jde-gen-conditional-padding-2 ")")))
     (if jde-gen-k&r
-        (insert " ")
+	(insert " ")
       (insert "\n"))
     (insert "{\n")
     (if jde-gen-k&r
-        (forward-char -1)
+	(forward-char -1)
       (forward-char -4))
     (indent-for-tab-command)
     (indent-region (point) to nil)
     (goto-char to)
     (insert "}")
     (if expr2
-        (progn
-          (if jde-gen-k&r
-              (insert jde-gen-conditional-padding-3)
-            (insert "\n"))
-          (if (string= expr2 "catch")
-              (insert (concat expr2 jde-gen-conditional-padding-1
-                              "(" jde-gen-conditional-padding-2 " e"
-                              jde-gen-conditional-padding-2 ")")) 
-            (insert expr2))
-          (if jde-gen-k&r 
-              (insert jde-gen-conditional-padding-3)
-            (insert "\n"))
-          (insert "{\n}")
-          (if jde-gen-comments
-              (insert " // end of " expr1 
-                      (if expr2
-                          (concat "-" expr2))))))
+	(progn
+	  (if jde-gen-k&r
+	      (insert jde-gen-conditional-padding-3)
+	    (insert "\n"))
+	  (if (string= expr2 "catch")
+	      (insert (concat expr2 jde-gen-conditional-padding-1
+			      "(" jde-gen-conditional-padding-2 " e"
+			      jde-gen-conditional-padding-2 ")"))
+	    (insert expr2))
+	  (if jde-gen-k&r
+	      (insert jde-gen-conditional-padding-3)
+	    (insert "\n"))
+	  (insert "{\n}")
+	  (if jde-gen-comments
+	      (insert " // end of " expr1
+		      (if expr2
+			  (concat "-" expr2))))))
     (insert "\n")
     (indent-region (marker-position to) (point) nil)
     (goto-char to)
     (if (string= expr1 "if")
-        (search-backward (concat "(" jde-gen-conditional-padding-2 ")")))
+	(search-backward (concat "(" jde-gen-conditional-padding-2 ")")))
     (if (string= expr2 "catch")
-        (search-forward "("))))
+	(search-forward "("))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -3772,7 +3773,7 @@ complete lines."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defcustom jde-electric-return-p nil
-  "Specifies whether the JDEE's electric return mode is 
+  "Specifies whether the JDEE's electric return mode is
 enabled for this session or project. This mode causes the JDEE to
 match an open brace at the end of a line with a closing
 brace. You can use `jde-toggle-electric-return' at any
@@ -3784,7 +3785,7 @@ time to enable or disable eelctric return mode."
 	    (let ((curr-project
 		   (with-current-buffer jde-current-buffer
 		     jde-current-project)))
-	      (mapc 
+	      (mapc
 	       (lambda (buf)
 		 (with-current-buffer buf
 		   (let ((key (car (read-from-string "[return]"))))
@@ -3817,11 +3818,11 @@ So if before
 you had:
 
    pubic void function () {
-                           ^
+			   ^
 You now have:
 
    pubic void function () {
-                                    
+
    } ^
 
 Point must be at the end of the line, or at a } character
@@ -3833,7 +3834,7 @@ Before:
    }                       ^
 After:
    pubic void function () {
-                                    
+
    } ^"
   (interactive)
   (if (or (eq (point) (point-min))
@@ -3855,14 +3856,14 @@ After:
 "Invokes `jde-gen-embrace' to close an open brace at the end of a line."
   (interactive)
   (if  ;; the current line ends at an open brace.
-       (and 
+       (and
 	(save-excursion
-	  (re-search-backward "{\\s-*" (line-beginning-position) t))  
+	  (re-search-backward "{\\s-*" (line-beginning-position) t))
 	(looking-at "}?\\s-*$"))
       (jde-gen-embrace)
     (call-interactively (car jde-newline-function))))
 
-(defvar jde-electric-return-mode nil 
+(defvar jde-electric-return-mode nil
   "Nonnil indicates that electric return mode is on.")
 
 (defun jde-electric-return-mode ()
@@ -3893,32 +3894,32 @@ by rebinding the Return key to its original binding."
 ;;         Comm = jde-gen-comments|Comm t|Comm nil|Comm t  |Comm nil
 ;;          K&R = jde-gen-k&r     |K&R  t|K&R  t  |K&R  nil|K&R  nil
 ;; -------------------------------+------+--------+--------+--------
-;; jde-gen-get-set	          |      |        |        |        
-;; jde-gen-inner-class            |      |        |        |        
-;; jde-gen-action-listener        |      |        |        |        
-;; jde-gen-change-listener        |      |        |        |        
-;; jde-gen-window-listener        |      |        |        |        
-;; jde-gen-mouse-listener         |      |        |        |        
-;; jde-gen-mouse-motion-listener  |      |        |        |        
-;; jde-gen-to-string-method       |      |        |        |        
-;; jde-gen-property-change-support|      |        |        |        
-;; jde-gen-entity-bean            |      |        |        |        
-;; jde-gen-session-bean           |      |        |        |        
-;; jde-gen-cflow-if               |      |        |        |        
-;; jde-gen-cflow-else             |      |        |        |        
-;; jde-gen-cflow-if-else          |      |        |        |        
-;; jde-gen-cflow-else-if          |      |        |        |        
-;; jde-gen-cflow-while            |      |        |        |        
-;; jde-gen-cflow-for              |      |        |        |        
-;; jde-gen-cflow-for-I            |      |        |        |        
-;; jde-gen-cflow-for-iter         |      |        |        |        
-;; jde-gen-cflow-main             |      |        |        |        
-;; jde-gen-cflow-switch           |      |        |        |        
-;; jde-gen-cflow-case             |      |        |        |        
-;; jde-gen-cflow-try-catch        |      |        |        |        
-;; jde-gen-cflow-catch            |      |        |        |        
-;; jde-gen-cflow-try-finally      |      |        |        |        
-;; jde-gen-cflow-finally          |      |        |        |        
+;; jde-gen-get-set	          |      |        |        |
+;; jde-gen-inner-class            |      |        |        |
+;; jde-gen-action-listener        |      |        |        |
+;; jde-gen-change-listener        |      |        |        |
+;; jde-gen-window-listener        |      |        |        |
+;; jde-gen-mouse-listener         |      |        |        |
+;; jde-gen-mouse-motion-listener  |      |        |        |
+;; jde-gen-to-string-method       |      |        |        |
+;; jde-gen-property-change-support|      |        |        |
+;; jde-gen-entity-bean            |      |        |        |
+;; jde-gen-session-bean           |      |        |        |
+;; jde-gen-cflow-if               |      |        |        |
+;; jde-gen-cflow-else             |      |        |        |
+;; jde-gen-cflow-if-else          |      |        |        |
+;; jde-gen-cflow-else-if          |      |        |        |
+;; jde-gen-cflow-while            |      |        |        |
+;; jde-gen-cflow-for              |      |        |        |
+;; jde-gen-cflow-for-I            |      |        |        |
+;; jde-gen-cflow-for-iter         |      |        |        |
+;; jde-gen-cflow-main             |      |        |        |
+;; jde-gen-cflow-switch           |      |        |        |
+;; jde-gen-cflow-case             |      |        |        |
+;; jde-gen-cflow-try-catch        |      |        |        |
+;; jde-gen-cflow-catch            |      |        |        |
+;; jde-gen-cflow-try-finally      |      |        |        |
+;; jde-gen-cflow-finally          |      |        |        |
 
 ;; $Log: jde-gen.el,v $
 ;; Revision 1.86  2004/12/12 14:27:02  paulk

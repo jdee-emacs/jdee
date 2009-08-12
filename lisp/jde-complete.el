@@ -1,33 +1,33 @@
 ;; jde-complete.el -- Smart completion for the JDE
-;;
-;; $Revision: 1.84 $
-;;
+;; $Id$
+
 ;; Author: Rodrigo Reyes <reyes@chez.com>
 ;; Maintainers: Rodrigo Reyes
-;;              Paul Kinnucan <pkinnucan@mediaone.net>
+;;              Paul Landes
 ;;              David Ponce
-;;              Howard Spector 
-;;              Stephane Nicolas <s.nicolas@videotron.ca>,
-;;              Javier Lopez <jlopez@forumsys.com> 
+;;              Howard Spector
+;;              Stephane Nicolas <s.nicolas@videotron.ca>
+;;              Javier Lopez <jlopez@forumsys.com>
 
 ;; Keywords: java, intellisense, completion
 
 ;; Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 Rodrigo Reyes, Paul Kinnucan,
 ;;                          Stephane Nicolas, David Ponce, Javier Lopez
+;; Copyright (C) 2009 by Paul Landes
 
 ;; This package follows the GNU General Public Licence (GPL), see the
 ;; COPYING file that comes along with GNU Emacs. This is free software,
 ;; you can redistribute it and/or modify it under the GNU GPL terms.
-;;
+
 ;; Java is a registered trademark of Sun Microsystem, Inc.
-;;
+
 ;;; Commentary:
 
 ;; This is one of a set of packages that make up the
 ;; Java Development Environment for Emacs (JDEE). See the
 ;; JDEE User's Guide for more information.
 
-;;
+
 ;; This package adds smart completion to the JDE. How it works is
 ;; simple : put the cursor at the end of a statement "under
 ;; construction", eg. "myVariable.rem<CURSOR HERE> and call the
@@ -42,11 +42,11 @@
 ;; call).
 
 ;; Known bugs/problems :
-;;
+
 ;; TODO
 ;; Move all the strings manipulation to the java side so that
 ;; class info can be loaded in the background.
-;;
+
 ;; The latest version of the JDEE is available at
 ;; <URL:http://jde.sunsite.dk>.
 
@@ -90,7 +90,7 @@ where the classes are placed.")
   "Contains the name of the class that was compiled last")
 
 (defvar jde-complete-current-signature nil
-  "Contains the signature of the last method inserted by 
+  "Contains the signature of the last method inserted by
 either `jde-complete-in-line' or `jde-complete-menu'")
 
 (defconst jde-complete-signature-buffer "*Signature*"
@@ -107,12 +107,12 @@ minibuffer), a buffer(a one line buffer shows the signature and then
 dissapears), or none."
   :group 'jde-complete
   :type '(list
-          (radio-button-choice 
-           (const "Eldoc")
-           (const "Buffer")
-           (const "None"))))
+	  (radio-button-choice
+	   (const "Eldoc")
+	   (const "Buffer")
+	   (const "None"))))
 
-(defcustom jde-complete-signature-display-time 5 
+(defcustom jde-complete-signature-display-time 5
   "Amount of time in seconds to display the method signature
 in the minibuffer after a completion."
   :group 'jde-complete
@@ -184,7 +184,7 @@ The `jde-complete-menu' function displays completions for
 the symbol at point in a popup menu. The `jde-complete-minibuf' function
 displays completions in the minibuffer. You may also
 specify a custom function to use. The custom function must
-be an interactive function that can be called by 
+be an interactive function that can be called by
 `call-interactively'."
   :group 'jde-project
   :type '(choice
@@ -207,13 +207,13 @@ cycle the list.")
 for the VARNAME variable."
   (save-excursion
     (goto-char point)
-    (if (looking-at 
-	 (concat "\\([A-Za-z0-9_.\177-\377]+\\)[ \t\n\r]+" 
-		 (jde-complete-double-backquotes varname) 
+    (if (looking-at
+	 (concat "\\([A-Za-z0-9_.\177-\377]+\\)[ \t\n\r]+"
+		 (jde-complete-double-backquotes varname)
 		 "[ \t\n\r]*[;=]"))
 	(match-string 1)
       nil)))
-  
+
 (defun jde-complete-double-backquotes (varname)
   "Build a new string identical to VARNAME, except that every backquote
 `\' is doubled, so that it can be used in a regex expression"
@@ -264,12 +264,12 @@ packages otherwise."
       (setq tmp (car importlist))
       (setq shortname (car (cdr tmp)))
       (setq fullname (concat (car tmp) name))
-      (cond 
+      (cond
        ((string= "*" shortname)
 	(setq result importlist))
        ((string= name shortname)
 	(setq result fullname))
-       (t 
+       (t
 	(setq importlist (cdr importlist)))))
     result))
 
@@ -287,7 +287,7 @@ packages otherwise."
 (defun jde-complete-flush-classes-in-cache (class-list)
   "Flushes all the classes in CLASS-LIST as entries of cache."
   (let ((temp (nth 0 jde-complete-classinfo-cache))
-	(index -1) 
+	(index -1)
 	(found nil)
 	(class (car class-list)))
     (while class
@@ -296,7 +296,7 @@ packages otherwise."
 	(setq temp (nth index jde-complete-classinfo-cache))
 	(if (string= (car temp) class)
 	    (setq found t)))
-      (if found 
+      (if found
 	  (setq jde-complete-classinfo-cache
 		(nthcdr (1+ index) jde-complete-classinfo-cache)))
       (setq class-list (cdr class-list))
@@ -306,17 +306,17 @@ packages otherwise."
 (defun jde-complete-add-to-classinfo-cache (name classinfo)
   (let (new-entry new-list)
     (if (nth jde-complete-classinfo-cache-size jde-complete-classinfo-cache)
-        (progn
-          (setq new-entry (list name classinfo))
-          (setq new-list (list new-entry nil))
-          (setcdr new-list (cdr jde-complete-classinfo-cache))
-          (setq jde-complete-classinfo-cache new-list)  
-          (message "cache is full"))
+	(progn
+	  (setq new-entry (list name classinfo))
+	  (setq new-list (list new-entry nil))
+	  (setcdr new-list (cdr jde-complete-classinfo-cache))
+	  (setq jde-complete-classinfo-cache new-list)
+	  (message "cache is full"))
       ;;else
-      (setq jde-complete-classinfo-cache 
-            (append 
-             jde-complete-classinfo-cache 
-             (list (list name classinfo)))))))
+      (setq jde-complete-classinfo-cache
+	    (append
+	     jde-complete-classinfo-cache
+	     (list (list name classinfo)))))))
 
 (defun jde-complete-get-from-cache (name)
   (let ((temp (nth 0 jde-complete-classinfo-cache)) (index -1) (found nil))
@@ -328,7 +328,7 @@ packages otherwise."
     (if found
 	(nth 1 temp)
       nil)))
- 
+
 (defun jde-complete-get-classinfo (name &optional access-level)
   "Return the class info list for the class NAME and the ACCESS-LEVEL.
 Allowed values for access level are 0 for protected 1 for private. This
@@ -340,51 +340,51 @@ informations on the completion."
   ;;replacing double quotes by empty strings double quotes seems to break the
   ;;beanshell
   (while (string-match "\"" name)
-    (setq name (replace-match "" nil nil name))) 
-  
+    (setq name (replace-match "" nil nil name)))
+
   ;;replacing back slaches by empty strings backlashes causes beanshell problem
   (while (string-match "\\\\" name)
-    (setq name (replace-match "" nil nil name))) 
+    (setq name (replace-match "" nil nil name)))
 
   ;;checking that access-level is not nil
   (if (not access-level)
       (setq access-level jde-complete-public))
 
   (let ((class-info (jde-complete-get-from-cache name))
-        public-methods protected-methods private-methods
-        package-methods)
+	public-methods protected-methods private-methods
+	package-methods)
     (when (not class-info)
       ;;Getting public class info
       (setq public-methods
-            (jde-complete-invoke-get-class-info
-             name jde-complete-public))
+	    (jde-complete-invoke-get-class-info
+	     name jde-complete-public))
 
       ;;Getting protected class info
       (setq protected-methods
-            (jde-complete-invoke-get-class-info
-             name jde-complete-protected))
+	    (jde-complete-invoke-get-class-info
+	     name jde-complete-protected))
 
       ;;Getting package class info
       (setq package-methods
-            (jde-complete-invoke-get-class-info
-             name jde-complete-package))
+	    (jde-complete-invoke-get-class-info
+	     name jde-complete-package))
 
       ;;Getting private class info
       (setq private-methods
-            (jde-complete-invoke-get-class-info
-             name jde-complete-private))
+	    (jde-complete-invoke-get-class-info
+	     name jde-complete-private))
       (setq class-info (append public-methods
-                               protected-methods
-                               package-methods
-                               private-methods))
+			       protected-methods
+			       package-methods
+			       private-methods))
       (if class-info
-          (jde-complete-add-to-classinfo-cache name class-info)))
-    
+	  (jde-complete-add-to-classinfo-cache name class-info)))
+
     ;;Getting the class info depending on the access level
     (setq class-info
-          (jde-complete-get-accessible-info class-info access-level name))
+	  (jde-complete-get-accessible-info class-info access-level name))
     (setq class-info (jde-complete-build-completion-list class-info))
-    
+
     ;;Removing duplicates
     (setq class-info (jde-complete-remove-duplicates class-info))
 
@@ -398,7 +398,7 @@ informations on the completion."
     (while class-list
       (setq temp (car class-list))
        (if (not (jde-complete-memberp (car temp) answer))
-           (setq answer (append answer (list temp))))
+	   (setq answer (append answer (list temp))))
       (setq class-list (cdr class-list)))
     answer))
 
@@ -408,10 +408,10 @@ informations on the completion."
     (while lst
       (setq tmp (caar lst))
       (if (string= tmp elt)
-          (progn
-           (setq answer t)
-           (setq lst nil))
-        (setq lst (cdr lst))))
+	  (progn
+	   (setq answer t)
+	   (setq lst nil))
+	(setq lst (cdr lst))))
     answer))
 
 (defun jde-complete-get-accessible-info (class-info access name)
@@ -422,50 +422,50 @@ info\)\).  Each info list is in the format \(list \(list fields\)
 method will return a list concatenating the fields, methods, and inner
 classes for the access level."
   (let* ((public (nth jde-complete-public class-info))
-        (protected (nth jde-complete-protected class-info))
-        (package (nth jde-complete-package class-info))
-        (private (nth jde-complete-private class-info))
-        (package-name (jde-parse-get-package-name))
-        (this (concat (if package-name 
-                          (concat package-name "." ))
-                      (jde-parse-get-class-at-point)))
-        answer fields constructors methods classes packagep)
+	(protected (nth jde-complete-protected class-info))
+	(package (nth jde-complete-package class-info))
+	(private (nth jde-complete-private class-info))
+	(package-name (jde-parse-get-package-name))
+	(this (concat (if package-name
+			  (concat package-name "." ))
+		      (jde-parse-get-class-at-point)))
+	answer fields constructors methods classes packagep)
     (if (null package-name)
-        (setq package-name ""))
-    (if package-name 
-        (setq packagep (string-match package-name name)))
+	(setq package-name ""))
+    (if package-name
+	(setq packagep (string-match package-name name)))
     (setq fields (append (nth jde-complete-fields public)
-                         (if (>= access jde-complete-protected)
-                             (nth jde-complete-fields protected))
-                         (if packagep
-                             (nth jde-complete-fields package))
-                         (if (or (>= access jde-complete-private)
-                                 (string= name this))
-                             (nth jde-complete-fields private))))
+			 (if (>= access jde-complete-protected)
+			     (nth jde-complete-fields protected))
+			 (if packagep
+			     (nth jde-complete-fields package))
+			 (if (or (>= access jde-complete-private)
+				 (string= name this))
+			     (nth jde-complete-fields private))))
     (setq constructors (append (nth jde-complete-constructors public)
-                               (if (>= access jde-complete-protected)
-                                   (nth jde-complete-constructors protected))
-                               (if packagep
-                                   (nth jde-complete-constructors package))
-                               (if (or (>= access jde-complete-private)
-                                       (string= name this))
-                                   (nth jde-complete-constructors private))))
+			       (if (>= access jde-complete-protected)
+				   (nth jde-complete-constructors protected))
+			       (if packagep
+				   (nth jde-complete-constructors package))
+			       (if (or (>= access jde-complete-private)
+				       (string= name this))
+				   (nth jde-complete-constructors private))))
     (setq methods (append (nth jde-complete-methods public)
-                          (if (>= access jde-complete-protected)
-                              (nth jde-complete-methods protected))
-                          (if packagep
-                              (nth jde-complete-methods package))
-                          (if (or (>= access jde-complete-private)
-                                  (string= name this))
-                              (nth jde-complete-methods private))))
+			  (if (>= access jde-complete-protected)
+			      (nth jde-complete-methods protected))
+			  (if packagep
+			      (nth jde-complete-methods package))
+			  (if (or (>= access jde-complete-private)
+				  (string= name this))
+			      (nth jde-complete-methods private))))
     (setq classes (append (nth jde-complete-classes public)
-                          (if (>= access jde-complete-protected)
-                             (nth jde-complete-classes protected))
-                          (if packagep
-                              (nth jde-complete-classes package))
-                          (if (or (>= access jde-complete-private)
-                                  (string= name this))
-                              (nth jde-complete-classes private))))
+			  (if (>= access jde-complete-protected)
+			     (nth jde-complete-classes protected))
+			  (if packagep
+			      (nth jde-complete-classes package))
+			  (if (or (>= access jde-complete-private)
+				  (string= name this))
+			      (nth jde-complete-classes private))))
     (setq answer (list fields constructors methods classes))
     answer))
 
@@ -480,15 +480,15 @@ classes for the access level."
 jde.util.Completion.getClassInfo function with the short java class
 name NAME and the package list IMPORT where to look at."
   (save-excursion
-    (concat 
-     "{ " 
+    (concat
+     "{ "
      "String[] lst = new String[" (number-to-string (length import)) "];\n"
      (let ((count -1))
-       (mapconcat 
-	(function 
-	 (lambda (x) 
+       (mapconcat
+	(function
+	 (lambda (x)
 	   (setq count (+ 1 count))
-	   (concat "lst[" (int-to-string count) "]=\"" 
+	   (concat "lst[" (int-to-string count) "]=\""
 		   (car (nth count import)) "\";\n")))
 	import
 	" "))
@@ -497,41 +497,41 @@ name NAME and the package list IMPORT where to look at."
      "}")))
 
 
-(defun jde-complete-sort-comparison (first second) 
+(defun jde-complete-sort-comparison (first second)
   (string< (car first) (car second)))
 
-(defun jde-complete-get-variables (variables) 
+(defun jde-complete-get-variables (variables)
   "Transform a list of the type (\"var\" \"java.lang.String\")
 into (\"var\" \"java.lang.String\ var\")"
   (let (result current prev)
-    (if (null jde-complete-unique-method-names) 
-        (while variables
-          (setq current (car (car variables))) 
-          (setq result
-                (append
-                 (list (cons (concat current  
+    (if (null jde-complete-unique-method-names)
+	(while variables
+	  (setq current (car (car variables)))
+	  (setq result
+		(append
+		 (list (cons (concat current
 				     (if jde-complete-display-result-type
 					 (concat
-					  " : " 
-					  (jde-complete-maybe-unqualify 
+					  " : "
+					  (jde-complete-maybe-unqualify
 					   (nth 1 (car variables))))))
-                             current))
-                 result))
-          (setq variables (cdr variables)))
+			     current))
+		 result))
+	  (setq variables (cdr variables)))
       (while variables
-        (if (not (string= prev current))
-            (progn 
-              (setq prev current)
-              (setq result
-                    (append
-                     (list (cons (concat current 
+	(if (not (string= prev current))
+	    (progn
+	      (setq prev current)
+	      (setq result
+		    (append
+		     (list (cons (concat current
 					 (if jde-complete-display-result-type
-					     (concat " : " 
-						     (jde-complete-maybe-unqualify 
+					     (concat " : "
+						     (jde-complete-maybe-unqualify
 						      (nth 1 (car variables))))))
-                                 current))
-                     result))))
-        (setq variables (cdr variables))))
+				 current))
+		     result))))
+	(setq variables (cdr variables))))
     result))
 
 (defun jde-complete-build-completion-list (classinfo)
@@ -544,67 +544,67 @@ jde.util.Completion.getClassInfo function."
 
     ;;get the constructors
     (setq tmp (jde-complete-get-methods
-               (nth jde-complete-constructors classinfo) t))
+	       (nth jde-complete-constructors classinfo) t))
     (if tmp (setq result (append tmp result)))
 
-    ;; get the methods 
+    ;; get the methods
     (setq tmp (jde-complete-get-methods (nth jde-complete-methods classinfo)))
     (if tmp (setq result (append tmp result)))
-    
+
     ;; get inner classes
     (setq tmp (jde-complete-get-inner-classes
-               (nth jde-complete-classes classinfo)))
+	       (nth jde-complete-classes classinfo)))
     (if tmp (setq result (append tmp result)))
 
     result))
 
-(defun jde-complete-get-methods (classinfo &optional constructor) 
+(defun jde-complete-get-methods (classinfo &optional constructor)
   (let ((end-paren (if (null jde-complete-add-space-after-method) "(" " ("))
-        (end-parens (if (null jde-complete-insert-method-signature)
-                        (if (null jde-complete-add-space-after-method)
-                            "()"
-                          " ()") ""))
-        prev tmp current) 
+	(end-parens (if (null jde-complete-insert-method-signature)
+			(if (null jde-complete-add-space-after-method)
+			    "()"
+			  " ()") ""))
+	prev tmp current)
     (while classinfo
       (let* ((type (car (cdr (car classinfo))));;method type i.e. boolean
-             (exceptions (jde-get-exceptions (car (last (car classinfo)))))
-             (method (jde-complete-build-information-for-completion
-                      (car classinfo) end-paren))
+	     (exceptions (jde-get-exceptions (car (last (car classinfo)))))
+	     (method (jde-complete-build-information-for-completion
+		      (car classinfo) end-paren))
 	     (display (jde-complete-build-display-for-completion
-                      (car classinfo) end-paren constructor)))
-        (setq current (jde-parse-get-unqualified-name (car (car classinfo))))
-        (if (not (and jde-complete-unique-method-names
-                      (string= prev current)))
-            (progn
-              (setq prev current)
-              (setq tmp (append
-                         (list
-                          (cons 
+		      (car classinfo) end-paren constructor)))
+	(setq current (jde-parse-get-unqualified-name (car (car classinfo))))
+	(if (not (and jde-complete-unique-method-names
+		      (string= prev current)))
+	    (progn
+	      (setq prev current)
+	      (setq tmp (append
+			 (list
+			  (cons
 			   display
-                           (concat
-                            (if (null jde-complete-insert-method-signature)
-                                current
-                              method)
-                            end-parens)))
-                         tmp))))
-        (setq classinfo (cdr classinfo))))
+			   (concat
+			    (if (null jde-complete-insert-method-signature)
+				current
+			      method)
+			    end-parens)))
+			 tmp))))
+	(setq classinfo (cdr classinfo))))
     tmp))
-    
+
 (defun jde-complete-get-inner-classes(class-info)
   "Takes as an argument a list of inner classes an return a string of
 them or nil"
   (let (tmp fullname pos name)
-    (if class-info 
-        (while class-info
-          (let* ((fullname (caar class-info))
-                 (pos (string-match "\\$" fullname))
-                 (name (substring fullname (+ 1 pos))))
-            (setq tmp
-                  (append 
-                   (list (cons (concat name " : " fullname)
-                               name))
-                   tmp)))
-          (setq class-info (cdr class-info))))
+    (if class-info
+	(while class-info
+	  (let* ((fullname (caar class-info))
+		 (pos (string-match "\\$" fullname))
+		 (name (substring fullname (+ 1 pos))))
+	    (setq tmp
+		  (append
+		   (list (cons (concat name " : " fullname)
+			       name))
+		   tmp)))
+	  (setq class-info (cdr class-info))))
     tmp))
 
 (defun jde-get-exceptions (exceptions)
@@ -612,11 +612,11 @@ them or nil"
 or nil"
   (if (and (listp exceptions) (car exceptions))
       (let ((exs ""))
-        (while exceptions
-          (setq exs (concat exs (car exceptions)))
-          (setq exceptions (cdr exceptions))
-          (if exceptions (setq exs (concat exs ", "))))
-        exs)
+	(while exceptions
+	  (setq exs (concat exs (car exceptions)))
+	  (setq exceptions (cdr exceptions))
+	  (if exceptions (setq exs (concat exs ", "))))
+	exs)
     nil))
 
 (defun jde-complete-maybe-unqualify (type)
@@ -629,20 +629,20 @@ or nil"
 						  &optional constructor)
   "Builds the string that describes a method in a menu for selecting a completion."
   (let ((result (concat
-                 (jde-parse-get-unqualified-name (car lst))
-                 end-parens))
+		 (jde-parse-get-unqualified-name (car lst))
+		 end-parens))
 	(rettype (car (cdr lst)))
-        (exceptions (if (and (listp (last lst)) (car (last lst)))
+	(exceptions (if (and (listp (last lst)) (car (last lst)))
 			(car (last lst)))))
-    (if constructor 
-        (setq lst (cdr lst))
+    (if constructor
+	(setq lst (cdr lst))
       (setq lst (cdr (cdr lst))))
     (while (and lst
-                (not (listp (car lst))))
+		(not (listp (car lst))))
       (setq result (concat result (jde-complete-maybe-unqualify (car lst))))
       (setq lst (cdr lst))
       (if (and lst
-               (not (listp (car lst))))
+	       (not (listp (car lst))))
 	  (setq result (concat result ", "))))
     (setq result (concat result ")"))
     (concat result
@@ -653,24 +653,24 @@ or nil"
 	    (if (and exceptions jde-complete-display-throws)
 		(concat " throws "
 			(jde-get-exceptions
-                         (mapcar 'jde-complete-maybe-unqualify exceptions)))))))
+			 (mapcar 'jde-complete-maybe-unqualify exceptions)))))))
 
 (defun jde-complete-build-information-for-completion (lst
-                                                      end-parens
-                                                      &optional constructor)
+						      end-parens
+						      &optional constructor)
   "Builds the text that is inserted in the code for a particular completion."
   (let ((result (concat
-                 (jde-parse-get-unqualified-name (car lst))
-                 end-parens)))
-    (if constructor 
-        (setq lst (cdr lst))
+		 (jde-parse-get-unqualified-name (car lst))
+		 end-parens)))
+    (if constructor
+	(setq lst (cdr lst))
       (setq lst (cdr (cdr lst))))
     (while (and lst
-                (not (listp (car lst))))
+		(not (listp (car lst))))
       (setq result (concat result (car lst)))
       (setq lst (cdr lst))
       (if (and lst
-               (not (listp (car lst))))
+	       (not (listp (car lst))))
 	  (setq result (concat result ", "))))
     (setq result (concat result ")"))
     result))
@@ -686,86 +686,86 @@ or nil"
     (if tmp
 	(progn
 	  (delete-region jde-parse-current-beginning
-                         jde-parse-current-end)
-          (insert tmp)
+			 jde-parse-current-end)
+	  (insert tmp)
 	  (setq jde-complete-current-signature (car elem))
-          (jde-complete-place-cursor)
-          (set-marker jde-parse-current-end 
+	  (jde-complete-place-cursor)
+	  (set-marker jde-parse-current-end
 		      (+ (marker-position jde-parse-current-beginning)
-                         (length tmp)))
-          (jde-complete-display-current-signature));;displaying the signature
+			 (length tmp)))
+	  (jde-complete-display-current-signature));;displaying the signature
       (message (format "No completion at this point!(cycle)")))
     ;;  (goto-char (marker-position jde-complete-current-end))
     ))
 
 (defun jde-complete-insert-completion (item)
-  (if item 
+  (if item
       (progn
-        (delete-region jde-parse-current-beginning
-                       jde-parse-current-end)
-        (insert item)
-        (jde-complete-place-cursor)
-        (jde-complete-display-current-signature)
-        (set-marker jde-parse-current-end 
-                    (+ (marker-position jde-parse-current-beginning) 
-                       (length item))))))
+	(delete-region jde-parse-current-beginning
+		       jde-parse-current-end)
+	(insert item)
+	(jde-complete-place-cursor)
+	(jde-complete-display-current-signature)
+	(set-marker jde-parse-current-end
+		    (+ (marker-position jde-parse-current-beginning)
+		       (length item))))))
 
 (defun jde-complete-find-all-completions (pair lst &optional exact-match)
   (let* (tmp
-         chop-pos
-         (args (nth 2 pair))
-         (pat (nth 1 pair))
-         (result nil)
-         (first-char (substring pat 0 1)))
-    
+	 chop-pos
+	 (args (nth 2 pair))
+	 (pat (nth 1 pair))
+	 (result nil)
+	 (first-char (substring pat 0 1)))
+
     (if (null args)
-        (setq exact-match nil)
-      (setq pat (concat pat args))) 
+	(setq exact-match nil)
+      (setq pat (concat pat args)))
 
     (if (string= pat "$")
-        (setq pat "\\$"))
+	(setq pat "\\$"))
 
     (while lst
       (setq tmp (car (car lst)))
       (setq chop-pos (string-match " : " tmp))
       (setq tmp (substring tmp 0 chop-pos))
-      (if (if exact-match 
-              (string= pat tmp)
-            (equal 0 (string-match pat tmp)))
-          (setq result (append result (list (car lst)))))
+      (if (if exact-match
+	      (string= pat tmp)
+	    (equal 0 (string-match pat tmp)))
+	  (setq result (append result (list (car lst)))))
       (setq lst (cdr lst)))
     result))
 
 
 (defun jde-complete-find-completion-for-pair (pair &optional exact-completion
-                                                   access-level)
+						   access-level)
   (let ((type (jde-parse-eval-type-of (car pair))))
     (if type
-        (cond ((member type jde-parse-primitive-types)
-               (error "Cannot complete primitive type: %s" type))
-              ((string= type "void")
-               (error "Cannot complete return type of %s is void." (car pair)))
-              (access-level
-               (let ((classinfo (jde-complete-get-classinfo
-                                 type access-level)))
-                 (if classinfo
-                     (if (and (string= (nth 1 pair) "")
-                              (not exact-completion))
-                         (setq jde-complete-current-list classinfo) 
-                       (setq jde-complete-current-list 
-                             (jde-complete-find-all-completions
-                              pair classinfo exact-completion))))))
-              (t
-               (let ((classinfo (jde-complete-get-classinfo type)))
-                 (if classinfo
-                     (if (and (string= (nth 1 pair) "")
-                              (not exact-completion))
-                         (setq jde-complete-current-list classinfo) 
-                       (setq jde-complete-current-list 
-                             (jde-complete-find-all-completions
-                              pair classinfo exact-completion)))))))
+	(cond ((member type jde-parse-primitive-types)
+	       (error "Cannot complete primitive type: %s" type))
+	      ((string= type "void")
+	       (error "Cannot complete return type of %s is void." (car pair)))
+	      (access-level
+	       (let ((classinfo (jde-complete-get-classinfo
+				 type access-level)))
+		 (if classinfo
+		     (if (and (string= (nth 1 pair) "")
+			      (not exact-completion))
+			 (setq jde-complete-current-list classinfo)
+		       (setq jde-complete-current-list
+			     (jde-complete-find-all-completions
+			      pair classinfo exact-completion))))))
+	      (t
+	       (let ((classinfo (jde-complete-get-classinfo type)))
+		 (if classinfo
+		     (if (and (string= (nth 1 pair) "")
+			      (not exact-completion))
+			 (setq jde-complete-current-list classinfo)
+		       (setq jde-complete-current-list
+			     (jde-complete-find-all-completions
+			      pair classinfo exact-completion)))))))
       nil)))
- 
+
 (defun jde-complete-in-line ()
   "Completes the method or field name at point.  Repeating the command
 cycles through all potential completions for the name.  This function
@@ -789,7 +789,7 @@ menu."
        (>= (point) (marker-position jde-parse-current-beginning))
        (<= (point) (marker-position jde-parse-current-end))
        (eq last-command this-command))
-      (jde-complete-complete-cycle) 
+      (jde-complete-complete-cycle)
     ;;else
     (jde-complete-generic "in-line")))
 
@@ -803,21 +803,21 @@ before invoking the completion"
   (let (index-alist pair name)
     (setq index-alist jde-complete-current-list)
     (setq pair
-          (if (= (length index-alist) 1)
-              ;; if only one item match, return it 
-              (car index-alist)
-            (if use-menu
-                ;; delegates menu handling to imenu :-)
-                (imenu--mouse-menu
-                 index-alist
-                 ;; Popup window at text cursor
-                 (jde-cursor-posn-as-event) 
-                 (or title "Completion"))
-              (assoc (completing-read (or title "Completion: ")
-                                      index-alist
-                                      nil ;;predicate
-                                      nil ;;required-match
-                                      initial-input) ;;initial-input
+	  (if (= (length index-alist) 1)
+	      ;; if only one item match, return it
+	      (car index-alist)
+	    (if use-menu
+		;; delegates menu handling to imenu :-)
+		(imenu--mouse-menu
+		 index-alist
+		 ;; Popup window at text cursor
+		 (jde-cursor-posn-as-event)
+		 (or title "Completion"))
+	      (assoc (completing-read (or title "Completion: ")
+				      index-alist
+				      nil ;;predicate
+				      nil ;;required-match
+				      initial-input) ;;initial-input
 				      index-alist))))
     (setq name (cdr pair))
     (setq jde-complete-current-signature (car pair))
@@ -828,21 +828,21 @@ before invoking the completion"
 cursor position on XEmacs."
   (if jde-xemacsp
       (let* ((mouse-pos (mouse-pixel-position))
-             (x (car (cdr mouse-pos)))
-             (y (cdr (cdr mouse-pos))))
-        (make-event 'button-press `(button 1 modifiers nil x ,x y ,y)))
+	     (x (car (cdr mouse-pos)))
+	     (y (cdr (cdr mouse-pos))))
+	(make-event 'button-press `(button 1 modifiers nil x ,x y ,y)))
     (let ((x (* (if jde-xemacsp (frame-width) (frame-char-width))
-                (if (and
-                     (boundp 'hscroll-mode)
-                     (fboundp 'hscroll-window-column))
-                    (hscroll-window-column)
-                  (mod (current-column) (window-width)))))
-          (y  (* (if jde-xemacsp (frame-height) (frame-char-height)) 
-                 (- (count-lines (point-min) (point))
-                    (count-lines (point-min) (window-start)))))
-          (window (get-buffer-window (current-buffer))))
+		(if (and
+		     (boundp 'hscroll-mode)
+		     (fboundp 'hscroll-window-column))
+		    (hscroll-window-column)
+		  (mod (current-column) (window-width)))))
+	  (y  (* (if jde-xemacsp (frame-height) (frame-char-height))
+		 (- (count-lines (point-min) (point))
+		    (count-lines (point-min) (window-start)))))
+	  (window (get-buffer-window (current-buffer))))
       (list (list x y) window))))
-  
+
 (defun jde-complete-menu ()
   "Completes the method or field name at point.  This command displays
 a popup menu listing the potential completions for the name at
@@ -863,70 +863,70 @@ completions at point."
   (interactive)
   (jde-complete-generic nil))
 
-(defun jde-complete-generic (completion-type) 
-  "Generic implementation for jde-complete methods" 
+(defun jde-complete-generic (completion-type)
+  "Generic implementation for jde-complete methods"
   (let* ((pair (jde-parse-java-variable-at-point))
-         jde-parse-attempted-to-import)
+	 jde-parse-attempted-to-import)
     ;;resetting jde-complete-current-list
     (setq jde-complete-current-list nil)
     (if pair
-        (condition-case err
-            (jde-complete-pair (jde-complete-get-pair pair nil) completion-type)
-          (error (condition-case err
-                     (jde-complete-pair (jde-complete-get-pair pair t)
-                                        completion-type))
-                 (error (message "%s" (error-message-string err)))))
+	(condition-case err
+	    (jde-complete-pair (jde-complete-get-pair pair nil) completion-type)
+	  (error (condition-case err
+		     (jde-complete-pair (jde-complete-get-pair pair t)
+					completion-type))
+		 (error (message "%s" (error-message-string err)))))
       (message "No completion at this point"))))
 
 (defun jde-complete-pair (pair completion-type)
   (let ((access (jde-complete-get-access pair))
-        completion-list)
+	completion-list)
     (progn
-      (if access 
-          (setq completion-list
-                (jde-complete-find-completion-for-pair pair nil access))
-        (setq completion-list (jde-complete-find-completion-for-pair pair)))
+      (if access
+	  (setq completion-list
+		(jde-complete-find-completion-for-pair pair nil access))
+	(setq completion-list (jde-complete-find-completion-for-pair pair)))
       ;;if the completion list is nil check if the method is in the current
       ;;class(this)
       (if (null completion-list)
-          (setq completion-list (jde-complete-find-completion-for-pair
-                                 (list (concat "this." (car pair)) "")
-                                 nil jde-complete-private)))
+	  (setq completion-list (jde-complete-find-completion-for-pair
+				 (list (concat "this." (car pair)) "")
+				 nil jde-complete-private)))
       ;;if completions is still null check if the method is in the
       ;;super class
       (if (null completion-list)
-          (setq completion-list (jde-complete-find-completion-for-pair
-                                 (list (concat "super." (car pair)) "")
-                                 nil jde-complete-protected)))
-      
-      (if completion-list
-          (let ((title (concat (car pair) "."
-                               (car (cdr pair)) "[...]")))
-            (if (null completion-type)
-                (jde-complete-choose-completion title (car (cdr pair)))
-              (if (string= completion-type "in-line")
-                  (progn
-                    (setq jde-complete-current-list-index -1)
-                    (jde-complete-complete-cycle))
-                (jde-complete-choose-completion title (car (cdr pair)) t))))
-        (error "No completion at this point")))))
+	  (setq completion-list (jde-complete-find-completion-for-pair
+				 (list (concat "super." (car pair)) "")
+				 nil jde-complete-protected)))
 
-(defun jde-complete-get-access (pair) 
+      (if completion-list
+	  (let ((title (concat (car pair) "."
+			       (car (cdr pair)) "[...]")))
+	    (if (null completion-type)
+		(jde-complete-choose-completion title (car (cdr pair)))
+	      (if (string= completion-type "in-line")
+		  (progn
+		    (setq jde-complete-current-list-index -1)
+		    (jde-complete-complete-cycle))
+		(jde-complete-choose-completion title (car (cdr pair)) t))))
+	(error "No completion at this point")))))
+
+(defun jde-complete-get-access (pair)
   (let (access)
     (if (string= (car pair) "this")
-        (setq access jde-complete-private)
+	(setq access jde-complete-private)
       (if (string= (car pair) "super")
-          (setq access jde-complete-protected)))
+	  (setq access jde-complete-protected)))
     access))
 
-(defun jde-complete-get-pair (pair op) 
+(defun jde-complete-get-pair (pair op)
   (let ((tmp (list (car pair) (cadr pair))))
     (if (and op
-             (string= (car tmp) "" )
-             (not (string= (cadr tmp) "")))
-        (setcar tmp (cadr tmp)))
+	     (string= (car tmp) "" )
+	     (not (string= (cadr tmp) "")))
+	(setcar tmp (cadr tmp)))
     (if (string= (car tmp) "" )
-        (setcar tmp "this"))
+	(setcar tmp "this"))
     tmp))
 
 (defun jde-complete ()
@@ -951,12 +951,12 @@ inside the buffer and replace it with message. Message should not be
 longer than a line."
   (interactive)
   (let* ((popup (get-buffer-window buffer-or-name));;last popup window
-         (new (get-buffer-create buffer-or-name));;new popup window
-         (current (current-buffer));;current buffer
-         (min window-min-height);;current window-min-height
-         (w (selected-window));;selected window
-         (height (window-height w));;window height
-         w2)
+	 (new (get-buffer-create buffer-or-name));;new popup window
+	 (current (current-buffer));;current buffer
+	 (min window-min-height);;current window-min-height
+	 (w (selected-window));;selected window
+	 (height (window-height w));;window height
+	 w2)
     (if popup (delete-window popup));;deleting previous windows
     (set-window-buffer w new);;set buffer of current window to be the new
     (erase-buffer)
@@ -965,10 +965,10 @@ longer than a line."
     (setq w2 (split-window w (- height 2)));;split windows
     (set-window-buffer w current);;restore the buffer in the current window
     (if (> (window-height w2) 2);;if the popup window is larger than 2
-        (enlarge-window (- (window-height w2) 2)));;resize it to 2
+	(enlarge-window (- (window-height w2) 2)));;resize it to 2
     (setq window-min-height min);; restore window-min-height
     (run-at-time jde-complete-signature-display-time
-                 nil 'delete-window w2)));;set timer to delete popup window
+		 nil 'delete-window w2)));;set timer to delete popup window
 
 (defun jde-complete-display-current-signature()
   "Displays the current signature: `jde-complete-current-signature'. The
@@ -976,27 +976,27 @@ display mode will depend on the variable `jde-complete-signature-display'"
   (interactive)
   (if jde-complete-current-signature
       (let ((display (car jde-complete-signature-display)))
-        (cond ((string= display "Eldoc") ;;eldoc
-               (setq jde-complete-display-signature t)
-               (run-at-time jde-complete-signature-display-time
-                            nil `set-variable
-                            `jde-complete-display-signature nil)
-               (eldoc-message jde-complete-current-signature))
-              ;;use buffer
-              ((string= display "Buffer")
-               (jde-complete-popup-message jde-complete-current-signature
-                                           jde-complete-signature-buffer))
-              (t));; do nothing 
-        )))
+	(cond ((string= display "Eldoc") ;;eldoc
+	       (setq jde-complete-display-signature t)
+	       (run-at-time jde-complete-signature-display-time
+			    nil `set-variable
+			    `jde-complete-display-signature nil)
+	       (eldoc-message jde-complete-current-signature))
+	      ;;use buffer
+	      ((string= display "Buffer")
+	       (jde-complete-popup-message jde-complete-current-signature
+					   jde-complete-signature-buffer))
+	      (t));; do nothing
+	)))
 
 (defun jde-complete-place-cursor ()
   "Places the cursor in between the parenthesis after a
 completion. This is only done for methods that contain parameters, for
 all the other completions the cursor is place at the end."
   (let ((end-paren (string-match ")" jde-complete-current-signature))
-        (start-paren (string-match "(" jde-complete-current-signature)))
+	(start-paren (string-match "(" jde-complete-current-signature)))
     (if (and end-paren start-paren (not (= start-paren (- end-paren 1))))
-        (goto-char (- (point) 1)))))
+	(goto-char (- (point) 1)))))
 
 (provide 'jde-complete)
 

@@ -1,11 +1,12 @@
 ;;; jde-javadoc-gen.el -- Javadoc builder
-;; $Revision: 1.18 $ 
+;; $Id$
 
 ;; Author: Sergey A Klibanov <sakliban@cs.wustl.edu>
-;; Maintainer: Paul Kinnucan, Sergey A Klibanov
+;; Maintainer: Paul Landes <landes <at> mailc dt net>, Sergey A Klibanov
 ;; Keywords: java, tools
 
 ;; Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; This file is not part of Emacs
 
@@ -27,10 +28,6 @@
 ;;; Commentary:
 
 ;;; Code:
-
-;;;;
-;;;; Customization
-;;;;
 
 (defgroup jde-javadoc nil
   "Javadoc template generator"
@@ -91,7 +88,7 @@ into the javadoc command line."
    The second argument can be a URL (http: or file:). If it is a relative file name, it is relative to the directory
    from which javadoc is run."
   :group 'jde-javadoc
-  :type '(repeat 
+  :type '(repeat
 	  (cons :tag "Remote URL and directory holding package-list for that URL"
 		(string :tag "URL")
 		(string :tag "Path"))))
@@ -229,7 +226,7 @@ into the javadoc command line."
   :group 'jde-javadoc
   :type '(repeat (string :tag "Argument")))
 
-(defclass jde-javadoc-maker (efc-compiler) 
+(defclass jde-javadoc-maker (efc-compiler)
   ((make-packages-p  :initarg :make-packages-p
 		     :type boolean
 		     :initform t
@@ -241,57 +238,57 @@ into the javadoc command line."
 
   (oset this name "javadoc")
 
-  (oset 
-   this 
+  (oset
+   this
    comp-finish-fcn
    (lambda (buf msg)
      (message msg)
      (if (and
 	  jde-javadoc-display-doc
 	  (string-match "finished" msg))
-	 (browse-url-of-file 
-	  (expand-file-name  
-	   "index.html" 
-	   (jde-normalize-path 
-	    jde-javadoc-gen-destination-directory 
+	 (browse-url-of-file
+	  (expand-file-name
+	   "index.html"
+	   (jde-normalize-path
+	    jde-javadoc-gen-destination-directory
 	    'jde-javadoc-gen-destination-directory))))))
 
-  (oset 
-   this 
-   exec-path 
+  (oset
+   this
+   exec-path
    (jde-cygpath (expand-file-name "bin/javadoc" (jde-get-jdk-dir)) t)))
 
 (defmethod get-args ((this jde-javadoc-maker))
-  "Get the arguments to pass to the javadoc process as specified 
+  "Get the arguments to pass to the javadoc process as specified
 by the jde-javadoc-gen variables."
   (let* ((destination-directory
-	  (jde-normalize-path 
-	   jde-javadoc-gen-destination-directory 
+	  (jde-normalize-path
+	   jde-javadoc-gen-destination-directory
 	   'jde-javadoc-gen-destination-directory))
-	 (args 
+	 (args
 	  (list
 	   "-d" destination-directory
 	   (car jde-javadoc-gen-detail-switch))))
 
-    (if (not (file-exists-p destination-directory)) 
-        (make-directory destination-directory))
+    (if (not (file-exists-p destination-directory))
+	(make-directory destination-directory))
 
     ;;Insert online links
-    (if jde-javadoc-gen-link-online 
-	(setq args 
+    (if jde-javadoc-gen-link-online
+	(setq args
 	      (append
 	       args
 	       (mapcan
 		(lambda (link)  (list "-link" link))
 		jde-javadoc-gen-link-URL))))
-    
+
     ;;Insert offline links
     (if jde-javadoc-gen-link-offline
 	(setq args
-	      (append 
+	      (append
 	       args
 	       (mapcan
-		(lambda (link) 
+		(lambda (link)
 		  (list "-linkoffline" (car  link) (cdr link)))
 		jde-javadoc-gen-link-offline))))
 
@@ -301,7 +298,7 @@ by the jde-javadoc-gen variables."
 	      (append
 	       args
 	       (mapcan
-		(lambda (group) 
+		(lambda (group)
 		  (list "-group" (car group) (cdr group)))
 		jde-javadoc-gen-group))))
 
@@ -356,7 +353,7 @@ by the jde-javadoc-gen variables."
     (if (not (equal "" jde-javadoc-gen-window-title))
 	(setq args
 	      (append
-	       args 
+	       args
 	       (list
 		"-windowtitle"
 		jde-javadoc-gen-window-title))))
@@ -365,7 +362,7 @@ by the jde-javadoc-gen variables."
     (if (not (equal "" jde-javadoc-gen-doc-title))
 	(setq args
 	      (append
-	       args 
+	       args
 	       (list
 		"-doctitle"
 		jde-javadoc-gen-doc-title))))
@@ -374,7 +371,7 @@ by the jde-javadoc-gen variables."
     (if (not (equal "" jde-javadoc-gen-header))
 	(setq args
 	      (append
-	       args 
+	       args
 	       (list
 		"-header"
 		jde-javadoc-gen-header))))
@@ -383,8 +380,8 @@ by the jde-javadoc-gen variables."
     (if (not (equal "" jde-javadoc-gen-footer))
 	(setq args
 	      (append
-	       args 
-	       (list 
+	       args
+	       (list
 		"-footer"
 		jde-javadoc-gen-footer))))
 
@@ -393,7 +390,7 @@ by the jde-javadoc-gen variables."
 	(setq args
 	      (append
 	       args
-	       (list 
+	       (list
 		"-bottom"
 		jde-javadoc-gen-bottom))))
 
@@ -401,7 +398,7 @@ by the jde-javadoc-gen variables."
     (if (not (equal "" jde-javadoc-gen-helpfile))
 	(setq args
 	      (append
-	       args 
+	       args
 	       (list
 	       "-helpfile"
 	       (jde-normalize-path 'jde-javadoc-gen-helpfile)))))
@@ -410,8 +407,8 @@ by the jde-javadoc-gen variables."
     (if (not (equal "" jde-javadoc-gen-stylesheetfile))
 	(setq args
 	      (append
-	       args 
-	       (list 
+	       args
+	       (list
 		"-stylesheetfile"
 		(jde-normalize-path 'jde-javadoc-gen-stylesheetfile)))))
 
@@ -419,8 +416,8 @@ by the jde-javadoc-gen variables."
     (if (not (equal "" jde-javadoc-gen-overview))
 	(setq args
 	      (append
-	       args 
-	       (list 
+	       args
+	       (list
 		"-overview"
 		jde-javadoc-gen-overview))))
 
@@ -428,7 +425,7 @@ by the jde-javadoc-gen variables."
     (if (not (equal "" jde-javadoc-gen-doclet))
 	(setq args
 	      (append
-	       args 
+	       args
 	       (list
 		"-doclet"
 		jde-javadoc-gen-doclet))))
@@ -448,84 +445,84 @@ by the jde-javadoc-gen variables."
     (if jde-javadoc-gen-use
 	(setq args
 	      (append
-	       args 
+	       args
 	       (list "-use"))))
 
     ;;Insert -author
     (if jde-javadoc-gen-author
 	(setq args
 	      (append
-	       args 
+	       args
 	       (list "-author"))))
-    
+
     ;;Insert -version
     (if jde-javadoc-gen-version
 	(setq args
 	      (append
-	       args 
+	       args
 	       (list "-version"))))
 
     ;;Insert -splitindex
     (if jde-javadoc-gen-split-index
 	(setq args
 	      (append
-	       args 
+	       args
 	       (list "-splitindex"))))
 
     ;;Insert -nodeprecated
     (if jde-javadoc-gen-nodeprecated
 	(setq args
-	      (append 
-	       args 
+	      (append
+	       args
 	       (list "-nodeprecated"))))
 
     ;;Insert -nodeprecatedlist
     (if jde-javadoc-gen-nodeprecatedlist
 	(setq args
-	      (append 
-	       args 
+	      (append
+	       args
 	       (list "-nodeprecatedlist"))))
 
     ;;Insert -notree
     (if jde-javadoc-gen-notree
 	(setq args
 	      (append
-	       args 
+	       args
 	       (list "-notree"))))
 
     ;;Insert -noindex
     (if jde-javadoc-gen-noindex
 	(setq args
 	      (append
-	       args 
+	       args
 	       (list "-noindex"))))
 
     ;;Insert -nohelp
     (if jde-javadoc-gen-nohelp
 	(setq args
 	      (append
-	       args 
+	       args
 	       (list "-nohelp"))))
 
     ;;Insert -nonavbar
     (if jde-javadoc-gen-nonavbar
 	(setq args
 	      (append
-	       args 
+	       args
 	       (list "-nonavbar"))))
 
     ;;Insert -serialwarn
     (if jde-javadoc-gen-serialwarn
 	(setq args
 	      (append
-	       args 
+	       args
 	       (list  "-serialwarn"))))
 
     ;;Insert -verbose
     (if jde-javadoc-gen-verbose
 	(setq args
 	      (append
-	       args 
+	       args
 	       (list  "-verbose"))))
 
     ;;Insert other tags
@@ -537,36 +534,36 @@ by the jde-javadoc-gen variables."
 
     ;;Insert packages/files
     (if (and (oref this make-packages-p) jde-javadoc-gen-packages)
-	(setq args 
-	      (append 
+	(setq args
+	      (append
 	       args
 	       (mapcar
 		(lambda (packagename) packagename)
 		jde-javadoc-gen-packages)))
-      (setq 
+      (setq
        args
        (append args (list (buffer-file-name)))))))
-	 
+
 
 ;;;###autoload
 (defun jde-javadoc-make-internal (&optional make-packages-p)
   "Generates javadoc for the current project if MAKE-PACKAGES-P
 and `jde-javadoc-gen-packages' are nonnil; otherwise, make doc
 for the current buffer. This command runs the
-currently selected javadoc's program to generate the documentation. 
+currently selected javadoc's program to generate the documentation.
 It uses `jde-get-jdk-dir' to determine the location of
-the currentlyh selected JDK. The variable `jde-global-classpath' specifies 
+the currentlyh selected JDK. The variable `jde-global-classpath' specifies
 the javadoc -classpath argument. The variable `jde-sourcepath'
 specifies the javadoc  -sourcepath argument. You can specify all
 other javadoc options via JDE customization variables. To specify the
-options, select Project->Options->Javadoc from the JDE menu. Use 
+options, select Project->Options->Javadoc from the JDE menu. Use
 `jde-javadoc-gen-packages' to specify the packages, classes, or source
 files for which you want to generate javadoc. If this variable is nil,
 this command generates javadoc for the Java source file in the current
 buffer. If `jde-javadoc-display-doc' is nonnil, this command displays
 the generated documentation in a browser."
   (save-some-buffers)
-  (let ((generator 
+  (let ((generator
 	 (jde-javadoc-maker
 	  "javadoc generator"
 	  :make-packages-p make-packages-p)))
@@ -577,13 +574,13 @@ the generated documentation in a browser."
 ;;;###autoload
 (defun jde-javadoc-make ()
   "Generates javadoc for the current project. This command runs the
-currently selected JDK's javadoc program to generate the documentation. 
-It uses `jde-get-jdk-dir' to determine the location of the currently 
-selected JDK. The variable `jde-global-classpath' specifies the javadoc 
+currently selected JDK's javadoc program to generate the documentation.
+It uses `jde-get-jdk-dir' to determine the location of the currently
+selected JDK. The variable `jde-global-classpath' specifies the javadoc
 -classpath argument. The variable `jde-sourcepath'
 specifies the javadoc  -sourcepath argument. You can specify all
 other javadoc options via JDE customization variables. To specify the
-options, select Project->Options->Javadoc from the JDE menu. Use 
+options, select Project->Options->Javadoc from the JDE menu. Use
 `jde-javadoc-gen-packages' to specify the packages, classes, or source
 files for which you want to generate javadoc. If this variable is nil,
 this command generates javadoc for the Java source file in the current
@@ -596,7 +593,7 @@ the generated documentation in a browser."
 (defun jde-javadoc-make-buffer ()
   "Generates javadoc for the current buffer. This command runs the
 currently selected JDK's javadoc program to generate the
-documentation. It uses `jde-get-jdk-dir' to determine the location of the currently 
+documentation. It uses `jde-get-jdk-dir' to determine the location of the currently
 selected JDK.  The variable `jde-global-classpath' specifies the
 javadoc -classpath argument. The variable `jde-sourcepath' specifies
 the javadoc -sourcepath argument. You can specify all other javadoc
@@ -618,9 +615,9 @@ browser."
 	   (substring jdk-url 0 (string-match "index" jdk-url))
 	   (if (eq system-type 'windows-nt) "tooldocs/windows/" "tooldocs/solaris/")
 	   "javadoc.html")))
-    (browse-url 
+    (browse-url
      javadoc-url
-     (if (boundp 
+     (if (boundp
 	  'browse-url-new-window-flag)
 	 browse-url-new-window-flag
        browse-url-new-window-p))))

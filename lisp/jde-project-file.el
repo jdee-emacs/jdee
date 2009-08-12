@@ -1,11 +1,12 @@
 ;;; jde-project-file.el -- Integrated Development Environment for Java.
-;; $Revision: 1.7 $ $Date: 2004/11/13 14:16:16 $ 
+;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
-;; Maintainer: Paul Kinnucan
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 2004 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -24,18 +25,7 @@
 
 ;;; Commentary:
 
-;; This is one of a set of packages that make up the 
-;; Java Development Environment (JDE) for Emacs. See the
-;; JDE User's Guide for more information.
-
-;; The latest version of the JDE is available at
-;; <URL:http://jdee.sunsite.dk>.
-
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Kinnucan at paulk@mathworks.com.
-
 ;;; Code:
-
 
 (defconst jde-project-file-version "1.0"
   "*The current JDE project file version number.")
@@ -57,7 +47,7 @@ temporarily when stepping through code."
 (defun jde-toggle-project-switching ()
   "Toggles project switching on or off."
   (interactive)
-  (setq jde-project-context-switching-enabled-p 
+  (setq jde-project-context-switching-enabled-p
 	(not jde-project-context-switching-enabled-p)))
 
 (defcustom jde-project-name "default"
@@ -118,13 +108,13 @@ starting with the topmost."
     (while file
       (setq files (append (list file) files))
       (setq current-dir (file-name-directory file))
-      (setq 
+      (setq
        file
        (if (not (jde-root-dir-p current-dir))
 	   (jde-find-project-file
 	    (expand-file-name ".." current-dir)))))
     files))
-      
+
 (defvar jde-loading-project nil
   "Used by project loading system.")
 
@@ -141,8 +131,8 @@ If no project files are found, set the JDE variables to their
 Emacs startup values."
   (interactive)
   (setq jde-loading-project t)
-  (let ((prj-files 
-	 (jde-find-project-files 
+  (let ((prj-files
+	 (jde-find-project-files
 	  ;; Need to normalize path to work around bug in the
 	  ;; cygwin version of XEmacs.
 	  (expand-file-name "." default-directory))))
@@ -168,7 +158,7 @@ Emacs startup values."
    (lambda (java-buffer)
      (save-excursion
        (set-buffer java-buffer)
-       (message "Loading project file for %s ..." 
+       (message "Loading project file for %s ..."
 		(buffer-file-name java-buffer))
        (jde-load-project-file)))
    (jde-get-java-source-buffers)))
@@ -219,12 +209,12 @@ Leave point at the location of the call, or after the last expression."
 (defun jde-symbol-list (&optional force-update)
   "Return a list of variables to be processed by `jde-save-project'.
 The first time this is called, the list is saved in `jde-symbol-list'.
-If nonnil, FORCE-UPDATE forces regeneration of `jde-symbol-list'. 
-This is useful for updating customization variables defined by 
+If nonnil, FORCE-UPDATE forces regeneration of `jde-symbol-list'.
+This is useful for updating customization variables defined by
 packages loaded after startup of the JDEE."
   (if force-update
       (setq jde-symbol-list nil))
-  (unless jde-symbol-list 
+  (unless jde-symbol-list
     (mapatoms
      (lambda (symbol)
        (if (jde-symbol-p symbol)
@@ -279,7 +269,7 @@ if none. To test if SYMBOL has any value for PROJECT, use
 
 (defun jde-save-close-buffer (project)
   "Saves and closes the buffer associated with PROJECT."
-  (let* ((buffer 
+  (let* ((buffer
 	  (if jde-xemacsp
 	      (get-file-buffer project)
 	    (find-buffer-visiting project)))
@@ -301,7 +291,7 @@ in PROJECTS."
    (lambda (project)
      (if (and (not (string= (car project) "default"))
 	      (member (car project) projects))
-	 (let ((buffer 
+	 (let ((buffer
 		(if jde-xemacsp
 		    (get-file-buffer (car project))
 		  (find-buffer-visiting (car project))))
@@ -351,7 +341,7 @@ should receive the customized values."
 			       (jde-get-project symbol (car proj-iter))))
 		 (setq val-to-save (eval (car (get symbol 'customized-value))))
 		 (and (not (null (get symbol 'customized-value))) ;; has been customized.
-		      (or                               ;; either 
+		      (or                               ;; either
 		       (null (get symbol 'saved-value)) ;; not saved in .emacs file, or
 		       (not (equal val-to-save          ;; different from value in .emacs file
 				   (eval (car (get symbol 'saved-value))))))))))
@@ -377,8 +367,8 @@ should receive the customized values."
     (jde-log-msg "jde-save-project-internal: projects: %S" projects-reversed)
     (mapc 'jde-save-open-buffer projects-reversed)
     (mapc (lambda (symbol)
-  	    (if (jde-save-needs-saving-p symbol projects-reversed)
-  		(jde-save-variable symbol projects-reversed)))
+	    (if (jde-save-needs-saving-p symbol projects-reversed)
+		(jde-save-variable symbol projects-reversed)))
 	  (jde-symbol-list))
     (mapc 'jde-save-close-buffer projects-reversed)))
 
@@ -419,7 +409,7 @@ hierarchical projects."
     (if (not (member prj-file projects))
 	;; create empty project file if none found
 	(let* ((auto-insert nil)	; disable auto-insert
-	       (standard-output (find-file-noselect prj-file))	
+	       (standard-output (find-file-noselect prj-file))
 	       (message-log-max nil))	; disable message log
 	  (princ "(jde-project-file-version ")
 	  (prin1 jde-project-file-version)
@@ -436,16 +426,16 @@ hierarchical projects."
   "JDEE customization variables that have project-specific customizations.")
 
 (defun jde-set-variables (&rest args)
-  "Initialize JDE customization variables.  
+  "Initialize JDE customization variables.
 
-Takes a variable number of arguments. Each argument 
+Takes a variable number of arguments. Each argument
 should be of the form:
 
   (SYMBOL VALUE)
 
 The value of SYMBOL is set to VALUE.
 This function is used in JDEE project files."
-  (while args 
+  (while args
     (let ((entry (car args)))
       (if (listp entry)
 	  (let* ((symbol (nth 0 entry))
@@ -473,14 +463,14 @@ This function is used in JDEE project files."
 	      (funcall set symbol (eval value)))
 	    (setq args (cdr args)))))))
 
-(defsubst jde-set-variable-init-value(symbol) 
+(defsubst jde-set-variable-init-value(symbol)
   "Set a variable  to the value it has at Emacs startup."
  (let ((val-to-set (eval (car (or (get symbol 'saved-value)
-                                   (get symbol 'standard-value)))))
-        (set (or (get symbol 'custom-set) 'set-default)))
+				   (get symbol 'standard-value)))))
+	(set (or (get symbol 'custom-set) 'set-default)))
     (if (or (get symbol 'customized-value)
-            (get symbol 'jde-project))
-        (funcall set symbol val-to-set))
+	    (get symbol 'jde-project))
+	(funcall set symbol val-to-set))
     (put symbol 'customized-value nil)
     (put symbol 'jde-project nil)
     (jde-put-project symbol "default" val-to-set)))
@@ -493,7 +483,7 @@ have been loaded)."
   (if (or (interactive-p) msg)
       (message "Setting customized JDE variables to startup values..."))
   (if jde-dirty-variables
-      (mapcar 
+      (mapcar
        'jde-set-variable-init-value
        jde-dirty-variables)))
 
@@ -510,25 +500,25 @@ differs from the old buffer's."
   (condition-case err
       (let ((project-file-path (jde-find-project-file default-directory)))
 	(if (not project-file-path) (setq project-file-path ""))
-	(if (and 
+	(if (and
 	     jde-project-context-switching-enabled-p
 	     (not (jde-debugger-running-p))
-	     (not (string= 
-		   (file-truename jde-current-project) 
+	     (not (string=
+		   (file-truename jde-current-project)
 		   (file-truename project-file-path))))
 	    (progn
 	      (setq jde-current-project project-file-path)
 	      (jde-load-project-file)
 	      (jde-wiz-set-bsh-project))))
-    (error (message 
-	    "Project file reload error: %s" 
+    (error (message
+	    "Project file reload error: %s"
 	    (error-message-string err)))))
 
 (defun jde-update-autoloaded-symbols ()
   "Regenerate `jde-symbol-list' and reload
 the project files for the current project. Insert
 this function at the end of autoloaded JDEE packages
-to register and  initialize customization variables 
+to register and  initialize customization variables
 defined by the current project's project file."
   (jde-symbol-list t)
   (jde-load-project-file))
@@ -570,4 +560,3 @@ defined by the current project's project file."
 ;;
 ;;
 ;;
-

@@ -5,7 +5,8 @@
 ;; Maintainer: Paul Kinnucan
 ;; Keywords: java, tools
 
-;; Copyright (C) 1997-2008, 2008 Paul Kinnucan.
+;; Copyright (C) 1997-2008 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

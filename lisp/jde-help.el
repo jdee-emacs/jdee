@@ -1,11 +1,13 @@
 ;;; jde-help.el
-;; $Revision: 1.72 $ 
+;; $Id$
 
-;; Author: Paul Kinnucan <paulk@mathworks.com>, Phillip Lord <plord@hgmp.mrc.ac.uk>
-;; Maintainer: Paul Kinnucan
+;; Author: Paul Kinnucan <paulk@mathworks.com>
+;;         Phillip Lord <plord@hgmp.mrc.ac.uk>
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 1999, 2001, 2002, 2003, 2004 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -47,13 +49,13 @@
 	(list "User (javadoc)"
 	 "http://wicket.apache.org/docs/1.4"
 	 nil))
-  "*Lists collections of HTML files documenting Java classes. 
-This list is used by the `jde-help-class' command to find help for 
+  "*Lists collections of HTML files documenting Java classes.
+This list is used by the `jde-help-class' command to find help for
 a class. You can specify the following information for each docset:
 
 Docset type
 
-  The following types are valid: 
+  The following types are valid:
 
   * JDK API
 
@@ -84,14 +86,14 @@ Docset directory
 
 Doc lookup function
 
-   Should specify a function that accepts a fully qualified class name, 
-   e.g., java.awt.String, and a docset directory and returns a path to 
-   an HTML file that documents that class, e.g., 
+   Should specify a function that accepts a fully qualified class name,
+   e.g., java.awt.String, and a docset directory and returns a path to
+   an HTML file that documents that class, e.g.,
    d:/jdk1.2/docs/api/java/awt/String.html. This field must be specified
    for non-javadoc collections. It is ignored for javadoc colletions.
 "
   :group 'jde-project
-  :type '(repeat 
+  :type '(repeat
 	  (list
 	   (radio-button-choice
 	    :format "%t \n%v"
@@ -101,17 +103,17 @@ Doc lookup function
 	    (const "User (not javadoc)"))
 	   (file :tag "Docset directory")
 	   ;;(symbol :tag "Doc lookup function")
-	   (choice :tag "Doc lookup function" 
+	   (choice :tag "Doc lookup function"
 		   (const nil)
 		   function))))
 
-(defcustom jde-help-use-frames t   
-   "A non-nil value makes the functions:`jde-help-symbol',   
- `jde-help-class-member' and `jde-help-class' use frames when displaying    
- the html javadocs."   
-   :group 'jde-project   
-   :type 'boolean)   
-  
+(defcustom jde-help-use-frames t
+   "A non-nil value makes the functions:`jde-help-symbol',
+ `jde-help-class-member' and `jde-help-class' use frames when displaying
+ the html javadocs."
+   :group 'jde-project
+   :type 'boolean)
+
 ;;(makunbound 'jde-help-remote-file-exists-function)
 (defcustom jde-help-remote-file-exists-function (list "wget")
   "Specifies the function the jde uses to retrieve remote documents.
@@ -136,25 +138,25 @@ which is included in the Emacs w3 package."
 (defcustom jde-help-wget-tries nil
   "Specifies the number of times that the JDEE should try getting
 documentation from a remote site This option applies only if wget is
-the`jde-help-remote-file-exists-function'. It sets wget's --tries 
+the`jde-help-remote-file-exists-function'. It sets wget's --tries
 command-line option. It is helpful in situations where
 one of the the sites in `jde-help-docsets' is not always reachable."
   :group 'jde-project
   :type '(choice (const :tag "Try once" :value nil)
 		 (const :tag "Never stop trying" :value 0)
-                 (integer :tag "Number of retries" :value 1)))
+		 (integer :tag "Number of retries" :value 1)))
 
 ;; (makunbound 'jde-help-wget-timeout)
 (defcustom jde-help-wget-timeout nil
   "Specifies the length of time that the JDEE should wait for a remote site
 to respond to a request for a document. This option applies only if wget is
-the`jde-help-remote-file-exists-function'. It sets wget's --timeout 
+the`jde-help-remote-file-exists-function'. It sets wget's --timeout
 command-line option. It is helpful in situations where
 one of the the sites in `jde-help-docsets' is not always reachable."
   :group 'jde-project
   :type '(choice (const :tag "Default (900 s.)" :value nil)
 		 (const :tag "Disable timeout checking" :value 0)
-                 (integer :tag "Timeout (seconds)" :value 900)))
+		 (integer :tag "Timeout (seconds)" :value 900)))
 
 (defcustom jde-help-wget-command-line-options "--quiet"
   "Specifies additional options (beyond --spider, --tries and
@@ -211,20 +213,20 @@ javadoc page for CLASS. This function uses the function
 specified by `jde-help-remote-file-exists-function'
 to verify the existence of pages located on remote systems."
   (let ((class-path
-         (concat (substitute ?/ ?. class) ".html")) 
+	 (concat (substitute ?/ ?. class) ".html"))
 	url)
     (cond
      ((string-match "http:" docset-dir)
       (setq url (concat docset-dir "/" class-path))
-             (if (string= 
-		  (car jde-help-remote-file-exists-function) 
+	     (if (string=
+		  (car jde-help-remote-file-exists-function)
 		  "url-file-exists")
 	  (if (fboundp 'url-file-exists)
 	      (if (not
 		   (url-file-exists url))
 		  (setq url nil))
 	    (error "Cannot find url-file-exists function"))
-        (if (executable-find 
+	(if (executable-find
 	     (if (eq system-type 'windows-nt) "wget.exe" "wget"))
 	    (let ((cmd (concat "wget --spider "
 			   (if jde-help-wget-tries
@@ -235,14 +237,14 @@ to verify the existence of pages located on remote systems."
 			       " " url)))
 	      (unless (= 0 (shell-command cmd))
 		(setq url nil)))
-          (error
-           (concat "Cannot find wget. This utility is needed "
-                   "to access javadoc on remote systems.")))))
+	  (error
+	   (concat "Cannot find wget. This utility is needed "
+		   "to access javadoc on remote systems.")))))
      (t
       (let ((doc-path
-             (expand-file-name class-path docset-dir)))
-        (if (file-exists-p doc-path)
-            (setq url (jde-file-to-url doc-path))))))
+	     (expand-file-name class-path docset-dir)))
+	(if (file-exists-p doc-path)
+	    (setq url (jde-file-to-url doc-path))))))
     url))
 
 (defun jde-help-get-root-dir (docfile)
@@ -250,7 +252,7 @@ to verify the existence of pages located on remote systems."
   (if jde-help-docsets
       (let ((docsets jde-help-docsets)
 	    dir)
-        (while docsets
+	(while docsets
 	  (let ((docset (car docsets)))
 	    (setq dir (jde-help-docset-get-dir docset))
 	    (if (and
@@ -258,14 +260,14 @@ to verify the existence of pages located on remote systems."
 		     (string= dir ""))
 		 (string= (jde-help-docset-get-type docset) "JDK API"))
 		(setq dir (expand-file-name "docs/api" (jde-get-jdk-dir))))
-	    (setq dir (jde-file-to-url (concat dir "/")))		     
+	    (setq dir (jde-file-to-url (concat dir "/")))
 	    (if (string-match dir docfile)
 		(setq docsets nil)
 	      (setq docsets (cdr docsets)))))
 	  dir)))
-        
-(defun jde-help-get-doc (class) 
-"Gets URL to the HTML file for CLASS where CLASS is a 
+
+(defun jde-help-get-doc (class)
+"Gets URL to the HTML file for CLASS where CLASS is a
 qualified class name."
   (if class
       (if jde-help-docsets
@@ -284,8 +286,8 @@ qualified class name."
 		      (jde-help-find-javadoc class dir)))
 		   ((string= (jde-help-docset-get-type docset) "User (javadoc)")
 		    (jde-help-find-javadoc
-                     class
-		      (jde-help-docset-get-dir docset))) 
+		     class
+		      (jde-help-docset-get-dir docset)))
 		   (t
 		    (apply
 		     (jde-help-docset-get-lookup-function docset)
@@ -300,20 +302,20 @@ qualified class name."
 
 (defun jde-help-symbol-internal (class &optional method-name)
   (let ((classinfo (jde-complete-get-classinfo class))
-        (doc-file (jde-help-get-doc class))
-        method-signature member pos)
+	(doc-file (jde-help-get-doc class))
+	method-signature member pos)
     (if (and method-name classinfo)
-        (setq method-signature (jde-complete-find-all-completions
-                                (list class method-name)
-                                classinfo)))
+	(setq method-signature (jde-complete-find-all-completions
+				(list class method-name)
+				classinfo)))
     (if method-signature
-        (progn 
-          (setq member (caar method-signature))
-          (setq pos (string-match " : " member))
-          (if pos 
-              (setq member (substring member 0 pos)))))
+	(progn
+	  (setq member (caar method-signature))
+	  (setq pos (string-match " : " member))
+	  (if pos
+	      (setq member (substring member 0 pos)))))
     (if doc-file
-        (jde-help-show-class-member-doc doc-file member)
+	(jde-help-show-class-member-doc doc-file member)
       (message "Error: cannot find documentation for class %s " class))))
 
 (defun jde-help-symbol ()
@@ -328,24 +330,24 @@ documented."
   (interactive)
   (condition-case err
       (let* ((parse-result (jde-help-parse-symbol-at-point))
-             (unqualified-name (thing-at-point 'symbol))
+	     (unqualified-name (thing-at-point 'symbol))
 	     (class-name (jde-parse-get-qualified-name unqualified-name t))
-             (pair (jde-parse-java-variable-at-point)))
+	     (pair (jde-parse-java-variable-at-point)))
 	(if (not class-name)
-            (if parse-result
-                (progn
-                  (setq unqualified-name  (car parse-result))
-                  (setq class-name (jde-parse-get-qualified-name unqualified-name t)))))
+	    (if parse-result
+		(progn
+		  (setq unqualified-name  (car parse-result))
+		  (setq class-name (jde-parse-get-qualified-name unqualified-name t)))))
 	(if class-name
 	    (jde-help-symbol-internal class-name (cdr parse-result))
-          (if (not (string= (car pair) ""))
-              (progn
-                (setq class-name (jde-parse-get-qualified-name (car pair) t))
-                (jde-help-symbol-internal class-name unqualified-name))
-            (message "Error: cannot find class '%s' on the current classpath." unqualified-name))))
+	  (if (not (string= (car pair) ""))
+	      (progn
+		(setq class-name (jde-parse-get-qualified-name (car pair) t))
+		(jde-help-symbol-internal class-name unqualified-name))
+	    (message "Error: cannot find class '%s' on the current classpath." unqualified-name))))
     (error
      (message "%s" (error-message-string err)))))
-  
+
 
 (defun jde-help-show-document (doc-url &rest args)
   "Displays DOC-URL in the browser specified by `jde-help-browser-function'."
@@ -370,7 +372,7 @@ field or method referenced by the name if qualified."
 	       (obj (if qualifier qualifier name))
 	       (member (if qualifier name)))
 	  (if (not
-	       (and 
+	       (and
 		qualifier
 		(string-match "[.]" qualifier)))
 	      (let ((declared-type (car (jde-parse-declared-type-of obj))))
@@ -385,24 +387,24 @@ field or method referenced by the name if qualified."
 	     (read-from-minibuffer "Class: " (thing-at-point 'symbol))))
 	 (fq-class-name
 	  (jde-parse-select-qualified-class-name class))
-	 (doc-file 
+	 (doc-file
 	  (if fq-class-name
 	      (jde-help-get-doc fq-class-name))))
-    (if doc-file 
-        (jde-help-show-class-member-doc doc-file)
+    (if doc-file
+	(jde-help-show-class-member-doc doc-file)
       (message "Error: cannot find documentation for %s" class))))
 
 
 (defun jde-help-show-class-member-doc (docfile &optional member)
   "Show DOCFILE in the browser defined by `jde-help-browser-function'
 where DOCFILE is the class and MEMBER is the anchor for a class
-member. If the `jde-help-browser-function' is is not w3m-browse-url, 
+member. If the `jde-help-browser-function' is is not w3m-browse-url,
 this function creates a temporary HTML file that redirects the
 browser to DOCFILE. This is a workaround made necessary by the fact
 that the default browser function for Windows uses the Windows
 ShellExecute function to invoke Internet Explorer and for some reason
 ShellExecute does not pass the anchor to IE. If `jde-help-use-frames'
-is nonnil, this function creates a metafile that displays the 
+is nonnil, this function creates a metafile that displays the
 multiframe version of the standard Javadoc page."
   (let* ((anchor (if member (concat docfile "#" member)
 		  docfile))
@@ -426,13 +428,13 @@ multiframe version of the standard Javadoc page."
 		      (princ "<title>JDE javadoc window</title>\n</head>\n")
 		      (princ "<frameset cols=\"20%,80%\" onload=\"window.focus()\">\n")
 		      (princ "<frameset rows=\"30%,70%\">\n")
-		      (princ 
+		      (princ
 		       (format "<frame src=\"%soverview-frame.html\" name=\"packageListFrame\">\n"
 			       root))
 		      (princ
 		       (format "<frame src=\"%spackage-frame.html\" name=\"packageFrame\">\n"
 			       (substring docfile 0 pos)))
-		      (princ 
+		      (princ
 		       (format "<frame src=\"%sallclasses-frame.html\" name=\"packageFrame\">\n"
 			     root))
 		      (princ "</frameset>\n")
@@ -443,7 +445,7 @@ multiframe version of the standard Javadoc page."
 		  (progn
 		    (princ "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n")
 		    (princ "<html>\n<head>\n")
-		    (princ 
+		    (princ
 		     (format "<meta http-equiv=\"Refresh\" content=\"0; URL=%s\">\n"  doc-url))
 			     (princ "</head>\n<body onload=\"window.focus()\">\n</body>\n</html>")))
 		(save-buffer)
@@ -456,33 +458,33 @@ multiframe version of the standard Javadoc page."
 (defun jde-help-popup-class-member-menu (class &optional title)
   "Popup a menu of the fields and methods defined by CLASS.
 Return the member selected by the user."
-  (let ((classinfo 
-	  (jde-complete-get-classinfo class)))  
+  (let ((classinfo
+	  (jde-complete-get-classinfo class)))
     (if classinfo
-	(let (pos 
-              (pair 
+	(let (pos
+	      (pair
 	       (if (= (length classinfo) 1)
-                   ;; if only one item match, return it 
-                   (car classinfo)
-                 
-                 (if (eq jde-complete-function 'jde-complete-menu)
-                     ;; delegates menu handling to imenu :-) Popup window at
-                     ;; text cursor
-                     (imenu--mouse-menu classinfo  
-                                        (jde-cursor-posn-as-event) 
-                                        (or title "Class Members"))
-                   (assoc (completing-read (or title "Completion: ")
-                                           classinfo)
-                          classinfo)))))
-          (setq pos (string-match " : " (car pair)))
-          (if pos
-              (substring (car pair) 0 pos)
-            (cdr pair)))
+		   ;; if only one item match, return it
+		   (car classinfo)
+
+		 (if (eq jde-complete-function 'jde-complete-menu)
+		     ;; delegates menu handling to imenu :-) Popup window at
+		     ;; text cursor
+		     (imenu--mouse-menu classinfo
+					(jde-cursor-posn-as-event)
+					(or title "Class Members"))
+		   (assoc (completing-read (or title "Completion: ")
+					   classinfo)
+			  classinfo)))))
+	  (setq pos (string-match " : " (car pair)))
+	  (if pos
+	      (substring (car pair) 0 pos)
+	    (cdr pair)))
       (message "Class %s has no members." class))))
 
 (defun jde-help-class-member (&optional class-name)
   "Pop up a menu of the fields and methods of CLASS.
-Then search `jde-help-docsets' for javadoc for CLASS. If found, 
+Then search `jde-help-docsets' for javadoc for CLASS. If found,
 point the browser to the doc for the selected method or
 field. Note: this command does not check whether the doc
 for CLASS actually documents the selected class member."
@@ -493,7 +495,7 @@ for CLASS actually documents the selected class member."
 	 (fq-class-name
 	  (jde-parse-select-qualified-class-name class))
 	 (doc-file (jde-help-get-doc fq-class-name)))
-    (if doc-file 
+    (if doc-file
 	(let ((member (jde-help-popup-class-member-menu fq-class-name)))
 	  (if member
 	      (jde-help-show-class-member-doc doc-file member)))
@@ -523,7 +525,7 @@ for CLASS actually documents the selected class member."
 					 (if jde-help-wget-timeout
 					     (concat "--timeout=" jde-help-wget-timeout))
 					 jde-help-wget-command-line-options
-					 " " jde-jdk-doc-url))))))	
+					 " " jde-jdk-doc-url))))))
 	(error "JDK doc does not exist at jde-jdk-doc-url value: %s" jde-jdk-doc-url))
     jde-jdk-doc-url)
    ((string-match "file://" jde-jdk-doc-url)
@@ -537,7 +539,7 @@ for CLASS actually documents the selected class member."
 	  path
 	(error "JDK doc does not exist at jde-jdk-doc-url value %s" path))))
    (t
-    (let ((path (expand-file-name "docs/index.html" 
+    (let ((path (expand-file-name "docs/index.html"
 				  (jde-normalize-path (jde-get-jdk-dir)))))
       (if (file-exists-p path)
 	  path
@@ -547,11 +549,11 @@ for CLASS actually documents the selected class member."
 (defun jde-help-beanshell ()
   "Displays the BeanShell documentation."
   (interactive)
-    (browse-url 
+    (browse-url
     "http://www.beanshell.org/manual/contents.html"
-     (if (boundp 
- 	 'browse-url-new-window-flag)
-         browse-url-new-window-flag
+     (if (boundp
+	 'browse-url-new-window-flag)
+	 browse-url-new-window-flag
        browse-url-new-window-p)))
 
 ;;;###autoload
@@ -559,9 +561,9 @@ for CLASS actually documents the selected class member."
   "Displays the JDK doc in a web browser. This function uses the URL
 stored in the variable jde-jdk-doc-url to locate the JDK documentation."
   (interactive)
-  (browse-url 
+  (browse-url
    (jde-help-get-jdk-doc-url)
-   (if (boundp 
+   (if (boundp
 	'browse-url-new-window-flag)
        browse-url-new-window-flag
      browse-url-new-window-p)))

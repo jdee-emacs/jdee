@@ -1,13 +1,13 @@
-;; JDE-XREF.EL --- Class cross-reference commands for the JDEE.
-;; $Revision: 1.24 $ $Date: 2004/06/06 14:19:23 $
+;; jde-xref.el --- Class cross-reference commands for the JDEE.
+;; $Id$
 ;;
 ;; Copyright (C) 2002, 2003 Andrew Hyatt
-;;
+;; Copyright (C) 2009 by Paul Landes
+
 ;; Author: Andrew Hyatt <andy_jde@thehyatts.net>
 ;; Maintainers: Andrew Hyatt and Paul Kinnucan
 ;; Keywords: java, tools
-;; 
-;;
+
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2, or (at your option)
@@ -26,7 +26,7 @@
 ;; LCD Archive Entry:
 ;; jde-xref|Andrew Hyatt|
 ;; |Java class cross-referencing commands for the JDEE
-;; |$Date: 2004/06/06 14:19:23 $|$Revision: 1.24 $|~/packages/jde-xref.el
+;; |$Date$|$Revision$|~/packages/jde-xref.el
 
 ;;; Commentary:
 
@@ -68,7 +68,7 @@
 ;; map of which classes are subclasses of which other classes. This
 ;; makes it possible to investigate a class's subclasses when looking
 ;; for references.
-;; 
+;;
 
 (require 'jde-parse)
 (require 'jde-parse-class)
@@ -90,7 +90,7 @@
   location "
   :group 'jde-xref
   :type 'directory)
-  
+
 (defcustom jde-xref-store-prefixes nil
   "A list of what prefixes to specify what references should be
   tracked in the caller database.  Such as: '(\"org.apache\" \"jde\"),
@@ -137,10 +137,10 @@ calling `jde-xref-unpickle-hash'."
       (erase-buffer)
       (insert "(")
       (maphash (lambda (key val)
-                 (when val
-                   (insert (concat "(" (prin1-to-string key) " . "
-                                   (prin1-to-string val) ")\n" ))))
-               hash)
+		 (when val
+		   (insert (concat "(" (prin1-to-string key) " . "
+				   (prin1-to-string val) ")\n" ))))
+	       hash)
       (insert ")")
       (save-buffer)
       (kill-buffer buf))))
@@ -150,11 +150,11 @@ calling `jde-xref-unpickle-hash'."
 FILENAME must be created by `jde-xref-pickle-hash'"
   (unless (file-exists-p filename)
     (error (concat "Cannot unpickle - file " filename " does not exist.  "
-                   "The xref database may need to be recreated.")))
+		   "The xref database may need to be recreated.")))
   (dolist (item (with-temp-buffer
-          (insert-file-contents-literally filename)
-          (read (current-buffer))))
-    (puthash (car item) (cdr item) hash))) 
+	  (insert-file-contents-literally filename)
+	  (read (current-buffer))))
+    (puthash (car item) (cdr item) hash)))
 
 (defun jde-xref-get-db-directory ()
   (concat (jde-normalize-path jde-xref-db-base-directory) "/xrefdb"))
@@ -172,28 +172,28 @@ FILENAME must be created by `jde-xref-pickle-hash'"
   other packages branch out from."
 
   (labels ((get-prefix (base-path package-path)
-             ;; if the directory contains just one directory (or two,
-             ;; one being CVS), then we can recurse down it to build
-             ;; up a proper prefix before the package tree really
-             ;; branches out
-             (let ((files (remove-if-not
-                           (lambda (dir) (and (file-directory-p
-                                               (concat base-path "/" package-path "/" dir)))
-                                              (not (equal "CVS" dir)))
-                           (directory-files 
-                            (concat base-path "/" package-path)
-                            nil "[^.]$"))))
-               (if (eq (length files) 1)
-                   (get-prefix base-path (concat package-path "/"
-                                                 (car files)))
-                 (subst-char-in-string ?/ ?. package-path)))))
+	     ;; if the directory contains just one directory (or two,
+	     ;; one being CVS), then we can recurse down it to build
+	     ;; up a proper prefix before the package tree really
+	     ;; branches out
+	     (let ((files (remove-if-not
+			   (lambda (dir) (and (file-directory-p
+					       (concat base-path "/" package-path "/" dir)))
+					      (not (equal "CVS" dir)))
+			   (directory-files
+			    (concat base-path "/" package-path)
+			    nil "[^.]$"))))
+	       (if (eq (length files) 1)
+		   (get-prefix base-path (concat package-path "/"
+						 (car files)))
+		 (subst-char-in-string ?/ ?. package-path)))))
     (when (and (eq major-mode 'jde-mode) jde-sourcepath)
       (let ((first-prefix (car (split-string (jde-parse-get-package-name)
-                                             "\\."))) (prefixes))
-        (dolist (path (remove-if-not (lambda (path) (file-exists-p path)) jde-sourcepath) prefixes)
-          (when (member first-prefix (directory-files path nil "[^.]$"))
-            (message (concat "path = " path))
-            (add-to-list 'prefixes (get-prefix path first-prefix))))))))
+					     "\\."))) (prefixes))
+	(dolist (path (remove-if-not (lambda (path) (file-exists-p path)) jde-sourcepath) prefixes)
+	  (when (member first-prefix (directory-files path nil "[^.]$"))
+	    (message (concat "path = " path))
+	    (add-to-list 'prefixes (get-prefix path first-prefix))))))))
 
 ;;;###autoload
 (defun jde-xref-make-xref-db ()
@@ -217,62 +217,62 @@ specified by `jde-xref-db-file'"
   "Like `member' but works with strings and will return true if any of
   the prefixes in PREFIXLIST match STR"
   (member-if (lambda (item) (string=
-                             (substring str 0 (min (length item)
-                                                   (length str)))
-                             item)) prefixlist))
+			     (substring str 0 (min (length item)
+						   (length str)))
+			     item)) prefixlist))
 
 (defun jde-xref-get-package-data ()
   (let ((data (make-hash-table :test 'equal :size 10))
-        (caller-files (directory-files (jde-xref-get-db-directory)
-                                       t "caller$")))
+	(caller-files (directory-files (jde-xref-get-db-directory)
+				       t "caller$")))
     (dolist (caller-file caller-files)
       (let* ((package (mapconcat (lambda (x) x)
-                                 (butlast 
-                                  (split-string (car (last
-                                                      (split-string caller-file
-                                                                    "/")))
-                                                "-")) "-"))
-             (package-data (jde-xref-load-package-hashes package)))
-        (puthash package package-data data)))
+				 (butlast
+				  (split-string (car (last
+						      (split-string caller-file
+								    "/")))
+						"-")) "-"))
+	     (package-data (jde-xref-load-package-hashes package)))
+	(puthash package package-data data)))
     data))
 
 (defun jde-xref-update-xref-db (&optional only-classes)
   (let ((package-data (if only-classes
-                        (jde-xref-get-package-data)
-                        (make-hash-table :test 'equal :size 10)))
-        (subclasses (make-hash-table :test 'equal :size 500)))
+			(jde-xref-get-package-data)
+			(make-hash-table :test 'equal :size 10)))
+	(subclasses (make-hash-table :test 'equal :size 500)))
     ;; Remove all occurances of classes to be updated from the package-data's caller-hashes
     (when only-classes
       (maphash (lambda (package single-package-data)
-                 (maphash (lambda (callee callers)
-                            (puthash callee
-                                     (remove-if (lambda (item)
-                                                  (member (car item)
-                                                          only-classes))
-                                                callers)
-                                     (nth 0 single-package-data)))
-                          (nth 0 single-package-data)))
-               package-data))
+		 (maphash (lambda (callee callers)
+			    (puthash callee
+				     (remove-if (lambda (item)
+						  (member (car item)
+							  only-classes))
+						callers)
+				     (nth 0 single-package-data)))
+			  (nth 0 single-package-data)))
+	       package-data))
     (with-all-class-infos-when (info)
-                               (lambda (class-file)
-                                 (or (null only-classes)
-                                     (jde-class-path-in-classes-p
-                                      class-file only-classes)))
-                               (jde-xref-add-class-info-to-db info package-data
-                                                              subclasses))
+			       (lambda (class-file)
+				 (or (null only-classes)
+				     (jde-class-path-in-classes-p
+				      class-file only-classes)))
+			       (jde-xref-add-class-info-to-db info package-data
+							      subclasses))
     (setq jde-xref-parsed-classes nil)
     (jde-xref-pickle-hash subclasses (jde-xref-get-subclass-file))
     (setq jde-xref-subclasses subclasses)
     (maphash (lambda (package data)
-               (jde-xref-pickle-hash (nth 0 data) 
-                                     (jde-xref-get-caller-file package))
-               (jde-xref-pickle-hash (nth 1 data)
-                                     (jde-xref-get-interface-file package))
-               (jde-xref-pickle-hash (nth 2 data)
-                                     (jde-xref-get-member-file package))
-               (jde-xref-pickle-hash (nth 3 data)
-                                     (jde-xref-get-superclass-file package)))
-             package-data)
+	       (jde-xref-pickle-hash (nth 0 data)
+				     (jde-xref-get-caller-file package))
+	       (jde-xref-pickle-hash (nth 1 data)
+				     (jde-xref-get-interface-file package))
+	       (jde-xref-pickle-hash (nth 2 data)
+				     (jde-xref-get-member-file package))
+	       (jde-xref-pickle-hash (nth 3 data)
+				     (jde-xref-get-superclass-file package)))
+	     package-data)
     (setq jde-xref-cache nil)))
 
 (defun jde-xref-create-package-hashes (&optional fake)
@@ -282,118 +282,118 @@ member-hash, and the superclass hash.  FAKE determines if we are just
 creating them so that there is something to check against.  In those
 circumstance we just create tiny hashes to conserve memory."
   (list (make-hash-table :test 'equal :size (if fake 1 100))
-        (make-hash-table :test 'equal :size (if fake 1 20))
-        (make-hash-table :test 'equal :size (if fake 1 100))
-        (make-hash-table :test 'equal :size (if fake 1 20))))
+	(make-hash-table :test 'equal :size (if fake 1 20))
+	(make-hash-table :test 'equal :size (if fake 1 100))
+	(make-hash-table :test 'equal :size (if fake 1 20))))
 
 (defun jde-xref-load-package-hashes (package)
   (let ((data (jde-xref-create-package-hashes)))
     (jde-xref-unpickle-hash (nth 0 data)
-                            (jde-xref-get-caller-file package))
+			    (jde-xref-get-caller-file package))
     (jde-xref-unpickle-hash (nth 1 data)
-                            (jde-xref-get-interface-file package))
+			    (jde-xref-get-interface-file package))
     (jde-xref-unpickle-hash (nth 2 data)
-                            (jde-xref-get-member-file package))
+			    (jde-xref-get-member-file package))
     (jde-xref-unpickle-hash (nth 3 data)
-                            (jde-xref-get-superclass-file package))
+			    (jde-xref-get-superclass-file package))
     data))
 
 (defun jde-xref-append-hash (key value hash)
   "Like `puthash' but appends VALUE to the HASH at KEY"
   (puthash key (append (gethash key hash) (if (listp value)
-                                            value
-                                            (list value))) hash))
+					    value
+					    (list value))) hash))
 
 (defun jde-xref-add-class-info-to-db (info package-data subclasses)
   (message (concat "Parsing class " (jde-parse-class-extract-classname info)))
   (add-to-list 'jde-xref-parsed-classes
-               (jde-parse-class-extract-classname info))
+	       (jde-parse-class-extract-classname info))
   (let ((package (jde-parse-get-package-from-name
-                  (jde-parse-class-extract-classname info))))
+		  (jde-parse-class-extract-classname info))))
     ;; If there is no existing package data
     (unless (gethash package package-data)
       (puthash package
-               ;; package-data's values are (caller-hash
-               ;; interface-hash method-and-field-hash)
-               (jde-xref-create-package-hashes)
-               package-data))
+	       ;; package-data's values are (caller-hash
+	       ;; interface-hash method-and-field-hash)
+	       (jde-xref-create-package-hashes)
+	       package-data))
     (destructuring-bind (caller-hash interface-hash
-                                     method-and-field-hash superclass-hash)
-        (gethash package package-data)
+				     method-and-field-hash superclass-hash)
+	(gethash package package-data)
       (puthash (jde-parse-class-extract-classname info)
-               (jde-parse-class-extract-interfaces info)
-               interface-hash)
+	       (jde-parse-class-extract-interfaces info)
+	       interface-hash)
       (puthash (jde-parse-class-extract-classname info)
-               (append (jde-parse-class-extract-method-signatures info)
-                       (jde-parse-class-extract-field-signatures info))
-               method-and-field-hash)
+	       (append (jde-parse-class-extract-method-signatures info)
+		       (jde-parse-class-extract-field-signatures info))
+	       method-and-field-hash)
       (puthash (jde-parse-class-extract-classname info)
-               (jde-parse-class-extract-superclass info)
-               superclass-hash)
+	       (jde-parse-class-extract-superclass info)
+	       superclass-hash)
       (jde-xref-append-hash
        (jde-parse-class-extract-superclass info)
        (jde-parse-class-extract-classname info) subclasses)
       (dolist (call (nreverse
-                     (jde-parse-class-extract-method-calls info)))
-        (let ((calls (car call))
-              (called (cadr call)))
-          (if (or (not jde-xref-store-prefixes)
-                  (and
-                   (jde-xref-substring-member (car calls)
-                                              jde-xref-store-prefixes)
-                   (jde-xref-substring-member (car called)
-                                              jde-xref-store-prefixes)))
-              (let* ((dqcalled (list (car called)
-                                     (nth 1 called)
-                                     (when (nth 2 called)
-                                       (jde-parse-get-unqualified-name
-                                        (nth 2 called)))
-                                     ;; We don't want to need to
-                                     ;; know the constructor args
-                                     ;; for anonymous classes
-                                     (unless (jde-xref-is-class-anonymous (car called))
-                                       (mapcar 'jde-parse-get-unqualified-name
-                                               (nth 3 called)))))
-                     (called-package (jde-parse-get-package-from-name
-                                      (car dqcalled))))
-                ;; Create the package data if needed
-                (unless (gethash called-package package-data)
-                  (puthash called-package (jde-xref-create-package-hashes)
-                           package-data))
-                (let* ((called-package-hashes
-                        (gethash called-package package-data))
-                       (called-package-caller-hash
-                        (car called-package-hashes)))
-                  ;; add things to the table - making sure there are no duplicates
-                  (puthash dqcalled
-                           (if (member calls (gethash
-                                              dqcalled
-                                              called-package-caller-hash))
-                               (gethash dqcalled called-package-caller-hash)
-                             (cons calls
-                                   (gethash dqcalled
-                                            called-package-caller-hash)))
-                           called-package-caller-hash)))))))))
+		     (jde-parse-class-extract-method-calls info)))
+	(let ((calls (car call))
+	      (called (cadr call)))
+	  (if (or (not jde-xref-store-prefixes)
+		  (and
+		   (jde-xref-substring-member (car calls)
+					      jde-xref-store-prefixes)
+		   (jde-xref-substring-member (car called)
+					      jde-xref-store-prefixes)))
+	      (let* ((dqcalled (list (car called)
+				     (nth 1 called)
+				     (when (nth 2 called)
+				       (jde-parse-get-unqualified-name
+					(nth 2 called)))
+				     ;; We don't want to need to
+				     ;; know the constructor args
+				     ;; for anonymous classes
+				     (unless (jde-xref-is-class-anonymous (car called))
+				       (mapcar 'jde-parse-get-unqualified-name
+					       (nth 3 called)))))
+		     (called-package (jde-parse-get-package-from-name
+				      (car dqcalled))))
+		;; Create the package data if needed
+		(unless (gethash called-package package-data)
+		  (puthash called-package (jde-xref-create-package-hashes)
+			   package-data))
+		(let* ((called-package-hashes
+			(gethash called-package package-data))
+		       (called-package-caller-hash
+			(car called-package-hashes)))
+		  ;; add things to the table - making sure there are no duplicates
+		  (puthash dqcalled
+			   (if (member calls (gethash
+					      dqcalled
+					      called-package-caller-hash))
+			       (gethash dqcalled called-package-caller-hash)
+			     (cons calls
+				   (gethash dqcalled
+					    called-package-caller-hash)))
+			   called-package-caller-hash)))))))))
 
 (defun jde-xref-class-and-token-to-signature (class token)
   (let ((ttype  (semantic-token-type token))
-        (tclass (semantic-token-token token))
-        (tname  (semantic-token-name token))) 
+	(tclass (semantic-token-token token))
+	(tname  (semantic-token-name token)))
     (list tclass
-          class
-          (if (equal tname (jde-parse-get-unqualified-name class))
-              "<init>"
-            tname)
-          (when (eq tclass 'function)
-            (if (or (not ttype) (equal ttype "void"))
-                nil
-              (jde-parse-get-unqualified-name ttype)))
-          (if (eq tclass 'function)
-              (mapcar (lambda (arg)
-                        (jde-parse-get-unqualified-name
-                         (semantic-token-type arg)))
-                      (semantic-token-function-args token))
-            (list (jde-parse-get-unqualified-name ttype))))))
+	  class
+	  (if (equal tname (jde-parse-get-unqualified-name class))
+	      "<init>"
+	    tname)
+	  (when (eq tclass 'function)
+	    (if (or (not ttype) (equal ttype "void"))
+		nil
+	      (jde-parse-get-unqualified-name ttype)))
+	  (if (eq tclass 'function)
+	      (mapcar (lambda (arg)
+			(jde-parse-get-unqualified-name
+			 (semantic-token-type arg)))
+		      (semantic-token-function-args token))
+	    (list (jde-parse-get-unqualified-name ttype))))))
 
 (defun jde-xref-get-current-class ()
   (let ((package-name (jde-parse-get-package-name)))
@@ -401,8 +401,8 @@ circumstance we just create tiny hashes to conserve memory."
 
 (defun jde-xref-get-current-signature ()
   (unless (member
-           (semantic-token-token (semantic-current-nonterminal))
-                '(function variable))
+	   (semantic-token-token (semantic-current-nonterminal))
+		'(function variable))
     (error "The cursor must be in a function or class variable to get the callers"))
   (jde-xref-class-and-token-to-signature
    (jde-xref-get-current-class)
@@ -420,11 +420,11 @@ the requested function are considered."
   (interactive "P")
   (jde-xref-load-subclasses-table-if-necessary)
   (setq jde-xref-stack (jde-xref-get-callers
-                            (jde-xref-get-current-signature) strict))
+			    (jde-xref-get-current-signature) strict))
   (if jde-xref-stack
       (progn
-        (ring-insert find-tag-marker-ring (point-marker))
-        (jde-xref-next-caller))
+	(ring-insert find-tag-marker-ring (point-marker))
+	(jde-xref-next-caller))
     (message "No calls")))
 
 (defun jde-xref-goto-caller (caller)
@@ -447,19 +447,19 @@ and show it"
   (unless jde-xref-subclasses
     (setq jde-xref-subclasses (make-hash-table :test 'equal :size 500))
     (jde-xref-unpickle-hash jde-xref-subclasses
-                            (jde-xref-get-subclass-file))
+			    (jde-xref-get-subclass-file))
     ;; if subclasses were empty, then it's the first time this is run,
     ;; so do our one-time initializations
     (add-hook 'after-save-hook 'jde-xref-file-saved)))
 
 (defun jde-xref-signature-to-string (sig)
   (concat (or (nth 3 sig) "void") " " (cadr sig) "."
-          (if (equal (nth 2 sig) "<init>")
-            (jde-parse-get-unqualified-name (cadr sig))
-            (nth 2 sig))
-          (when (eq (car sig) 'function)
-            (concat "("
-                    (mapconcat (lambda (x) x) (nth 4 sig) ",") ")"))))
+	  (if (equal (nth 2 sig) "<init>")
+	    (jde-parse-get-unqualified-name (cadr sig))
+	    (nth 2 sig))
+	  (when (eq (car sig) 'function)
+	    (concat "("
+		    (mapconcat (lambda (x) x) (nth 4 sig) ",") ")"))))
 
 (defun jde-xref-find-package-in-cache (package cache)
   (when cache
@@ -487,14 +487,14 @@ and show it"
     (error "The variable `jde-xref-db-base-directory' must be specified to load the xref db"))
   (if (file-exists-p (jde-xref-get-caller-file package))
     (or (jde-xref-find-package-in-cache package jde-xref-cache)
-        ;; Or we need to get the new package and put it in the cache
-        (let ((data (jde-xref-load-package-hashes package)))
-        (setq jde-xref-cache (cons (cons package data)
-                                   (if (> (length jde-xref-cache)
-                                          jde-xref-cache-size)
-                                       (cdr jde-xref-cache)
-                                     jde-xref-cache)))
-        data))
+	;; Or we need to get the new package and put it in the cache
+	(let ((data (jde-xref-load-package-hashes package)))
+	(setq jde-xref-cache (cons (cons package data)
+				   (if (> (length jde-xref-cache)
+					  jde-xref-cache-size)
+				       (cdr jde-xref-cache)
+				     jde-xref-cache)))
+	data))
     (jde-xref-create-package-hashes t)))
 
 (defun jde-xref-get-caller-hash (package)
@@ -511,15 +511,15 @@ and show it"
 
 (defun jde-xref-get-basic-caller (sig)
   (gethash (cdr sig) (jde-xref-get-caller-hash (jde-parse-get-package-from-name
-                                                (nth 1 sig)))))
+						(nth 1 sig)))))
 
 (defun jde-xref-get-members (class)
   (gethash class (jde-xref-get-member-hash (jde-parse-get-package-from-name
-                                            class))))
+					    class))))
 
 (defun jde-xref-get-superclass (class)
   (gethash class (jde-xref-get-superclass-hash (jde-parse-get-package-from-name
-                                                class))))
+						class))))
 
 (defun jde-xref-is-class-anonymous (class)
   (string-match "\\$[0-9]+$" class))
@@ -542,32 +542,32 @@ and show it"
      (jde-xref-get-basic-caller sig)
      (unless strict
        (apply 'append
-          (mapcar
-           (lambda (classname)
-         (let* ((sig `(,typesig ,classname ,@(cddr sig)))
-            (callers-for-classname (jde-xref-get-basic-caller sig)))
-           (when callers-for-classname
-             (cons classname callers-for-classname)))) ;; include classname in the usage list
-           (jde-xref-get-subs classname sig (jde-xref-get-supers classname nil))))))))
+	  (mapcar
+	   (lambda (classname)
+	 (let* ((sig `(,typesig ,classname ,@(cddr sig)))
+	    (callers-for-classname (jde-xref-get-basic-caller sig)))
+	   (when callers-for-classname
+	     (cons classname callers-for-classname)))) ;; include classname in the usage list
+	   (jde-xref-get-subs classname sig (jde-xref-get-supers classname nil))))))))
 
 
 (defun jde-xref-get-supers (classname collect)
   (mapc (lambda (super)
       (unless (member super collect)
-        (setq collect (jde-xref-get-supers super (cons super collect)))))
+	(setq collect (jde-xref-get-supers super (cons super collect)))))
     (let* ((package (jde-parse-get-package-from-name classname))
-           (superclass (jde-xref-get-superclass classname))
-           (superinterfaces (gethash classname (jde-xref-get-interface-hash package))))
+	   (superclass (jde-xref-get-superclass classname))
+	   (superinterfaces (gethash classname (jde-xref-get-interface-hash package))))
       (if superclass
-          (cons superclass superinterfaces)
-        superinterfaces)))
+	  (cons superclass superinterfaces)
+	superinterfaces)))
   collect)
-    
+
 
 (defun jde-xref-get-subs (classname sig collect)
   (mapc (lambda (subclass)
-        (unless (or (member subclass collect) (member (cddr sig) (jde-xref-get-members subclass)))
-          (setq collect (jde-xref-get-subs subclass sig (cons subclass collect)))))
+	(unless (or (member subclass collect) (member (cddr sig) (jde-xref-get-members subclass)))
+	  (setq collect (jde-xref-get-subs subclass sig (cons subclass collect)))))
       (gethash classname jde-xref-subclasses))
   collect)
 
@@ -577,7 +577,7 @@ and show it"
 
 (defun jde-xref-caller-to-sig (caller)
   (list 'function (nth 0 caller) (nth 1 caller) (when (nth 2 caller) (jde-parse-get-unqualified-name (nth 2 caller)))
-        (mapcar 'jde-parse-get-unqualified-name (nth 3 caller))))
+	(mapcar 'jde-parse-get-unqualified-name (nth 3 caller))))
 
 (defun jde-xref-tree-get-children (sig)
   (when sig
@@ -585,17 +585,17 @@ and show it"
      (lambda (caller)
        (if (listp caller)
        (let  ((caller-sig (jde-xref-caller-to-sig caller)))
-         (list
-          'tree-widget
-          :node `(push-button
-              :tag ,(jde-xref-signature-to-string caller-sig)
-              :format "%[%t%]\n"
-              :sig ,caller-sig
-              :caller ,caller
-              :notify jde-xref-notify)
-          :dynargs 'jde-xref-tree-get-children-from-tree
-          :sig caller-sig
-          :has-children t))
+	 (list
+	  'tree-widget
+	  :node `(push-button
+	      :tag ,(jde-xref-signature-to-string caller-sig)
+	      :format "%[%t%]\n"
+	      :sig ,caller-sig
+	      :caller ,caller
+	      :notify jde-xref-notify)
+	  :dynargs 'jde-xref-tree-get-children-from-tree
+	  :sig caller-sig
+	  :has-children t))
      (list 'tree-widget :tag caller))) ;; class for next set of usages
        (jde-xref-get-callers sig))))
 
@@ -613,24 +613,24 @@ and show it"
   (interactive "P")
   (jde-xref-load-subclasses-table-if-necessary)
   (let* ((sig (jde-xref-get-current-signature))
-         (buf (get-buffer-create (concat "JDE call graph for "
-                                         (jde-xref-signature-to-string
-                                          sig)))))
+	 (buf (get-buffer-create (concat "JDE call graph for "
+					 (jde-xref-signature-to-string
+					  sig)))))
     (switch-to-buffer buf)
     (erase-buffer)
     (widget-create 'tree-widget
-                   :tag (jde-xref-signature-to-string sig)
-                   :dynargs 'jde-xref-tree-get-children-from-tree
-                   :has-children t
-                   :sig sig)
+		   :tag (jde-xref-signature-to-string sig)
+		   :dynargs 'jde-xref-tree-get-children-from-tree
+		   :has-children t
+		   :sig sig)
     (use-local-map widget-keymap)
     (widget-setup)))
 
 (defun jde-xref-get-class-variables (class-token)
   (mapcan (lambda (token)
-            (when (eq (semantic-token-token token) 'variable)
-              (list token)))
-          (semantic-nonterminal-children class-token)))
+	    (when (eq (semantic-token-token token) 'variable)
+	      (list token)))
+	  (semantic-nonterminal-children class-token)))
 
 ;;;###autoload
 (defun jde-xref-list-uncalled-functions (strict)
@@ -649,25 +649,25 @@ while. If it does, you might want to consider increasing
   (jde-xref-load-subclasses-table-if-necessary)
   (save-excursion
     (flet ((get-unused-string (token)
-             (goto-char (semantic-token-start token))
-             (unless (jde-xref-get-callers
-                      (jde-xref-class-and-token-to-signature
-                       (jde-xref-get-current-class) token) strict)
-               (list (jde-xref-signature-to-string
-                      (jde-xref-class-and-token-to-signature
-                       (jde-xref-get-current-class) token))))))
+	     (goto-char (semantic-token-start token))
+	     (unless (jde-xref-get-callers
+		      (jde-xref-class-and-token-to-signature
+		       (jde-xref-get-current-class) token) strict)
+	       (list (jde-xref-signature-to-string
+		      (jde-xref-class-and-token-to-signature
+		       (jde-xref-get-current-class) token))))))
     (let ((uncalled-methods
-            (mapcan 'get-unused-string
-                    (semantic-find-nonterminal-by-token 'function
-                                                        (current-buffer)
-                                                        t)))
-          (unreferenced-variables
-            (mapcan 'get-unused-string
-                    (mapcan 'jde-xref-get-class-variables
-                            (semantic-find-nonterminal-by-type "class"
-                                                               (current-buffer)
-                                                               t))))
-          (outbuf (get-buffer-create "Unreferenced Methods and Members")))
+	    (mapcan 'get-unused-string
+		    (semantic-find-nonterminal-by-token 'function
+							(current-buffer)
+							t)))
+	  (unreferenced-variables
+	    (mapcan 'get-unused-string
+		    (mapcan 'jde-xref-get-class-variables
+			    (semantic-find-nonterminal-by-type "class"
+							       (current-buffer)
+							       t))))
+	  (outbuf (get-buffer-create "Unreferenced Methods and Members")))
       (switch-to-buffer outbuf)
       (erase-buffer)
       (insert "The following is a list of methods and members that are\n")
@@ -677,25 +677,25 @@ while. If it does, you might want to consider increasing
       (newline)
       (newline)
       (if uncalled-methods
-        (progn
-          (insert "Unreferenced methods:\n")
-          (insert (mapconcat (lambda (x) x) uncalled-methods "\n")))
-        (insert "There are no uncalled methods\n\n"))
+	(progn
+	  (insert "Unreferenced methods:\n")
+	  (insert (mapconcat (lambda (x) x) uncalled-methods "\n")))
+	(insert "There are no uncalled methods\n\n"))
       (if unreferenced-variables
-        (progn
-          (insert "\n\nUnreferenced class variables:\n")
-          (insert (mapconcat (lambda (x) x) unreferenced-variables "\n")))
-        (insert "\n\nThere are no unreferenced variables\n\n"))
+	(progn
+	  (insert "\n\nUnreferenced class variables:\n")
+	  (insert (mapconcat (lambda (x) x) unreferenced-variables "\n")))
+	(insert "\n\nThere are no unreferenced variables\n\n"))
       (toggle-read-only)
       (not-modified)))))
 
 (defun jde-xref-remove-classes-from-subclasses-table (classes)
   (maphash (lambda (key value)
-             (puthash key
-                      (remove-if (lambda (item)
-                                   (member item classes)) value)
-                      jde-xref-subclasses))
-           jde-xref-subclasses))
+	     (puthash key
+		      (remove-if (lambda (item)
+				   (member item classes)) value)
+		      jde-xref-subclasses))
+	   jde-xref-subclasses))
 
 ;;;###autoload
 (defun jde-xref-update (&rest ignored)
@@ -714,13 +714,13 @@ call list of all files modified in emacs"
 (defun jde-xref-file-saved ()
   (when (eq major-mode 'jde-mode)
     (setq jde-xref-modified-classes
-          (append jde-xref-modified-classes
-                  (mapcar (lambda (class-token)
-                            (concat (jde-parse-get-package-name)
-                                    (when (jde-parse-get-package-name) ".")
-                                    (semantic-token-name class-token)))
-                          (semantic-find-nonterminal-by-type
-                           "class" (current-buffer) t))))))
+	  (append jde-xref-modified-classes
+		  (mapcar (lambda (class-token)
+			    (concat (jde-parse-get-package-name)
+				    (when (jde-parse-get-package-name) ".")
+				    (semantic-token-name class-token)))
+			  (semantic-find-nonterminal-by-type
+			   "class" (current-buffer) t))))))
 
 ;;;###autoload
 (defun jde-xref-customize ()

@@ -1,11 +1,12 @@
 ;; jde-run.el --- runs the Java app in the current buffer.
-;; $Revision: 1.96 $ $Date: 2004/11/21 07:49:55 $
+;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
-;; Maintainer: Paul Kinnucan
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: tools, processes
 
 ;; Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2008 Paul Kinnucan
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -24,16 +25,6 @@
 
 ;;; Commentary:
 
-;; This is one of a set of packages that make up the 
-;; Java Development Environment (JDE) for Emacs. See the
-;; JDE User's Guide for more information.
-
-;; The latest version of the JDE is available at
-;; <URL:http://jde.sunsite.dk>.
-
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Kinnucan at paulk@mathworks.com.
-
 (require 'eieio)
 
 (defcustom jde-run-mode-hook nil
@@ -42,7 +33,7 @@
   :type 'hook)
 
 (defcustom jde-run-application-class ""
-  "*Name of the Java class to run. 
+  "*Name of the Java class to run.
 This is the class that is run if you select JDE->Run App from the JDE
 menu or type C-c C-v C-r. If this option is the empty string, the JDE
 runs the class corresponding to the source file in the current
@@ -103,7 +94,7 @@ the `jde-run-option' variable group."
 ;; (makunbound 'jde-run-option-classpath)
 (defcustom jde-run-option-classpath "global"
 "*Specify paths of classes required to run this application.
-Choose Global from the customization buffer value menu to use 
+Choose Global from the customization buffer value menu to use
 the paths specified by `jde-global-classpath'.
 Choose Local from the menu to override the
 `jde-global-classpath' option. Choose None to specify
@@ -113,7 +104,7 @@ no classpath."
 	  (const :menu-tag "Global" "global")
 	  (repeat :menu-tag "Local" (file :tag "Path"))
 	  (const :menu-tag "None" "none")))
- 
+
 (defcustom jde-run-option-verbose (list nil nil nil)
   "*Print messages about the running process.
 The messages are printed in the run buffer."
@@ -140,7 +131,7 @@ Property Name field; enter its value, for example, green, in the
 Property Value field. You can specify as many properties as you like."
   :group 'jde-run-options
   :type '(repeat (cons :tag "Property"
-		  (string :tag "Name") 
+		  (string :tag "Name")
 		  (string :tag "Value"))))
 
 (defcustom jde-run-option-heap-size (list
@@ -153,12 +144,12 @@ Property Value field. You can specify as many properties as you like."
 	     (radio-button-choice (const "bytes")
 				  (const "kilobytes")
 				  (const "megabytes")
-                                  (const "gigabytes")))
+				  (const "gigabytes")))
 	(cons (integer :tag "Max")
 	       (radio-button-choice (const "bytes")
 				    (const "kilobytes")
 				    (const "megabytes")
-                                    (const "gigabytes")))))
+				    (const "gigabytes")))))
 
 (defcustom jde-run-option-stack-size (list
 				      (cons 128 "kilobytes")
@@ -170,12 +161,12 @@ Property Value field. You can specify as many properties as you like."
 	       (radio-button-choice (const "bytes")
 				    (const "kilobytes")
 				    (const "megabytes")
-                                    (const "gigabytes")))
+				    (const "gigabytes")))
 	  (cons (integer :tag "Java Stack")
 	       (radio-button-choice (const "bytes")
 				    (const "kilobytes")
 				    (const "megabytes")
-                                    (const "gigabytes")))))
+				    (const "gigabytes")))))
 
 (defcustom jde-run-option-garbage-collection (list t t)
   "*Specify garbage collection options."
@@ -191,7 +182,7 @@ Property Value field. You can specify as many properties as you like."
   :group 'jde-run-options
   :type '(cons boolean
 	       (file :tag "File"
-		     :help-echo 
+		     :help-echo
 "Specify where to put profile results here.")))
 
 (defcustom jde-run-option-heap-profile (cons nil
@@ -234,7 +225,7 @@ archives. To append the custom list to the standard list, select
 \"append\" from the Value Menu.  To prepend the custom list to the
 standard list, select \"prepend\" from the Value Menu. To replace the
 standard list with the custom list, select \"replace\" from the Value
-Menu. 
+Menu.
 
 Note that if `jde-jdk' specifies the 1.2.x version of the JDK, the
 JDEE replaces the standard list with the custom list regardless of the
@@ -254,17 +245,17 @@ nonnil, the JDEE treats the paths as relative to the location of the
 project file for the current project and replaces the period (.) with
 the path of the directory containing the project file."
   :group 'jde-run-options
-  :type '(choice 
+  :type '(choice
 	  :tag "Classpath Options"
 	  (const :tag "standard" nil)
 	  (cons :tag "custom" :inline nil
-		(choice 
+		(choice
 		 :tag "Custom Mode"
 		 (const "append")
 		 (const "prepend")
-		 (const "replace"))	   
-		(repeat 
-		 :tag "Classpath" 
+		 (const "replace"))
+		(repeat
+		 :tag "Classpath"
 		 (file :tag "Path")))))
 
 
@@ -275,7 +266,7 @@ the path of the directory containing the project file."
 
 \"Mode\" specifies the method for establishing the connection. The
 options are \"Server\" (allow a debugger to attach to the application
-after the application starts) or \"Client\" (allows the application to connect 
+after the application starts) or \"Client\" (allows the application to connect
 to a listening debugger).
 
 \"Data Transport\" specifies the method that the debuggee process uses to
@@ -292,21 +283,21 @@ This option applies only when you specify a shared memory connection
 to the debugger.
 
 The \"Socket Host\" specifes the host on which a remote debugger
-resides. This option applies only when you run the process in 
+resides. This option applies only when you run the process in
 client mode, using a socket transport.
- 
-The \"Socket Port\" option specifies the socket port used to 
+
+The \"Socket Port\" option specifies the socket port used to
 connect this process to the debugger. This option applies only
 when you select socket as the transport method.
 
 The \"Suspend\" option specifies whether the vm should suspend
 this process on startup."
   :group 'jde-run-options
-  :type  '(choice 
+  :type  '(choice
 	   :tag "Debug Connection Options"
 	   (const :tag "No connect" nil)
 	   (list
-	    :tag "Connect" 
+	    :tag "Connect"
 	    :inline nil
 	    (choice
 	     :tag "Mode"
@@ -320,18 +311,18 @@ this process on startup."
 	     :tag "Shared Memory Name"
 	     (const :menu-tag "Default" "javadebug")
 	     (string :menu-tag "Custom" :tag "Name"))
-	    (choice	     
+	    (choice
 	     :tag "Socket Host"
 	     (const :menu-tag "Local" nil)
 	     (string :menu-tag "Remote" :tag "Name"))
-	    (choice	     
+	    (choice
 	     :tag "Socket Port"
 	     (const :menu-tag "Default" "4444")
 	     (string :menu-tag "Custom" :tag "Address"))
 	    (choice
 	     :tag "Suspend?"
 	     (const :tag "No" nil)
-	     (const :tag "Yes" t)))))	  
+	     (const :tag "Yes" t)))))
 
 (defcustom jde-run-option-interpret-mode nil
   "Causes the vm to interpret all byte codes. By default VMs
@@ -363,13 +354,13 @@ are ignored."
   "Specify whether to use the Hotspot client or server vm."
   :group 'jde-run-options
   :type  '(choice :tag "vm type"
-                  (const :tag "client"    client)
-                  (const :tag "server"    server)))
+		  (const :tag "client"    client)
+		  (const :tag "server"    server)))
 
 
 ;;(makunbound 'jde-run-option-enable-assertions)
 (defcustom jde-run-option-enable-assertions "Nowhere"
-  "Enable assertions for the current project. 
+  "Enable assertions for the current project.
 
 To disable assertions everywhere (the default), select \"Nowhere\"
 from the Value Menu. To enable assertions everywhere except in system
@@ -385,15 +376,15 @@ to specify the exceptions. To enable assertions in system classes, set
 `jde-run-option-enable-system-assertions' on.
 
 The JDEE  ignores this option if `jde-jdk' specifies a version
-of the JDK that precedes version 1.4, which 
+of the JDK that precedes version 1.4, which
 introduced assertions into Java."
   :group 'jde-run-options
   :type '(choice :tag "Enable assertions"
 	      (const "Nowhere")
-              (const "Everywhere")
+	      (const "Everywhere")
 	      (cons :tag "Somewhere" :inline "Everywhere"
 		    (boolean :tag "In current directory")
-		    (repeat :tag "In the following locations"  
+		    (repeat :tag "In the following locations"
 			    (cons :tag "Location"
 				  (choice :tag "Type"
 					  (const "package")
@@ -416,21 +407,21 @@ package in the current directory (the directory of the current Java
 source buffer), and in specific packages and classes.
 
 The JDEE  ignores this option if `jde-jdk' specifies a version
-of the JDK that precedes version 1.4, which 
+of the JDK that precedes version 1.4, which
 introduced assertions into Java."
   :group 'jde-run-options
   :type '(choice :tag "Disable assertions"
 	      (const "Nowhere")
-              (const "Everywhere")
+	      (const "Everywhere")
 	      (cons :tag "Somewhere" :inline "Everywhere"
 		    (boolean :tag "In current directory")
-		    (repeat :tag "In the following locations"  
+		    (repeat :tag "In the following locations"
 			    (cons :tag "Location"
 				  (choice :tag "Type"
 					  (const "package")
 					  (const "class"))
 				  (string :tag "Name"))))))
-		   
+
 (defcustom jde-run-option-enable-system-assertions nil
   "Enable assertions in system classes."
   :group 'jde-run-options
@@ -447,7 +438,7 @@ This option allows you to specify one or more arguments to be passed
 to the Java interpreter. It is an alternative to using JDE Run Option
 variables, such as `jde-run-option-stack-size', to specify Java
 interpreter options. Also, it makes it possible to use the JDE with
-interpreters that accept command line arguments not supported by 
+interpreters that accept command line arguments not supported by
 the JDE Run Option variable set."
   :group 'jde-run-options
   :type '(repeat (string :tag "Argument")))
@@ -506,13 +497,13 @@ to the executable specified by `jde-run-executable'."
 Any substring that is enclosed in single or double quotes or does not include
 whitespace is considered a parameter."
    (let ((n (string-match "[^\"' ][^ ]*\\|\"[^\"]*\"\\|'[^']*'" s))
- 	(tok)
- 	(tokens '()))
+	(tok)
+	(tokens '()))
      (while n
        (setq n (match-end 0))
        (setq tok (match-string 0 s))
        (if (string-match "[\"']\\([^\"']*\\)[\"']" tok)
-           (setq tok (match-string 1 tok)))
+	   (setq tok (match-string 1 tok)))
        (setq tokens (append tokens (list tok)))
        (setq n (string-match "[^\"' ][^ ]*\\|\"[^\"]*\"\\|'[^']*'" s n)))
      tokens))
@@ -532,7 +523,7 @@ whitespace is considered a parameter."
 ;;;###autoload
 (defun jde-run-set-app (app)
   "Specify the name of the application class to run."
-  (interactive 
+  (interactive
    "sEnter application class: ")
   (setq jde-run-application-class app))
 
@@ -541,7 +532,7 @@ whitespace is considered a parameter."
   "Specify arguments to be passed to the Java vm.
 This command serves as an alternative to using the JDE Run Options
 panel to specify command-line arguments for the Java interpreter."
-  (interactive 
+  (interactive
    "sEnter arguments: ")
   (setq jde-run-option-vm-args (jde-run-parse-args args)))
 
@@ -552,13 +543,13 @@ panel to specify command-line arguments for the Java interpreter."
 This command provides an alternative to using the JDE Run Options panel
 to specify command-line arguments to pass to the application when starting
 the application."
-  (interactive 
+  (interactive
    "sEnter arguments: ")
   (setq jde-run-option-application-args (jde-run-parse-args args)))
 
 ;;;###autoload
 (defun jde-run-set-applet-viewer (viewer)
-  "Sets the viewer to be used to view an applet. The default is 
+  "Sets the viewer to be used to view an applet. The default is
 appletviewer."
   (interactive
    "sEnter viewer name: ")
@@ -587,9 +578,9 @@ panel to specifying the applet document."
 		     :documentation
 		     "Path of the compiler executable.")
    (buffer           :initarg :buffer
-	             :type buffer
-	             :documentation
-	             "Compilation buffer")
+		     :type buffer
+		     :documentation
+		     "Compilation buffer")
    (main-class        :initarg :main-class
 		     :type string
 		     :documentation
@@ -620,7 +611,7 @@ panel to specifying the applet document."
     (if jde-run-classic-mode-vm
 	(list "-classic")))
 
-    
+
 (defmethod jde-run-property-args ((this jde-run-vm))
     "Get property arguments."
     (mapcar
@@ -634,13 +625,13 @@ panel to specifying the applet document."
 	    (list (cons "bytes" "")
 	       (cons "kilobytes" "k")
 	       (cons "megabytes" "m")
-               (cons "gigabytes" "g")))
+	       (cons "gigabytes" "g")))
 	   (start-cons (nth 0 jde-run-option-heap-size))
-	   (start-size (format "%d%s" (car start-cons) 
+	   (start-size (format "%d%s" (car start-cons)
 			       (cdr (assoc (cdr start-cons)
 				      memory-unit-abbrevs))))
 	   (max-cons (nth 1 jde-run-option-heap-size))
-	   (max-size (format "%d%s" (car max-cons) 
+	   (max-size (format "%d%s" (car max-cons)
 			     (cdr (assoc (cdr max-cons)
 				    memory-unit-abbrevs)))))
       (append
@@ -655,20 +646,20 @@ panel to specifying the applet document."
 	    (list (cons "bytes" "")
 	       (cons "kilobytes" "k")
 	       (cons "megabytes" "m")
-               (cons "gigabytes" "g")))
+	       (cons "gigabytes" "g")))
 	   (c-cons (nth 0 jde-run-option-stack-size))
-	   (c-size (format "%d%s" (car c-cons) 
-                           (cdr (assoc (cdr c-cons)
-                                       memory-unit-abbrevs))))
+	   (c-size (format "%d%s" (car c-cons)
+			   (cdr (assoc (cdr c-cons)
+				       memory-unit-abbrevs))))
 	   (java-cons (nth 1 jde-run-option-stack-size))
-	   (java-size (format "%d%s" (car java-cons) 
+	   (java-size (format "%d%s" (car java-cons)
 			     (cdr (assoc (cdr java-cons)
 				    memory-unit-abbrevs)))))
       (append
        (if (not (string= c-size "128k"))
 	   (list (concat "-Xss" c-size)))
        (if (not (string= java-size "400k"))
-           (list (concat "-Xoss" java-size))))))
+	   (list (concat "-Xoss" java-size))))))
 
 
 (defmethod jde-run-java-profile-arg ((this jde-run-vm))
@@ -687,7 +678,7 @@ panel to specifying the applet document."
 	   (file (nth 0 prof-options))
 	   (depth (nth 1 prof-options))
 	   (top (nth 2 prof-options))
-	   (sort 
+	   (sort
 	    (downcase (substring (nth 3 prof-options) 0 1))))
       (if profilep
 	  (if (and (string= file "./java.hprof")
@@ -696,7 +687,7 @@ panel to specifying the applet document."
 		   (string= sort "a"))
 	      '("-Xhprof")
 	    (list
-	     (format 
+	     (format
 	      "-Xhprof:file=%s,depth=%d,top=%d,sort=%s"
 	      file depth top sort))))))
 
@@ -735,7 +726,7 @@ panel to specifying the applet document."
 				 nil nil
 				 'jde-run-interactive-app-arg-history)))
 			   ))
-	       (command-string (concat prog " " 
+	       (command-string (concat prog " "
 				       (jde-run-make-arg-string
 					prog-args)
 				       "\n\n")))
@@ -749,9 +740,9 @@ panel to specifying the applet document."
 	  (save-w32-show-window
 	    (comint-exec run-buffer (oref this :main-class) prog nil prog-args))
 	  (pop-to-buffer run-buffer)
-          (save-excursion
-            (goto-char (point-min))
-          (jde-run-etrace-update-current-marker))
+	  (save-excursion
+	    (goto-char (point-min))
+	  (jde-run-etrace-update-current-marker))
 	  (cd source-directory))
       (message "An instance of %s is running." (oref this :main-class))
       (pop-to-buffer run-buf-name))))
@@ -765,7 +756,7 @@ panel to specifying the applet document."
 
   ;; Call parent initializer.
   (call-next-method)
-  
+
   (oset this :version "1.1"))
 
 (defmethod jde-run-verbose-arg ((this jde-run-vm-1-1))
@@ -783,9 +774,9 @@ panel to specifying the applet document."
 
 (defmethod jde-run-gc-args ((this jde-run-vm-1-1))
   "Get garbage collection arguments."
-    (let ((no-gc-asynch (not 
+    (let ((no-gc-asynch (not
 			 (nth 0 jde-run-option-garbage-collection)))
-	  (no-gc-classes (not 
+	  (no-gc-classes (not
 			  (nth 1 jde-run-option-garbage-collection))))
       (append
        (if no-gc-asynch
@@ -841,7 +832,7 @@ to a debugger."
 
   ;; Call parent initializer.
   (call-next-method)
-  
+
   (oset this :version "1.2"))
 
 (defmethod jde-run-boot-classpath-arg ((this jde-run-vm-1-2))
@@ -851,7 +842,7 @@ to a debugger."
 	 (concat
 	  "-Xbootclasspath:"
 	  (jde-build-classpath
-	   (cdr jde-run-option-boot-classpath) 
+	   (cdr jde-run-option-boot-classpath)
 	   'jde-run-option-boot-classpath)))))
 
 (defmethod jde-run-verbose-arg ((this jde-run-vm-1-2))
@@ -869,9 +860,9 @@ to a debugger."
 
 (defmethod jde-run-gc-args ((this jde-run-vm-1-2))
   "Get garbage collection arguments."
-    (let ((no-gc-asynch (not 
+    (let ((no-gc-asynch (not
 			 (nth 0 jde-run-option-garbage-collection)))
-	  (no-gc-classes (not 
+	  (no-gc-classes (not
 			  (nth 1 jde-run-option-garbage-collection))))
       (append
        (if no-gc-asynch
@@ -923,7 +914,7 @@ to a debugger."
 
   ;; Call parent initializer.
   (call-next-method)
-  
+
   (oset this :version "1.3"))
 
 
@@ -931,7 +922,7 @@ to a debugger."
   "Returns the boot classpath argument for this vm."
   (if jde-run-option-boot-classpath
       (list
-       (concat 
+       (concat
 	"-Xbootclasspath"
 	(let ((mode (car jde-run-option-boot-classpath)))
 	  (cond
@@ -944,7 +935,7 @@ to a debugger."
 	   (t
 	    (error "Illegal custom classpath mode: %s"  mode))))
 	(jde-build-classpath
-	 (cdr jde-run-option-boot-classpath) 
+	 (cdr jde-run-option-boot-classpath)
 	 'jde-run-option-boot-classpath)))))
 
 
@@ -960,20 +951,20 @@ to a debugger."
 	    (suspend (nth 5 jde-run-option-debug))
 	    (ms-windows (eq system-type 'windows-nt)))
 	(list "-Xdebug"
-	      (format 
+	      (format
 	       "-Xrunjdwp:transport=%s,address=%s,server=%s,suspend=%s"
 	       (if (string= transport "Shared Memory")
 		   (if ms-windows
 		       "dt_shmem"
 		     (error "Shared memory transport is valid only on Windows."))
 		 "dt_socket")
-	       (if  (string= transport "Shared Memory") 
+	       (if  (string= transport "Shared Memory")
 		   shared-mem-name
 		 (if (string= mode "Client")
 		     (if socket-host
 			 (concat socket-host ":" socket-port)
 		       socket-port)
-		   socket-port))		       
+		   socket-port))
 	       (if (string= mode "Server") "y" "n")
 	       (if suspend "y" "n"))))))
 
@@ -1005,7 +996,7 @@ to a debugger."
 
   ;; Call parent initializer.
   (call-next-method)
-  
+
   (oset this :version "1.4"))
 
 
@@ -1029,7 +1020,7 @@ to a debugger."
        ((string= jde-run-option-enable-assertions "Everywhere")
 	(setq args '("-ea")))
        (t
-	(error "Illegal enable assertions option: \"%s\"." 
+	(error "Illegal enable assertions option: \"%s\"."
 	       jde-run-option-enable-assertions))))
      ((listp jde-run-option-enable-assertions)
       (if (car jde-run-option-enable-assertions)
@@ -1041,7 +1032,7 @@ to a debugger."
 		  (setq name (concat name "...")))
 	      (setq args  (append args (list (concat "-ea:" name)))))))
      (t
-      (error "Illegal enable assertions option: \"%s\"." 
+      (error "Illegal enable assertions option: \"%s\"."
 		jde-run-option-enable-assertions)))
     args))
 
@@ -1056,7 +1047,7 @@ to a debugger."
        ((string= jde-run-option-disable-assertions "Everywhere")
 	(setq args '("-da")))
        (t
-	(error "Illegal disable assertions option: \"%s\"." 
+	(error "Illegal disable assertions option: \"%s\"."
 	       jde-run-option-disable-assertions))))
      ((listp jde-run-option-disable-assertions)
       (if (car jde-run-option-disable-assertions)
@@ -1068,11 +1059,11 @@ to a debugger."
 		  (setq name (concat name "...")))
 	      (setq args  (append args (list (concat "-da:" name)))))))
      (t
-      (error "Illegal disable assertions option: \"%s\"." 
+      (error "Illegal disable assertions option: \"%s\"."
 		jde-run-option-disable-assertions)))
     args))
 
-			
+
 (defmethod jde-run-enable-system-assertions-arg ((this jde-run-vm-1-4))
   "Get argument required to enable system assertions."
   (if jde-run-option-enable-system-assertions
@@ -1114,7 +1105,7 @@ to a debugger."
 
   ;; Call parent initializer.
   (call-next-method)
-  
+
   (oset this :version "1.5"))
 
 (defclass jde-run-vm-1-6 (jde-run-vm-1-5) ()
@@ -1125,7 +1116,7 @@ to a debugger."
 
   ;; Call parent initializer.
   (call-next-method)
-  
+
   (oset this :version "1.6"))
 
 
@@ -1152,9 +1143,9 @@ to a debugger."
 	   jde-run-virtual-machines)))
     (if (not vm)
 	(setq vm (car jde-run-virtual-machines)))
-    (oset vm 
-	  :path 
-	  (let ((vm-path 
+    (oset vm
+	  :path
+	  (let ((vm-path
 		 (substitute-in-file-name jde-vm-path)))
 	    (if (string= vm-path "")
 		(jde-get-jdk-prog (if (eq system-type 'windows-nt)
@@ -1202,7 +1193,7 @@ interact with the program."
 		 (read-from-minibuffer
 		  "Main class: "
 		  (concat (jde-db-get-package)
-		      (file-name-sans-extension 
+		      (file-name-sans-extension
 		       (file-name-nondirectory (buffer-file-name)))))
 	       (jde-run-get-main-class)))
 	    (let ((jde-run-read-app-args read-app-args))
@@ -1210,10 +1201,10 @@ interact with the program."
 	(jde-run-executable))
     (error "The jde-run command works only in a Java source buffer.")))
 
-(defun jde-run-get-main-class () 
+(defun jde-run-get-main-class ()
   "Gets the main class for the application to which the current
 source buffer belongs."
-  (let ((main-class 
+  (let ((main-class
 	 (if jde-run-option-jar
 	     (jde-normalize-path 'jde-run-application-class)
 	 jde-run-application-class)))
@@ -1222,13 +1213,13 @@ source buffer belongs."
 	 (string= main-class ""))
 	(setq main-class
 	      (concat (jde-db-get-package)
-		      (file-name-sans-extension 
+		      (file-name-sans-extension
 		       (file-name-nondirectory (buffer-file-name))))))
     main-class))
 
 (defun jde-run-main-class()
   "Runs the Java program named by `jde-run-application-class' in
-a buffer, piping output from the program to the buffer and 
+a buffer, piping output from the program to the buffer and
 input from the buffer to the program."
   (interactive)
   (let ((vm (jde-run-get-vm)))
@@ -1243,7 +1234,7 @@ before evaluating body and restores the value afterwards."
 	 (w32-quote-process-args ?\")
 	 (win32-quote-process-args ?\") ;; XEmacs
 	 (windowed-process-io t)
-	 (process-connection-type nil))		 
+	 (process-connection-type nil))
      ,@body))
 
 (defun jde-run-unquote (string)
@@ -1260,11 +1251,11 @@ buffer belongs is running."
 
 (defun jde-run-executable()
   (let* ((prog-path
-	  (jde-normalize-path 
+	  (jde-normalize-path
 	   jde-run-executable
 	   'jde-run-executable))
 	 (prog-name (file-name-sans-extension
-		     (file-name-nondirectory 
+		     (file-name-nondirectory
 		      prog-path)))
 	 (run-buf-name (concat "*" prog-name "*"))
 	 (source-directory default-directory)
@@ -1285,7 +1276,7 @@ buffer belongs is running."
 				 nil nil
 				 '(jde-run-interactive-app-arg-history . 1))))
 			   ))
-	       (command-string (concat jde-run-executable " " 
+	       (command-string (concat jde-run-executable " "
 				       (mapconcat (lambda (arg) arg)
 						  prog-args " ")
 				       "\n\n")))
@@ -1299,9 +1290,9 @@ buffer belongs is running."
 	  (save-w32-show-window
 	   (comint-exec run-buffer prog-name prog-path nil prog-args))
 	  (pop-to-buffer run-buffer)
-          (save-excursion
-            (goto-char (point-min))
-            (jde-run-etrace-update-current-marker))
+	  (save-excursion
+	    (goto-char (point-min))
+	    (jde-run-etrace-update-current-marker))
 	  (cd source-directory))
       (message "An instance of %s is running." prog-name)
       (pop-to-buffer run-buf-name))))
@@ -1314,7 +1305,7 @@ buffer belongs is running."
   (font-lock-mode 1)
   (jde-run-etrace-setup-font-lock))
 
-(define-derived-mode 
+(define-derived-mode
   jde-run-mode comint-mode "JDE Run Mode"
   "Major mode for running Java applications and applets.
   \\{jde-run-mode-map}"
@@ -1323,22 +1314,22 @@ buffer belongs is running."
 (defun jde-get-appletviewer-options ()
   (let (options)
     (if (not (string= jde-appletviewer-option-encoding ""))
-	(setq options (list 
+	(setq options (list
 			"-encoding"
-		        jde-appletviewer-option-encoding)))
+			jde-appletviewer-option-encoding)))
     (if jde-appletviewer-option-vm-args
 	(let ((len (length jde-appletviewer-option-vm-args))
 	      (n 0))
 	  (while (< n len)
 	    (setq options
-		  (nconc 
+		  (nconc
 		   options
-		   (list 
+		   (list
 		    (concat "-J"
 			    (nth n jde-appletviewer-option-vm-args)))))
 	    (setq n (1+ n)))))
     options))
- 
+
 (defun jde-run-applet-exec (buffer name command startfile switches)
   "A version of comint-exec patched to start an applet viewer as
 a command shell subprocess rather than as a subprocess of Emacs. This
@@ -1418,13 +1409,13 @@ under Windows."
 
 
 (defun jde-run-find-html-files ()
-  "If (buffer-file-name) is /a/b/c.xxx (where xxx can be anything), 
-return (\"/a/b/c.html\") if it exists, else return (\"/a/b/c.htm\") 
+  "If (buffer-file-name) is /a/b/c.xxx (where xxx can be anything),
+return (\"/a/b/c.html\") if it exists, else return (\"/a/b/c.htm\")
 if it exists, else return a list of all *.html files in /a/b/
 directory."
   (let ((basename (file-name-sans-extension (buffer-file-name)))
 	f)
-    (cond 
+    (cond
      ((file-exists-p (setq f (concat basename ".html")))
       (list f))
      ((file-exists-p (setq f (concat basename ".htm"))) ;; for poor winXX souls
@@ -1434,13 +1425,13 @@ directory."
 		(if (or
 		     (string-match "[.]html$" file)
 		     (string-match "[.]htm$" file))
-		    (list file)))       
-	      (directory-files 
+		    (list file)))
+	      (directory-files
 	       (file-name-directory (buffer-file-name)) t))))))
 
 
 
-(setq jde-run-applet-last-doc nil) 
+(setq jde-run-applet-last-doc nil)
 
 ;;;###autoload
 (defun jde-run-applet (&optional doc)
@@ -1476,7 +1467,7 @@ file."
 	  (if (or
 	       (string= jde-run-applet-viewer "")
 	       (string-match "browse-url" jde-run-applet-viewer))
-	      (browse-url applet-doc 
+	      (browse-url applet-doc
 			  (if (boundp 'browse-url-new-window-flag)
 			      'browse-url-new-window-flag
 			    browse-url-new-window-p))
@@ -1487,22 +1478,22 @@ file."
 (defun jde-run-menu-run-applet ()
   (interactive)
   (jde-run-applet))
-   
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                      ;;
 ;;  Exception Trace Navigation                                          ;;
-;;                                                                      ;;           
-;;  Copyright (C) 1999 Phillip Lord <p.lord@hgmp.mrc.ac.uk>             ;; 
-;;  Copyright (C) 2001 Sam Steingold <sds@gnu.org>                      ;;              
+;;                                                                      ;;
+;;  Copyright (C) 1999 Phillip Lord <p.lord@hgmp.mrc.ac.uk>             ;;
+;;  Copyright (C) 2001 Sam Steingold <sds@gnu.org>                      ;;
 ;;  Copyright (C) 2001 Kevin A. Burton <burton@apache.org>              ;;
 ;;                                                                      ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;           
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defvar jde-run-etrace-current-marker (cons (make-marker) (make-marker))
   "The location of the last stack shown.
 A cons of two markers, location of the error and the location in the code.")
 
-(defvar jde-run-font-lock-keywords 
+(defvar jde-run-font-lock-keywords
   '(("\\(^[_a-z.]+[_a-zA-Z0-9]+Exception\\)\\(: \\)?\\(.*\\)?"
      (1 'font-lock-keyword-face append)
      (3 'font-lock-string-face append))
@@ -1512,7 +1503,7 @@ A cons of two markers, location of the error and the location in the code.")
      (3 'font-lock-type-face append)))
   "Defines font-lock keywords for highlighting exception stack traces.")
 
-(defun jde-run-etrace-update-current-marker () 
+(defun jde-run-etrace-update-current-marker ()
   "Updates the `car' of `jde-run-etrace-current-marker' to be at the current point"
   (set-marker (car jde-run-etrace-current-marker) (point) (current-buffer)))
 
@@ -1520,52 +1511,52 @@ A cons of two markers, location of the error and the location in the code.")
   "Update the `cdr' and the `car' of `jde-run-etrace-current-marker' from its `car'.
 Here goes all the error message parsing."
   (let ((here (car jde-run-etrace-current-marker))
-        (there (cdr jde-run-etrace-current-marker))
-        (n (or next 0))
-        (re (concat " \\([a-zA-Z0-9_.]+\\.\\)?" ; package
-                     "\\([a-zA-Z0-9_$]+\\)" ; class
-                     "\\.<?[a-zA-Z0-9_]+>?" ; method
-                     "(\\([a-zA-Z0-9_]+\\)\\.java:" ; java file = public class
-                     "\\([0-9]+\\))"))); line number
+	(there (cdr jde-run-etrace-current-marker))
+	(n (or next 0))
+	(re (concat " \\([a-zA-Z0-9_.]+\\.\\)?" ; package
+		     "\\([a-zA-Z0-9_$]+\\)" ; class
+		     "\\.<?[a-zA-Z0-9_]+>?" ; method
+		     "(\\([a-zA-Z0-9_]+\\)\\.java:" ; java file = public class
+		     "\\([0-9]+\\))"))); line number
     (save-excursion
       (set-buffer (marker-buffer here))
       (goto-char here)
-      ;; In order to display the current match at the top of 
-      ;; the error screen the previous match was set to be 
+      ;; In order to display the current match at the top of
+      ;; the error screen the previous match was set to be
       ;; at the beggining of the line. If we do not place the point
       ;; at the end of the line again, you will match the same error.
       ;; If n is 0 ensure that point is at the beggining
       (if (> n 0)
-          (end-of-line)
-        (beginning-of-line))
-      
+	  (end-of-line)
+	(beginning-of-line))
+
       (if (>= n 0)
-          (if (re-search-forward re nil t)
-              (progn
-                ;;setting the line at the beggining
-                ;;so that it is the first line of the errors
-                (beginning-of-line) 
-                (jde-run-etrace-update-current-marker))
-            (error "End of stack trace"))
-        (if (re-search-backward re nil t)
-            (progn
-              (jde-run-etrace-update-current-marker))
-          (error "Start of stack trace")))
+	  (if (re-search-forward re nil t)
+	      (progn
+		;;setting the line at the beggining
+		;;so that it is the first line of the errors
+		(beginning-of-line)
+		(jde-run-etrace-update-current-marker))
+	    (error "End of stack trace"))
+	(if (re-search-backward re nil t)
+	    (progn
+	      (jde-run-etrace-update-current-marker))
+	  (error "Start of stack trace")))
 ;;       (message "1: [%s]; 2: [%s]; 3: [%s]; 4: [%s]" (match-string 1)
 ;;                (match-string 2) (match-string 3) (match-string 4))
       (let* ((package (or (match-string 1) ""))
-            (class (match-string 2))
-            (file-name (match-string 3))
-            (line (car (read-from-string (match-string 4))))
-            (file (jde-find-class-source-file (concat package file-name)))
-	    buf) 
-        (condition-case err
-            (progn 
-              (setq buf (if file (find-file-noselect file)))
-              (set-buffer buf)
-              (goto-line line)
-              (set-marker there (point) buf))
-          (error err))))
+	    (class (match-string 2))
+	    (file-name (match-string 3))
+	    (line (car (read-from-string (match-string 4))))
+	    (file (jde-find-class-source-file (concat package file-name)))
+	    buf)
+	(condition-case err
+	    (progn
+	      (setq buf (if file (find-file-noselect file)))
+	      (set-buffer buf)
+	      (goto-line line)
+	      (set-marker there (point) buf))
+	  (error err))))
     jde-run-etrace-current-marker))
 
 (defun jde-run-etrace-goto (&optional next)
@@ -1573,8 +1564,8 @@ Here goes all the error message parsing."
   (jde-run-etrace-current-marker next)
   (if jde-emacs22p
       (compilation-goto-locus (car jde-run-etrace-current-marker)
-                              (cdr jde-run-etrace-current-marker)
-                              nil)
+			      (cdr jde-run-etrace-current-marker)
+			      nil)
     (compilation-goto-locus jde-run-etrace-current-marker)))
 
 (defun jde-run-etrace-show-at-mouse (event)
@@ -1630,14 +1621,14 @@ The point should be anywhere on the line with the stack reference."
       ;; (set (make-local-variable 'font-lock-keywords) jde-run-font-lock-keywords)
       nil
     (progn
-      (font-lock-add-keywords 
-       nil 
+      (font-lock-add-keywords
+       nil
        '(("\\(^[_a-z.]+[_a-zA-Z0-9]+Exception\\)\\(: \\)?\\(.*\\)?"
 	  (1 'font-lock-keyword-face append)
 	  (3 'font-lock-string-face append))))
-  
-      (font-lock-add-keywords 
-       nil 
+
+      (font-lock-add-keywords
+       nil
        '(("\\(at [_a-z.]+[_a-zA-Z0-9]+\\.[_a-zA-Z<>]*\\)(\\([_a-zA-Z0-9]+.java\\):\\([0-9]+\\))$"
 	  (1 'font-lock-constant-face append)
 	  (2 'font-lock-variable-name-face append)
@@ -1845,7 +1836,7 @@ The point should be anywhere on the line with the stack reference."
 ;; Updated to resolve relative paths relative to the project file that defines them. Thanks to Nick Seiger.
 ;;
 ;; Revision 1.48  2001/04/09 05:28:20  paulk
-;; 
+;;
 ;; Revision 1.47  2001/03/16 04:52:46  paulk
 ;; Use major-mode instead of mode-name to check the buffer mode. Thanks to Kevin Burton.
 ;;

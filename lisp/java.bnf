@@ -1,10 +1,11 @@
 # BNF grammar for Java
+# $Id$
 #
 # Copyright (C) 2000, 2001 Paul F. Kinnucan, Jr.
+# Copyright (C) 2009 by Paul Landes
 #
 # Author: Paul F. Kinnucan, Jr. <paulk@mathworks.com>
 #         Augmented by David Ponce <david@dponce.com>
-# $Id: java.bnf,v 1.17 2001/01/17 18:22:15 paulk Exp $
 #
 # java.bnf is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

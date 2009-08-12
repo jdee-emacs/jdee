@@ -358,7 +358,7 @@ point at the definition. (The first time you type
 M-x ., Emacs prompts you to load the TAGS file.)
 
 Please send bug reports and enhancement suggestions
-to Paul Kinnucan at paulk@mathworks.com.
+to Paul Landes <landes <at> mailc dt net>
 
 Enjoy
 

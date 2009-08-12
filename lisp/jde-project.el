@@ -1,11 +1,12 @@
 ;;; jde-project.el -- Integrated Development Environment for Java.
-;; $Revision: 1.5 $ $Date: 2002/02/17 14:29:23 $ 
+;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
-;; Maintainer: Paul Kinnucan
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 2000 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -23,17 +24,6 @@
 ;; Boston, MA 02111-1307, USA.
 
 ;;; Commentary:
-
-;; This is one of a set of packages that make up the 
-;; Java Development Environment (JDE) for Emacs. See the
-;; JDE User's Guide for more information.
-
-;; The latest version of the JDE is available at
-;; <URL:http://sunsite.auc.dk/jde/>.
-;; <URL:http://www.geocities.com/SiliconValley/Lakes/1506/>
-
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Kinnucan at paulk@mathworks.com.
 
 ;;; Code:
 
@@ -54,7 +44,7 @@
 (defvar jde-project-keymap (make-sparse-keymap)
   "JDE Project keymap.")
 
-(easy-menu-define 
+(easy-menu-define
  jde-project-menu jde-project-keymap
  "JDE Project menu" jde-project-menu-definition)
 
@@ -66,8 +56,8 @@
      (or
       (not jde-xemacsp)
       (featurep 'infodock)))
-    (define-key-after (cdr (assq 'menu-bar global-map)) 
-      [jde-project] 
+    (define-key-after (cdr (assq 'menu-bar global-map))
+      [jde-project]
       (cons (car jde-project-menu-definition) jde-project-menu) 'mule))
 
 
@@ -85,15 +75,15 @@
    (dir      :initarg :dir
 	     :type string
 	     :documentation
-	     "Path of directory that contains this project.")	     
+	     "Path of directory that contains this project.")
    (prj-file :initarg :prj-file
 	     :type string
 	     :documentation
 	     "Project file for this project.")
    (src      :initarg :src
 	     :type string
-             :documentation 
-             "Path of directory that contains the source for this project"))
+	     :documentation
+	     "Path of directory that contains the source for this project"))
   (:allow-nil-initform t)
   "Class of JDE projects.")
 
@@ -104,7 +94,7 @@
 	      :documentation
 	      "Project that this dialog creates.")
   (name-field :initarg :name-field
-	      :documentation 
+	      :documentation
 	      "Field for entering project name.")
    (dir-field :initarg :dir-field
 	      :documentation
@@ -147,7 +137,7 @@
 
 (defmethod jde-project-create ((this jde-project-application))
     (if (not (file-exists-p proj-dir))
-	(if (yes-or-no-p 
+	(if (yes-or-no-p
 	      (format "%s does not exist. Should I create it?" proj-dir))
 	    (make-directory proj-dir)
 	  (error "Cannot create project.")))
@@ -164,13 +154,13 @@
 
 (defmethod jde-project-show-creation-dialog ((this jde-project-application))
   "Shows the dialog for creating a Java application project."
-  (let ((dialog 
-	 (jde-project-application-create-dialog 
+  (let ((dialog
+	 (jde-project-application-create-dialog
 	  "project create dialog"
 	  :project this)))
     (efc-dialog-show dialog)))
 
-	      
+
 (defclass jde-project-application-create-dialog (jde-project-create-dialog)
   ()
  "Create a jde-project-app-create-dialog.")
@@ -183,11 +173,11 @@ the Application Project Creation dialog."
 	 (dir (widget-value (oref this dir-field)))
 	 (proj-dir (expand-file-name name dir)))
     (oset project :name name)
-    (oset project :dir proj-dir)    
-    (jde-project-create project)        
+    (oset project :dir proj-dir)
+    (jde-project-create project)
     (call-next-method)))
 
-	   
+
 (defun jde-project-create-project ()
   "Creates a JDE project."
   (interactive)
@@ -216,4 +206,3 @@ the Application Project Creation dialog."
 ;; Initial revision
 ;;
 ;;
-

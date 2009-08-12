@@ -1,12 +1,13 @@
 ;;; jde-imenu.el --- imenu setup for the JDE
-;; $Revision: 1.7 $ 
+;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>,
 ;;         David Ponce <david@dponce.com>
-;; Maintainer: Paul Kinnucan, David Ponce
+;; Maintainer: David Ponce, Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 2000, 2001, 2002, 2004 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -41,9 +42,9 @@
   (defun jde-imenu-char-valid-p (object)
     "Return t if OBJECT is a valid normal character."
     (condition-case nil
-        (progn
-          (char-to-string object)
-          t)
+	(progn
+	  (char-to-string object)
+	  t)
       (error nil))))
  )
 
@@ -97,9 +98,9 @@ See also `jde-imenu-modifier-abbrev-alist'."
 
 (defconst jde-imenu-valid-modifiers-regexp
   (concat "\\b"
-          (regexp-opt
-           (mapcar #'car jde-imenu-default-modifier-abbrev-alist) t)
-          "\\b")
+	  (regexp-opt
+	   (mapcar #'car jde-imenu-default-modifier-abbrev-alist) t)
+	  "\\b")
   "Regexp of valid Java modifiers used by
 `jde-imenu-modifier-field-validate'.")
 
@@ -109,10 +110,10 @@ Used by `jde-imenu-modifier-abbrev-alist' customization."
   (save-excursion
     (let ((value (widget-value widget)))
       (if (and (stringp value)
-               (string-match jde-imenu-valid-modifiers-regexp value))
-          nil
-        (widget-put widget :error (format "Invalid modifier: %S" value))
-        widget))))
+	       (string-match jde-imenu-valid-modifiers-regexp value))
+	  nil
+	(widget-put widget :error (format "Invalid modifier: %S" value))
+	widget))))
 
 (defun jde-imenu-abbrev-field-validate (widget)
   "Validate a character abbreviation.
@@ -120,11 +121,11 @@ Used by `jde-imenu-modifier-abbrev-alist' customization."
   (save-excursion
     (let ((value (widget-value widget)))
       (if (jde-imenu-char-valid-p value)
-          nil
-        (widget-put widget :error
-                    (format "Invalid character value: %S" value))
-        widget))))
-      
+	  nil
+	(widget-put widget :error
+		    (format "Invalid character value: %S" value))
+	widget))))
+
 (defcustom jde-imenu-modifier-abbrev-alist
   jde-imenu-default-modifier-abbrev-alist
   "*Alist of character abbreviations for Java modifiers.
@@ -136,19 +137,19 @@ association are not displayed (see also `jde-imenu-include-modifiers')."
   :type '(repeat
 	  (cons :tag "Abbrev"
 		(string :tag "Modifier"
-                        :validate
-                        (lambda (widget)
-                          (jde-imenu-modifier-field-validate widget))
-                        "")
-                (choice :tag "Abbreviation"
-                        (const     :tag "None" nil)
-                        (character :tag "Character")
-                        (integer   :tag "Character value"
-                                   :validate
-                                   (lambda (widget)
-                                     (jde-imenu-abbrev-field-validate widget))
-                                   ))
-                )))
+			:validate
+			(lambda (widget)
+			  (jde-imenu-modifier-field-validate widget))
+			"")
+		(choice :tag "Abbreviation"
+			(const     :tag "None" nil)
+			(character :tag "Character")
+			(integer   :tag "Character value"
+				   :validate
+				   (lambda (widget)
+				     (jde-imenu-abbrev-field-validate widget))
+				   ))
+		)))
 
 (defcustom jde-imenu-sort nil
   "*If non-nil sorts items in the index menu.
@@ -160,22 +161,22 @@ You can choose:
 Use *Rescan* to rebuild the imenu when you have changed this option."
   :group 'jde-project
   :type '(choice (const :tag "No sort"    nil )
-                 (const :tag "Ascending"  asc )
-                 (const :tag "Descending" desc))
+		 (const :tag "Ascending"  asc )
+		 (const :tag "Descending" desc))
   :set '(lambda (sym val)
-          ;; setup sorting for `semantic-create-imenu-index'
-          ;; buffer local
-          (setq semantic-imenu-sort-bucket-function
-                (cond ((eq val 'asc)
-                       'semantic-sort-tokens-by-name-increasing-ci)
-                      ((eq val 'desc)
-                       'semantic-sort-tokens-by-name-decreasing-ci)
-                      (t
-                       nil)))
-          ;; global
-          (set-default 'semantic-imenu-sort-bucket-function
-                       semantic-imenu-sort-bucket-function)
-          (set-default sym val)))
+	  ;; setup sorting for `semantic-create-imenu-index'
+	  ;; buffer local
+	  (setq semantic-imenu-sort-bucket-function
+		(cond ((eq val 'asc)
+		       'semantic-sort-tokens-by-name-increasing-ci)
+		      ((eq val 'desc)
+		       'semantic-sort-tokens-by-name-decreasing-ci)
+		      (t
+		       nil)))
+	  ;; global
+	  (set-default 'semantic-imenu-sort-bucket-function
+		       semantic-imenu-sort-bucket-function)
+	  (set-default sym val)))
 
 ;;;;
 ;;;; Helper functions
@@ -189,19 +190,19 @@ also `jde-imenu-include-modifiers')."
   (if (not jde-imenu-include-modifiers)
       ""
     (let ((alist jde-imenu-modifier-abbrev-alist)
-          (abbrevs "")
-          entry modifier)
+	  (abbrevs "")
+	  entry modifier)
       (while alist
-        (setq entry (car alist)
-              alist (cdr alist))
-        (if (member (car entry) modifiers)
-            (setq abbrevs
-                  (concat abbrevs (if (jde-imenu-char-valid-p (cdr entry))
-                                      (char-to-string (cdr entry))
-                                    "")))))
+	(setq entry (car alist)
+	      alist (cdr alist))
+	(if (member (car entry) modifiers)
+	    (setq abbrevs
+		  (concat abbrevs (if (jde-imenu-char-valid-p (cdr entry))
+				      (char-to-string (cdr entry))
+				    "")))))
       (if (> (length abbrevs) 0)
-          (concat abbrevs " ")         ; trailing whitespace separator
-        abbrevs))))
+	  (concat abbrevs " ")         ; trailing whitespace separator
+	abbrevs))))
 
 ;;;;
 ;;;; Universal `semantic-imenu' stuff adapted to JDE's needs
@@ -211,46 +212,46 @@ also `jde-imenu-include-modifiers')."
   "Return a prototype for TAG.
 See also `semantic-prototype-nonterminal'."
   (let* ((tag-cat  (semantic-tag-class tag))
-         (prototyper (intern-soft (format "jde-imenu-prototype-%s"
-                                          tag-cat))))
+	 (prototyper (intern-soft (format "jde-imenu-prototype-%s"
+					  tag-cat))))
     (if (fboundp prototyper)
-        (funcall prototyper tag parent color)
+	(funcall prototyper tag parent color)
       (semantic-format-prototype-tag-java-mode tag parent color))))
 
 (defun jde-imenu-prototype-function (tag &optional parent color)
   "Return a function (method) prototype for TAG.
 See also `semantic-java-prototype-function'."
   (let ((sign (if jde-imenu-include-signature
-                  (semantic-java-prototype-function tag parent color)
-                (concat (if color
-                            (semantic--format-colorize-text
-                             (semantic-tag-name tag) 'function)
-                          (semantic-tag-name tag))
-                        "()"))))
+		  (semantic-java-prototype-function tag parent color)
+		(concat (if color
+			    (semantic--format-colorize-text
+			     (semantic-tag-name tag) 'function)
+			  (semantic-tag-name tag))
+			"()"))))
     (concat (jde-imenu-abbreviate-modifiers
-             (semantic-tag-modifiers tag))
-            sign)))
+	     (semantic-tag-modifiers tag))
+	    sign)))
 
 (defun jde-imenu-prototype-variable (tag &optional parent color)
   "Return a variable (field) prototype for TAG.
 See also `semantic-java-prototype-variable'."
   (let ((sign (if jde-imenu-include-signature
-                  (semantic-java-prototype-variable tag parent color)
-                (if color
-                    (semantic--format-colorize-text
-                     (semantic-tag-name tag) 'variable)
-                  (semantic-tag-name tag)))))
+		  (semantic-java-prototype-variable tag parent color)
+		(if color
+		    (semantic--format-colorize-text
+		     (semantic-tag-name tag) 'variable)
+		  (semantic-tag-name tag)))))
     (concat (jde-imenu-abbreviate-modifiers
-             (semantic-tag-modifiers tag))
-            sign)))
+	     (semantic-tag-modifiers tag))
+	    sign)))
 
 (defun jde-imenu-prototype-type (tag &optional parent color)
   "Return a type (class/interface) prototype for TAG.
 See also `semantic-prototype-nonterminal'."
   (let ((sign (semantic-java-prototype-type tag parent color)))
     (concat (jde-imenu-abbreviate-modifiers
-             (semantic-tag-modifiers tag))
-            sign)))
+	     (semantic-tag-modifiers tag))
+	    sign)))
 
 ;;;;
 ;;;; Specific JDE's imenu (to be replaced by semantic-imenu stuff)
@@ -265,102 +266,102 @@ index to go to class definition."
 (defun jde-imenu-sort-tags (tags)
   "Sorts the tag list TAGS depending on `jde-imenu-sort' value."
   (cond ((eq jde-imenu-sort 'asc)
-         (sort tags
-               (function
-                (lambda (tag1 tag2)
-                  (string-lessp (upcase (semantic-tag-name tag1))
-                                (upcase (semantic-tag-name tag2)))))))
-        ((eq jde-imenu-sort 'desc)
-         (sort tags
-               (function
-                (lambda (tag1 tag2)
-                  (string-lessp (upcase (semantic-tag-name tag2))
-                                (upcase (semantic-tag-name tag1)))))))
-        (t
-         tags)))
+	 (sort tags
+	       (function
+		(lambda (tag1 tag2)
+		  (string-lessp (upcase (semantic-tag-name tag1))
+				(upcase (semantic-tag-name tag2)))))))
+	((eq jde-imenu-sort 'desc)
+	 (sort tags
+	       (function
+		(lambda (tag1 tag2)
+		  (string-lessp (upcase (semantic-tag-name tag2))
+				(upcase (semantic-tag-name tag1)))))))
+	(t
+	 tags)))
 
 (defun jde-imenu-index-class  (class-tag)
   "Creates an imenu index for a class in CLASS-TAG."
   (let* ((class-name  (semantic-tag-name       class-tag))
-         (class-type  (semantic-tag-type       class-tag))
-         (class-start (semantic-tag-start      class-tag))
-         (class-parts (semantic-tag-type-members class-tag))
-         (class-index (jde-imenu-index-class-parts class-parts)))
+	 (class-type  (semantic-tag-type       class-tag))
+	 (class-start (semantic-tag-start      class-tag))
+	 (class-parts (semantic-tag-type-members class-tag))
+	 (class-index (jde-imenu-index-class-parts class-parts)))
 
     (if jde-imenu-include-classdef
-        ;; If requested adds a *class def* item to go to the class def.
-        (setq class-index (cons (cons "*class def*" class-start)
-                                class-index))
+	;; If requested adds a *class def* item to go to the class def.
+	(setq class-index (cons (cons "*class def*" class-start)
+				class-index))
       ;; Else adds an *empty* item to go to the class def. only
       ;; when there is not parts
       (or class-index
-          (setq class-index
-                (list (cons "*empty*"
-                            class-start)))))
+	  (setq class-index
+		(list (cons "*empty*"
+			    class-start)))))
 
     (list (cons (format "%s %s" class-type class-name)
-                class-index))))
+		class-index))))
 
 (defun jde-imenu-index-class-parts (tags)
   "Creates an imenu index for class parts in TAGS.
 When`jde-imenu-include-signature' is non-nil the
 index menu displays full method signatures and field types."
   (let ((methods (semantic-find-nonterminal-by-token 'function tags))
-        (fields  (semantic-find-nonterminal-by-token 'variable tags))
-        (classes (semantic-find-nonterminal-by-token 'type     tags))
-        index)
+	(fields  (semantic-find-nonterminal-by-token 'variable tags))
+	(classes (semantic-find-nonterminal-by-token 'type     tags))
+	index)
 
     (setq methods (jde-imenu-sort-tags methods))
     (while methods
       (let* ((method-tag (car methods))
-             (method-name  (semantic-tag-name method-tag))
-             (method-pos   (semantic-tag-start method-tag))
-             method-sig)
-        (if jde-imenu-include-signature
-            (let ((method-type  (semantic-tag-type method-tag))
-                  (method-args  (semantic-tag-function-arguments method-tag)))
-              (setq method-sig (if method-type
-                                   (format "%s %s(" method-type method-name)
-                                 (format "%s(" method-name)))
-              (while method-args
-                (let ((method-arg-tag (car method-args))
-                      method-arg-type)
-                  (when (semantic-tag-p method-arg-tag)
-                    (setq method-arg-type (semantic-tag-type method-arg-tag))
-                    (setq method-sig (concat method-sig method-arg-type ",")))
-                  (setq method-args (cdr method-args))))
-              ;; remove the extra comma at end
-              (if (char-equal ?, (aref method-sig (1- (length method-sig))))
-                  (setq method-sig (substring method-sig 0 -1)))
-              (setq method-sig (concat method-sig ")")))
-          (setq method-sig (format "%s()" method-name)))
-        (setq index
-              (append
-               index (list (cons method-sig method-pos)))))
+	     (method-name  (semantic-tag-name method-tag))
+	     (method-pos   (semantic-tag-start method-tag))
+	     method-sig)
+	(if jde-imenu-include-signature
+	    (let ((method-type  (semantic-tag-type method-tag))
+		  (method-args  (semantic-tag-function-arguments method-tag)))
+	      (setq method-sig (if method-type
+				   (format "%s %s(" method-type method-name)
+				 (format "%s(" method-name)))
+	      (while method-args
+		(let ((method-arg-tag (car method-args))
+		      method-arg-type)
+		  (when (semantic-tag-p method-arg-tag)
+		    (setq method-arg-type (semantic-tag-type method-arg-tag))
+		    (setq method-sig (concat method-sig method-arg-type ",")))
+		  (setq method-args (cdr method-args))))
+	      ;; remove the extra comma at end
+	      (if (char-equal ?, (aref method-sig (1- (length method-sig))))
+		  (setq method-sig (substring method-sig 0 -1)))
+	      (setq method-sig (concat method-sig ")")))
+	  (setq method-sig (format "%s()" method-name)))
+	(setq index
+	      (append
+	       index (list (cons method-sig method-pos)))))
       (setq methods (cdr methods)))
 
     ;; Add a separator between method and field index
     (if fields
-        (setq index (append index '(("-"))))) 
-    
+	(setq index (append index '(("-")))))
+
     (setq fields (jde-imenu-sort-tags fields))
     (while fields
       (let* ((field-tag (car fields))
-             (field-name  (semantic-tag-name  field-tag))
-             (field-pos   (semantic-tag-start field-tag)))
-        (if jde-imenu-include-signature
-            (setq field-name (concat (semantic-tag-type field-tag)
-                                     " " field-name)))
-        (setq index 
-              (append 
-               index (list (cons field-name field-pos)))))
+	     (field-name  (semantic-tag-name  field-tag))
+	     (field-pos   (semantic-tag-start field-tag)))
+	(if jde-imenu-include-signature
+	    (setq field-name (concat (semantic-tag-type field-tag)
+				     " " field-name)))
+	(setq index
+	      (append
+	       index (list (cons field-name field-pos)))))
       (setq fields (cdr fields)))
 
     (setq classes (jde-imenu-sort-tags classes))
     (while classes
       (let* ((class-tag  (car classes))
-             (class-index  (jde-imenu-index-class class-tag)))
-        (setq index (append index class-index)))
+	     (class-index  (jde-imenu-index-class class-tag)))
+	(setq index (append index class-index)))
       (setq classes (cdr classes)))
     index))
 
@@ -369,7 +370,7 @@ index menu displays full method signatures and field types."
 This function uses the semantic bovinator to index the buffer."
 
     (semantic-fetch-tags)
- 
+
     (let* ((tags   (semantic-fetch-tags))
 	   (packages (semantic-find-nonterminal-by-token 'package tags))
 	   (depends  (semantic-find-nonterminal-by-token 'include tags))
@@ -400,9 +401,9 @@ This function uses the semantic bovinator to index the buffer."
 	(let* ((package-tag (car packages))
 	       (package-name  (semantic-tag-name  package-tag))
 	       (package-pos   (semantic-tag-start package-tag)))
-	  (setq index 
-		(append 
-		 index 
+	  (setq index
+		(append
+		 index
 		 (list (cons (concat "package " package-name) package-pos)))))
 	(setq packages (cdr packages)))
       index))
@@ -418,15 +419,15 @@ This function uses the semantic bovinator to index the buffer."
     ;; semantic overloaded functions
     (semantic-install-function-overrides
      (if (fboundp 'semantic-format-tag-prototype)
-         '((format-tag-prototype . jde-imenu-prototype-nonterminal))
+	 '((format-tag-prototype . jde-imenu-prototype-nonterminal))
        '((prototype-nonterminal . jde-imenu-prototype-nonterminal))
        ))
 
     ;; function to use for creating the imenu
     (setq imenu-create-index-function
-          (if (fboundp jde-imenu-create-index-function)
-              jde-imenu-create-index-function
-            'semantic-create-imenu-index))
+	  (if (fboundp jde-imenu-create-index-function)
+	      jde-imenu-create-index-function
+	    'semantic-create-imenu-index))
 
     ;; add the imenu to the menu bar for the current buffer
     (imenu-add-to-menubar "Classes")

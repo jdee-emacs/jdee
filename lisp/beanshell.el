@@ -1,11 +1,12 @@
 ;;; beanshell.el
-;; $Revision: 1.76 $ 
+;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
-;; Maintainer: Paul Kinnucan
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 1997, 1998, 2001, 2002, 2003, 2004 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -40,7 +41,7 @@
 ;;                   for interacting with the BeanShell.
 ;; bsh-eval          Sends a Java expression to the BeanShell for evaluation and
 ;;                   waits for a response.
-;; bsh-eval-r        Sends a Java expression to the BeanShell for evaluation 
+;; bsh-eval-r        Sends a Java expression to the BeanShell for evaluation
 ;;                   and then evaluates the resulting BeanShell output
 ;;                   as a Lisp expression.
 ;; bsh-async-eval    Sends a Java expression to the BeanShell for evaluation
@@ -61,10 +62,10 @@
 ;; BeanShell jar file, the Java vm used to run the BeanShell, a
 ;; startup classpath and directory, vm arguments, etc. Emacs package
 ;; developers can easily extend this base class to tailor the BeanShell
-;; to specific applications. 
+;; to specific applications.
 ;; This package provides one such derived class named
 ;; bsh-standalone-bsh.  This is a BeanShell implementation intended
-;; for use by interactive users. 
+;; for use by interactive users.
 
 ;; To use the standalone BeanShell, download the BeanShell jar file
 ;; from http://www.beanshell.org/ and install it on your system.
@@ -97,9 +98,9 @@ bsh uses the first vm that it finds on the Emacs
 path). To specify a vm, select Path and enter the
 path to the vm. "
   :group 'bsh
-  :type '(choice 
-          (const :tag "Default" :value nil)
-          (file :tag "Path")))
+  :type '(choice
+	  (const :tag "Default" :value nil)
+	  (file :tag "Path")))
 
 (defcustom bsh-classpath nil
   "Startup classpath for the BeanShell."
@@ -116,7 +117,7 @@ getting timeout errors no matter how large a value you set, try
 setting this variable to no timeout (nil)."
   :group 'bsh
   :type '(choice (const :tag "No timeout" :value nil)
-                 (number :tag "Length")))
+		 (number :tag "Length")))
 
 ;; (makunbound 'bsh-eval-timeout)
 (defcustom bsh-eval-timeout 30
@@ -128,7 +129,7 @@ no matter how large a value you set, try setting this variable to no
 timeout (nil)."
   :group 'bsh
   :type '(choice (const :tag "No timeout" :value nil)
-                 (number :tag "Length")))
+		 (number :tag "Length")))
 
 (defcustom bsh-vm-args nil
   "*Specify arguments to be passed to the Java vm.
@@ -144,7 +145,7 @@ for each argument."
   "Path of directory in which to start the beanshell.
 The path may start with a tilde (~) indication your
 home directory and may include environment variables.
-If this variable is the null string (the default), 
+If this variable is the null string (the default),
 the beanshell starts in the directory of the current
 buffer."
   :group 'bsh
@@ -153,7 +154,7 @@ buffer."
 
 (defclass bsh-buffer ()
   ((buffer-name   :initarg :buffer-name
-                  :initform "*bsh*"
+		  :initform "*bsh*"
 		  :type string
 		  :documentation
 		  "Name of buffer used to interact with BeanShell process.")
@@ -163,9 +164,9 @@ buffer."
 		  "Buffer used to interact with BeanShell process.")
 
    (process       :initarg :process
-		  :documentation 
+		  :documentation
 		  "Beanshell process.")
-  
+
    (filter        :initarg :filter
 		  :type function
 		  :documentation
@@ -231,13 +232,13 @@ buffer."
 
   (bsh-compilation-buffer-create-native-buffer this)
 
-  (oset 
-   this 
+  (oset
+   this
    filter
    (lexical-let ((this-buf this))
      (lambda (process output)
        (bsh-compilation-buffer-filter this-buf process output))))
-    
+
   ;; This buffer does not have its own process.
   (oset this process nil)
   (bsh-compilation-buffer-set-mode this))
@@ -255,22 +256,22 @@ buffer."
 	    ;; Some or all of these variables may not be defined by
 	    ;; the various versions of compile.el shipped with Emacs
 	    ;; and XEmacs.
-	    (error-regexp-alist 
+	    (error-regexp-alist
 	     (if (boundp  'compilation-error-regexp-alist)
 		  compilation-error-regexp-alist))
-	    (enter-regexp-alist 
-	     (if (boundp 'compilation-enter-directory-regexp-alist) 
+	    (enter-regexp-alist
+	     (if (boundp 'compilation-enter-directory-regexp-alist)
 		 compilation-enter-directory-regexp-alist))
-	    (leave-regexp-alist 
-	     (if (boundp 'compilation-leave-directory-regexp-alist) 
+	    (leave-regexp-alist
+	     (if (boundp 'compilation-leave-directory-regexp-alist)
 		 compilation-leave-directory-regexp-alist))
-	    (file-regexp-alist 
+	    (file-regexp-alist
 	     (if (boundp 'compilation-file-regexp-alist)
 		 compilation-file-regexp-alist))
-	    (nomessage-regexp-alist 
+	    (nomessage-regexp-alist
 	     (if (boundp 'compilation-nomessage-regexp-alist)
 		 compilation-nomessage-regexp-alist))
-	    (parser 
+	    (parser
 	     (if (boundp 'compilation-parse-errors-function)
 		 compilation-parse-errors-function))
 	    (error-message "No further errors"))
@@ -286,7 +287,7 @@ buffer."
 	(buffer-enable-undo (current-buffer))
 
 	(compilation-mode)
-        (setq buffer-read-only nil)
+	(setq buffer-read-only nil)
 
 	(set (make-local-variable 'compilation-parse-errors-function) parser)
 	(set (make-local-variable 'compilation-error-message) error-message)
@@ -307,64 +308,64 @@ buffer."
 	(setq default-directory thisdir)
 	(setq compilation-directory-stack (list default-directory))))))
 
-(defmethod bsh-compilation-buffer-filter ((this bsh-compilation-buffer) proc string) 
+(defmethod bsh-compilation-buffer-filter ((this bsh-compilation-buffer) proc string)
   "This filter prints out the result of the process without buffering.
 The result is inserted as it comes in the compilation buffer."
   (with-current-buffer (oref this buffer)
     (let ((end-of-result (string-match ".*bsh % " string))
-          (win (get-buffer-window (oref this buffer)))
-          output len (status " "))
+	  (win (get-buffer-window (oref this buffer)))
+	  output len (status " "))
       (save-excursion
-        ;;Insert the text, advancing the process marker
-        (goto-char (point-max))
-        (if end-of-result
-            (progn 
-              (setq output (substring string 0 end-of-result))
-              (set-buffer-modified-p nil)
-              
-              ;;Searching backwards for the status code
-              (while (member status '(" " "\r" "\n"))
-                (setq len (length output))
-                (if (not (= len 0))
-                    (progn
-                      (setq status (substring output (- len 1))) 
-                      (setq output (substring output 0 (- len 1))))
-                  (progn
-                    (setq status (buffer-substring (- (point-max) 1) 
-                                                   (point-max)))
-                    (delete-region (- (point-max) 1) (point-max)))))
+	;;Insert the text, advancing the process marker
+	(goto-char (point-max))
+	(if end-of-result
+	    (progn
+	      (setq output (substring string 0 end-of-result))
+	      (set-buffer-modified-p nil)
 
-              (insert output)
-              (compilation-handle-exit 
+	      ;;Searching backwards for the status code
+	      (while (member status '(" " "\r" "\n"))
+		(setq len (length output))
+		(if (not (= len 0))
+		    (progn
+		      (setq status (substring output (- len 1)))
+		      (setq output (substring output 0 (- len 1))))
+		  (progn
+		    (setq status (buffer-substring (- (point-max) 1)
+						   (point-max)))
+		    (delete-region (- (point-max) 1) (point-max)))))
+
+	      (insert output)
+	      (compilation-handle-exit
 	       'exit (string-to-number status)
-               (if (string= "0" status)
-                   "finished\n"
-                 (format "exited abnormally with code %s\n"
-                         status))))
-          (insert string)))
+	       (if (string= "0" status)
+		   "finished\n"
+		 (format "exited abnormally with code %s\n"
+			 status))))
+	  (insert string)))
       (if (not (featurep 'xemacs))
-          (if compilation-scroll-output
-              (save-selected-window
-                (if win
-                    (progn 
-                      (select-window win)
-                      (goto-char (point-max))))
-                (sit-for 0)))))))
+	  (if compilation-scroll-output
+	      (save-selected-window
+		(if win
+		    (progn
+		      (select-window win)
+		      (goto-char (point-max))))
+		(sit-for 0)))))))
 
 
 
 (defclass bsh ()
   ((buffer        :initarg :buffer
-	          :type bsh-comint-buffer
-	          :documentation
-	          "Buffer used to interact with BeanShell process.")
+		  :type bsh-comint-buffer
+		  :documentation
+		  "Buffer used to interact with BeanShell process.")
 
-   
+
    (eval-buffer   :initarg :eval-buffer
-	          :type (or null bsh-buffer)
+		  :type (or null bsh-buffer)
 		  :initform nil
-	          :documentation
-	          "Buffer used to display evaluation result.")
+		  :documentation
+		  "Buffer used to display evaluation result.")
 
    (eval-filter   :initarg :eval-filter
 		  :type function
@@ -382,57 +383,57 @@ The result is inserted as it comes in the compilation buffer."
 		  "Redirects BeanShell output to eval-buffer.")
 
    (java-expr     :initarg :java-expr
-                  :initform ""
+		  :initform ""
 		  :type string
 		  :documentation
 		  "Last Java expression evaluated in the BeanShell.")
 
    (lisp-output   :initarg :lisp-output
-                  :initform ""
+		  :initform ""
 		  :type string
 		  :documentation
 		  "Lisp output from the BeanShell.")
 
 
    (vm            :initarg :vm
-                  :initform "java"
-                  :type string
-                  :documentation
-                  "Path of Java vm used to run the BeanShell.")
+		  :initform "java"
+		  :type string
+		  :documentation
+		  "Path of Java vm used to run the BeanShell.")
 
    (vm-args       :initarg :vm-args
-                  :initform nil
-                  :type list
-                  :documentation
-                  "List of arguments to be passed to the Beanshell vm.")
+		  :initform nil
+		  :type list
+		  :documentation
+		  "List of arguments to be passed to the Beanshell vm.")
 
    (startup-dir   :initarg :startup-dir
-                  :initform ""
-                  :type string
-                  :documentation
-                  "Directory in which to start the BeanShell")
+		  :initform ""
+		  :type string
+		  :documentation
+		  "Directory in which to start the BeanShell")
 
    (cp            :initarg :cp
-                  :type list
-                  :documentation
-                  "Startup classpath for BeanShell")
+		  :type list
+		  :documentation
+		  "Startup classpath for BeanShell")
 
    (jar           :initarg :jar
-                  :initform "bsh.jar"
-                  :type string
-                  :documentation
-                  "Path of the BeanShell jar file.")
+		  :initform "bsh.jar"
+		  :type string
+		  :documentation
+		  "Path of the BeanShell jar file.")
 
    (class-name    :initarg :class-name
-                  :initform "bsh.Interpreter"
-                  :type string
-                  :documentation
-                  "Name of BeanShell class."))
+		  :initform "bsh.Interpreter"
+		  :type string
+		  :documentation
+		  "Name of BeanShell class."))
 "Defines an instance of a BeanShell process.")
 
 (defmethod initialize-instance ((this bsh) &rest fields)
   "Constructor for BeanShell instance."
-  
+
   (call-next-method)
 
   (bsh-create-buffer this)
@@ -469,8 +470,8 @@ The result is inserted as it comes in the compilation buffer."
 (defmethod bsh-build-classpath-argument ((this bsh))
   "Convert the list of classes specified by the cp slot
 to the string form required by the vm."
-  (mapconcat 
-   'identity 
+  (mapconcat
+   'identity
    (append
     (and (slot-boundp this 'cp) (oref this cp))
     (list (oref this jar)))
@@ -481,7 +482,7 @@ to the string form required by the vm."
   (let* ((buffer (oref this buffer))
 	 (process
 	  (if (slot-boundp buffer  'process)
-	      (oref buffer process))))	    
+	      (oref buffer process))))
     (and
      process
      (processp process)
@@ -495,49 +496,49 @@ to the string form required by the vm."
 
 (defmethod bsh-launch ((this bsh) &optional display-buffer)
 
-  (assert 
+  (assert
    (or (file-exists-p (oref this vm))
        (executable-find (oref this vm)))
    nil "Specified vm does not exist: %s" (oref this vm))
 
-  (assert 
+  (assert
    (file-exists-p (oref this jar))
-   nil 
+   nil
    "Specified BeanShell jar filed does not exist: %s" (oref this jar))
 
 
   (if (not (bsh-running-p this))
       (let*  ((dir
-                 (cond
-                  ((not (string= (oref this startup-dir) ""))
-                   (expand-file-name (oref this startup-dir)))
-                  ((buffer-file-name)
-                   (file-name-directory (buffer-file-name)))
-                  (t
-                   default-directory)))
-                (vm-args (list "-classpath" (bsh-build-classpath-argument this)))
-		(buffer 
+		 (cond
+		  ((not (string= (oref this startup-dir) ""))
+		   (expand-file-name (oref this startup-dir)))
+		  ((buffer-file-name)
+		   (file-name-directory (buffer-file-name)))
+		  (t
+		   default-directory)))
+		(vm-args (list "-classpath" (bsh-build-classpath-argument this)))
+		(buffer
 		 (let ((buf (oref this buffer)))
 		   (if (bsh-buffer-live-p buf)
 		       buf
 		     (bsh-create-buffer this))))
 		(native-buff (oref buffer buffer)))
-		       
-          
+
+
 	  (setq vm-args (append vm-args (oref this vm-args)))
 	  (setq vm-args (append vm-args bsh-vm-args))
-	  (setq vm-args (append vm-args (list (oref this class-name))))	      
+	  (setq vm-args (append vm-args (list (oref this class-name))))
 
 	  (with-current-buffer native-buff
- 	    (erase-buffer)
+	    (erase-buffer)
 
 	    (cd dir)
 	    (insert (concat "cd " dir "\n"))
-	    (insert 
+	    (insert
 	     (concat (oref this vm) " "
 		     (mapconcat (lambda (x) x) vm-args " ") "\n\n"))
 
-            (setq bsh-the-bsh this))
+	    (setq bsh-the-bsh this))
 
 	  (message "%s" "Starting the BeanShell. Please wait...")
 	  (bsh-comint-buffer-exec buffer (oref this vm) vm-args)
@@ -554,7 +555,7 @@ to the string form required by the vm."
 
 
 (defmethod bsh-snag-lisp-output ((this bsh) process output)
-  "Assemble Lisp OUTPUT from the BeanShell." 
+  "Assemble Lisp OUTPUT from the BeanShell."
     (let ((end-of-output (string-match ".*bsh % " output)))
       ;; Check for case
       ;;   %bsh\n...eval output...%bsh\n
@@ -564,20 +565,20 @@ to the string form required by the vm."
       ;; (if (eq end-of-result 0)
       ;; (accept-process-output process 0 5))
       (if end-of-output
-        (oset 
-         this
-         lisp-output 
-         (concat (oref this lisp-output) (substring output 0 end-of-output)))
-        (oset this lisp-output (concat (oref this lisp-output) output))
-        (accept-process-output process bsh-eval-timeout 5))))
+	(oset
+	 this
+	 lisp-output
+	 (concat (oref this lisp-output) (substring output 0 end-of-output)))
+	(oset this lisp-output (concat (oref this lisp-output) output))
+	(accept-process-output process bsh-eval-timeout 5))))
 
 (defmethod bsh-detect-java-eval-error ((this bsh) bsh-output)
   (if (string-match "// Error:" bsh-output)
       (progn
-        (message 
-         "Beanshell expression evaluation error.\n  Expression: %s\n  Error: %s"
-         (oref this java-expr) bsh-output)
-        (error "Beanshell eval error. See messages buffer for details."))))
+	(message
+	 "Beanshell expression evaluation error.\n  Expression: %s\n  Error: %s"
+	 (oref this java-expr) bsh-output)
+	(error "Beanshell eval error. See messages buffer for details."))))
 
 
 (defmethod bsh-eval-lisp-output ((this bsh))
@@ -603,7 +604,7 @@ to the string form required by the vm."
       (message "  Expression: %s" (oref this java-expr)))))
 
 (defmethod bsh-snag-and-eval-lisp-output ((this bsh) process output)
-  "Assemble and parse Lisp OUTPUT from the BeanShell PROCESS." 
+  "Assemble and parse Lisp OUTPUT from the BeanShell PROCESS."
   (bsh-snag-lisp-output this process output)
   (bsh-detect-java-eval-error this output)
   (bsh-eval-lisp-output this))
@@ -617,8 +618,8 @@ to the string form required by the vm."
     ;; the Beanshell prompt reappears.
     (if (string-match ".*bsh % " output)
        (progn
-        (set-process-filter process (oref (oref this buffer) filter))
-         (oset this eval-buffer nil)))))
+	(set-process-filter process (oref (oref this buffer) filter))
+	 (oset this eval-buffer nil)))))
 
 (defmethod bsh-eval ((this bsh) expr &optional eval-return)
   "Uses the BeanShell Java interpreter to evaluate the Java expression
@@ -626,10 +627,10 @@ EXPR.  This function returns any text output by the Java interpreter's
 standard out or standard error pipes.  If EVAL-RETURN is non-nil, this
 function returns the result of evaluating the Java output as a Lisp
 expression."
-  
+
   (unless (bsh-running-p this)
     (bsh-launch this))
-    
+
   (when (bsh-running-p this)
     (oset this java-expr expr)
     (oset this lisp-output "")
@@ -638,31 +639,31 @@ expression."
     (process-send-string (oref (oref this buffer) process) (concat expr "\n"))
 
     (if (not (accept-process-output (oref (oref this buffer) process) bsh-eval-timeout))
-        (progn 
-          (set-process-filter (oref (oref this buffer) process) (oref (oref this buffer) filter))
-          (error "No reply from BeanShell")))
-      
+	(progn
+	  (set-process-filter (oref (oref this buffer) process) (oref (oref this buffer) filter))
+	  (error "No reply from BeanShell")))
+
     (set-process-filter (oref (oref this buffer) process) (oref (oref this buffer) filter))
 
     (bsh-detect-java-eval-error this (oref this lisp-output))
     ;; (if eval-return (message "Evaluating reply: %s" (oref this lisp-output)))
     (if eval-return
-        (bsh-eval-lisp-output this)
+	(bsh-eval-lisp-output this)
       (oref this lisp-output))))
 
-(defmethod bsh-eval-r ((this bsh) java-statement) 
+(defmethod bsh-eval-r ((this bsh) java-statement)
   "Convenience method for evaluating Java statements
-that return Lisp expressions as output. This function 
+that return Lisp expressions as output. This function
 invokes bsh-eval with the evaluate-return option set to
 t."
   (bsh-eval this java-statement t))
 
 (defmethod bsh-async-eval ((this bsh) expr)
-  "Send the Java statement EXPR to the BeanShell for 
+  "Send the Java statement EXPR to the BeanShell for
 evaluation. Do not wait for a response."
   (unless (bsh-running-p this)
     (bsh-launch this))
-   
+
   (oset this lisp-output "")
   (oset this java-expr expr)
   (set-process-filter (oref (oref this buffer) process) (oref this async-filter))
@@ -674,7 +675,7 @@ evaluation. Do not wait for a response."
   "Evaluate EXPR and displays its output in BUFFER. BUFFER
 must be an instance of `bsh-buffer' class. A typical use for this
 method is to invoke a Java application whose output is compiler-like,
-e.g., javac, ant, or checkstyle. In this case, BUFFER would be 
+e.g., javac, ant, or checkstyle. In this case, BUFFER would be
 an instance of a subclass of `bsh-compiler-buffer'."
   (assert (typep expr 'string))
   (assert (typep buffer 'bsh-buffer))
@@ -690,81 +691,81 @@ an instance of a subclass of `bsh-compiler-buffer'."
   "Terminates the BeanShell process."
   (process-send-string  (oref (oref this buffer) process) "exit();\n"))
 
-(defun get-bsh(buffer-name) 
+(defun get-bsh(buffer-name)
   "Get the `bsh' object associated
 with the buffer named BUFFER-NAME."
   (let (bsh-object
-        (buffer (get-buffer buffer-name)))
+	(buffer (get-buffer buffer-name)))
     (if buffer
-        (save-excursion
-          (set-buffer buffer)
-          (setq bsh-object bsh-the-bsh)))
+	(save-excursion
+	  (set-buffer buffer)
+	  (setq bsh-object bsh-the-bsh)))
     bsh-object))
 
 
 (defun bsh-demo-eval ()
-  "This command demonstrates use of the BeanShell to 
-execute Java code. It assumes that 
+  "This command demonstrates use of the BeanShell to
+execute Java code. It assumes that
 `bsh-jar' points to the location of the BeanShell
 jar file on your system and that either `exec-path'
 or `bsh-vm' point to a Java vm on your system."
    (interactive)
 
-   (assert 
+   (assert
     (file-exists-p (expand-file-name bsh-jar))
     nil
-    (concat 
+    (concat
      "Cannot find the BeanShell jar file at "
      (expand-file-name bsh-jar)
      ". Type C-h bsh-jar for more info."))
 
    (if bsh-vm
-       (assert 
-        (or 
-         (executable-find bsh-vm)
-         (file-exists-p bsh-vm))
-        nil
-        "The vm specified by bsh-vm does not exist: %s." bsh-vm)
+       (assert
+	(or
+	 (executable-find bsh-vm)
+	 (file-exists-p bsh-vm))
+	nil
+	"The vm specified by bsh-vm does not exist: %s." bsh-vm)
      (assert
       (executable-find (if (eq system-type 'windows-nt) "javaw" "java"))
       nil
       "Cannot find a Java vm on exec-path."))
 
-   
+
    (let ((beanshell  (get-bsh "*bsh demo*"))
-         (demo-script
-          (concat
-           "demo() {" 
-             "name = JOptionPane.showInputDialog(\"Enter your name.\");"
-             "print(\"(message \\\"Your name is \" + name + \"\\\")\");" 
-           "};")
-         ))
+	 (demo-script
+	  (concat
+	   "demo() {"
+	     "name = JOptionPane.showInputDialog(\"Enter your name.\");"
+	     "print(\"(message \\\"Your name is \" + name + \"\\\")\");"
+	   "};")
+	 ))
 
      (if (not beanshell)
-         (progn
-           
-           ;; Create a BeanShell wrapper object
-           (setq beanshell (bsh "BeanShell"))
+	 (progn
 
-           (oset (oref beanshell buffer) buffer-name "*bsh demo*")
+	   ;; Create a BeanShell wrapper object
+	   (setq beanshell (bsh "BeanShell"))
 
-           ;; Set the wrapper's jar slot (eieio/CLOS speak for field) to
-           ;; point to the location of the BeanShell on the user's
-           ;; system.
-           (oset beanshell jar (expand-file-name bsh-jar))
+	   (oset (oref beanshell buffer) buffer-name "*bsh demo*")
 
-           ;; Set the wrapper's vm slot to point to the location
-           ;; of a vm on the user's system. The wrapper's launch
-           ;; method (see below) uses the specified vm to launch
-           ;; the BeanShell.
-           (oset 
-            beanshell
-            vm
-            (if bsh-vm
-                (or
-                 (executable-find bsh-vm)
-                 bsh-vm)
-              (executable-find (if (eq system-type 'windows-nt) "javaw" "java"))))))
+	   ;; Set the wrapper's jar slot (eieio/CLOS speak for field) to
+	   ;; point to the location of the BeanShell on the user's
+	   ;; system.
+	   (oset beanshell jar (expand-file-name bsh-jar))
+
+	   ;; Set the wrapper's vm slot to point to the location
+	   ;; of a vm on the user's system. The wrapper's launch
+	   ;; method (see below) uses the specified vm to launch
+	   ;; the BeanShell.
+	   (oset
+	    beanshell
+	    vm
+	    (if bsh-vm
+		(or
+		 (executable-find bsh-vm)
+		 bsh-vm)
+	      (executable-find (if (eq system-type 'windows-nt) "javaw" "java"))))))
 
      (unless (bsh-running-p beanshell)
        (bsh-launch beanshell)
@@ -779,31 +780,31 @@ or `bsh-vm' point to a Java vm on your system."
 
 (defclass bsh-standalone-bsh (bsh)
   ((the-bsh        :type bsh-standalone-bsh
-                   :allocation :class
-                   :documentation
-                   "The single instance of the standalone BeanShell."))
-  "BeanShell intended to be used independently of any other 
+		   :allocation :class
+		   :documentation
+		   "The single instance of the standalone BeanShell."))
+  "BeanShell intended to be used independently of any other
 Emacs package.")
 
 (defmethod initialize-instance ((this bsh-standalone-bsh) &rest fields)
   "Constructor for the standard bsh BeanShell instance."
   (call-next-method)
 
-  (assert 
+  (assert
    (file-exists-p (expand-file-name bsh-jar))
    nil
-   (concat 
+   (concat
     "Cannot find the BeanShell jar file at "
     (expand-file-name bsh-jar)
     ". Type C-h bsh-jar for more info."))
 
    (if bsh-vm
-       (assert 
-        (or 
-         (executable-find bsh-vm)
-         (file-exists-p bsh-vm))
-        nil
-        "The vm specified by bsh-vm does not exist: %s." bsh-vm)
+       (assert
+	(or
+	 (executable-find bsh-vm)
+	 (file-exists-p bsh-vm))
+	nil
+	"The vm specified by bsh-vm does not exist: %s." bsh-vm)
      (assert
       (executable-find (if (eq system-type 'windows-nt) "javaw" "java"))
       nil
@@ -812,13 +813,13 @@ Emacs package.")
 
   (oset this jar (expand-file-name bsh-jar))
 
-  (oset 
-   this 
+  (oset
+   this
    vm
    (if bsh-vm
        (or
-        (executable-find bsh-vm)
-        bsh-vm)
+	(executable-find bsh-vm)
+	bsh-vm)
      (executable-find (if (eq system-type 'windows-nt) "javaw" "java"))))
 
   (oset this cp bsh-classpath)
@@ -831,7 +832,7 @@ Emacs package.")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun bsh-run()
-  "*Starts the standalone version of the BeanShell, a Java interpreter developed 
+  "*Starts the standalone version of the BeanShell, a Java interpreter developed
 by Pat Niemeyer."
   (interactive)
   (oset-default 'bsh-standalone-bsh the-bsh (bsh-standalone-bsh "Standalone BeanShell"))
@@ -840,7 +841,7 @@ by Pat Niemeyer."
 (defun bsh-exit ()
   "Closes the standalone version of the BeanShell."
   (interactive)
-  (let ((bsh  
+  (let ((bsh
 	 (if (slot-boundp 'bsh-standalone-bsh 'the-bsh)
 	     (oref 'bsh-standalone-bsh the-bsh))))
     (if (and bsh (bsh-running-p bsh))
@@ -850,17 +851,17 @@ by Pat Niemeyer."
 
 (defun bsh-find-bsh-data-directory ()
   "Return the path of the bsh data directory.
-Returns the path of the directory containing the documentation directory;  nil if the 
+Returns the path of the directory containing the documentation directory;  nil if the
 directory cannot be found. If XEmacs, returns the location of
-the data directory in the XEmacs distribution hierarchy. On all other Emacs versions, 
-the bsh expects to find the documentation 
+the data directory in the XEmacs distribution hierarchy. On all other Emacs versions,
+the bsh expects to find the documentation
 in the same directory that contains the bsh.el file."
   (let ((directory-sep-char ?/)
 	dir)
-    (flet ((find-data-dir 
+    (flet ((find-data-dir
 	    ()
-	    (expand-file-name 
-	     "../" 
+	    (expand-file-name
+	     "../"
 	     (file-name-directory (locate-library "beanshell")))))
       (if (featurep 'xemacs)
 	  (progn
@@ -872,7 +873,7 @@ in the same directory that contains the bsh.el file."
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Beanshell mode                                            ;;  
+;;; Beanshell mode                                            ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define-derived-mode
@@ -882,8 +883,8 @@ in the same directory that contains the bsh.el file."
 
   (set (make-local-variable 'font-lock-defaults)
        (if (featurep 'xemacs)
-           (get 'java-mode 'font-lock-defaults)
-         (cdr (assq 'java-mode font-lock-defaults))))
+	   (get 'java-mode 'font-lock-defaults)
+	 (cdr (assq 'java-mode font-lock-defaults))))
   (set (make-local-variable 'font-lock-maximum-decoration) t)
   (set (make-local-variable 'font-lock-multiline) t)
   (turn-on-font-lock))
@@ -895,40 +896,40 @@ in the same directory that contains the bsh.el file."
   "Display BeanShell User's Guide."
   (interactive)
   (let* ((bsh-dir (bsh-find-bsh-data-directory))
-         (bsh-help
-          (if bsh-dir
-	      (expand-file-name "bsh-ug.html" bsh-dir))))      
+	 (bsh-help
+	  (if bsh-dir
+	      (expand-file-name "bsh-ug.html" bsh-dir))))
     (if (and
-         bsh-help
-         (file-exists-p bsh-help))
-        (browse-url (concat "file://" bsh-help)
-                    (if (boundp 'browse-url-new-window-flag)
+	 bsh-help
+	 (file-exists-p bsh-help))
+	(browse-url (concat "file://" bsh-help)
+		    (if (boundp 'browse-url-new-window-flag)
 			'browse-url-new-window-flag
 		      browse-url-new-window-p))
       (signal 'error '("Cannot find BeanShell help file.")))))
 
 (defcustom bsh-script-menu-definition
   (list "Bsh"
-        ["Help" bsh-script-help t])
+	["Help" bsh-script-help t])
   "Definition of menu for BeanShell script buffers."
   :group 'bsh
   :type 'sexp
   :set '(lambda (sym val)
 	  (set-default sym val)
 	  ; Define Bsh script menu for FSF Emacs.
-	  (if (or (not (featurep 'xemacs)) 
-                  (featurep 'infodock))
-	      (easy-menu-define bsh-script-menu 
+	  (if (or (not (featurep 'xemacs))
+		  (featurep 'infodock))
+	      (easy-menu-define bsh-script-menu
 				bsh-script-mode-map
 				"Menu for BeanShell Script Buffer."
 				val))
-	  (if (and (featurep 'xemacs) 
-                   (eq major-mode 'bsh-script-mode))
+	  (if (and (featurep 'xemacs)
+		   (eq major-mode 'bsh-script-mode))
 	      (bsh-script-insert-menu-in-xemacs-menubar))))
 
 (defun bsh-script-insert-menu-in-xemacs-menubar ()
   "Insert BeanShell script menu in the XEmacs menu bar."
-  (if (and 
+  (if (and
        (not (featurep 'infodock))
        (not (memq 'infodock c-emacs-features))
        (boundp 'current-menubar)
@@ -937,7 +938,7 @@ in the same directory that contains the bsh.el file."
 	  (add-submenu nil bsh-script-menu-definition)
 	(add-menu nil "Bsh" (cdr bsh-script-menu-definition)))))
 
-  
+
 
 (provide 'beanshell)
 

@@ -1,6 +1,8 @@
 ;;; jde-which-method.el --- Print current method in mode line
+;; $Id$
 
 ;; Copyright (C) 1997-2004 Paul Kinnucan
+;; Copyright (C) 2009 by Paul Landes
 
 ;; Author: Paul Kinnucan (paulk@mathworks.com)
 ;; Inspired by Alex Rezinsky's which-func package.
@@ -26,7 +28,7 @@
 ;;; Commentary:
 
 ;; This package displays the name of the method at point
-;; in the Emacs mode line. 
+;; in the Emacs mode line.
 
 ;;; History:
 
@@ -61,8 +63,8 @@
 ;;  *** empty log message ***
 ;;
 ;;  Revision 1.4  2000/10/06 05:41:28  paulk
-;;  Now optionally truncates method name. 
-;;  Thanks to klaus.berndl@sdm.de. Also, moves method 
+;;  Now optionally truncates method name.
+;;  Thanks to klaus.berndl@sdm.de. Also, moves method
 ;;  name after point location display in mode line.
 ;;
 ;;  Revision 1.3  2000/09/05 04:42:22  paulk
@@ -79,7 +81,7 @@
 
 ;; Variables for customization
 ;; ---------------------------
-;;  
+;;
 
 (require 'jde-parse)
 
@@ -101,8 +103,8 @@ displayed in the mode line."
   :group 'jde-which-method
   :type 'sexp)
 
-(defcustom jde-mode-line-format 
-  '("-" 
+(defcustom jde-mode-line-format
+  '("-"
     mode-line-mule-info
     mode-line-modified
     mode-line-frame-identification
@@ -125,12 +127,12 @@ displayed in the mode line."
 `jde-which-method-format'). If nil, the string is not \
 truncated."
   :type '(choice (const :tag "No truncation" :value nil)
-                 (integer :tag "Max. length"))
+		 (integer :tag "Max. length"))
   :group 'jde-which-method)
 
 (defcustom jde-which-method-class-min-length 4
   "Specifies the minimum length of the class part of the full method
-name after truncation of the class name, but only if the class 
+name after truncation of the class name, but only if the class
 is displayed and if `jde-which-method-max-length'
 is not nil. If the full method name is still greater than
 `jde-which-method-max-length', the method part of the name is truncated."
@@ -149,7 +151,7 @@ is not nil. If the full method name is still greater than
 
 (defvar jde-which-method-idle-timer nil
   "Timer that updates the mode line.")
-  
+
 (defvar jde-which-method-unknown "???"
   "String to display in the mode line when the current method is unknown.")
 
@@ -174,7 +176,7 @@ is not nil. If the full method name is still greater than
 (defun jde-which-method-truncate-end (str truncation)
   (let ((str-length (length str)))
     (if (> truncation (length jde-which-method-abbrev-symbol))
-        (concat (substring str 0 (- str-length truncation)) 
+	(concat (substring str 0 (- str-length truncation))
 		jde-which-method-abbrev-symbol)
       str)))
 
@@ -186,10 +188,10 @@ is not nil. If the full method name is still greater than
       (condition-case info
 	  (let ((p (point)))
 	    (unless (or
-                     (= jde-which-method-current-point-loc p)
-                     (and
-                      (>= p (car jde-which-method-current-method-bounds))
-                      (<= p (cdr jde-which-method-current-method-bounds))))
+		     (= jde-which-method-current-point-loc p)
+		     (and
+		      (>= p (car jde-which-method-current-method-bounds))
+		      (<= p (cdr jde-which-method-current-method-bounds))))
 	      (let ((name;; (jde-parse-get-method-at-point)
 		     (if jde-parse-the-method-map
 			 (jde-parse-method-map-get-method-at jde-parse-the-method-map))
@@ -253,9 +255,9 @@ is not nil. If the full method name is still greater than
 									    jde-which-method-max-length))))
 			  (setq jde-which-method-current (format "C:%s" class)))
 		      (setq jde-which-method-current jde-which-method-unknown))))
-                (unless (equal jde-which-method-current jde-which-method-previous)
-                  (setq jde-which-method-previous jde-which-method-current)
-                  (force-mode-line-update)))))
+		(unless (equal jde-which-method-current jde-which-method-previous)
+		  (setq jde-which-method-previous jde-which-method-current)
+		  (force-mode-line-update)))))
 	(error
 	 ;; (debug)
 	 (cancel-timer jde-which-method-idle-timer)
@@ -263,15 +265,15 @@ is not nil. If the full method name is still greater than
 	 (message "Error in jde-which-method-update: %s" info)))))
 
 (defun jde-which-method-update-on-entering-buffer ()
-  ;; This is a hook function. Catch all errors to 
+  ;; This is a hook function. Catch all errors to
   ;; avoid canceling other hooks.
   (condition-case err
       (progn
 	(setq jde-which-method-current-point-loc 0)
 	(setq jde-which-method-current-method-bounds (cons -1 -1))
 	(jde-which-method-update))
-    (error (message 
-	    "Which method update error: %s" 
+    (error (message
+	    "Which method update error: %s"
 	    (error-message-string err)))))
 
 (provide 'jde-which-method)

@@ -1,6 +1,8 @@
 ;;; regress.el --- Regression test harness for Emacs Lisp code
+;; $Id$
 
 ;; Copyright (C) 1997, 2004 by Wayne Mesard
+;; Copyright (C) 2009 by Paul Landes
 
 ;; Author: Wayne Mesard <wmesard@sgi.com>
 ;;	Tom Breton <tob@world.std.com>
@@ -91,7 +93,7 @@
 ;;     description := <a string>
 ;;     probe       := a Lisp expression to perform the actual test.
 ;;     grader      := a Lisp expression to evaluate whether or not the
-;;                    probe was successful.  
+;;                    probe was successful.
 ;;
 ;;                    If <grader> is preceded by the keyword :test,
 ;;                    <grader> itself is evaluated, and the test
@@ -165,19 +167,19 @@
   (defvar demo2
    '("test uses a temp buffer; grader looks at the buffer to see how we did"
      ((progn (set-buffer (get-buffer-create "regress-demo"))
-            (erase-buffer)
-            (insert "abc")
-            )
+	    (erase-buffer)
+	    (insert "abc")
+	    )
      ;; If our string appears right before point, then the insert succeeded
      ;; Note that the result of the probe is not important; we're looking
      ;; at what the probe did to the current buffer
        :test
      (eq (point)
-         (save-excursion
-           (and (re-search-backward "abc" nil t)
-                (match-end 0)
-                ))
-         )
+	 (save-excursion
+	   (and (re-search-backward "abc" nil t)
+		(match-end 0)
+		))
+	 )
      )))
 
   ;;
@@ -200,7 +202,7 @@
       (equal RESULT user-login-name)
       )
      ))
-  
+
   (defvar demo4
     '("Demonstrations of error recognition"
 
@@ -208,7 +210,7 @@
 	 (+ "Not a number" "Not one either")
 	 :test
 	 (regress-got-error RESULT))
-       
+
        ( "Expect a specific error."
 	 (+ "Not a number" "Not one either")
 	 :test
@@ -218,26 +220,26 @@
 grader expression itself will not masquerade as a successful test"
        t
        :test
-	 (progn 
+	 (progn
 	   (error "Not a real error, but an incredible simulation")
 	   t))
 
        ))
 
-  
-  (defvar demo6 
+
+  (defvar demo6
     '("Demonstrations of failure indication."
        ("DELIBERATE FAILURE: demonstrate FAILURE-INDICATION"
 	 t
 	 (progn
-	   (setq FAILURE-INDICATION 
+	   (setq FAILURE-INDICATION
 	     "Show this object if the test fails")
 	   nil))
 
        (
 	t
 	(progn
-	  (setq FAILURE-INDICATION 
+	  (setq FAILURE-INDICATION
 	    "FAILURE-INDICATION is not seen if the test succeeds.")
 	  t))
 
@@ -276,21 +278,21 @@ describing the purpose of the test suite.
 inserted."
   (interactive
    (let* ((var (read-from-minibuffer
-                "Variable name for this regression suite: "
-                (regress-default-variable-name)
-                nil t))
-          (vname (symbol-name var))
-          (doc (read-string
-                (concat "Documentation: (default \"" vname "\"): ")))
-          )
+		"Variable name for this regression suite: "
+		(regress-default-variable-name)
+		nil t))
+	  (vname (symbol-name var))
+	  (doc (read-string
+		(concat "Documentation: (default \"" vname "\"): ")))
+	  )
      (list vname
-           (prin1-to-string (if (zerop (length doc)) vname doc))
-           (let ((loc (regress-call-site)))
-             (if (and loc
-                      (or current-prefix-arg
-                          (y-or-n-p "Add to the regress call site below? ")))
-                 loc))
-           )
+	   (prin1-to-string (if (zerop (length doc)) vname doc))
+	   (let ((loc (regress-call-site)))
+	     (if (and loc
+		      (or current-prefix-arg
+			  (y-or-n-p "Add to the regress call site below? ")))
+		 loc))
+	   )
      ))
 
   (if (eq t update-call-site)
@@ -298,7 +300,7 @@ inserted."
     ;; regress-call-site itself).
     (setq update-call-site (regress-call-site)))
 
-  (insert 
+  (insert
     "\n(eval\-when-compile"
     "\n  ;; This code will not appear in the compiled (.elc) file"
     "\n  (put '" name " 'regression-suite t)"
@@ -310,7 +312,7 @@ inserted."
 
     (regress-expert
       (insert "\n     ;; ([description] probe grader)"))
-    
+
     (t
       (insert
 	"\n     ;; Each test in the suite is of the form:"
@@ -321,10 +323,10 @@ inserted."
 	"\n     ;;   how we did"
 	)))
 
-  (insert 
+  (insert
     "\n     (")
   (save-excursion
-    (insert 
+    (insert
       "\n      )"
       "\n      )))"
       "\n"
@@ -333,29 +335,29 @@ inserted."
       (progn
 	(goto-char update-call-site)
 	(insert " " name)))
-    
+
     ))
 
 (defun regress-call-site ()
   (save-excursion
     (let ((regexp "(if (featurep 'regress)[\n\t ]*(regress"))
     (and (re-search-forward regexp nil t)
-         (not (re-search-forward regexp nil t))
-         (point-marker)))
+	 (not (re-search-forward regexp nil t))
+	 (point-marker)))
     ))
 
 
 (defun regress-default-variable-name ()
   (if regress-default-variable-name
       (let ((str (if (looking-at "[\n\t ]*(defun[\t ]+\\([^\t ]+\\)")
-                     (buffer-substring-no-properties
-                      (match-beginning 1) (match-end 1))
-                   (if buffer-file-name
-                       (file-name-nondirectory
-                        (file-name-sans-extension buffer-file-name)))
-                   )))
-        (if str
-            (cons (concat str "-regress") 0)))
+		     (buffer-substring-no-properties
+		      (match-beginning 1) (match-end 1))
+		   (if buffer-file-name
+		       (file-name-nondirectory
+			(file-name-sans-extension buffer-file-name)))
+		   )))
+	(if str
+	    (cons (concat str "-regress") 0)))
     ))
 
 
@@ -364,25 +366,25 @@ inserted."
 The idea is that the programmer would put this at the end of the .el file."
   (interactive (regress-prompt-for-suites "Insert" ))
   (insert "\n;; Run diagnostics when this module is evaluated or compiled"
-          "\n;; if and only if the \"regress\" package is already loaded."
-          "\n;; This code will not appear in the compiled (.elc) file"
-          "\n(eval\-when-compile"
-          "\n  (autoload 'regress \"regress\" \"run regression test suites\" t)
+	  "\n;; if and only if the \"regress\" package is already loaded."
+	  "\n;; This code will not appear in the compiled (.elc) file"
+	  "\n(eval\-when-compile"
+	  "\n  (autoload 'regress \"regress\" \"run regression test suites\" t)
 "
-          "\n  (if (featurep 'regress)"
-          "\n      (regress "
-          (mapconcat (function symbol-name) suites " ")
-          "))\n  )\n")
+	  "\n  (if (featurep 'regress)"
+	  "\n      (regress "
+	  (mapconcat (function symbol-name) suites " ")
+	  "))\n  )\n")
   )
 
-        
+
 (defun regress-forget (&rest suites)
   "Forget that a variable contains a test suite.
 This can be handy if you're done working on one module that has regression
 tests and want to move on to another."
   (interactive (regress-prompt-for-suites "Forget"))
-  (mapcar 
-    (function 
+  (mapcar
+    (function
       (lambda (x)
 	(put x 'regression-suite nil)))
     suites))
@@ -397,14 +399,14 @@ tests and want to move on to another."
   "Run a single test.
 
 Return a list of failure-data if the test failed, otherwise return nil."
-  
+
   (save-excursion
     (let
       ( obtained
 	(FAILURE-INDICATION nil)
 	success)
-	    
-      (setq obtained 
+
+      (setq obtained
 	(condition-case err
 
 	  ;;Eval the probe expression.
@@ -414,7 +416,7 @@ Return a list of failure-data if the test failed, otherwise return nil."
 	  ;;The grader may be interested in exactly what the error is,
 	  ;;and not trapping the error would stop the entire suite.
 	  (error err)))
-      
+
       (condition-case err
 	(progn
 	  (setq success
@@ -426,79 +428,79 @@ Return a list of failure-data if the test failed, otherwise return nil."
 
 	      ;;An implicit grader succeeds if it gives the same value
 	      ;;as the probe.
-	      (equal obtained 
+	      (equal obtained
 		(eval (nth 2 item)))))
 
-	  (if 
+	  (if
 	    (not success)
 	    (list description item obtained FAILURE-INDICATION)
 	    nil))
-	
+
 	;;If the grader had an error, catch it and return a special
 	;;error.
 	(error
 	  (list description item obtained err))
-	
+
 	))))
 
 
 (defun regress (&rest suites)
- (interactive 
-    (mapcar (function symbol-value) 
+ (interactive
+    (mapcar (function symbol-value)
       (regress-prompt-for-suites "Run" )))
   (let ((description nil)
 	 (failures nil)
 	 (test-count 0)
 	 (fail-count 0)
 	 suite item
-	 ideal;;Never used. 
-	 new-failure) 
-    
+	 ideal;;Never used.
+	 new-failure)
+
     (while suites
       (setq suite (car suites)
-            suites (cdr suites))
+	    suites (cdr suites))
       (if (and (car suite) (not (stringp (car suite))))
-          (setq description "Untitled test suite")
-        (setq description (car suite)
-              suite (cdr suite)))
+	  (setq description "Untitled test suite")
+	(setq description (car suite)
+	      suite (cdr suite)))
       (while suite
-        (setq item (car suite))
-        ;; Untitled test (and no nil placeholder, so add the placeholder
-        (if (and (car item) (not (stringp (car item))))
+	(setq item (car suite))
+	;; Untitled test (and no nil placeholder, so add the placeholder
+	(if (and (car item) (not (stringp (car item))))
 	  (setq item (cons nil item)))
 
 
 	(setq new-failure
 	  (regress-do-test item description))
-	  
+
 	(if
 	  new-failure
-	  (setq 
+	  (setq
 	    failures    (cons new-failure failures)
 	    fail-count  (1+ fail-count)
 	    ;; only report the suite name the first time.
 	    description nil))
-	  
-        (setq suite (cdr suite)
+
+	(setq suite (cdr suite)
 	  test-count (1+ test-count)))
-      
+
       (if description
-          ;; there were no failures, simply record the suite title
-          (setq failures (cons description failures))))
-    
+	  ;; there were no failures, simply record the suite title
+	  (setq failures (cons description failures))))
+
     (if (zerop fail-count)
       (message (if (= 1 test-count)
-                   "The single regression test ran successfully"
-                 (if (= 2 test-count)
-                     "Both regression tests ran successfully"
-                   "All %d regression tests ran successfully"))
-               test-count)
-        (progn
-          (message "%d failure%s detected"
-                   fail-count
-                   (if (= 1 fail-count) "" "s"))
-          (regress-report test-count (reverse failures))
-          ))
+		   "The single regression test ran successfully"
+		 (if (= 2 test-count)
+		     "Both regression tests ran successfully"
+		   "All %d regression tests ran successfully"))
+	       test-count)
+	(progn
+	  (message "%d failure%s detected"
+		   fail-count
+		   (if (= 1 fail-count) "" "s"))
+	  (regress-report test-count (reverse failures))
+	  ))
     ))
 
 
@@ -510,13 +512,13 @@ Return a list of failure-data if the test failed, otherwise return nil."
   (let ((num-fails 0))
     (with-output-to-temp-buffer regress-error-buffer
       (while failures
-        (if (stringp (car failures))
-            ;; this is not a failure, but the docstring from a suite
-            ;; that passed
-            (regress-report-one-success (car failures))
-          (regress-report-one-failure (setq num-fails (1+ num-fails))
-                                      (car failures)))
-        (setq failures (cdr failures)))
+	(if (stringp (car failures))
+	    ;; this is not a failure, but the docstring from a suite
+	    ;; that passed
+	    (regress-report-one-success (car failures))
+	  (regress-report-one-failure (setq num-fails (1+ num-fails))
+				      (car failures)))
+	(setq failures (cdr failures)))
       )
     ;; Now do some post-processing to make it more readable
     (set-buffer regress-error-buffer)
@@ -524,16 +526,16 @@ Return a list of failure-data if the test failed, otherwise return nil."
     ;; Insert a header and center it
     (goto-char (point-min))
     (insert "*** Emacs Lisp Regression Test Report ***\nGenerated by: "
-            user-mail-address
-            "\n" (current-time-string) "\nTests: "
-            (number-to-string num-tests)
-            "; Failures: "
-            (number-to-string num-fails)
-            "; Score: "
-            (number-to-string
-             (truncate (/ (float (* 100 (- num-tests num-fails)))
-                          num-tests)))
-            "%\n\n")
+	    user-mail-address
+	    "\n" (current-time-string) "\nTests: "
+	    (number-to-string num-tests)
+	    "; Failures: "
+	    (number-to-string num-fails)
+	    "; Score: "
+	    (number-to-string
+	     (truncate (/ (float (* 100 (- num-tests num-fails)))
+			  num-tests)))
+	    "%\n\n")
     (center-region (point-min) (point))
 
     ;; Indent everything
@@ -574,34 +576,34 @@ Return a list of failure-data if the test failed, otherwise return nil."
   (if (car failure)
       ;; This is the first failure in the set, so print the docstring
       (progn
-        (princ "\n__regressSUITE: ")
-        (princ (car failure))
-        (terpri)))
+	(princ "\n__regressSUITE: ")
+	(princ (car failure))
+	(terpri)))
   (princ "\n__regressFAILURE: ")
   (princ count)
   (if (car item)
       ;; This test has a docstring, so print it
       (progn (princ "\n\nDescription:\n-----------\n")
-             (princ (car item))
-             ))
+	     (princ (car item))
+	     ))
   (princ "\n\nTest:\n----\n")
   (pp (nth 1 item))
   (if (regress-test-is-explicit-p item)
     (progn
       (princ "\nRequirement:\n-----------\n")
       (pp (nth 3 item)))
-    
+
     (princ "\nExpected value:\n--------------\n")
     (pp (nth 2 item)))
-    
-    (if (or 
+
+    (if (or
 	  (not (regress-test-is-explicit-p item))
 	  (regress-sexp-contains 'RESULT (nth 3 item)))
       ;; The test used the return value, so print it
       (progn
-        (princ "\n\nActual Value:\n------------\n")
-        (pp (nth 2 failure))
-        ))
+	(princ "\n\nActual Value:\n------------\n")
+	(pp (nth 2 failure))
+	))
 
     ;;Report a failure indication if there is one.
     (if
@@ -610,7 +612,7 @@ Return a list of failure-data if the test failed, otherwise return nil."
 	(princ "\n\nFailure indication:\n------------\n")
 	(pp (nth 3 failure))
 	))
-    
+
 
   (terpri) (terpri)
   ))
@@ -631,8 +633,8 @@ Return a list of failure-data if the test failed, otherwise return nil."
 
 (defun regress-prompt-for-suites (verb)
   (let (lis nam)
-    (while 
-      (not 
+    (while
+      (not
 	(zerop
 	  (length
 	    (setq nam
@@ -647,8 +649,8 @@ Return a list of failure-data if the test failed, otherwise return nil."
 		t)))))
       (setq lis (cons (intern nam) lis)))
     (if (null lis)
-      (mapatoms 
-	(function 
+      (mapatoms
+	(function
 	  (lambda (x)
 	    (if (get x 'regression-suite)
 	      (setq lis (cons x lis)))
@@ -676,7 +678,7 @@ Return a list of failure-data if the test failed, otherwise return nil."
       nil)
      ("The items are eq, so return t"
       (let ((it '(this is a test)))
-        (regress-sexp-contains it (list 'abc it 'xyz)))
+	(regress-sexp-contains it (list 'abc it 'xyz)))
       t)
      )
    ))
@@ -687,8 +689,8 @@ Return a list of failure-data if the test failed, otherwise return nil."
 (defun regress-sexp-contains (item sexp)
   (or (eq item sexp)
       (and (not (atom sexp))
-           (or (regress-sexp-contains item (car sexp))
-               (regress-sexp-contains item (cdr sexp))))
+	   (or (regress-sexp-contains item (car sexp))
+	       (regress-sexp-contains item (cdr sexp))))
       ))
 
 
@@ -707,7 +709,7 @@ Result is the result of a probe expression."
 ;;Moved
 (eval-and-compile
   (defun regress-answer-parm (exp)
-    "Define a single test parameter within a grader function.  
+    "Define a single test parameter within a grader function.
 Helper for regress-define-grader-function."
 
     `(,(car exp) nil ,(intern (concat "ask-" (symbol-name (car exp))))))
@@ -720,18 +722,18 @@ Helper for regress-define-grader-function.
 If COMPARER is passed, it is used to compare NAME and COMPARAND,
 otherwise equal is used."
 
-    
-    (let* 
+
+    (let*
       ((ask-name-sym (intern-soft (concat "ask-" (symbol-name name))))
 	(comparer-sym (or comparer 'equal)))
-      
+
       `(if
 	 ,ask-name-sym
 	 (,comparer-sym ,comparand ,name)
 	 t)))
 
 
-  (defmacro regress-define-grader-function 
+  (defmacro regress-define-grader-function
     (function-name decomposition-list answerlist)
     "Build a grader function named FUNCTION-NAME.
 
@@ -751,8 +753,8 @@ COMPARAND, otherwise equal is used
 
 Except for the required parm RESULT, all parms to FUNCTION-NAME are
 optional."
-  
-    (let* 
+
+    (let*
       (
 	(result-sym (gensym))
 
@@ -760,7 +762,7 @@ optional."
 	  (mapcar
 	    'regress-answer-parm
 	    answerlist))
-       
+
 	(body
 	  (mapcar
 	    ( function
@@ -770,20 +772,20 @@ optional."
 		))
 	    answerlist))
 
-      
+
 	(letlist
 	  (loop
 	    for X in decomposition-list
 	    for I from 0
 	    collect `(,X (nth ,I ,result-sym)))));;ch
-    
+
       (require 'cl)
 
-      `(defun* ,function-name 
+      `(defun* ,function-name
 	 (,result-sym &optional &key;;ch
 	   ,@parmlist)
-       
-	 (let* 
+
+	 (let*
 	   ,letlist
 	   (and
 	     ,@body))))))
@@ -803,20 +805,20 @@ optional."
      (
       "Create the call site"
       (progn
-        (set-buffer (get-buffer-create " regress-test-scratch"))
-        (erase-buffer)
-        (regress-insert-call 'foobar 'biz)
-        (goto-char (point-min))
-        (buffer-string)
-        )
+	(set-buffer (get-buffer-create " regress-test-scratch"))
+	(erase-buffer)
+	(regress-insert-call 'foobar 'biz)
+	(goto-char (point-min))
+	(buffer-string)
+	)
        :test
       (string-match "(if (featurep 'regress)[\n\t ]*(regress foobar biz))"
-                    RESULT)
+		    RESULT)
       )
      ("Insert a new suite and get it added to the call site."
       (progn
-        (set-buffer (get-buffer-create " regress-test-scratch"))
-        (regress-insert-suite "testme" "testmedoc" t))
+	(set-buffer (get-buffer-create " regress-test-scratch"))
+	(regress-insert-suite "testme" "testmedoc" t))
        :test
       (re-search-forward
        "(if (featurep 'regress)[\n\t ]*(regress testme foobar biz))"
@@ -833,13 +835,13 @@ optional."
    '("regress-call-site tests all in 1 big ugly test"
      (
       (progn
-        ;; each test is run in a save-excursion, so set-buffer is safe
-        (set-buffer (get-buffer-create " regress-test-scratch"))
-        (erase-buffer)
-        (regress-insert-call 'foobar 'biz)
-        (goto-char (point-min))
-        (regress-insert-suite "testme" "testmedoc" t)
-        )
+	;; each test is run in a save-excursion, so set-buffer is safe
+	(set-buffer (get-buffer-create " regress-test-scratch"))
+	(erase-buffer)
+	(regress-insert-call 'foobar 'biz)
+	(goto-char (point-min))
+	(regress-insert-suite "testme" "testmedoc" t)
+	)
        :test
       (re-search-forward
        "(if (featurep 'regress)[\n\t ]*(regress testme foobar biz))"
@@ -859,7 +861,7 @@ optional."
       ;;Define a grader function.  This sort of grader function is
       ;;useful for when you have to grade different parts of a complex
       ;;result in different tests.
-      (regress-define-grader-function 
+      (regress-define-grader-function
 
 	;;It will be named regress-demo5-grader
 	regress-demo5-grader
@@ -876,7 +878,7 @@ optional."
 	  (the-second my-second)))
 
       (defvar demo5
-	'( 
+	'(
 	   "How to use a function defined by regress-define-grader-function."
 
 	   ;;For simplicity, these examples use a literal as the probe.
@@ -884,7 +886,7 @@ optional."
 	     '(5  6)
 	     :test
 	     (regress-demo5-grader RESULT :the-first 5))
-	   
+
 
 	   ( "Test only the second element."
 	     '(5  6)
@@ -902,7 +904,7 @@ optional."
 	     '(5  6)
 	     :test
 	     (regress-demo5-grader RESULT :the-first 1000))
-	    
+
 	   ))
       (put 'demo5 'regression-suite t)
       )))

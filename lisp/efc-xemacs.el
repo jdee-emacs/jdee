@@ -1,4 +1,5 @@
 ;;; efc-xemacs.el -- Emacs Foundation Classes using XEmacs gui features.
+;; $Id$
 
 ;; Author: Andy Piper <andy@xemacs.org>
 ;; Maintainer: Andy Piper
@@ -6,6 +7,7 @@
 
 ;; Copyright (C) 2002, 2003, 2004 Andy Piper.
 ;; Copyright (C) 2001, 2002 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -26,9 +28,6 @@
 ;; This package contains a set of eieio-based foundation classes
 ;; for XEmacs.
 
-;; Please send bug reports and enhancement suggestions
-;; to Andy Piper at <andy@xemacs.org>
-
 ;;; Code:
 
 (require 'eieio)
@@ -41,7 +40,7 @@
   (setq efc-query-options-function 'efc-xemacs-query-options))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                                                                            ;; 
+;;                                                                            ;;
 ;; Option Dialog                                                              ;;
 ;;                                                                            ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -49,7 +48,7 @@
 (defclass efc-xemacs-option-dialog (efc-dialog)
   ((options        :initarg :options
 		   :documentation
-		   "Options from from which to choose.")		  
+		   "Options from from which to choose.")
    (radio-buttons  :initarg :radio-buttons
 		   :documentation
 		   "Buttons for selecting options.")
@@ -103,21 +102,21 @@ an option or canceled the dialog. See `efc-dialog-ok' and
 				      :horizontally-justify left
 				      :vertically-justify center
 				      :items
-				      ,(mapcar 
+				      ,(mapcar
 					(lambda (x)
 					  (vector
 					   'button :descriptor x
 					   :style 'radio
-					   :selected 
+					   :selected
 					   (list 'efc-xemacs-option-dialog-action this x)
 					   :callback
 					   (list 'efc-xemacs-option-dialog-select this x)))
 					(oref this options))]
 			      [layout :orientation horizontal
 				      :justify center
-				      :items 
+				      :items
 				      ([button :descriptor "Ok"
-					       :callback-ex 
+					       :callback-ex
 					       (lambda (image-instance event)
 						 (efc-xemacs-dialog-ok ,this event))]
 				       [button :descriptor "Cancel"

@@ -1,31 +1,29 @@
 ;;; jde-xemacs.el -- xemacs specific code for JDEE.
+;; $Id$
 ;; Keywords: java, tools, debugging
 
 ;; Copyright (C) 2002, 2003, 2004 Andy Piper <andy@xemacs.org>
 ;; Copyright (C) 2002 Paul Kinnucan <paulk@mathworks.com>
-;; 
+;; Copyright (C) 2009 by Paul Landes
+;;
 ;; This file is part of XEmacs.
-;; 
+;;
 ;; XEmacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2 of the License, or
 ;; (at your option) any later version.
-;; 
+;;
 ;; XEmacs is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
-;; 
+;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with XEmacs; if not, write to the Free Software
 ;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-;; Please send bug reports and enhancement suggestions
-;; to Andy Piper at <andy@xemacs.org>
-;; 
 ;; If you don't use XEmacs, you should! XEmacs kicks some serious
 ;; butt!
-
 
 ;; XEmacs doesn't have replace-regexp-in-string so define our own
 ;; version
@@ -119,14 +117,14 @@ STRING should be given if the last search was by `string-match' on STRING."
 
 (unless (fboundp 'line-beginning-position)
   (defun line-beginning-position (&optional n)
-    "Return the character position of the first character on the 
+    "Return the character position of the first character on the
 current line. With argument N not nil or 1, move forward N - 1 lines first.
 If scan reaches end of buffer, return that position."
     (save-excursion (beginning-of-line n) (point))))
 
 (unless (fboundp 'line-end-position)
   (defun line-end-position (&optional n)
-    "Return the character position of the last character on the 
+    "Return the character position of the last character on the
 current line. With argument N not nil or 1, move forward N - 1 lines first.
 If scan reaches end of buffer, return that position."
     (save-excursion (end-of-line n) (point))))
@@ -136,11 +134,11 @@ If scan reaches end of buffer, return that position."
 (unless (fboundp 'run-with-timer)
   (defun run-with-timer (secs repeat function &rest args)
     (start-itimer "timer" function secs repeat
-                  nil (if args t nil) args))
+		  nil (if args t nil) args))
   (defun run-with-idle-timer (secs repeat function &rest args)
     (start-itimer "idle timer"
-                  function secs (if repeat secs nil)
-                  t (if args t nil) args)))
+		  function secs (if repeat secs nil)
+		  t (if args t nil) args)))
 
 (when (featurep 'toolbar)
   (require 'debug-toolbar))
@@ -165,7 +163,7 @@ If scan reaches end of buffer, return that position."
   (interactive)
   (call-interactively 'jde-compile))
 
-(add-hook 'jde-bug-minor-mode-hook 
+(add-hook 'jde-bug-minor-mode-hook
 	  '(lambda (&optional on)
 	     (if on
 		 (easy-menu-add jde-bug-menu-spec jde-bug-mode-map)
@@ -227,8 +225,8 @@ If scan reaches end of buffer, return that position."
      t
      "Clear at selected position"]
     [debug::toolbar-evaluate-icon
-     jde-bug-evaluate-expression 
-     (and 
+     jde-bug-evaluate-expression
+     (and
       (jde-dbs-debugger-running-p)
       (jde-dbs-get-target-process))
      "Evaluate selected expression"]
@@ -241,19 +239,19 @@ If scan reaches end of buffer, return that position."
      (jde-dbs-target-process-runnable-p)
      "Continue current program"]
     [debug::toolbar-step-into-icon
-     jde-bug-step-into 
+     jde-bug-step-into
      (jde-dbs-target-process-steppable-p)
      "Step into (aka step)"]
     [debug::toolbar-step-over-icon
-     jde-bug-step-over 
+     jde-bug-step-over
      (jde-dbs-target-process-steppable-p)
      "Step over (aka next)"]
     [debug::toolbar-up-icon
-     jde-xemacs-toolbar-up 
+     jde-xemacs-toolbar-up
      (or
       (not (jde-dbs-target-process-steppable-p))
       (let* ((process (jde-dbs-get-target-process))
-	     (stack-max 
+	     (stack-max
 	      (if (slot-boundp process 'stack)
 		  (1- (length (oref process stack)))
 		0))
@@ -333,7 +331,7 @@ from the current buffer containing Java source code."
 
 (defun jde-xemacs-bug-minor-mode-reset ()
   ;; tidy house and turn off jde-xemacs-bug-minor-mode in all buffers
-  (mapcar #'(lambda (buffer) 
+  (mapcar #'(lambda (buffer)
 	      (set-buffer buffer)
 	      (cond ((local-variable-p 'jde-xemacs-bug-initial-readonly (current-buffer))
 		     (jde-xemacs-bug-minor-mode -1 t))))

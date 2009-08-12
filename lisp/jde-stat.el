@@ -1,11 +1,12 @@
 ;;; jde-stat.el -- Integrated Development Environment for Java.
-;; $Revision: 1.7 $ $Date: 2003/03/28 05:33:30 $ 
+;; $Id$
 
 ;; Author: Stephane Nicolas <s.nicolas@videotron.ca>
-;; Maintainer: Paul Kinnucan
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 2000, 2002 Stephane Nicolas, Paul Kinnucan
+;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -24,17 +25,6 @@
 
 ;;; Commentary:
 
-;; This is one of a set of packages that make up the 
-;; Java Development Environment (JDE) for Emacs. See the
-;; JDE User's Guide for more information.
-
-;; The latest version of the JDE is available at
-;; <URL:http://sunsite.auc.dk/jde/>.
-;; <URL:http://www.geocities.com/SiliconValley/Lakes/1506/>
-
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Kinnucan at paulk@mathworks.com.
-
 ;;; Code:
 
 ;;;###autoload
@@ -49,7 +39,7 @@ processed files."
     (let* ((fname (buffer-file-name))
 	   (result (if count count (jde-stat-count-loc)))
 	   (total (nth 0 result))
-	   (comment (nth 1 result)) 
+	   (comment (nth 1 result))
 	   (javadoc (nth 2 result))
 	   (blank (nth 3 result))
 	   (code (- total (+ comment javadoc blank)))
@@ -59,11 +49,11 @@ processed files."
 	   (blank-perc (perc2x2 blank total)))
       (with-output-to-temp-buffer "LOC Report"
 	(princ "Lines of Code Report\n\n")
-        (if (and count total-files)
-            (princ (format "Total files:  %d\n" total-files))
-          (progn 
-            (princ (format "File name: %s\n" fname))
-            (princ (format "File date: %s\n" (format-time-string "%D" (nth 5 (file-attributes fname)))))))
+	(if (and count total-files)
+	    (princ (format "Total files:  %d\n" total-files))
+	  (progn
+	    (princ (format "File name: %s\n" fname))
+	    (princ (format "File date: %s\n" (format-time-string "%D" (nth 5 (file-attributes fname)))))))
 	(princ "------------------- \n")
 	(princ (format "Code lines:    %d (%s%%)\n" code code-perc))
 	(princ (format "Javadoc lines: %d (%s%%)\n" javadoc jdoc-perc))
@@ -77,24 +67,24 @@ processed files."
   (let (result)
      ;;;Does the line contain '//'?
     (if (string-match token line)
-         ;;;if so, does it contain '"'
+	 ;;;if so, does it contain '"'
 	(if (not (string-match "\"" line ))
-             ;;;no! Ok, it's a comment
+	     ;;;no! Ok, it's a comment
 	    (setq result t)
-           ;;;yes!? so, we've got to parse to see if '//' exists without enclosing quote
+	   ;;;yes!? so, we've got to parse to see if '//' exists without enclosing quote
 	  (let (
-                ;;;we split the line in '"' delimited parts
+		;;;we split the line in '"' delimited parts
 		(to-parse (split-string line "\""))
 		(temp "")
 		(count-even 0))
-            ;;;we consider the even numbered parts of split
-            ;;;to see if the contain a'//'
-            ;;;if so, this is a doc line
+	    ;;;we consider the even numbered parts of split
+	    ;;;to see if the contain a'//'
+	    ;;;if so, this is a doc line
 	    (while temp
 	      (setq temp (nth count-even to-parse))
 	      (if temp
 		  (if (string-match token temp)
-		      (progn 
+		      (progn
 			(setq result t)
 			(setq temp nil))))
 	      (setq count-even (+ 2  count-even))))))
@@ -110,7 +100,7 @@ Returns the counts in a list: (TOTAL-LINES COMMENT-LINES JAVADOC-LINES BLANK-LIN
 	(blank-count 0)
 	in-javadoc
 	in-comment
-        (test-b t)
+	(test-b t)
 	start
 	end)
     (save-excursion
@@ -123,32 +113,32 @@ Returns the counts in a list: (TOTAL-LINES COMMENT-LINES JAVADOC-LINES BLANK-LIN
 	(setq line (buffer-substring start end))
 	(setq count (+ 1 count))
 
-      ;;;To match a blank line, we search the pattern representing an empty line 
+      ;;;To match a blank line, we search the pattern representing an empty line
       ;;;or a line that just contains spaces
 	(if (string-match "^ *$" line)
 	    (setq blank-count (+ 1 blank-count) ))
 
-      ;;;To match a comment line, we search the pattern '//' 
+      ;;;To match a comment line, we search the pattern '//'
       ;;;but we must disgard the '//' patterns enclosed in a pair of quote '"'
 	(if (jde-stat-parse-token-out-of-quote "//" line)
-	    (setq comment-count (+ 1 comment-count))) 
+	    (setq comment-count (+ 1 comment-count)))
 
-      ;;;To match a comment block start, we search the pattern '/*' and exclude those of type '/**' 
+      ;;;To match a comment block start, we search the pattern '/*' and exclude those of type '/**'
       ;;;but we must disgard the '/*' patterns enclosed in a pair of quote '"'
-	(if (and 
+	(if (and
 	     (jde-stat-parse-token-out-of-quote "/\\*" line)
 	     (not (jde-stat-parse-token-out-of-quote "/\\*\\*" line)))
-	    (setq in-comment t)) 
+	    (setq in-comment t))
 
       ;;;To match a javadoc block start, we search the pattern '/**'
       ;;;but we must disgard the '/**' patterns enclosed in a pair of quote '"'
 	(if (jde-stat-parse-token-out-of-quote "/\\*\\*" line)
-	    (setq in-javadoc t)) 
+	    (setq in-javadoc t))
 
       ;;;To match a block end, we search the pattern '*/'
       ;;;but we must disgard the '*/' patterns enclosed in a pair of quote '"'
 	(if (jde-stat-parse-token-out-of-quote "\\*/" line)
-	    (progn  
+	    (progn
 	      (if in-javadoc
 		  (setq javadoc-count (+ 1 javadoc-count)))
 	      (if in-comment
@@ -157,12 +147,12 @@ Returns the counts in a list: (TOTAL-LINES COMMENT-LINES JAVADOC-LINES BLANK-LIN
 	      (setq in-comment nil)))
 	(if in-javadoc
 	    (setq javadoc-count (+ 1 javadoc-count)))
-	(if in-comment 
+	(if in-comment
 	    (setq comment-count (+ 1 comment-count)))
 	(if (not (= (forward-line 1) 0))
 	    (setq test-b nil))))
-    (list count comment-count javadoc-count blank-count))) 
- 
+    (list count comment-count javadoc-count blank-count)))
+
 ;;;###autoload
 (defun jde-stat-loc-report-project (dir)
   "Generates a report showing the number of code, comment,
@@ -181,26 +171,26 @@ containing a java file contained in dir. It returns a list containing
 two elements, a list of the number of code lines, comment lines,
 javadoc lines and blank lines and the number fo files."
   (let* ((directories (jde-stat-get-directories dir))
-         (count (jde-stat-loc-count-directory dir))
-         (current-count (car count))
-         (number-of-files (cadr count)))
+	 (count (jde-stat-loc-count-directory dir))
+	 (current-count (car count))
+	 (number-of-files (cadr count)))
     (while directories
       (setq count (jde-stat-loc-count-directories (car directories)))
       (setq current-count (jde-stat-add current-count (car count)))
       (setq number-of-files (+ number-of-files (cadr count)))
       (setq directories (cdr directories)))
     (list current-count number-of-files)))
-      
+
 (defun jde-stat-get-directories (dir)
   "Returns a list of the subdirectories in dir."
   (let (result)
     (apply 'nconc
-           (mapcar (function
-                    (lambda (file)
-                      (if (and (not (string= (substring file -1) "."))
-                               (file-directory-p file))
-                          (setq result (append result (list file))))))
-                   (directory-files dir t nil t)))
+	   (mapcar (function
+		    (lambda (file)
+		      (if (and (not (string= (substring file -1) "."))
+			       (file-directory-p file))
+			  (setq result (append result (list file))))))
+		   (directory-files dir t nil t)))
     result))
 
 ;;;###autoload
@@ -221,8 +211,8 @@ contained in dir. It returns a list containing two elements,
 a list of the number of code lines, comment lines,
 javadoc lines and blank lines and the number fo files."
   (let* ((files (directory-files dir t (wildcard-to-regexp "*.java") t))
-         (number-of-files (length files))
-         (count (list 0 0 0 0)))
+	 (number-of-files (length files))
+	 (count (list 0 0 0 0)))
     (while files
       (switch-to-buffer (find-file-noselect (car files) nil t))
       (setq count (jde-stat-add count (jde-stat-count-loc)))
@@ -237,9 +227,9 @@ the third the number of javadoc lines, and fourth the number of
 blank lines. It adds the respective elements in each list and returns another
 list of four elements."
   (list (+ (nth 0 count) (nth 0 count2))
-        (+ (nth 1 count) (nth 1 count2))
-        (+ (nth 2 count) (nth 2 count2))
-        (+ (nth 3 count) (nth 3 count2))))
+	(+ (nth 1 count) (nth 1 count2))
+	(+ (nth 2 count) (nth 2 count2))
+	(+ (nth 3 count) (nth 3 count2))))
 
 ;; Register and initialize the customization variables defined
 ;; by this package.

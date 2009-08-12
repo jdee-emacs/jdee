@@ -1,9 +1,10 @@
 ;;; sregex.el --- symbolic regular expressions
 
 ;; Copyright (C) 1997, 1998, 2000, 2004 Free Software Foundation, Inc.
+;; Copyright (C) 2009 by Paul Landes
 
 ;; Author: Bob Glickstein <bobg+sregex@zanshin.com>
-;; Maintainer: Bob Glickstein <bobg+sregex@zanshin.com>
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: extensions
 
 ;; This file is part of GNU Emacs.
@@ -26,7 +27,7 @@
 ;;; Commentary:
 
 ;; This version of sregex is provided with the JDEE to support
-;; users of XEmacs, which does not include sregex in its 
+;; users of XEmacs, which does not include sregex in its
 ;; distribution.
 
 ;; This package allows you to write regular expressions using a
@@ -278,8 +279,8 @@ An argument-evaluating sregex interpreter lets you reuse sregex
 subexpressions:
 
   (let ((dotstar '(0+ any))
-        (whitespace '(1+ (syntax ?-)))
-        (digits '(1+ (char (?0 . ?9)))))
+	(whitespace '(1+ (syntax ?-)))
+	(digits '(1+ (char (?0 . ?9)))))
     (sregex 'bol dotstar \":\" whitespace digits))  =>  \"^.*:\\\\s-+[0-9]+\""
   (sregex--sequence exps nil))
 
@@ -313,16 +314,16 @@ It *is* possible to group parts of the expression in order to refer
 to them with numbered backreferences:
 
   (sregexq (group (or \"Go\" \"Run\"))
-           \", Spot, \"
-           (backref 1))             =>  \"\\\\(Go\\\\|Run\\\\), Spot, \\\\1\"
+	   \", Spot, \"
+	   (backref 1))             =>  \"\\\\(Go\\\\|Run\\\\), Spot, \\\\1\"
 
 If `sregexq' needs to introduce its own grouping parentheses, it will
 automatically renumber your backreferences:
 
   (sregexq (opt \"resent-\")
-           (group (or \"to\" \"cc\" \"bcc\"))
-           \": \"
-           (backref 1))  =>  \"\\\\(resent-\\\\)?\\\\(to\\\\|cc\\\\|bcc\\\\): \\\\2\"
+	   (group (or \"to\" \"cc\" \"bcc\"))
+	   \": \"
+	   (backref 1))  =>  \"\\\\(resent-\\\\)?\\\\(to\\\\|cc\\\\|bcc\\\\): \\\\2\"
 
 `sregexq' is a macro.  Each time it is used, it constructs a simple
 Lisp expression that then invokes a moderately complex engine to
@@ -334,7 +335,7 @@ wherever possible instead of repeatedly constructing the same ones
 over and over.  Example:
 
    (let ((field-regex (sregexq (opt \"resent-\")
-                               (or \"to\" \"cc\" \"bcc\"))))
+			       (or \"to\" \"cc\" \"bcc\"))))
      ...
      (while ...
        ...
@@ -354,8 +355,8 @@ but computed clauses can be included easily, allowing for the reuse
 of common clauses:
 
   (let ((dotstar '(0+ any))
-        (whitespace '(1+ (syntax ?-)))
-        (digits '(1+ (char (?0 . ?9)))))
+	(whitespace '(1+ (syntax ?-)))
+	(digits '(1+ (char (?0 . ?9)))))
     (sregex 'bol dotstar \":\" whitespace digits))  =>  \"^.*:\\\\s-+[0-9]+\"
 
 Here are the clauses allowed in an `sregex' or `sregexq' expression:
@@ -386,8 +387,8 @@ Here are the clauses allowed in an `sregex' or `sregexq' expression:
   this:
 
     (sregexq (or \"dog\" \"cat\"
-                 (sequence (opt \"sea \") \"monkey\")))
-                                 =>  \"dog\\\\|cat\\\\|\\\\(?:sea \\\\)?monkey\"
+		 (sequence (opt \"sea \") \"monkey\")))
+				 =>  \"dog\\\\|cat\\\\|\\\\(?:sea \\\\)?monkey\"
 
   where a single `or' alternate needs to contain multiple
   subclauses.
@@ -523,8 +524,8 @@ has one of the following forms:
 	       (lambda (e) (sregex--engine e 'concat))
 	       exps "")))
       (if (eq combine 'suffix)
-          (concat "\\(?:" re "\\)")
-        re))))
+	  (concat "\\(?:" re "\\)")
+	re))))
 
 (defun sregex--or (exps combine)
   (if (= (length exps) 1) (sregex--engine (car exps) combine)
@@ -532,8 +533,8 @@ has one of the following forms:
 	       (lambda (e) (sregex--engine e 'or))
 	       exps "\\|")))
       (if (not (eq combine 'or))
-          (concat "\\(?:" re "\\)")
-        re))))
+	  (concat "\\(?:" re "\\)")
+	re))))
 
 (defun sregex--group (exps combine) (concat "\\(" (sregex--sequence exps nil) "\\)"))
 

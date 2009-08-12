@@ -1,15 +1,16 @@
-;;; JDE-CHECKSTYLE.EL --- Checkstyle interface for JDE
-;; $Revision: 1.20 $ $Date: 2004/12/29 05:01:29 $
+;;; jde-checkstyle.el --- Checkstyle interface for JDE
+;; $Id$
 
 ;; Copyright (C) 2001, 2002, 2003, 2004 Markus Mohnen and Paul Kinnucan
+;; Copyright (C) 2009 by Paul Landes
 
 ;; Authors: Markus Mohnen and Paul Kinnucan
-;; Maintainers: Markus Mohnen and Paul Kinnucan
+;; Maintainers: Markus Mohnen and Paul Landes
 ;; Created: 06 Jun 2001
-;; 
+;;
 ;;
 ;; Keywords: Java coding standard checker Emacs
- 
+
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2, or (at your option)
@@ -28,7 +29,7 @@
 ;; LCD Archive Entry:
 ;; jde-checkstyle|Markus Mohnen|
 ;; |Checkstyle interface for JDE
-;; |$Date: 2004/12/29 05:01:29 $|$Revision: 1.20 $|~/packages/jde-checkstyle.el
+;; |$Date$|$Revision$|~/packages/jde-checkstyle.el
 
 ;;; Commentary:
 
@@ -61,7 +62,7 @@
 (defconst jde-checkstyle-version "3.1")
 
 (defgroup jde-checkstyle nil
-  "This group specifies options for the JDEE's interface to the CheckStyle 
+  "This group specifies options for the JDEE's interface to the CheckStyle
 package (http://checkstyle.sourceforge.net). The CheckStyle package
 checks Java source files for conformity to a specified coding
 style."
@@ -87,7 +88,7 @@ argument to pass to the Java interpreter. This option overrides the
 If this variable is non-nil, the jde-checkstyle command prompts
 you to enter additional checker arguments in the minibuffer.
 These arguments are appended to those specified by customization
-variables. The JDE maintains a history list of arguments 
+variables. The JDE maintains a history list of arguments
 entered in the minibuffer."
   :group 'jde-checkstyle
   :type 'boolean)
@@ -111,7 +112,7 @@ documentation for information on configuration files). Use
 the configuration file reads from the CheckStyle command line."
    :group 'jde-checkstyle
    :type '(choice (const :tag "Sun" :value nil)
-                 (file :menu-tag "Custom" :tag "Config. File")))
+		 (file :menu-tag "Custom" :tag "Config. File")))
 
 
 (defcustom jde-checkstyle-expanded-properties nil
@@ -127,8 +128,8 @@ properties. You can specify as many properties as you like in
 this way. To delete a property, select the DEL button next
 to the property."
   :group 'jde-checkstyle
-  :type '(repeat (cons 
-		  (string :tag "Property Name") 
+  :type '(repeat (cons
+		  (string :tag "Property Name")
 		  (string :tag "Property Value"))))
 
 ;; (makunbound 'jde-checkstyle-expanded-properties-file)
@@ -142,7 +143,7 @@ the settings of the `jde-checkstyle-expanded-properties' variable."
 
 ;; (makunbound 'jde-checkstyle-module-package-names-file)
 (defcustom jde-checkstyle-module-package-names-file nil
-  "*Path of a file that specifies the package names of 
+  "*Path of a file that specifies the package names of
 custom style checking modules used by this project."
    :group 'jde-checkstyle
    :type '(choice (const :tag "None" :value nil)
@@ -166,7 +167,7 @@ custom style checking modules used by this project."
 
 ;; (makunbound 'jde-checkstyle-source-dir)
 (defcustom jde-checkstyle-source-dir nil
-  "*Path of a directory to check. If you specify a 
+  "*Path of a directory to check. If you specify a
 path, CheckStyle checks all the files in the specified
 directory. Otherwise, it checks the file in the current
 buffer."
@@ -176,7 +177,7 @@ buffer."
 
 
 ;; (makunbound 'jde-checkstyle-finish-hook)
-(defcustom jde-checkstyle-finish-hook 
+(defcustom jde-checkstyle-finish-hook
   '(jde-compile-finish-kill-buffer)
   "List of functions to be invoked when CheckStyle terminates.  Each
 function should accept two arguments: the compilation buffer and a
@@ -199,7 +200,7 @@ string describing how the compilation finished."
      (lambda (prop)
        (format "-D%s=%s" (car prop) (cdr prop)))
      jde-run-option-properties))
-  
+
 
 ;;;###autoload
 (defun jde-checkstyle-customize ()
@@ -210,9 +211,9 @@ string describing how the compilation finished."
 
 (defclass jde-checkstyle-checker ()
   ((buffer           :initarg :buffer
-	             :type buffer
-	             :documentation
-	             "Compilation buffer")
+		     :type buffer
+		     :documentation
+		     "Compilation buffer")
    (window           :initarg :window
 		     :type window
 		     :documentation
@@ -228,13 +229,13 @@ string describing how the compilation finished."
     (let ((buf (get-buffer-create "*check style*"))
 	  (error-regexp-alist compilation-error-regexp-alist)
 	  (enter-regexp-alist (if (boundp 'compilation-enter-directory-regexp-alist)
-                                  compilation-enter-directory-regexp-alist))
+				  compilation-enter-directory-regexp-alist))
 	  (leave-regexp-alist (if (boundp 'compilation-leave-directory-regexp-alist)
-                                  compilation-leave-directory-regexp-alist))
+				  compilation-leave-directory-regexp-alist))
 	  (file-regexp-alist (if (boundp 'compilation-file-regexp-alist)
-                                 compilation-file-regexp-alist))
+				 compilation-file-regexp-alist))
 	  (nomessage-regexp-alist (if (boundp 'compilation-nomessage-regexp-alist)
-                                      compilation-nomessage-regexp-alist))
+				      compilation-nomessage-regexp-alist))
 	  (parser compilation-parse-errors-function)
 	  (error-message "No further errors")
 	  (thisdir default-directory))
@@ -272,7 +273,7 @@ string describing how the compilation finished."
       (setq buffer-read-only nil)
 
       (set (make-local-variable 'compilation-finish-function)
-	   (lambda (buf msg) 
+	   (lambda (buf msg)
 	     (run-hook-with-args 'jde-checkstyle-finish-hook buf msg)
 	     (setq compilation-finish-function nil)))
       (set (make-local-variable 'compilation-parse-errors-function) parser)
@@ -298,7 +299,7 @@ string describing how the compilation finished."
      (lambda (prop)
        (format "-D%s=%s" (car prop) (cdr prop)))
      jde-checkstyle-expanded-properties))
-  
+
 (defmethod jde-checkstyle-exec ((this jde-checkstyle-checker))
 
   (jde-checkstyle-create-checker-buffer this)
@@ -310,11 +311,11 @@ string describing how the compilation finished."
 
   (if (not jde-xemacsp)
       (if compilation-process-setup-function
-	  (funcall compilation-process-setup-function)))     
+	  (funcall compilation-process-setup-function)))
 
   (let* ((outbuf (oref this :buffer))
 	 (vm-path (oref (jde-run-get-vm) :path))
-	 (source-file 
+	 (source-file
 	  (concat (file-name-nondirectory buffer-file-name)))
 	 (jde-java-directory
 	  (concat
@@ -324,24 +325,24 @@ string describing how the compilation finished."
 		(unless jde-checkstyle-expanded-properties-file
 		  (jde-checkstyle-get-property-args this))
 		(oref this :interactive-args)
-		(list "-classpath" 
+		(list "-classpath"
 		      (if jde-checkstyle-classpath
 			  (jde-build-classpath jde-checkstyle-classpath)
 			(jde-normalize-path
 			 (expand-file-name "lib/checkstyle-all.jar" jde-java-directory))))
-		(list jde-checkstyle-class)		
-		(list "-c" 
+		(list jde-checkstyle-class)
+		(list "-c"
 		      (if jde-checkstyle-style
 			  (jde-normalize-path jde-checkstyle-style)
 			(concat (jde-find-jde-data-directory) "java/lib/sun_checks.xml")))
 		(if jde-checkstyle-expanded-properties-file
-                    (list "-p" (jde-normalize-path jde-checkstyle-expanded-properties-file)))
+		    (list "-p" (jde-normalize-path jde-checkstyle-expanded-properties-file)))
 		(if jde-checkstyle-module-package-names-file
-                    (list "-n" (jde-normalize-path jde-checkstyle-module-package-names-file)))
+		    (list "-n" (jde-normalize-path jde-checkstyle-module-package-names-file)))
 		(if jde-checkstyle-output-format
 		    (list "-f" jde-checkstyle-output-format))
 		(if jde-checkstyle-output-file
-                    (list "-o" (jde-normalize-path jde-checkstyle-output-file)))
+		    (list "-o" (jde-normalize-path jde-checkstyle-output-file)))
 		(if jde-checkstyle-source-file-extension
 		    (list "-e" jde-checkstyle-source-file-extension))
 		(if jde-checkstyle-source-dir
@@ -356,13 +357,13 @@ string describing how the compilation finished."
       (insert (concat
 	       vm-path
 	       " "
-               (mapconcat 'identity args " ")
+	       (mapconcat 'identity args " ")
 	       "\n\n"))
 
       (let* ((process-environment (cons "EMACS=t" process-environment))
 	     (w32-quote-process-args ?\")
 	     (win32-quote-process-args ?\") ;; XEmacs
-	     (proc (apply 'start-process 
+	     (proc (apply 'start-process
 			  (downcase mode-name)
 			  outbuf
 			  vm-path
@@ -391,17 +392,17 @@ history enabled."
 
   (if jde-checkstyle-read-args
       (setq jde-checkstyle-interactive-args
-            (read-from-minibuffer 
-             "Check args: "
-             jde-checkstyle-interactive-args
-             nil nil
-             '(jde-checkstyle-interactive-arg-history . 1))))
+	    (read-from-minibuffer
+	     "Check args: "
+	     jde-checkstyle-interactive-args
+	     nil nil
+	     '(jde-checkstyle-interactive-arg-history . 1))))
 
-  (let ((checker (jde-checkstyle-checker 
-		  "checker" 
+  (let ((checker (jde-checkstyle-checker
+		  "checker"
 		  :interactive-args (if jde-checkstyle-read-args
 					jde-checkstyle-interactive-args))))
-            
+
     ;; Force save-some-buffers to use the minibuffer
     ;; to query user about whether to save modified buffers.
     ;; Otherwise, when user invokes jde-checkstyle from
@@ -409,14 +410,14 @@ history enabled."
     ;; which seems not to be supported--at least on
     ;; the PC.
     (if (and (eq system-type 'windows-nt)
-             (not jde-xemacsp)) 
-        (let ((temp last-nonmenu-event))
-          ;; The next line makes emacs think that jde-checkstyle
-          ;; was invoked from the minibuffer, even when it
-          ;; is actually invoked from the menu-bar.
-          (setq last-nonmenu-event t)
-          (save-some-buffers (not compilation-ask-about-save) nil)
-          (setq last-nonmenu-event temp))
+	     (not jde-xemacsp))
+	(let ((temp last-nonmenu-event))
+	  ;; The next line makes emacs think that jde-checkstyle
+	  ;; was invoked from the minibuffer, even when it
+	  ;; is actually invoked from the menu-bar.
+	  (setq last-nonmenu-event t)
+	  (save-some-buffers (not compilation-ask-about-save) nil)
+	  (setq last-nonmenu-event temp))
       (save-some-buffers (not compilation-ask-about-save) nil))
 
     (jde-checkstyle-exec checker)))
@@ -506,7 +507,7 @@ history enabled."
 ;; Initial revision to style checker interface.
 ;;
 
-;; Version: 1.3 
+;; Version: 1.3
 ;; - Updated to support latest version of checkstyle (2.3), adding
 ;; support for all the command-line properties as customizable variables. A
 ;; total of 43 properties are now supported, from 19 in the previous jde-checkstyle
@@ -515,11 +516,11 @@ history enabled."
 ;; Version: 1.2
 ;; - adopted to checkstyle version 1.3
 ;; - compatible with recent versions of jde
-;;   patch by Nascif Abousalh-Neto 
+;;   patch by Nascif Abousalh-Neto
 ;;
 ;; Version: 1.1
 ;; - minor bug fix to be compatible with recent versions of jde
-;; 
+;;
 ;; Version: 1.0
 
 ;;; JDE-CHECKSTYLE.EL ends here
