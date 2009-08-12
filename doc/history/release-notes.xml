@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<revision-log>
+    <release version="2.4.0">
+	<change commiter="paullandes">
+	    <msg>The old CVS Log entries have now moved to doc/history/cvs-revision-log.xml.</msg>
+	</change>
+
+	<change commiter="paullandes">
+	    <msg>The release version is now dynamically updated in the source at build time.</msg>
+	</change>
+
+	<change commiter="paullandes">
+	    <author>Ke Lu</author>
+	    <author>Przemystaw Wojnowski</author>
+	    <msg>Support for 1.5 generics and simplified for loops in jde-complete</msg>
+	</change>
+    </release>
+
+    <!--
+	TODO add ReleaseNotes.txt for previous releases here and delete
+	ReleaseNotes.txt
+    -->
+</revision-log>
