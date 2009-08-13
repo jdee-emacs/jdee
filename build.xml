@@ -154,6 +154,7 @@
     <mkdir dir="${dist.lisp.dir}"/>
     <copy todir="${dist.lisp.dir}">
       <fileset dir="${build.lisp.dir}"/>
+      <fileset file="${src.lisp.dir}/jtags*"/>
     </copy>
 
     <!-- this subdir contains all things Java -->
