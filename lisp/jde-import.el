@@ -47,7 +47,6 @@
 ;;;; Customization
 ;;;;
 
-;; (makunbound 'jde-import-excluded-classes)
 (defcustom jde-import-excluded-classes
   '(("^bsh\\..*" . nil)
     ("^java\\.lang\\.[^.]*$" . t)
@@ -176,10 +175,9 @@ jde-import-choose-import function."
 (defun jde-import-current-package-p (class)
   "Returns non-nil if the fully qualified classname CLASS belongs to
 the same package as the class in the current buffer."
-  (if (jde-parse-get-package-name)
-      (string-match
-       (concat (regexp-quote (jde-parse-get-package-name)) "\\.[^.]*$")
-       class)))
+  (let ((pkg (jde-parse-get-package-name)))
+    (if pkg
+	(string= pkg (jde-parse-get-package-from-name class)))))
 
 (defun jde-import-get-qualified-names (unqualified-class)
   "Returns a list containing all qualified name for UNQUALIFIED-CLASS."
