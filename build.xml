@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<project name="jdee" default="build">
+<project name="jdee" default="dist">
   <!--
      For compilation and installation instructions, see doc/install.html
      -->
