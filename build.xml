@@ -144,7 +144,7 @@
   </target>
 
 
-  <target name="build" depends="build-lisp, build-java"
+  <target name="build" depends="build-lisp,build-java"
 	  description="compile all JDEE source code"/>
 
 
@@ -152,7 +152,8 @@
 	  description="create the &quot;binary&quot; distribution">
     <!-- create dist java lib directory -->
     <mkdir dir="${dist.lisp.dir}"/>
-    <copy todir="${dist.lisp.dir}">
+    <!-- keep mod times to avoid .el being newer than .elc -->
+    <copy todir="${dist.lisp.dir}" preservelastmodified="true">
       <fileset dir="${build.lisp.dir}"/>
       <fileset file="${src.lisp.dir}/jtags*"/>
     </copy>
@@ -193,7 +194,7 @@
   <target name="install" depends="dist"
 	  description="install the derived objects (the entire dist)">
       <mkdir dir="${prefix.dir}"/>
-      <copy todir="${prefix.dir}">
+      <copy todir="${prefix.dir}" preservelastmodified="true">
 	  <fileset dir="${dist.dir}"/>
       </copy>
   </target>
