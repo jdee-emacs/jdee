@@ -2,7 +2,7 @@
 ;; $Id$
 
 ;; Author: Paul Kinnucan <pkinnucan@attbi.com>
-;; Maintainer: Paul Kinnucan
+;; Maintainer: Paul Landes
 ;; Keywords: java, tools
 
 ;; Copyright (C) 1997-2008 Paul Kinnucan.
@@ -24,16 +24,6 @@
 ;; Boston, MA 02111-1307, USA.
 
 ;;; Commentary:
-
-;; This is one of a set of packages that make up the
-;; Java Development Environment (JDE) for Emacs. See the
-;; JDE User's Guide for more information.
-
-;; The latest version of the JDE is available at
-;; <URL:http://jdee.sunsite.dk>.
-
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Kinnucan at paulk@mathworks.com.
 
 ;;; Code:
 
@@ -418,7 +408,7 @@ system command path."
   jde-java-version-cache)
 
 (defun jde-java-version ()
-  "Get the version of Java used by the JDE."
+  "Get the version of Java used by the JDEE."
   (interactive)
   (let ((java-version (if jde-jdk (car jde-jdk)
 			(getenv
@@ -1183,6 +1173,11 @@ Does nothing but return nil if `jde-log-max' is nil."
 		    ["Load All" jde-load-all-project-files t]
 		    )
 	      )
+	(list "Refactor"
+	      [ "Rename Class" jde-rename-class t]
+	      [ "Fully Qualify Class" jde-replace-fully-qualified-class-at-point t]
+	      [ "Create HTML" jde-htmlize-code t]
+	      )
 	(list "Help"
 	      ["JDEE Users Guide"      jde-show-help t]
 	      ["JDK"                   jde-help-browse-jdk-doc t]
@@ -1615,8 +1610,9 @@ that contain spaces."
       (or
        (string= parent "//") ; for paths like //host/d/prj/src
        (string= parent "\\\\") ; for paths like \\host\d\prj\src
-       (string= parent dir) ;; for paths like d:/ on emacs 22
-       (string= (substring parent -3) "/.."))) ;; for paths like d:/ on emacs 21
+       (string= (substring parent -3) "/..") ; for paths like d:/prj/src
+       (save-match-data
+	 (and (string-match "^[a-zA-Z]:/$" parent) t)))) ; for paths like d:/
      ((member system-type '(cygwin32 cygwin))
       (or (string= (file-truename dir) (file-truename "/"))
 	  (string= parent "//") ; for paths like //host/d/prj/src
@@ -2390,228 +2386,6 @@ environment variable."
 	    jde-current-project
 	    classpath)))
 
-(defclass jde-bsh-buffer (bsh-comint-buffer) ()
-  "JDEE's beanshell buffer")
-
-(defmethod initialize-instance ((this jde-bsh-buffer) &rest fields)
-  (oset this buffer-name "*JDEE bsh*")
-  (call-next-method))
-
-(defclass jde-bsh (bsh)
-  ((bsh-cmd-dir      :initarg :bsh-cmd-dir
-		     :type string
-		     :documentation
-		     "Path of the BeanShell commmand directory.")
-
-   (checkstyle-jar  :initarg :checkstyle-jar
-		    :type string
-		    :documentation
-		    "Path of the Checkstyle jar.")
-
-   (regexp-jar      :initarg :regexp-jar
-		    :type string
-		    :documentation
-		    "Path of the Jakarta regexp jar.")
-
-   (jde-jar         :initarg :jde-jar
-		    :type string
-		    :documentation
-		    "Path of the JDEE jar.")
-
-   (jde-classes-dir :initarg :jde-classes-dir
-		    :type string
-		    :documentation
-		    "Path of the JDEE classes directory.")
-
-
-   (the-bsh        :type jde-bsh
-		   :allocation :class
-		   :documentation
-		   "The single instance of the JDEE's BeanShell."))
-  "Class of JDEE BeanShells. There is only one per Emacs session.")
-
-(defmethod initialize-instance ((this jde-bsh) &rest fields)
-  "Constructor for the JDEE BeanShell instance."
-  (call-next-method)
-  (let* ((jde-java-directory
-	  (concat
-	   (jde-find-jde-data-directory)
-	   "java/")))
-
-    (oset this bsh-cmd-dir (expand-file-name "bsh-commands" jde-java-directory))
-    (oset this checkstyle-jar  (expand-file-name "lib/checkstyle-all.jar" jde-java-directory))
-    (oset this regexp-jar (expand-file-name "lib/jakarta-regexp.jar" jde-java-directory))
-    (oset this jde-classes-dir (expand-file-name "classes" jde-java-directory))
-    (oset this jde-jar (expand-file-name "lib/jde.jar" jde-java-directory))
-    (oset this jar  (expand-file-name "lib/bsh.jar" jde-java-directory))
-    (oset-default 'jde-bsh the-bsh this)))
-
-(defmethod bsh-create-buffer ((this jde-bsh))
-  "Creates the JDEE's beanshell buffer."
-  (oset this buffer (jde-bsh-buffer "JDEE bsh buffer")))
-
-(defmethod bsh-build-classpath-argument ((this jde-bsh))
-  (jde-build-classpath (oref this cp) 'jde-global-classpath t))
-
-(defmethod bsh-launch :BEFORE ((this jde-bsh) &optional display-buffer)
-  "Sets the vm and classpath to the vm and classpath for the current project before
-the PRIMARY launch method is invoked."
-  (let* ((project-ant-home
-	  ;; Code referring to jde-ant variables uses symbols to
-	  ;; avoid causing compilation errors since jde-ant is not required.
-	  (jde-get-project 'jde-ant-home jde-current-project))
-	 (ant-home (if (and (boundp 'jde-ant-home)
-			    (not (string= (symbol-value 'jde-ant-home) "")))
-		       (symbol-value 'jde-ant-home)     ;jde-ant loaded
-		     (if (and project-ant-home
-			      (not (string= project-ant-home "")))
-			 project-ant-home ; jde-ant not loaded but
-					; jde-ant-home set in project
-					; file
-		       (getenv "ANT_HOME")))) ; jde-ant-home not set in
-					; project file and not
-					; customized
-	 )
-
-    (oset this vm (oref (jde-run-get-vm) :path))
-    (oset  this  cp (delq
-		     nil
-		     (append
-		      (list
-		       (oref this jar)
-		       (oref this bsh-cmd-dir)
-		       (oref this checkstyle-jar)
-		       (oref this regexp-jar)
-		       (if jde-devel-debug
-			   (oref this jde-classes-dir))
-		       (oref this jde-jar)
-		       (jde-get-tools-jar)
-		       (if ant-home (expand-file-name "lib" ant-home)))
-		      (jde-pi-get-bsh-classpath)
-		      (jde-expand-classpath (jde-get-global-classpath)))))))
-
-;; Create the BeanShell wrapper object.
-(jde-bsh "JDEE BeanShell")
-
-(defun jde-bsh-running-p ()
-  "Returns t if the JDEE's BeanShell instance is running."
-  (bsh-running-p (oref 'jde-bsh the-bsh)))
-
-
-(defun jde-jeval (java-statement &optional eval-return)
-  "Uses the JDEE's instance of the BeanShell
-Java interpreter to evaluate the Java expression EXPR.  If the
-BeanShell is not running, the JDEE starts an instance. This function
-returns any text output by the Java interpreter's standard out or
-standard error pipes.  If EVAL-RETURN is non-nil, this function
-returns the result of evaluating the Java output as a Lisp
-expression."
-  (let ((the-bsh (oref 'jde-bsh the-bsh)))
-
-    (when (not (bsh-running-p the-bsh))
-      (bsh-launch the-bsh)
-      (bsh-eval the-bsh (jde-create-prj-values-str)))
-
-    (bsh-eval the-bsh java-statement eval-return)))
-
-(defun jde-jeval-r (java-statement)
-  "Uses the JDEE's instance of the BeanShell to
-evaluate JAVA-STATEMENT and then uses the Emacs Lisp
-interpreter to evaluate the result. This function
-is intended to be used to implement Emacs extensions
-coded in Java and executed by the BeanShell. The function
-assumes that the Java extension interacts with Emacs
-by printing Lisp forms to the BeanShell's standard output \
-port."
-  (jde-jeval java-statement t))
-
-
-(defun jde-jeval-cm (java-expr &optional buffer-head finish-fcn)
-  "Evaluate JAVA-EXPR and display the result in a compilation-mode buffer.
-The optional argument BUFFER-HEAD specifies text to appear at the head of
-the compilation buffer. The optional argument FINISH-FCN specifies a
-function to be called when the compilation is finished. This function
-is intended to be used to invoke Java development utilities, such as
-source code style checkers, that emit compiler-like error messages.
-Displaying the output in a compilation-mode buffer enables the user to
-use compilation-mode's error message navigation and hyperlinking
-capabilities.
-
-The following example uses this function to invoke the javac compiler on
-a file in the current directory:
-
- (jde-bsh-compile-mode-eval \"jde.util.CompileServer.compile(\\\"Test.java\\\");\"
-   \"Compile Test.java\" 'jde-compile-finish-kill-buffer)"
-  (let* ((buffer-obj (bsh-compilation-buffer "buffer"))
-	 (native-buf (oref buffer-obj buffer))
-	 (bufwin (display-buffer native-buf)))
-
-    (compilation-set-window-height bufwin)
-
-    (save-some-buffers (not compilation-ask-about-save) nil)
-
-    (if finish-fcn
-	(lexical-let ((finish finish-fcn))
-	  (setq compilation-finish-function
-		(lambda (buf msg)
-		  (funcall finish buf msg)
-		  (setq compilation-finish-function nil)))))
-
-
-    (if (not (featurep 'xemacs))
-	(if compilation-process-setup-function
-	  (funcall compilation-process-setup-function)))
-
-
-    (if (not (featurep 'xemacs))
-	(if compilation-process-setup-function
-	  (funcall compilation-process-setup-function)))
-
-
-    (save-excursion
-      (set-buffer native-buf)
-
-      (if buffer-head
-	  (insert buffer-head)
-	(insert java-expr))
-
-      (insert "\n")
-
-
-      (if (not (jde-bsh-running-p))
-	  (progn
-	    (bsh-launch (oref 'jde-bsh the-bsh))
-	    (bsh-eval (oref 'jde-bsh the-bsh) (jde-create-prj-values-str))))
-
-
-      (bsh-buffer-eval
-       (oref 'jde-bsh the-bsh)
-       java-expr
-       buffer-obj)
-
-    (set-buffer-modified-p nil)
-    (setq compilation-last-buffer native-buf))))
-
-
-;;;###autoload
-(defun jde-bsh-run()
-  "*Starts the JDEE version of the BeanShell."
-  (interactive)
-  (bsh-launch (oref 'jde-bsh the-bsh) t))
-
-(defun jde-bsh-exit ()
-  "Closes the existing beanshell process"
-  (interactive)
-  (if (jde-bsh-running-p)
-      (let ((process (bsh-get-process (oref 'jde-bsh the-bsh))))
-	(if (and
-	     (boundp 'jde-ant-invocation-method) ;; ant package may not be loaded.
-	     (string= (car (symbol-value 'jde-ant-invocation-method)) "Ant Server"))
-	    (process-send-string process "jde.util.JdeUtilities.exit();\n")
-	  (process-send-string process "exit();\n")))
-    (message "The beanshell is not running")))
-
-
 (defun jde-show-speedbar ()
   "Show the speedbar after first checking whether the correct
 version of speedar is installed."
@@ -2651,6 +2425,16 @@ feature in JDE (see `jde-complete-at-point')."
 	  (error "Can not parse the thing at point!")))
     (message "You need JDE >= 2.2.6 and Senator for using this feature!")))
 
+(defun jde-assert-mode (&optional no-raise-p)
+  "Maybe raise an error if the current buffer isn't a JDEE mode buffer.
+NO-RAISE-P, if non-`nil', don't raise an error if this insn't a JDEE mode
+buffer, otherwise, return whether or not it is a legitimate buffer."
+  (if (and (not no-raise-p) (not (eq major-mode 'jde-mode)))
+      (error "Not visiting a Java source file.")
+    (eq major-mode 'jde-mode)))
+
+;; beanshell related code moved to it's own library
+(require 'jde-bsh)
 
 (eval-when-compile
   ;; This code will not appear in the compiled (.elc) file

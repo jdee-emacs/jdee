@@ -52,11 +52,9 @@
 ;; (it is currently erased after the user presses a key).
 ;; - [AVERAGE] Add a cache for the class informations.
 
-;; The latest version of the JDE is available at
-;; <URL:http://sunsite.auc.dk/jde/>.
-;; <URL:http://www.geocities.com/SiliconValley/Lakes/1506/>
-
 ;;; Code:
+
+(require 'beanshell)
 
 (defvar prf2-current-list nil
 "The list of all the completion. Each element of the list is a list
@@ -79,7 +77,7 @@ It mostly scans the buffer for 'import' statements, and return the
 resulting list. It impliciyly adds the java.lang.* package."
   (interactive)
   (save-excursion
-    (beginning-of-buffer)
+    (goto-char (point-min))
     (let (lst first second)
       (while (not (null
 		   (re-search-forward "import[ \t\n\r]+\\(\\([a-zA-Z0-9]+[.]\\)+\\)\\([*]\\|[a-zA-Z0-9]+\\)" nil t) ))

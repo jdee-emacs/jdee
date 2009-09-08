@@ -32,9 +32,35 @@
 (require 'eieio)
 (require 'wid-edit)
 
-(defvar efc-query-options-function nil
+(defcustom efc-query-options-function 'efc-query-options-function-dialog
   "If non-nil the function to use for interactively querying options.
-If nil then the default efc custom-based dialogs will be used.")
+If nil then the default efc custom-based dialogs will be used."
+  :type '(choice :tag "Options Query Function"
+		 (const :tag "Dialog" efc-query-options-function-dialog)
+		 (const :tag "Mini-Buffer" efc-query-options-function-minibuf)
+		 (function :tag "Specify Function"
+			   efc-query-options-function-dialog))
+  :group 'jde)
+
+(defun efc-query-options-function-dialog (options prompt title history)
+  (let ((dialog
+	 (efc-option-dialog
+	  (or title "option dialog")
+	  :text (or prompt "Select option:")
+	  :options options)))
+    (efc-dialog-show dialog)
+    (oref dialog selection)))
+
+(defun efc-query-options-function-minibuf (options prompt title history)
+  (let ((default (car options))
+	sel)
+    ;; efc doesn't add the end colon
+    (if prompt
+	(setq prompt (format "%s: " prompt)))
+    (setq sel (completing-read prompt options nil t nil nil history default))
+    (if (= (length sel) 0) (error "Input required"))
+    sel))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                            ;;
@@ -122,6 +148,9 @@ default method kills the dialog buffer."
 ;;                                                                            ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; silence the compiler warnings
+(defun efc-option-dialog (&rest a))
+
 (defclass efc-option-dialog (efc-dialog)
   ((options        :initarg :options
 		   :documentation
@@ -172,7 +201,6 @@ an option or canceled the dialog. See `efc-dialog-ok' and
     (call-next-method)
     (recursive-edit)))
 
-
 (defmethod efc-dialog-ok ((this efc-option-dialog))
   "Invoked when the user selects the OK button on the options
 dialog. Sets the :selection field of THIS to the option chosen by the
@@ -194,143 +222,9 @@ and then exits recursive edit mode."
   (oset this selection nil)
   (exit-recursive-edit))
 
-(defun efc-query-options (options &optional prompt title)
+(defun efc-query-options (options &optional prompt title history)
   "Ask user to choose among a set of options."
-  (if efc-query-options-function
-      (funcall efc-query-options-function options prompt title)
-    (let ((dialog
-	   (efc-option-dialog
-	    (or title "option dialog")
-	    :text (or prompt "Select option:")
-	    :options options)))
-      (efc-dialog-show dialog)
-      (oref dialog selection))))
-
-;; The following code is a patch that implements Richard Stallman's fix
-;; for the following error that occurs only in Emacs 21.1.1.
-;;
-;; Debugger entered--Lisp error: (wrong-type-argument window-live-p #<window 66>)
-;;      select-window(#<window 66>)
-;;      exit-recursive-edit()
-;; This replacement macro fixes the problem with exit-recursive-edit on Emacs 21.
-;; You'll have to recompile wid-edit.el with it.
-;; (defmacro save-selected-window (&rest body)
-;;   "Execute BODY, then select the window that was selected before BODY.
-;; However, if that window has become dead, don't get an error,
-;; just refrain from switching to it."
-;;   `(let ((save-selected-window-window (selected-window)))
-;;      (unwind-protect
-;;	 (progn ,@body)
-;;        (if (window-live-p save-selected-window-window)
-;;	   (select-window save-selected-window-window)))))
-
-
-(if (and (not (featurep 'xemacs))
-	 (or
-	  (string-match "21\\.1" (emacs-version))
-	  (string-match "21\\.2" (emacs-version))))
-    (progn
-      ;; Need to load wid-edit first to ensure that
-      ;; it does not get loaded after this patch and
-      ;; hence override the patch.
-      (require 'wid-edit)
-
-      ;; Patched version of save-selected-window.
-      (defmacro save-selected-window (&rest body)
-	"Execute BODY, then select the window that was selected before BODY.
-However, if that window has become dead, don't get an error,
-just refrain from switching to it."
-	`(let ((save-selected-window-window (selected-window)))
-	   (unwind-protect
-	       (progn ,@body)
-	     (if (window-live-p save-selected-window-window)
-		 (select-window save-selected-window-window)))))
-
-      ;; Redefine widget-button-click to use the patched
-      ;; version of save-selected-window
-      (defun widget-button-click (event)
-	"Invoke the button that the mouse is pointing at."
-	(interactive "@e")
-	(if (widget-event-point event)
-	    (let* ((pos (widget-event-point event))
-		   (button (get-char-property pos 'button)))
-	      (if button
-		  ;; Mouse click on a widget button.  Do the following
-		;; in a save-excursion so that the click on the button
-		  ;; doesn't change point.
-		  (save-selected-window
-		    (save-excursion
-		      (mouse-set-point event)
-		      (let* ((overlay (widget-get button :button-overlay))
-			     (face (overlay-get overlay 'face))
-			     (mouse-face (overlay-get overlay 'mouse-face)))
-			(unwind-protect
-		       ;; Read events, including mouse-movement events
-		      ;; until we receive a release event.  Highlight/
-		     ;; unhighlight the button the mouse was initially
-			    ;; on when we move over it.
-			    (let ((track-mouse t))
-			      (save-excursion
-				(when face ; avoid changing around image
-				  (overlay-put overlay
-					       'face widget-button-pressed-face)
-				  (overlay-put overlay
-					       'mouse-face widget-button-pressed-face))
-				(unless (widget-apply button :mouse-down-action event)
-				  (while (not (widget-button-release-event-p event))
-				    (setq event (read-event)
-					  pos (widget-event-point event))
-				    (if (and pos
-					     (eq (get-char-property pos 'button)
-						 button))
-					(when face
-					  (overlay-put overlay
-						       'face
-						       widget-button-pressed-face)
-					  (overlay-put overlay
-						       'mouse-face
-						       widget-button-pressed-face))
-				      (overlay-put overlay 'face face)
-				      (overlay-put overlay 'mouse-face mouse-face))))
-
-			;; When mouse is released over the button, run
-				;; its action function.
-				(when (and pos
-					   (eq (get-char-property pos 'button) button))
-				  (widget-apply-action button event))))
-			  (overlay-put overlay 'face face)
-			  (overlay-put overlay 'mouse-face mouse-face))))
-
-		    (unless (pos-visible-in-window-p (widget-event-point event))
-		      (mouse-set-point event)
-		      (beginning-of-line)
-		      (recenter)))
-
-		(let ((up t) command)
-	       ;; Mouse click not on a widget button.  Find the global
-		;; command to run, and check whether it is bound to an
-		  ;; up event.
-		  (mouse-set-point event)
-		  (if (memq (event-basic-type event) '(mouse-1 down-mouse-1))
-		      (cond ((setq command ;down event
-				   (lookup-key widget-global-map [down-mouse-1]))
-			     (setq up nil))
-			    ((setq command ;up event
-				   (lookup-key widget-global-map [mouse-1]))))
-		    (cond ((setq command ;down event
-				 (lookup-key widget-global-map [down-mouse-2]))
-			   (setq up nil))
-			  ((setq command ;up event
-				 (lookup-key widget-global-map [mouse-2])))))
-		  (when up
-		    ;; Don't execute up events twice.
-		    (while (not (widget-button-release-event-p event))
-		      (setq event (read-event))))
-		  (when command
-		    (call-interactively command)))))
-	  (message "You clicked somewhere weird.")))
-      ))
-
+  (funcall efc-query-options-function options prompt title history))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                            ;;
@@ -427,7 +321,10 @@ The dialog sets SELECTION to the options selected by the user.")
 		     :documentation "Path of compiler executable.")
    (comp-finish-fcn  :initarg :comp-finish-fcn
 		     :type function
-		     :documentation "Function to invoke at end of compilation."))
+		     :documentation "\
+A list of function to invoke at end of compilation.  Each
+function is called with two arguments: the compilation buffer,
+and a string describing how the process finished."))
   "Class of compiler-like applications.")
 
 (defmethod create-buffer ((this efc-compiler))
@@ -441,7 +338,10 @@ The dialog sets SELECTION to the options selected by the user.")
 				  compilation-leave-directory-regexp-alist))
 	  (file-regexp-alist (if (boundp 'compilation-file-regexp-alist)
 				 compilation-file-regexp-alist))
-	  (nomessage-regexp-alist (if (not jde-xemacsp) compilation-nomessage-regexp-alist))
+	  (nomessage-regexp-alist
+	   ;; silence the compiler warnings
+	   (if (boundp 'compilation-nomessage-regexp-alist)
+	       (if (not jde-xemacsp) compilation-nomessage-regexp-alist)))
 	  (parser compilation-parse-errors-function)
 	  (error-message "No further errors")
 	  (thisdir default-directory))
@@ -478,27 +378,32 @@ The dialog sets SELECTION to the options selected by the user.")
 
       (compilation-mode (oref this name))
 
-      (set (make-local-variable 'compilation-parse-errors-function) parser)
-      (set (make-local-variable 'compilation-error-message) error-message)
+      (if (boundp 'compilation-parse-errors-function)
+	  (set (make-local-variable 'compilation-parse-errors-function) parser))
+      (if (boundp 'compilation-error-message)
+	  (set (make-local-variable 'compilation-error-message) error-message))
       (set (make-local-variable 'compilation-error-regexp-alist)
-	     error-regexp-alist)
-      (if (not jde-xemacsp)
-	  (progn
-	    (set (make-local-variable 'compilation-enter-directory-regexp-alist)
-		 enter-regexp-alist)
-	    (set (make-local-variable 'compilation-leave-directory-regexp-alist)
-		 leave-regexp-alist)
-	    (set (make-local-variable 'compilation-file-regexp-alist)
-		 file-regexp-alist)
-	    (set (make-local-variable 'compilation-nomessage-regexp-alist)
-	      nomessage-regexp-alist)))
+	   error-regexp-alist)
+
+      (when (not (featurep 'xemacs))
+	(dolist (elt `((compilation-enter-directory-regexp-alist
+			,enter-regexp-alist)
+		       (compilation-leave-directory-regexp-alist
+			,leave-regexp-alist)
+		       (compilation-file-regexp-alist
+			,file-regexp-alist)
+		       (compilation-nomessage-regexp-alist
+			,nomessage-regexp-alist)))
+	  (if (boundp (car elt))
+	      (set (make-local-variable (car elt)) (second elt)))))
 
       (if (slot-boundp this 'comp-finish-fcn)
-	  (set (make-local-variable 'compilation-finish-function)
+	  (set (make-local-variable 'compilation-finish-functions)
 	       (oref this comp-finish-fcn)))
 
-      (setq default-directory thisdir
-	    compilation-directory-stack (list default-directory)))))
+      (if (boundp 'compilation-directory-stack)
+	  (setq default-directory thisdir
+		compilation-directory-stack (list default-directory))))))
 
 (defmethod get-args ((this efc-compiler))
   "Get a list of command-line arguments to pass to the
@@ -661,6 +566,9 @@ is an object of efc-visitor class."
 ;; List Iterator Class                                                        ;;
 ;;                                                                            ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; silence the compiler warnings
+(defun efc-list-iterator (&rest a))
 
 (defclass efc-list-iterator (efc-iterator)
   ((list-obj :initarg :list-obj

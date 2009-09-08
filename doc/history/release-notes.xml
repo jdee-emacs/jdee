@@ -15,6 +15,57 @@
 	    <author>Przemystaw Wojnowski</author>
 	    <msg>Support for 1.5 generics and simplified for loops in jde-complete</msg>
 	</change>
+
+	<change commiter="lentrig">
+	    <author>TODO: look up in the logs who made these contributed these patches</author>
+	    <msg>More 1.5 and 1.6 support.</msg>
+	</change>
+
+	<change commiter="paullandes">
+	    <author>Paul Landes</author>
+	    <msg>jde-parse-get-buffer-class is now interactive and also returns class names sans packages.</msg>
+	</change>
+
+	<change commiter="paullandes">
+	    <author>Paul Landes</author>
+	    <msg>New addition of class driven bookmarks (jde-bookmark.el).</msg>
+	</change>
+
+	<change commiter="paullandes">
+	    <author>Paul Landes</author>
+	    <msg>More fontification (i.e. constructors).</msg>
+	</change>
+
+	<change commiter="paullandes">
+	    <author>Paul Landes</author>
+	    <msg>Beanshell can optionally display a separate buffer for errors based on customized variable `jde-bsh-separate-buffer'.</msg>
+	</change>
+
+	<change commiter="paullandes">
+	    <author>Paul Landes</author>
+	    <msg>New function `jde-parse-class-name' parses class name into package name parts so we don't have to pass around fully qualified type flags to functions that need this--i.e. source finding functions.</msg>
+	</change>
+
+	<change commiter="paullandes">
+	    <author>Paul Landes</author>
+	    <msg>New function `jde-read-class' provides better user input class finding.</msg>
+	</change>
+
+	<change commiter="paullandes">
+	    <author>Paul Landes</author>
+	    <msg>New function `jde-exception-goto' provides a way to go to a file and line number from an exception stack trace line..</msg>
+	</change>
+
+	<change commiter="paullandes">
+	    <author>Paul Landes</author>
+	    <msg>More robust jde-eval, which now doesn't get confused with extraneous show() output.  This feature can be turned off..</msg>
+	</change>
+
+	<change commiter="paullandes">
+	    <author>Paul Landes</author>
+	    <msg>More parsing ability (i.e. reverse camel notation parsing, which replaces some key bindings, convert from reverse camel notation to other variable formats like SQL, Java properties, hungarian notation, C constants, etc. parse Beanshell/Java expressions).</msg>
+	</change>
+
     </release>
 
     <!--

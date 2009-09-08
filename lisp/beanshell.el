@@ -78,6 +78,7 @@
 
 (require 'eieio)
 (require 'comint)
+(require 'lmenu)
 
 (defgroup bsh nil
   "Customizations for the Emacs inteface to Pat Neimeyer's Java
@@ -151,6 +152,9 @@ buffer."
   :group 'bsh
   :type 'directory)
 
+(defvar bsh-the-bsh nil
+  "The BeanShell instance associated with the current BeanShell buffer.")
+(make-variable-buffer-local 'bsh-the-bsh)
 
 (defclass bsh-buffer ()
   ((buffer-name   :initarg :buffer-name
@@ -203,7 +207,7 @@ buffer."
 (defmethod bsh-comint-buffer-exec ((this bsh-comint-buffer) vm vm-args)
   (let ((win32-start-process-show-window t)
 	(w32-start-process-show-window t)
-	(w32-quote-process-args ?\") ;; Emacs
+	(w32-quote-process-args ?\")   ;; Emacs
 	(win32-quote-process-args ?\") ;; XEmacs
 	(windowed-process-io t)
 	(process-connection-type nil)
@@ -216,7 +220,13 @@ buffer."
 
   (oset this process (get-buffer-process (oref this buffer)))
   (oset this filter (process-filter (oref this process)))
-  (process-kill-without-query (oref this process))
+
+  ;; moved to `process-query-on-exit-flag' per compile warning hint: 
+  ;; `process-kill-without-query' is an obsolete function (as of Emacs 22.1);
+  ;; use `process-query-on-exit-flag' or `set-process-query-on-exit-flag'.
+  ;;
+  ;;(process-kill-without-query (oref this process))
+  (set-process-query-on-exit-flag (oref this process) nil)
 
   (if (eq system-type 'windows-nt)
       (accept-process-output (oref this process) bsh-startup-timeout 0)
@@ -250,7 +260,7 @@ buffer."
 
 (defmethod bsh-compilation-buffer-set-mode ((this bsh-compilation-buffer))
   "Define buffer mode."
-   (let ((thisdir default-directory))
+  (let ((thisdir default-directory))
     (with-current-buffer (oref this buffer)
       (let ((buf (oref this buffer))
 	    ;; Some or all of these variables may not be defined by
@@ -258,7 +268,7 @@ buffer."
 	    ;; and XEmacs.
 	    (error-regexp-alist
 	     (if (boundp  'compilation-error-regexp-alist)
-		  compilation-error-regexp-alist))
+		 compilation-error-regexp-alist))
 	    (enter-regexp-alist
 	     (if (boundp 'compilation-enter-directory-regexp-alist)
 		 compilation-enter-directory-regexp-alist))
@@ -276,8 +286,8 @@ buffer."
 		 compilation-parse-errors-function))
 	    (error-message "No further errors"))
 
-	;; In case the compilation buffer is current, make sure we get the global
-	;; values of compilation-error-regexp-alist, etc.
+	;; In case the compilation buffer is current, make sure we get the
+	;; global values of compilation-error-regexp-alist, etc.
 	(kill-all-local-variables)
 
 	;; Clear out the compilation buffer and make it writable.
@@ -289,24 +299,28 @@ buffer."
 	(compilation-mode)
 	(setq buffer-read-only nil)
 
-	(set (make-local-variable 'compilation-parse-errors-function) parser)
-	(set (make-local-variable 'compilation-error-message) error-message)
+	(if (boundp 'compilation-parse-errors-function)
+	    (set (make-local-variable 'compilation-parse-errors-function) parser))
+	(if (boundp 'compilation-error-message)
+	    (set (make-local-variable 'compilation-error-message) error-message))
 	(set (make-local-variable 'compilation-error-regexp-alist)
 	     error-regexp-alist)
 
-	(if (not (featurep 'xemacs))
-	    (progn
-	      (set (make-local-variable 'compilation-enter-directory-regexp-alist)
-		   enter-regexp-alist)
-	      (set (make-local-variable 'compilation-leave-directory-regexp-alist)
-		   leave-regexp-alist)
-	      (set (make-local-variable 'compilation-file-regexp-alist)
-		   file-regexp-alist)
-	      (set (make-local-variable 'compilation-nomessage-regexp-alist)
-		   nomessage-regexp-alist)))
+	(when (not (featurep 'xemacs))
+	  (dolist (elt `((compilation-enter-directory-regexp-alist
+			  ,enter-regexp-alist)
+			 (compilation-leave-directory-regexp-alist
+			  ,leave-regexp-alist)
+			 (compilation-file-regexp-alist
+			  ,file-regexp-alist)
+			 (compilation-nomessage-regexp-alist
+			  ,nomessage-regexp-alist)))
+	    (if (boundp (car elt))
+		(set (make-local-variable (car elt)) (second elt)))))
 
 	(setq default-directory thisdir)
-	(setq compilation-directory-stack (list default-directory))))))
+	(if (boundp 'compilation-directory-stack)
+	    (setq compilation-directory-stack (list default-directory)))))))
 
 (defmethod bsh-compilation-buffer-filter ((this bsh-compilation-buffer) proc string)
   "This filter prints out the result of the process without buffering.
@@ -394,7 +408,6 @@ The result is inserted as it comes in the compilation buffer."
 		  :documentation
 		  "Lisp output from the BeanShell.")
 
-
    (vm            :initarg :vm
 		  :initform "java"
 		  :type string
@@ -428,7 +441,13 @@ The result is inserted as it comes in the compilation buffer."
 		  :initform "bsh.Interpreter"
 		  :type string
 		  :documentation
-		  "Name of BeanShell class."))
+		  "Name of BeanShell class.")
+
+   (separate-error-buffer :initarg :separate-error-buffer
+			  :initform nil
+			  :type boolean
+			  :documentation
+			  "Whether or not to use a separate error buffer."))
 "Defines an instance of a BeanShell process.")
 
 (defmethod initialize-instance ((this bsh) &rest fields)
@@ -493,7 +512,6 @@ to the string form required by the vm."
   (if (bsh-running-p this)
       (oref (oref this buffer) process)))
 
-
 (defmethod bsh-launch ((this bsh) &optional display-buffer)
 
   (assert
@@ -549,11 +567,6 @@ to the string form required by the vm."
       (message "The BeanShell is already running.")
       (bsh-buffer-display (oref this buffer)))))
 
-(defvar bsh-the-bsh nil
-  "The BeanShell instance associated with the current BeanShell buffer.")
-(make-variable-buffer-local 'bsh-the-bsh)
-
-
 (defmethod bsh-snag-lisp-output ((this bsh) process output)
   "Assemble Lisp OUTPUT from the BeanShell."
     (let ((end-of-output (string-match ".*bsh % " output)))
@@ -574,12 +587,20 @@ to the string form required by the vm."
 
 (defmethod bsh-detect-java-eval-error ((this bsh) bsh-output)
   (if (string-match "// Error:" bsh-output)
-      (progn
+      (if (oref this separate-error-buffer)
+	  (save-excursion
+	    (set-buffer (get-buffer-create "*Beanshell Error*"))
+	    (erase-buffer)
+	    (insert (format "Expression: %s" (oref this java-expr)))
+	    (newline)
+	    (insert (format "Error: %s" bsh-output))
+	    (goto-char (point-min))
+	    (display-buffer (current-buffer))
+	    (error "Beanshell eval error."))
 	(message
 	 "Beanshell expression evaluation error.\n  Expression: %s\n  Error: %s"
 	 (oref this java-expr) bsh-output)
 	(error "Beanshell eval error. See messages buffer for details."))))
-
 
 (defmethod bsh-eval-lisp-output ((this bsh))
   (if (not (string= (oref this lisp-output) ""))
@@ -856,8 +877,7 @@ directory cannot be found. If XEmacs, returns the location of
 the data directory in the XEmacs distribution hierarchy. On all other Emacs versions,
 the bsh expects to find the documentation
 in the same directory that contains the bsh.el file."
-  (let ((directory-sep-char ?/)
-	dir)
+  (let (dir)
     (flet ((find-data-dir
 	    ()
 	    (expand-file-name
@@ -904,8 +924,7 @@ in the same directory that contains the bsh.el file."
 	 (file-exists-p bsh-help))
 	(browse-url (concat "file://" bsh-help)
 		    (if (boundp 'browse-url-new-window-flag)
-			'browse-url-new-window-flag
-		      browse-url-new-window-p))
+			browse-url-new-window-flag))
       (signal 'error '("Cannot find BeanShell help file.")))))
 
 (defcustom bsh-script-menu-definition
@@ -931,6 +950,7 @@ in the same directory that contains the bsh.el file."
   "Insert BeanShell script menu in the XEmacs menu bar."
   (if (and
        (not (featurep 'infodock))
+       (boundp 'c-emacs-features)
        (not (memq 'infodock c-emacs-features))
        (boundp 'current-menubar)
        current-menubar)

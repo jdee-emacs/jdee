@@ -178,12 +178,46 @@ the Application Project Creation dialog."
     (call-next-method)))
 
 
+;;; utility functions
+
+;;;###autoload
 (defun jde-project-create-project ()
   "Creates a JDE project."
   (interactive)
   (let ((project (jde-project-application "Application")))
     (jde-project-show-creation-dialog project)))
 
+;;;###autoload
+(defun jde-describe-path (path-type)
+  "Prints and gives file existance for each path.
+PATH-TYPE is either `global classpath' for `jde-global-classpath' or
+`source path' for `jde-sourcepath'."
+  (interactive
+   (list (completing-read "Path: " '("global classpath" "source path") nil t)))
+  (let ((user-home (expand-file-name "~/"))
+	path-name path desc)
+    (if (equal "source path" path-type)
+	(setq path-name "Source Path"
+	    path jde-sourcepath)
+      (setq path-name "Global Classpath"
+	      path jde-global-classpath))
+    (save-excursion
+      (set-buffer (get-buffer-create (format "*JDEE %s*" path-name)))
+      (setq truncate-lines t)
+      (erase-buffer)
+      (insert (format "%s:
+d:      directory
+f:      file
+blank:  path doesn't exist
+--------------------------\n" path-name))
+      (dolist (file path)
+	(setq desc (cond ((file-directory-p file) "d")
+			 ((file-exists-p file) "f")
+			 (t " ")))
+	(setq file (replace-in-string file user-home "~/" t))
+	(insert (format "[%s]  %s\n" desc file)))
+      (goto-char (point-min))
+      (pop-to-buffer (current-buffer)))))
 
 (provide 'jde-project)
 

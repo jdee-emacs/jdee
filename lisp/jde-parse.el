@@ -178,12 +178,6 @@ replaced by that range.  See also `semantic-change-hooks'."
 	       'type inner-class-parts)))
 	(>= (length inner-classes) 1))))))
 
-;; (defun test ()
-;;   (interactive)
-;;   (message
-;;    (if (jde-parse-buffer-contains-multiple-classes-p)
-;;        "Yes"
-;;      "No")))
 
 (defvar jde-parse-buffer-contains-multiple-classes-p nil
   "non-nil if buffer contains more than one class definition.")
@@ -629,16 +623,27 @@ white space. It returns null if there is no qualified name at point."
 	  (cons qualifier name))))))
 
 
-(defun jde-parse-get-buffer-class ()
-  "Get the fully qualified name of the class of this buffer."
+;;;###autoload
+(defun jde-parse-get-buffer-class (&optional no-package-p)
+  "Get the fully qualified name of the class of this buffer.
+
+NO-PACKAGE-P, if non-`nil', return only the class name (sans
+package name), otherwise, include the package name.
+
+If called interactively, add the name in the mini-buffer."
+  (interactive (list (not current-prefix-arg)))
   (if (eq major-mode 'jde-mode)
       (let ((package-name (jde-parse-get-package-name))
 	    (class-name (file-name-sans-extension
 			 (file-name-nondirectory (buffer-file-name)))))
-	(if package-name
-	    (concat package-name "." class-name)
-	  class-name))
+	(if (and (not no-package-p) package-name)
+	    (setq class-name (concat package-name "." class-name)))
+	(when (interactive-p)
+	  (kill-new class-name)
+	  (message (format "Copied `%s'" class-name)))
+	class-name)
     (error "Not a Java source buffer.")))
+
 
 (defun jde-parse-get-buffer-unqualified-class ()
   "Get the class name from the buffer filename"
@@ -1685,6 +1690,36 @@ otherwise."
   "Checks if VARIABLE is a Java keyword, for performance reasons this only checks if the VARIABLE is an if or an else, since those are the ones that seem to be causing a problem"
   (or (string= variable "if")
       (string= variable "else")))
+
+(defun jde-parse-class-name (classname)
+  "Parse CLASSNAME into it's package and non-fully qualified name.
+
+If CLASSNAME is the symbol `point', then parse it from what is
+at the point.
+
+Return a list in the form:
+  \(FULLY-QUALIFIED-CLASSNAME PACKAGE CLASS-NAME)
+or `nil' if the passed class name doesn't look like a class (by the Sun Java
+codeing standard).
+
+The first two elements of the list are `nil' if CLASSNAME isn't fully qualifed."
+  (flet ((parse-at-point
+	  (classname)
+	  (let (end-pos fq pkg)
+	    (when (> (length classname) 0)
+	      (setq end-pos (position ?. classname :from-end t))
+	      (if end-pos
+		  (setq fq classname
+			pkg (substring fq 0 end-pos)
+			classname (substring fq (1+ end-pos))))
+	      (when (> (length classname) 0)
+		(let ((char (substring classname 0 1)))
+		  (if (string= char (upcase char))
+		      (list fq pkg classname))))))))
+    (if (eq classname 'point)
+	(or (parse-at-point (thing-at-point 'word));;'filename))
+	    (parse-at-point (thing-at-point 'symbol)))
+      (parse-at-point classname))))
 
 (provide 'jde-parse)
 

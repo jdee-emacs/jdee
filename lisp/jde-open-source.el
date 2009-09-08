@@ -2,7 +2,7 @@
 ;; $Id$
 ;;
 ;; Author: Klaus Berndl
-
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, open files
 
 ;; Copyright (C) 2002, 2003, 2004 Klaus Berndl
@@ -21,17 +21,6 @@
 ;; JDE User's Guide for more information.
 
 ;; This package allows to open the class at point.
-
-;; Known bugs/problems :
-;;
-;; TODO
-;;
-;; The latest version of the JDE is available at
-;; <URL:http://jde.sunsite.dk>.
-;; <URL:http://www.geocities.com/SiliconValley/Lakes/1506/>
-
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Kinnucan at pkinnucan@mediaone.net
 
 (require 'jde-parse)
 (require 'jde-util)
@@ -293,6 +282,210 @@ you to select one of the interfaces to show."
 	    (if interface
 		(jde-show-class-source interface)))))))
 
+(defun jde-find-class-source-file (class)
+  "Find the source file for a specified class.
+CLASS is the fully qualified name of the class. This function searchs
+the directories and source file archives (i.e., jar or zip files)
+specified by `jde-sourcepath' for the source file corresponding to
+CLASS. If it finds the source file in a directory, it returns the
+file's path. If it finds the source file in an archive, it returns a
+buffer containing the contents of the file. If this function does not
+find the source for the class, it returns nil."
+  (let ((verified-name (jde-parse-class-exists class))
+	outer-class file package)
+    (if (null verified-name)
+	(error "Class not found: %s" class))
+    (setq outer-class (car (split-string verified-name "[$]"))
+	  file (concat
+		(jde-parse-get-unqualified-name outer-class)
+		".java")
+	  package (jde-parse-get-package-from-name outer-class))
+    (catch 'found
+      (loop for path in jde-sourcepath do
+	    (progn
+	      (setq path (jde-normalize-path path 'jde-sourcepath))
+	      (if (and (file-exists-p path)
+		       (or (string-match "\.jar$" path)
+			   (string-match "\.zip$" path)))
+		  (let* ((bufname (concat file " (" (file-name-nondirectory path) ")"))
+			 (buffer (get-buffer bufname)))
+		    (if buffer
+			(throw 'found buffer)
+		      (let* ((pkg-path (subst-char-in-string ?. ?/ package))
+			     (class-file-name (concat  pkg-path "/" file))
+			     success)
+			(setq buffer (get-buffer-create bufname))
+			(save-excursion
+			  (set-buffer buffer)
+			  (setq buffer-file-name (expand-file-name (concat path ":" class-file-name)))
+			  (setq buffer-file-truename file)
+			  (let ((exit-status
+				 (archive-extract-by-stdout path class-file-name archive-zip-extract)))
+			    (if (and (numberp exit-status) (= exit-status 0))
+				(progn
+				  (jde-mode)
+				  (goto-char (point-min))
+				  (setq buffer-undo-list nil)
+				  (setq buffer-saved-size (buffer-size))
+				  (set-buffer-modified-p nil)
+				  (setq buffer-read-only t)
+				  (throw 'found buffer))
+			      (progn
+				(set-buffer-modified-p nil)
+				(kill-buffer buffer))))))))
+		(if (file-exists-p (expand-file-name file path))
+		    (throw 'found (expand-file-name file path))
+		  (let* ((pkg-path (subst-char-in-string ?. ?/ package))
+			 (pkg-dir (expand-file-name pkg-path path))
+			 (file-path (expand-file-name file pkg-dir)))
+		    (if (file-exists-p file-path)
+			(throw 'found file-path))))))))))
+
+(defcustom jde-preferred-packages
+  '("java.util" "java" "javax")
+  "Classes from these packages will appear first when reading from user input."
+  :group 'jde-project
+  :type '(repeat string))
+
+(defun jde-choose-class (classes &optional prompt uq-name confirm-fq-p)
+  "Choose a class from user input.
+
+CLASSES are a list of fully qualified classes that are presetned to user as
+choices for input.
+
+PROMPT the prompt the user sees.  Don't add the `: ' at the end to this.
+
+UQ-NAME the unqualified name, which is used for the initial input if found as
+an import in the buffer.
+
+CONFIRM-FQ-P, if non-nil, confirm the class name even when there
+is only one unique fully qualified class found for the simple
+class name \(that is the class without the package part in the
+name)."
+  (flet ((sort-helper
+	  (a b)
+	  (dolist (pkg jde-preferred-packages)
+	    (let ((len (length pkg)))
+	      (cond ((eq t (compare-strings pkg 0 len a 0 len))
+		     (return t))
+		    ((eq t (compare-strings pkg 0 len b 0 len))
+		     (return nil))
+		    (t (string< a b)))))))
+    (setq prompt (or prompt "Class"))
+    (let ((initial-input (if uq-name
+			     (jde-import-get-import uq-name))))
+      (if (and (not confirm-fq-p) (= 1 (length classes)))
+	  (car classes)
+	(efc-query-options (sort classes 'sort-helper)
+			   prompt "Class" jde-read-class-fq-items)))))
+
+(defvar jde-read-class-items nil
+  "*History for `jde-read-class' read items.")
+
+(defvar jde-read-class-fq-items nil
+  "*History for `jde-read-class' read items (second part of fully
+qualified classes).")
+
+;;;###autoload
+(defun jde-read-class (&optional prompt fq-prompt
+				 this-class-p confirm-fq-p no-confirm-nfq-p)
+  "Select a class interactively.  PROMPT is used to prompt the user for the
+first class name, FQ-PROMPT is used only if the class name expands into more
+than one fully qualified name.
+
+PROMPT text used to prompt the user for the simple class name, or
+\"Class\" as the default.  Don't add the colon/space at the end
+of this prompt as a default will be added if it exists.
+
+FQ-PROMPT text used to prompt the fully qualified class name, or
+\"Select qualified class\" as the default.  Don't add the
+colon/space at the end of this prompt as a default will be added
+if it exists.
+
+THIS-CLASS-P, if non-nil, use the current class name if no class name at point
+and we are in a JDEE buffer.
+
+CONFIRM-FQ-P, if non-nil, confirm the class name even when there
+is only one unique fully qualified class found for the simple
+class name \(that is the class without the package part in the
+name).
+
+NO-CONFIRM-NFQ-P, if non-nil, don't confirm the class to check for fully
+qualified classes if it is obtainable from either the point or this class (see
+THIS-CLASS-P).  If obtained from the point, then the class name is parsed with
+`jde-parse-class-name' for the input.
+
+When called interactively, select the class and copy it to the kill ring."
+  (interactive (list nil nil t))
+  (if (null fq-prompt) (setq fq-prompt "Select qualified class"))
+  (let ((ctup (jde-parse-class-name 'point))
+	uinput uq-name classes initial-input fqc default)
+    (if (and (null ctup)
+	     (eq major-mode 'jde-mode)
+	     this-class-p)
+	(setq ctup
+	      (jde-parse-class-name (jde-parse-get-buffer-class))))
+    (setq default (cond ((null ctup) nil)
+			((first ctup) (first ctup))
+			(t (third ctup))))
+    (setq prompt (concat (or prompt "Class")
+			 (if default
+			     (format " (default %s): " default)
+			   ": ")))
+    (setq uinput
+	  (if (and default no-confirm-nfq-p)
+	      (prog1
+		  default
+		(setq fq-prompt (format "%s" fq-prompt)))
+	    (read-string prompt nil 'jde-read-class-items default)))
+    (setq ctup (jde-parse-class-name uinput))
+    (if (null ctup)
+	(error "Doesn't appear to be a classname: `%s'" uinput))
+    (setq fqc (first ctup)
+	  uq-name (third ctup))
+    (if fqc
+	(if (not (jde-jeval-r (concat "jde.util.JdeUtilities."
+				      "classExists(\""
+				      fqc "\");")))
+	    (error "No match for %s" uq-name))
+      (setq classes (jde-jeval-r (concat "jde.util.JdeUtilities."
+					 "getQualifiedName(\""
+					 uq-name "\");")))
+      (if (= 0 (length classes))
+	  (error "Not match for %s" uq-name))
+      (setq fqc (jde-choose-class classes fq-prompt uq-name confirm-fq-p)))
+    (when (interactive-p)
+      (kill-new fqc)
+      (message "Copied `%s'" fqc))
+    fqc))
+
+;;;###autoload
+(defun jde-find-class-source (class &optional other-window)
+  "*Find the source file for a specified fully qualified class.
+Calls `jde-find-class-source-file' to do the search.
+If it finds the source file, it opens the file in a buffer."
+  (interactive (list (jde-read-class "Class") current-prefix-arg))
+  (let ((source (jde-find-class-source-file class)))
+    (if source
+	(progn
+	  (if (typep source 'buffer)
+	      (switch-to-buffer source)
+	      ;; (pop-to-buffer source other-window)
+	    (if (not (string-equal (buffer-file-name)  source))
+		(if other-window
+		    (find-file-other-window source)
+		  (find-file source))))
+	  (if (fboundp 'senator-re-search-forward)
+	      (let ((inner-class-pos (string-match "\\$" class)))
+		(if inner-class-pos
+		    (let ((inner-class (substring class (+ 1 inner-class-pos))))
+		      (when inner-class
+			(beginning-of-buffer)
+			(senator-parse)
+			(senator-re-search-forward
+			 (concat "\\b" inner-class "\\b") nil t)))))))
+      (message "JDE error: Could not find source for \"%s\" in this
+project's source path. See `jde-sourcepath' for more information." class))))
 
 (provide 'jde-open-source)
 

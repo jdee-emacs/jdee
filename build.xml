@@ -93,14 +93,37 @@
 	  unless="lisp.uptodate">
     <!-- copy the lisp to the build directory -->
     <copy todir="${build.lisp.dir}">
-      <fileset dir="${src.lisp.dir}" includes="*.el"/>
+      <fileset dir="${src.lisp.dir}">
+	<include name="*.el"/>
+	<exclude name=".dir-locals.el"/>
+      </fileset>
     </copy>
+
+    <exec outputproperty="build.lisp.is-xemacs"
+	  executable="${build.bin.emacs}" failonerror="true">
+      <arg value="--no-site-file"/>
+      <arg value="--batch"/>
+      <arg value="--eval"/>
+      <arg value="(message &quot;%S&quot; (if (featurep 'xemacs) 'true 'false))"/>
+    </exec>
+    <if>
+	<equals arg1="${build.lisp.is-xemacs}" arg2="true"/>
+	<then>
+	    <copy todir="${build.lisp.dir}">
+		<fileset dir="${src.xelisp.dir}">
+		    <include name="*.el"/>
+		    <exclude name=".dir-locals.el"/>
+		</fileset>
+	    </copy>
+	</then>
+    </if>
 
     <!-- make windows paths "mixed" dos paths (cygwin term) -->
     <mixed-path property="cedet.escaped.dir" value="${cedet.dir}"/>
     <mixed-path property="elib.escaped.dir" value="${elib.dir}"/>
     <mixed-path property="src.lisp.escaped.dir" value="${src.lisp.dir}"/>
     <mixed-path property="build.lisp.escaped.dir" value="${build.lisp.dir}"/>
+    <mixed-path property="build.lisp.dst.escaped.file" value="${build.lisp.dst.file}"/>
 
     <!-- create the file used to compile the emacs lisp code -->
     <copy file="${build.lisp.src.file}" tofile="${build.lisp.dst.file}"/>
@@ -120,15 +143,11 @@
 
   <target name="build-lisp" depends="configure-ebuild" unless="lisp.uptodate"
 	  description="compile the JDEE Emacs lisp code">
-    <!-- invoke Emacs in batch mode to creat autoloads and compile emacs lisp
+    <!-- invoke Emacs in batch mode to create autoloads and compile emacs lisp
          -->
-    <!-- here we set os=unix since otherwise the exec complains about the
-         directory not existing -->
-    <mixed-path property="build.lisp.escaped.dir" value="${build.lisp.dir}"/>
-    <mixed-path property="build.lisp.dst.escaped.file" value="${build.lisp.dst.file}"/>
-
     <exec dir="${build.lisp.escaped.dir}"
 	  executable="${build.bin.emacs}" failonerror="true">
+      <arg value="--no-site-file"/>
       <arg value="--batch"/>
       <arg value="--load"/>
       <arg value="${build.lisp.dst.escaped.file}"/>
@@ -197,6 +216,10 @@
       <copy todir="${prefix.dir}" preservelastmodified="true">
 	  <fileset dir="${dist.dir}"/>
       </copy>
+  </target>
+
+  <target name="warnings" depends="build-lisp">
+      <antcall target="clean"/>
   </target>
 
   <target name="clean" depends="init"

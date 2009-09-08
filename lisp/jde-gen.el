@@ -848,6 +848,8 @@ command `jde-gen-get-set', as a side-effect."
 	     "Insert variable at the top of the class and get-set method pair at point."))
 	  (set-default sym val)))
 
+(defalias 'jde-gen-property 'jde-gen-get-set)
+
 (defun jde-gen-get-set-methods (duples)
   "Generate variables at the top of the class and get and set methods for
 the variables at point.
@@ -2697,25 +2699,16 @@ Or, with `jde-gen-equals-trailing-and-operators' set to t:
 (defcustom jde-gen-equals-method-template
   '("'>"
     "\"/**\" '> 'n"
-    "\" * Check if this object is equal to another object.\" '> 'n"
-    "\" * \" '> 'n"
-    "\" * <p>For the definition of the object equivalence relation\" '> 'n"
-    "\" * see {@link java.lang.Object#equals(Object)}.</p>\" '> 'n"
-    "\" * \" '> 'n"
-    "\" * @param obj another, possibly equal object.\" '> 'n"
-    "\" * \" '> 'n"
-    "\" * @return true if the objects are equal, false otherwise.\" '> 'n"
-    "\" * \" '> 'n"
-    "\" * @see java.lang.Object#equals(Object)\" '> 'n"
+    "\" * Check if this object is equal (equivalent) to another object.\" '> 'n"
     "\" */\" '> 'n"
     "(jde-gen-method-signature \"public\" \"boolean\" \"equals\" \"Object obj\")"
     "(jde-gen-electric-brace)"
-    "\"if (obj == this)\" '> 'n"
-    "\"return true;\" '> 'n '> 'n"
-    "\"if (obj == null || getClass() != obj.getClass())\" '> 'n"
-    "\"return false;\" '> 'n '> 'n"
+    "\"if (obj == this) return true;\" '> 'n"
+    "\"if ((obj == null) || !getClass().equals(obj.getClass())) return false;\" '> 'n"
+    "'> 'n"
     "(jde-gen-equals-return \"obj\" \"o\") '> 'n"
-    "\"}\" '> 'n '>")
+    "\"}\" '> 'n '>))"
+    )
   "*Template for creating an equals method.
 Setting this variable defines a template instantiation command
 `jde-gen-equals-method', as a side-effect."

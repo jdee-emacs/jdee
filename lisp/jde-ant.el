@@ -314,8 +314,12 @@ classpath normalized with `jde-build-classpath'."
 				  (jde-get-tools-jar))
 			    jde-ant-user-jar-files))
 
-    (when jde-ant-use-global-classpath
-      (setq classpath (append classpath jde-global-classpath)))
+    ;; silence the compiler
+    ;; TODO: remove this boundp and require 'jde after resolving jde
+    ;; compilation warnings
+    (with-no-warnings
+      (when jde-ant-use-global-classpath
+	(setq classpath (append classpath jde-global-classpath))))
 
     (jde-build-classpath classpath)))
 
@@ -377,7 +381,7 @@ classpath normalized with `jde-build-classpath'."
     buildfile))
 
 ;;;###autoload
-(defun jde-ant-build(buildfile target &optional interactive-args)
+(defun jde-ant-build (buildfile target &optional interactive-args)
   "Build the current project using Ant.  If interactive, we try to prompt the
   user for certain variables.."
   (interactive
@@ -454,10 +458,10 @@ classpath normalized with `jde-build-classpath'."
 	    (setq last-nonmenu-event temp))
 	(save-some-buffers (not compilation-ask-about-save) nil))
 
-      (setq compilation-finish-function
+      (setq compilation-finish-functions
 	    (lambda (buf msg)
 	      (run-hook-with-args 'jde-ant-build-hook buf msg)
-	      (setq compilation-finish-function nil)))
+	      (setq compilation-finish-functions nil)))
 
       (if (string= (car jde-ant-invocation-method) "Ant Server")
 	  (progn
@@ -467,7 +471,7 @@ classpath normalized with `jde-build-classpath'."
 	    (jde-ant-compile-internal compile-command
 				      "No more errors"))
 	(let ((default-directory (jde-ant-get-default-directory)))
-	  (compile-internal compile-command "No more errors"))))))
+	  (compilation-start compile-command))))))
 
 (defvar jde-ant-comint-filter nil)
 
@@ -545,25 +549,27 @@ and there are no more errors. "
 	    ;; (setq buffer-read-only t)  ;;; Non-ergonomic.
 	    (set (make-local-variable 'compilation-parse-errors-function)
 		 parser)
-	    (set (make-local-variable 'compilation-error-message)
-		 error-message)
+	    (if (boundp 'compilation-error-message)
+		(set (make-local-variable 'compilation-error-message)
+		     error-message))
 	    (set (make-local-variable 'compilation-error-regexp-alist)
 		 error-regexp-alist)
-	    (if (not jde-xemacsp)
-		(progn
-		  (set (make-local-variable
-			'compilation-enter-directory-regexp-alist)
-		       enter-regexp-alist)
-		  (set (make-local-variable
-			'compilation-leave-directory-regexp-alist)
-		       leave-regexp-alist)
-		  (set (make-local-variable 'compilation-file-regexp-alist)
-		       file-regexp-alist)
-		  (set (make-local-variable
-			'compilation-nomessage-regexp-alist)
-		       nomessage-regexp-alist)))
-	    (setq default-directory thisdir
-		  compilation-directory-stack (list default-directory))
+
+	    (when (not (featurep 'xemacs))
+	      (dolist (elt `((compilation-enter-directory-regexp-alist
+			      ,enter-regexp-alist)
+			     (compilation-leave-directory-regexp-alist
+			      ,leave-regexp-alist)
+			     (compilation-file-regexp-alist
+			      ,file-regexp-alist)
+			     (compilation-nomessage-regexp-alist
+			      ,nomessage-regexp-alist)))
+		(if (boundp (car elt))
+		    (set (make-local-variable (car elt)) (second elt)))))
+
+	    (if (boundp 'compilation-directory-stack)
+		(setq default-directory thisdir
+		      compilation-directory-stack (list default-directory)))
 	    (compilation-set-window-height outwin)
 
 	    (if (not jde-xemacsp)

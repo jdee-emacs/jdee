@@ -29,26 +29,11 @@
 (require 'eieio)
 (require 'jde-util)
 
-;; (makunbound 'jde-help-docsets)
 (defcustom jde-help-docsets
   (list (list "JDK API"
 	      "http://java.sun.com/javase/6/docs/api"
 	      nil)
-	(list "User (javadoc)"
-	 "http://static.springsource.org/spring/docs/3.0.x/javadoc-api/"
-	 nil)
-	(list "User (javadoc)"
-	 "http://commons.apache.org/sandbox/functor/apidocs/"
-	 nil)
-	(list "User (javadoc)"
-	 "https://www.hibernate.org/hib_docs/v3/api"
-	 nil)
-	(list "User (javadoc)"
-	 "http://acegisecurity.org/acegi-security/apidocs"
-	 nil)
-	(list "User (javadoc)"
-	 "http://wicket.apache.org/docs/1.4"
-	 nil))
+	)
   "*Lists collections of HTML files documenting Java classes.
 This list is used by the `jde-help-class' command to find help for
 a class. You can specify the following information for each docset:
@@ -114,7 +99,6 @@ Doc lookup function
    :group 'jde-project
    :type 'boolean)
 
-;;(makunbound 'jde-help-remote-file-exists-function)
 (defcustom jde-help-remote-file-exists-function (list "wget")
   "Specifies the function the jde uses to retrieve remote documents.
 wget is a Unix utility available on Windows as part of the Cygwin
@@ -134,7 +118,6 @@ which is included in the Emacs w3 package."
 	       (autoload 'url-file-exists "url" nil nil nil))
 	  (set-default sym val)))
 
-;; (makunbound 'jde-help-wget-tries)
 (defcustom jde-help-wget-tries nil
   "Specifies the number of times that the JDEE should try getting
 documentation from a remote site This option applies only if wget is
@@ -146,7 +129,6 @@ one of the the sites in `jde-help-docsets' is not always reachable."
 		 (const :tag "Never stop trying" :value 0)
 		 (integer :tag "Number of retries" :value 1)))
 
-;; (makunbound 'jde-help-wget-timeout)
 (defcustom jde-help-wget-timeout nil
   "Specifies the length of time that the JDEE should wait for a remote site
 to respond to a request for a document. This option applies only if wget is
@@ -165,7 +147,6 @@ one of the the sites in `jde-help-docsets' is not always reachable."
   :group 'jde-project
   :type 'string)
 
-;; (makunbound 'jde-help-browser-function)
 (defcustom jde-help-browser-function "browse-url"
   "Specifies the function that the JDEE uses to display
 HTML pages."

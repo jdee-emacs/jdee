@@ -93,7 +93,7 @@ Unless optional argument INPLACE is non-nil, return a new string."
 
 (if (not (fboundp 'replace-in-string))
     (defun replace-in-string  (string regexp newtext &optional literal)
-      "Replace REGEXP with NEWTEXT in STRIng."
+      "Replace REGEXP with NEWTEXT in STRING."
       (if (string-match regexp string)
 	  (replace-match newtext nil nil string)
 	string)))
@@ -111,120 +111,7 @@ Unless optional argument INPLACE is non-nil, return a new string."
 	  (1+ ln)
 	ln))))
 
-(defmacro jde-with-file-contents (file &rest body)
-  "If FILE exists and is readable creates a temporary buffer with the contents
-of FILE, points to beginning of buffer, evaluates BODY and return the value of
-the last form of BODY. If FILE does not exist or is not readable nil is
-returned.
-Note: No major/minor-mode is activated and no local variables are evaluated
-for FILE, but proper EOL-conversion and charcater interpretation is done!"
-  (let ((exp-filename (make-symbol "exp-filename")))
-    `(let ((,exp-filename (expand-file-name ,file)))
-       (if (and (file-exists-p ,exp-filename)
-		(file-readable-p ,exp-filename))
-	   (with-temp-buffer
-	     (insert-file-contents ,exp-filename)
-	     (goto-char (point-min))
-	     ,@body)
-	 nil))))
-
-(defmacro jde-normalize-paths (pathlist &optional symbol)
-  "Normalize all paths of the list PATHLIST and returns a list with the
-expanded paths."
-  `(mapcar (lambda (path)
-	     (jde-normalize-path path ,symbol))
-	   ,pathlist))
-
-(defun jde-remove-inner-class (class)
-  "Removes the inner class name for the class"
-  (car (split-string class "[$]")))
-
-(defun jde-find-class-source-file (class)
-  "Find the source file for a specified class.
-CLASS is the fully qualified name of the class. This function searchs
-the directories and source file archives (i.e., jar or zip files)
-specified by `jde-sourcepath' for the source file corresponding to
-CLASS. If it finds the source file in a directory, it returns the
-file's path. If it finds the source file in an archive, it returns a
-buffer containing the contents of the file. If this function does not
-find the source for the class, it returns nil."
-  (let* ((verified-name (jde-parse-class-exists class))
-	 (outer-class (jde-remove-inner-class verified-name))
-	 (file (concat
-		(jde-parse-get-unqualified-name outer-class)
-		".java"))
-	 (package (jde-parse-get-package-from-name outer-class)))
-    (catch 'found
-      (loop for path in jde-sourcepath do
-	    (progn
-	      (setq path (jde-normalize-path path 'jde-sourcepath))
-	      (if (and (file-exists-p path)
-		       (or (string-match "\.jar$" path)
-			   (string-match "\.zip$" path)))
-		  (let* ((bufname (concat file " (" (file-name-nondirectory path) ")"))
-			 (buffer (get-buffer bufname)))
-		    (if buffer
-			  (throw 'found buffer)
-		      (let* ((pkg-path (subst-char-in-string ?. ?/ package))
-			     (class-file-name (concat  pkg-path "/" file))
-			     success)
-		      (setq buffer (get-buffer-create bufname))
-		      (save-excursion
-			(set-buffer buffer)
-			(setq buffer-file-name (expand-file-name (concat path ":" class-file-name)))
-			(setq buffer-file-truename file)
-			(let ((exit-status
-			       (archive-extract-by-stdout path class-file-name archive-zip-extract)))
-			  (if (and (numberp exit-status) (= exit-status 0))
-			      (progn
-				(jde-mode)
-				(goto-char (point-min))
-				(setq buffer-undo-list nil)
-				(setq buffer-saved-size (buffer-size))
-				(set-buffer-modified-p nil)
-				(setq buffer-read-only t)
-				(throw 'found buffer))
-			  (progn
-			    (set-buffer-modified-p nil)
-			    (kill-buffer buffer))))))))
-		(if (file-exists-p (expand-file-name file path))
-		    (throw 'found (expand-file-name file path))
-		  (let* ((pkg-path (subst-char-in-string ?. ?/ package))
-			 (pkg-dir (expand-file-name pkg-path path))
-			 (file-path (expand-file-name file pkg-dir)))
-		    (if (file-exists-p file-path)
-			(throw 'found file-path))))))))))
-
-
-(defun jde-find-class-source (class &optional other-window)
-  "*Find the source file for a specified class.
-Calls `jde-find-class-source-file' to do the search.
-If it finds the source file, it opens the file in a buffer."
-  (interactive "sClass: ")
-  (let ((source (jde-find-class-source-file class)))
-    (if source
-	(progn
-	  (if (typep source 'buffer)
-	      (switch-to-buffer source)
-	      ;; (pop-to-buffer source other-window)
-	    (if (not (string-equal (buffer-file-name)  source))
-		(if other-window
-		    (find-file-other-window source)
-		  (find-file source))))
-	  (if (fboundp 'senator-re-search-forward)
-	      (let ((inner-class-pos (string-match "\\$" class)))
-		(if inner-class-pos
-		    (let ((inner-class (substring class (+ 1 inner-class-pos))))
-		      (when inner-class
-			(beginning-of-buffer)
-			(senator-parse)
-			(senator-re-search-forward (concat "\\b" inner-class "\\b") nil t)))))))
-      (message "JDE error: Could not find source for \"%s\" in this
-project's source path. See `jde-sourcepath' for more information." class))))
-
-
-
-(defun jde-root()
+(defun jde-root ()
   "Return the path of the root directory of this JDEE
 installation. The root directory is the parent of the
 directory that contains the JDEE's Lisp files. On
@@ -236,8 +123,8 @@ packaged with XEmacs, the root directory is
 xemacs-packages/lisp."
   (let ((directory-sep-char ?/))
     (expand-file-name
-	     "../"
-	     (file-name-directory (locate-library "jde")))))
+     "../"
+     (file-name-directory (locate-library "jde")))))
 
 (defun jde-find-jde-data-directory ()
   "Return the path of the JDE data directory.
@@ -302,6 +189,74 @@ currently selected source buffer."
     (if (eq major-mode 'jde-mode)
 	(current-buffer))))
 
+;;;###autoload
+(defun jde-exception-goto ()
+  "Go to the Java source file and line indicated by an exception stack trace."
+  (interactive)
+  (let ((regexp "[ \t]+at \\([a-zA-Z0-9.]+\\)\\(?:\\$?[a-zA-Z0-9]*\\)\\.\\([^(]+\\)([^:]+:\\([0-9]+\\))$")
+	file line end)
+    (save-match-data
+      (save-excursion
+	(end-of-line)
+	(setq end (point))
+	(beginning-of-line)
+	(if (not (re-search-forward regexp end t))
+	    (error (concat "Current line doesn't look "
+			   "like an exception stack trace line")))
+	(let ((full-class (match-string 1))
+	      (method (match-string 2)))
+	  (setq line (string-to-int (match-string 3)))
+	  (setq file (jde-find-class-source-file full-class))
+	  (if (null file)
+	      (error "Java source for class `%s' not found" full-class)))))
+    (find-file-other-window file)
+    (goto-line line)))
+
+(defcustom jde-htmlize-code-destinations '("~/Desktop" "~/tmp")
+  "*Directories to put the output of `jde-htmlize-code'.
+The function iterates through each and stops when it finds an existing
+directory."
+  :group 'jde-project
+  :type '(repeat directory))
+
+;;;###autoload
+(defun jde-htmlize-code (start end &optional no-line-numbers-p)
+  "Write the current code region as an HTML document.
+Line numbers are added as well.
+
+See `jde-htmlize-code-destinations'."
+  (interactive
+   (append (if mark-active
+	       (list (region-beginning) (region-end))
+	     (list (point-min) (point-max)))
+	   (list (not current-prefix-arg))))
+  (require 'htmlize)
+  (save-restriction
+    (narrow-to-region start end)
+    (let ((code-buf (current-buffer))
+	  (line-width (ceiling (log10 (count-lines (point-min) (point-max)))))
+	  (ln 0))
+      (with-temp-buffer
+	(insert-buffer code-buf)
+	(untabify (point-min) (point-max))
+	(beginning-of-buffer)
+	(if (not no-line-numbers-p)
+	    (while (not (eobp))
+	      (beginning-of-line)
+	      (insert (format (format "%%.%dd " line-width) (incf ln)))
+	      (forward-line)))
+	(let ((buf (htmlize-buffer))
+	      (bname (concat (buffer-name code-buf) ".html")))
+	  (unwind-protect
+	      (with-current-buffer buf
+		(set-visited-file-name
+		 (dolist (dir jde-htmlize-code-destinations)
+		   (setq dir (expand-file-name dir))
+		   (if (file-exists-p dir)
+		       (return (expand-file-name bname dir)))))
+		(save-buffer))
+	    (if (buffer-live-p buf)
+		(kill-buffer buf))))))))
 
 (provide 'jde-util)
 

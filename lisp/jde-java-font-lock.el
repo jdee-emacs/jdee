@@ -227,6 +227,16 @@ you have a lot of user's defined names don't use a value less than 1!"
   "Font Lock Mode face used to highlight public access."
   :group 'jde-java-font-lock-faces)
 
+(defface jde-java-font-lock-constructor-face
+  '((((type tty) (class color)) (:foreground "blue" :weight light))
+    (((class grayscale) (background light)) (:foreground "LightGray" :bold t))
+    (((class grayscale) (background dark)) (:foreground "DimGray" :bold t))
+    (((class color) (background light)) (:foreground "DarkBlue"))
+    (((class color) (background dark)) (:foreground "LightSteelBlue"))
+    (t (:bold t)))
+  "Font Lock Mode face used to highlight protected access."
+  :group 'jde-java-font-lock-faces)
+
 (defface jde-java-font-lock-bold-face
   '((t (:bold t)))
   "Font Lock Mode face used to highlight HTML bold text style."
@@ -269,6 +279,8 @@ you have a lot of user's defined names don't use a value less than 1!"
   "Face name to use for protected modifiers.")
 (defvar jde-java-font-lock-public-face    'jde-java-font-lock-public-face
   "Face name to use for public modifiers.")
+(defvar jde-java-font-lock-constructor-face 'jde-java-font-lock-constructor-face
+  "Face name to use for constructors.")
 (defvar jde-java-font-lock-api-face       'jde-java-font-lock-api-face
   "Face name to use for user's defined names.")
 (defvar jde-java-font-lock-doc-tag-face   'jde-java-font-lock-doc-tag-face
@@ -368,18 +380,33 @@ you have a lot of user's defined names don't use a value less than 1!"
 ;;;; Support for fontification inside javadocs and comments.
 ;;;;
 
-(defun jde-java-font-lock-remove-javadoc-keywords (keywords)
-  "Remove existing javadoc font lock keywords from KEYWORDS.
-That is those with \"@\" in their matcher regexp."
-  (let (kw matcher)
-    (while keywords
-      (setq matcher  (car keywords)
-	    keywords (cdr keywords))
-      (if (not (and (consp matcher)
-		    (stringp (car matcher))
-		    (string-match "@" (car matcher))))
-	  (setq kw (cons matcher kw))))
-    (nreverse kw)))
+(eval-and-compile
+  (defun jde-java-font-lock-html-tag-regexp (tag &rest aliases)
+    "Return a regexp that matches HTML tag TAG.
+The string between <TAG> and </TAG> is the second parenthesized
+expression in the returned regexp.  ALIASES are other names for TAG."
+    (let* ((tag-re (mapconcat
+		    #'(lambda (tag)
+			(mapconcat #'(lambda (c)
+				       (format "[%c%c]"
+					       (upcase c)
+					       (downcase c)))
+				   tag
+				   ""))
+		    (cons tag aliases)
+		    "\\|"))
+	   (hit-re (if (or (and (featurep 'xemacs)
+				(or (< emacs-major-version 21)
+				    (and (= emacs-major-version 21)
+					 (< emacs-minor-version 4))))
+			   (< emacs-major-version 21))
+		       ".*"
+		     ;; In GNU Emacs 21 use the "non-greedy" variant of
+		     ;; the operator `*' to match the smallest possible
+		     ;; substring.
+		     "\\(.\\|[\r\n]\\)*?")))
+      (format "<\\(%s\\)>\\(%s\\)</\\(%s\\)>" tag-re hit-re tag-re)
+      )))
 
 (defconst jde-java-font-lock-comment-faces
   '(font-lock-comment-face font-lock-doc-face)
@@ -681,6 +708,27 @@ Limit search to END position."
       "Font lock keyword for javadoc exception types.")
 
     ))
+
+;; I disagree with this:
+;;    `font-lock-comment-face' in older Emacs (that since source
+;;    documentation are actually comments in these languages, as opposed
+;;    to elisp).
+;;
+;; Taken from `cc-fonts':
+;; revert back to pre Emacs 22 style where javadocs are
+;; `font-lock-comment-face'
+;; PL--11/16/2007
+(when (>= emacs-major-version 22)
+  (defconst c-doc-face-name
+    (cond ((c-face-name-p 'font-lock-doc-string-face)
+	   ;; XEmacs.
+	   'font-lock-doc-string-face)
+	  ((c-face-name-p 'font-lock-doc-face)
+	   ;; Emacs 21 and later.
+	   'font-lock-comment-face)
+	  (t
+	   'font-lock-comment-face))))
+
 
 ;;;;
 ;;;; Support for fontification of user's defined names.
@@ -908,6 +956,33 @@ expressions."
 	`(,(c-make-font-lock-search-function
 	    "\\<\\(const\\|goto\\)\\>"
 	    '(1 'font-lock-warning-face t)))
+	;; package and imports
+	`(,(c-make-font-lock-search-function
+	    "\\<\\(package\\|import\\)\\>\\s-+\\([a-zA-Z][a-zA-Z0-9.*]*\\)"
+	    '(1 'font-lock-keyword-face t)
+	    '(2 'jde-java-font-lock-package-face t)))
+	;; constructor
+	`(,(c-make-font-lock-search-function
+	    (concat
+	     "^\\s-*\\<\\(?:public\\|private\\|protected\\)\\>?\\s-*"
+	     "\\([" jde-java-font-lock-capital-letter "]\\sw*\\)"
+	     "(.*?)")
+	    '(1 'jde-java-font-lock-constructor-face t)))
+	;; class names
+	`(,(c-make-font-lock-search-function
+	    "\\<\\(new\\|instanceof\\)\\>[ \t]+\\(\\sw+\\)"
+	    '(2 font-lock-type-face t)))
+
+	;; modifier protections
+	 `(,(c-make-font-lock-search-function
+	    "\\<\\(private\\)\\>"
+	    '(1 'jde-java-font-lock-private-face t)))
+	`(,(c-make-font-lock-search-function
+	    "\\<\\(protected\\)\\>"
+	    '(1 'jde-java-font-lock-protected-face t)))
+	`(,(c-make-font-lock-search-function
+	    "\\<\\(public\\)\\>"
+	    '(1 'jde-java-font-lock-public-face t)))
 	;; Fontify numbers
 	`(,(c-make-font-lock-search-function
 	    jde-java-font-lock-number-regexp

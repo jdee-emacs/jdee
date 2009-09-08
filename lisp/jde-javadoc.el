@@ -1861,6 +1861,25 @@ Report the next tag with documentation errors."
 (require 'jde-javadoc-gen)
 
 ;;;###autoload
+(defun jde-javadoc-remove (start end)
+  "Remove all Javadoc from the region (if one is active) or the buffer.
+START, the start position in the buffer.
+END, the end position in the buffer."
+  (interactive (if mark-active
+		   (list (region-beginning) (region-end))
+		 (list (point-min) (point-max))))
+  (save-excursion
+    (save-restriction
+      (narrow-to-region start end)
+      (beginning-of-buffer)
+      (while (re-search-forward
+	      "^\\([ \t]*\\/\\*\\(?:.\\|[.\n]\\)*?\\*\\/[ \t]*\n\\)"
+	      nil t)
+	(replace-match ""))
+      (while (re-search-forward "^[ \t]*\\/\\/.*\n" nil t)
+	(replace-match "")))))
+
+;;;###autoload
 (defun jde-javadoc-enable-menu-p ()
   "Return non-nil if corresponding doc menu item is enabled.
 That is point is on the first line of a class, method, or field
