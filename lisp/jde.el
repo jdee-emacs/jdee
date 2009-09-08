@@ -2433,9 +2433,6 @@ buffer, otherwise, return whether or not it is a legitimate buffer."
       (error "Not visiting a Java source file.")
     (eq major-mode 'jde-mode)))
 
-;; beanshell related code moved to it's own library
-(require 'jde-bsh)
-
 (eval-when-compile
   ;; This code will not appear in the compiled (.elc) file
   (defun jde-self-test ()

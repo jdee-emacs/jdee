@@ -32,6 +32,7 @@
 ;;; Code:
 
 (require 'eieio)
+(require 'beanshell)
 (require 'jde-parse-expr)
 
 (defcustom jde-bsh-separate-buffer nil
