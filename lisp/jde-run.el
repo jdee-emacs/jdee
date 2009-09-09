@@ -492,6 +492,17 @@ to the executable specified by `jde-run-executable'."
   :type '(repeat (string :tag "Argument")))
 
 
+(defmacro save-w32-show-window (&rest body)
+  "Saves the value of the w32-start-process-show-window variable
+before evaluating body and restores the value afterwards."
+  `(let ((win32-start-process-show-window t)
+	 (w32-start-process-show-window t)
+	 (w32-quote-process-args ?\")
+	 (win32-quote-process-args ?\") ;; XEmacs
+	 (windowed-process-io t)
+	 (process-connection-type nil))
+     ,@body))
+
 (defun jde-run-parse-args (s)
  "Converts a string of command-line arguments to a list of arguments.
 Any substring that is enclosed in single or double quotes or does not include
@@ -1225,17 +1236,6 @@ input from the buffer to the program."
   (let ((vm (jde-run-get-vm)))
     (oset vm :main-class (jde-run-get-main-class))
     (jde-run-vm-launch vm)))
-
-(defmacro save-w32-show-window (&rest body)
-  "Saves the value of the w32-start-process-show-window variable
-before evaluating body and restores the value afterwards."
-  `(let ((win32-start-process-show-window t)
-	 (w32-start-process-show-window t)
-	 (w32-quote-process-args ?\")
-	 (win32-quote-process-args ?\") ;; XEmacs
-	 (windowed-process-io t)
-	 (process-connection-type nil))
-     ,@body))
 
 (defun jde-run-unquote (string)
   (if (eq (aref string 0) ?\")
