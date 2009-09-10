@@ -899,11 +899,6 @@ This command invokes the function defined by `jde-build-function'."
 	;; was not bound at startup.
 	(custom-initialize-reset 'jde-key-bindings nil)
 
-	(if (and
-	     jde-setnu-mode-enable
-	     (< (point-max) jde-setnu-mode-threshold))
-	    (setnu-mode 1))
-
 	(make-local-variable 'mode-line-format)
 	(setq mode-line-format jde-mode-line-format)
 
@@ -1906,78 +1901,6 @@ for insertion of the .emacs file"
        (if  (jde-symbol-p symbol)
 	 (setq vars (cons symbol vars)))))
     vars))
-
-
-;; Line numbering support.
-(eval-when (compile)
-  (require 'setnu))
-
-(defvar jde-setnu-deletion-check t "deletion check")
-(make-variable-buffer-local 'jde-setnu-deletion-check)
-
-(defun jde-setnu-after-change (start end length)
- "When in setnu-mode, toggles setnu-mode off and on."
-   (if setnu-mode
-       (if (or
-	    (and
-	     (> length 0)
-	     jde-setnu-deletion-check)
-	    (string-match
-		  "[\n\r]"
-		  (buffer-substring-no-properties start end)))
-	   (run-with-timer
-	    0.001 nil
-	    ;; setnu toggler
-	   (lambda () (setnu-mode) (setnu-mode))))
-     (setq jde-setnu-deletion-check nil)))
-
-(defun jde-setnu-before-change (start end)
-  "Determines whether any newlines were deleted."
-   (if setnu-mode
-       (if (> end start)
-	   (setq jde-setnu-deletion-check
-		 (string-match "[\n\r]"
-			       (buffer-substring-no-properties start end))))))
-
-(defcustom jde-setnu-mode-threshold 20000
- "Maximum number of bytes in a file (buffer) that can result in
-automatic line numbering."
- :group 'jde-project
- :type 'integer)
-
-(defcustom jde-setnu-mode-enable nil
- "Enable numbering of lines in Java source buffers."
- :group 'jde-project
- :type 'boolean
- :set '(lambda (sym val)
-	 (if val
-	     (progn
-	       (require 'setnu)
-	       (add-hook
-		'after-change-functions
-		'jde-setnu-after-change)
-	       (add-hook
-		'before-change-functions
-		'jde-setnu-before-change)
-	       (mapc
-		(lambda (buf)
-		  (save-excursion
-		    (set-buffer buf)
-		    (if (and
-			 (not setnu-mode)
-			 (< (point-max) jde-setnu-mode-threshold))
-			(setnu-mode 1))))
-		  (jde-get-java-source-buffers)))
-	   (progn
-	     (mapc
-	      (lambda (buf)
-		(save-excursion
-		  (set-buffer buf)
-		  (if (and (boundp 'setnu-mode)
-			   setnu-mode)
-		      (setnu-mode))))
-	      (jde-get-java-source-buffers))))
-	 (set-default sym val)))
 
 ;; jde-describe-map is Ehud Karni's describe map with jde prepended.
 (defun jde-keymap-test (var)           ; internal function for keymap checking
