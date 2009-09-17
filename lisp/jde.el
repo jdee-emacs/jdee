@@ -1154,6 +1154,7 @@ Does nothing but return nil if `jde-log-max' is nil."
 		    ["Compile"         jde-compile-show-options-buffer t]
 		    ["Run"             jde-show-run-options t]
 		    ["Debug"           jde-show-debug-options t]
+		    ["Goto Exception"  jde-exception-goto t]
 		    ["Autocode"        jde-show-autocode-options t]
 		    ["Javadoc"         jde-javadoc-customize t]
 		    ["Make"            jde-make-show-options t]
