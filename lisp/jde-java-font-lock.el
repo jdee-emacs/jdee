@@ -709,25 +709,6 @@ Limit search to END position."
 
     ))
 
-;; I disagree with this:
-;;    `font-lock-comment-face' in older Emacs (that since source
-;;    documentation are actually comments in these languages, as opposed
-;;    to elisp).
-;;
-;; Taken from `cc-fonts':
-;; revert back to pre Emacs 22 style where javadocs are
-;; `font-lock-comment-face'
-;; PL--11/16/2007
-(when (>= emacs-major-version 22)
-  (defconst c-doc-face-name
-    (cond ((c-face-name-p 'font-lock-doc-string-face)
-	   ;; XEmacs.
-	   'font-lock-doc-string-face)
-	  ((c-face-name-p 'font-lock-doc-face)
-	   ;; Emacs 21 and later.
-	   'font-lock-comment-face)
-	  (t
-	   'font-lock-comment-face))))
 
 
 ;;;;
