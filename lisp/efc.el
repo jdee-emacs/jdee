@@ -42,7 +42,7 @@ If nil then the default efc custom-based dialogs will be used."
 			   efc-query-options-function-dialog))
   :group 'jde)
 
-(defun efc-query-options-function-dialog (options prompt title history)
+(defun efc-query-options-function-dialog (options prompt title history default)
   (let ((dialog
 	 (efc-option-dialog
 	  (or title "option dialog")
@@ -51,13 +51,15 @@ If nil then the default efc custom-based dialogs will be used."
     (efc-dialog-show dialog)
     (oref dialog selection)))
 
-(defun efc-query-options-function-minibuf (options prompt title history)
-  (let ((default (car options))
-	sel)
+(defun efc-query-options-function-minibuf (options prompt title history default)
+  (let (sel)
     ;; efc doesn't add the end colon
-    (if prompt
-	(setq prompt (format "%s: " prompt)))
-    (setq sel (completing-read prompt options nil t nil nil history default))
+    (setq prompt (format "%s%s" 
+			 (or prompt "Select option")
+			 (if default
+			     (format " (default %s): " default)
+			   ": ")))
+    (setq sel (completing-read prompt options nil t nil history default))
     (if (= (length sel) 0) (error "Input required"))
     sel))
 
@@ -222,9 +224,9 @@ and then exits recursive edit mode."
   (oset this selection nil)
   (exit-recursive-edit))
 
-(defun efc-query-options (options &optional prompt title history)
+(defun efc-query-options (options &optional prompt title history default)
   "Ask user to choose among a set of options."
-  (funcall efc-query-options-function options prompt title history))
+  (funcall efc-query-options-function options prompt title history default))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                            ;;
