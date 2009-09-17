@@ -212,6 +212,9 @@ currently selected source buffer."
     (find-file-other-window file)
     (goto-line line)))
 
+;;;###autolaod
+(defalias 'jde-goto-exception 'jde-exception-goto)
+
 (defcustom jde-htmlize-code-destinations '("~/Desktop" "~/tmp")
   "*Directories to put the output of `jde-htmlize-code'.
 The function iterates through each and stops when it finds an existing
