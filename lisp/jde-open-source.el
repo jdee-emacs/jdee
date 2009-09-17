@@ -372,13 +372,14 @@ name)."
 		    ((eq t (compare-strings pkg 0 len b 0 len))
 		     (return nil))
 		    (t (string< a b)))))))
+    (setq classes (sort classes 'sort-helper))
     (setq prompt (or prompt "Class"))
-    (let ((initial-input (if uq-name
-			     (jde-import-get-import uq-name))))
+    (let ((default (if uq-name
+		       (jde-import-get-import uq-name))))
+      (setq default (or default (car classes)))
       (if (and (not confirm-fq-p) (= 1 (length classes)))
 	  (car classes)
-	(efc-query-options (sort classes 'sort-helper)
-			   prompt "Class" jde-read-class-fq-items)))))
+	(efc-query-options classes prompt "Class" jde-read-class-fq-items default)))))
 
 (defvar jde-read-class-items nil
   "*History for `jde-read-class' read items.")
@@ -389,7 +390,8 @@ qualified classes).")
 
 ;;;###autoload
 (defun jde-read-class (&optional prompt fq-prompt
-				 this-class-p confirm-fq-p no-confirm-nfq-p)
+				 this-class-p confirm-fq-p no-confirm-nfq-p
+				 validate-fn)
   "Select a class interactively.  PROMPT is used to prompt the user for the
 first class name, FQ-PROMPT is used only if the class name expands into more
 than one fully qualified name.
@@ -416,9 +418,14 @@ qualified classes if it is obtainable from either the point or this class (see
 THIS-CLASS-P).  If obtained from the point, then the class name is parsed with
 `jde-parse-class-name' for the input.
 
+VALIDATE-FN is a function to validate the class.  This function takes an
+argument the output from `jde-parse-class-name' given from the first user input
+class name query.  The function should raise an error if there is anything
+wrong with the class.  If this is `nil', then no validate is done.
+
 When called interactively, select the class and copy it to the kill ring."
   (interactive (list nil nil t))
-  (if (null fq-prompt) (setq fq-prompt "Select qualified class"))
+  (setq fq-prompt (or fq-prompt "Select qualified class"))
   (let ((ctup (jde-parse-class-name 'point))
 	uinput uq-name classes initial-input fqc default)
     (if (and (null ctup)
@@ -442,19 +449,22 @@ When called interactively, select the class and copy it to the kill ring."
     (setq ctup (jde-parse-class-name uinput))
     (if (null ctup)
 	(error "Doesn't appear to be a classname: `%s'" uinput))
-    (setq fqc (first ctup)
-	  uq-name (third ctup))
-    (if fqc
-	(if (not (jde-jeval-r (concat "jde.util.JdeUtilities."
-				      "classExists(\""
-				      fqc "\");")))
-	    (error "No match for %s" uq-name))
-      (setq classes (jde-jeval-r (concat "jde.util.JdeUtilities."
-					 "getQualifiedName(\""
-					 uq-name "\");")))
-      (if (= 0 (length classes))
-	  (error "Not match for %s" uq-name))
-      (setq fqc (jde-choose-class classes fq-prompt uq-name confirm-fq-p)))
+    (if validate-fn
+	(setq fqc (funcall validate-fn ctup)))
+    (when (not (eq 'pass fqc))
+      (setq fqc (first ctup)
+	    uq-name (third ctup))
+      (if fqc
+	  (if (not (jde-jeval-r (concat "jde.util.JdeUtilities."
+					"classExists(\""
+					fqc "\");")))
+	      (error "No match for %s" uq-name))
+	(setq classes (jde-jeval-r (concat "jde.util.JdeUtilities."
+					   "getQualifiedName(\""
+					   uq-name "\");")))
+	(if (= 0 (length classes))
+	    (error "Not match for %s" uq-name))
+	(setq fqc (jde-choose-class classes fq-prompt uq-name confirm-fq-p))))
     (when (interactive-p)
       (kill-new fqc)
       (message "Copied `%s'" fqc))
