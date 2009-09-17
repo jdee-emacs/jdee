@@ -1717,7 +1717,11 @@ The first two elements of the list are `nil' if CLASSNAME isn't fully qualifed."
 		  (if (string= char (upcase char))
 		      (list fq pkg classname))))))))
     (if (eq classname 'point)
-	(or (parse-at-point (thing-at-point 'word));;'filename))
+	;; TODO: a fully qualified class name looks like a file name
+	;; (i.e. [a-zA-Z.])  but this need to be refined to use the Sun Java
+	;; standards of class name parsing
+	(or (parse-at-point (thing-at-point 'filename))
+	    (parse-at-point (thing-at-point 'word))
 	    (parse-at-point (thing-at-point 'symbol)))
       (parse-at-point classname))))
 
