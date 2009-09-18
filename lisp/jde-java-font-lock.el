@@ -180,6 +180,11 @@ you have a lot of user's defined names don't use a value less than 1!"
   "Font Lock Mode face used to highlight packages."
   :group 'jde-java-font-lock-faces)
 
+(defface jde-java-font-lock-javadoc-face
+  '((t :inherit font-lock-doc-face))
+  "Font Lock Mode face used to highlight javadoc (sans tags etc)."
+  :group 'jde-java-font-lock-faces)
+
 (defface jde-java-font-lock-doc-tag-face
   '((((class color) (background dark)) (:foreground "light coral"))
     (((class color) (background light)) (:foreground "green4"))
@@ -271,6 +276,8 @@ you have a lot of user's defined names don't use a value less than 1!"
   "Face name to use for constants.")
 (defvar jde-java-font-lock-package-face   'jde-java-font-lock-package-face
   "Face name to use for packages.")
+(defvar jde-java-font-lock-javadoc-face   'jde-java-font-lock-javadoc-face
+  "Face name to use for javadocs (sans tags etc).")
 (defvar jde-java-font-lock-modifier-face  'jde-java-font-lock-modifier-face
   "Face name to use for modifiers.")
 (defvar jde-java-font-lock-private-face	  'jde-java-font-lock-private-face
@@ -481,34 +488,6 @@ Limit search to END position."
   "Font lock keyword for javadoc HTML A HREF anchor.")
 
 (eval-and-compile
-  (defun jde-java-font-lock-html-tag-regexp (tag &rest aliases)
-    "Return a regexp that matches HTML tag TAG.
-The string between <TAG> and </TAG> is the second parenthesized
-expression in the returned regexp.  ALIASES are other names for TAG."
-    (let* ((tag-re (mapconcat
-		    #'(lambda (tag)
-			(mapconcat #'(lambda (c)
-				       (format "[%c%c]"
-					       (upcase c)
-					       (downcase c)))
-				   tag
-				   ""))
-		    (cons tag aliases)
-		    "\\|"))
-	   (hit-re (if (or (and (featurep 'xemacs)
-				(or (< emacs-major-version 21)
-				    (and (= emacs-major-version 21)
-					 (< emacs-minor-version 4))))
-			   (< emacs-major-version 21))
-		       ".*"
-		     ;; In GNU Emacs 21 use the "non-greedy" variant of
-		     ;; the operator `*' to match the smallest possible
-		     ;; substring.
-		     "\\(.\\|[\r\n]\\)*?")))
-      (format "<\\(%s\\)>\\(%s\\)</\\(%s\\)>" tag-re hit-re tag-re)
-      )))
-
-(eval-and-compile
   (if (featurep 'cc-fonts)
 
       ;; Highlight javadoc comments through cc-fonts.
@@ -571,35 +550,6 @@ That is those with \"@\" in their matcher regexp."
 			(string-match "@" (car matcher))))
 	      (setq kw (cons matcher kw))))
 	(nreverse kw)))
-
-    (defsubst jde-java-font-lock-search-in-javadoc (regexp end)
-      "Search forward from point for regular expression REGEXP.
-Ensure matching occurs in a javadoc comment.  Buffer position END
-bounds the search.  The match found must not extend after that
-position."
-      (let ((here (point))
-	    b c ok md p)
-	(while (and (not ok) (setq p (re-search-forward regexp end t)))
-	  (setq b  (match-beginning 0)
-		md (match-data)
-		ok (and (re-search-backward "^\\s-*\\(/[*][*]\\)" nil t)
-			(jde-java-font-lock-at-comment
-			 (goto-char (setq c (match-beginning 1))))
-			(forward-comment 1)
-			(< p (point))
-			(>= b c)
-			(setq here p)))
-	  (goto-char p))
-	(set-match-data md)
-	(goto-char here)
-	ok))
-
-    (defun jde-java-font-lock-html-ahref-matcher (end)
-      "Font lock matcher for HTML A HREF anchor in javadoc comments.
-Limit search to END position."
-      (jde-java-font-lock-search-in-javadoc
-       "<[Aa]\\s-+[Hh][Rr][Ee][Ff][^>]*>\\([^>]+\\)</[Aa]>"
-       end))
 
     (defconst jde-java-font-lock-html-ahref-keyword
       '(jde-java-font-lock-html-ahref-matcher
@@ -1180,6 +1130,11 @@ standard `java-mode'."
     ;; Always turn on font locking if `jde-use-font-lock' is non-nil.
     (if jde-use-font-lock
 	(turn-on-font-lock))))
+
+;; Java has a different font for comments than Emacs Lisp, but by default,
+;; `jde-java-font-lock-javadoc-face' inherits from `font-lock-doc-face', which
+;; is the mapping for `c-doc-face-name' Emacs 22 and up
+(defconst c-doc-face-name 'jde-java-font-lock-javadoc-face)
 
 ;; By default, enable extra fontification in `jde-mode'.
 (add-hook 'jde-mode-hook #'jde-setup-syntax-coloring)
