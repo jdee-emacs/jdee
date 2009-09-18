@@ -1089,6 +1089,8 @@ Does nothing but return nil if `jde-log-max' is nil."
 	      ["Generate Buffer"     jde-javadoc-make-buffer t]
 	      "-"
 	      ["Javadoc Reference"     jde-javadoc-browse-tool-doc t]
+	      "-"
+	      [ "Create HTML"    jde-htmlize-code t]
 	)
 	"-"
 	(list "Code Generation"
@@ -1172,7 +1174,6 @@ Does nothing but return nil if `jde-log-max' is nil."
 	(list "Refactor"
 	      [ "Rename Class" jde-rename-class t]
 	      [ "Fully Qualify Class" jde-replace-fully-qualified-class-at-point t]
-	      [ "Create HTML" jde-htmlize-code t]
 	      )
 	(list "Help"
 	      ["JDEE Users Guide"      jde-show-help t]
