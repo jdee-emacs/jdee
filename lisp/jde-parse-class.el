@@ -328,9 +328,8 @@ Returns the constant information contained at the reference"
 		;; The second mod is to make sure on an offset of 4 we really don't skip anything
 		(forward-char (mod (- 4 (mod (- (point) begin-point) 4)) 4))
 		(forward-char 4)  ;; we don't care about default
-		(let ((low (jde-parse-class-get-next-4-bytes-as-signed))
-		      (high (jde-parse-class-get-next-4-bytes-as-signed)))
-		  (forward-char (* 4 (+ (- high low) 1)))))
+		(let ((diff (jde-parse-class-diff-next-two-4-bytes-as-signed)))
+		  (forward-char (* 4 (+ diff 1)))))
 	      ((eq opcode-val 'lookupswitch)
 		(forward-char (mod (- 4 (mod (- (point) begin-point) 4)) 4))
 		(forward-char 4)
@@ -492,13 +491,23 @@ returns ('f 'g)"
 (defun jde-parse-class-get-next-4-bytes-as-signed (&optional ignore-large-val)
   (let ((db1 (jde-parse-class-get-next-2-bytes))
 	(db2 (jde-parse-class-get-next-2-bytes)))
-    (if (> (logand 32768 db1) 0)  ;; if it's high-bit is set, then it's negative.
+    (if (> (logand 32768 db1) 0)  ;; if its high-bit is set, then it's negative.
       (if (> db1 63488)
 	(- (+ 1 (+ (* (- 65535 db1) 65536) (- 65535 db2))))
 	(if ignore-large-val
 	  0
 	  (error "Class file has an unsigned int who is smaller than emacs can handle")))
       (jde-parse-class-get-4byte (- (point) 4)))))
+
+(defun jde-parse-class-diff-next-two-4-bytes-as-signed ()
+  (let ((low1 (jde-parse-class-get-next-2-bytes))
+        (low2 (jde-parse-class-get-next-2-bytes))
+        (high1 (jde-parse-class-get-next-2-bytes))
+        (high2 (jde-parse-class-get-next-2-bytes)))
+    (if (and (> (logand 32768 low1) 0)
+             (<= (logand 32768 high1) 0))
+        (+ (* 65536 (- (+ high1 65535) low1)) (- (+ high2 65536) low2))
+      (+ (* 65535 (- high1 low1)) (- high2 low2)))))
 
 (defun jde-parse-class-get-next-4-bytes (&optional ignore-large-val)
   (do-and-advance-chars 4
