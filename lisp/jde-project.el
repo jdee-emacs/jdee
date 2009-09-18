@@ -214,7 +214,7 @@ blank:  path doesn't exist
 	(setq desc (cond ((file-directory-p file) "d")
 			 ((file-exists-p file) "f")
 			 (t " ")))
-	(setq file (replace-in-string file user-home "~/" t))
+	(setq file (replace-regexp-in-string "~/" user-home file nil t))
 	(insert (format "[%s]  %s\n" desc file)))
       (goto-char (point-min))
       (pop-to-buffer (current-buffer)))))
