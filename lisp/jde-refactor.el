@@ -43,7 +43,7 @@ string replace, changes the buffer name, and changes the file name."
 	 (old-class-name
 	  (with-temp-buffer
 	    (insert buf-name)
-	    (beginning-of-buffer)
+	    (goto-char (point-min))
 	    (if (re-search-forward "\\.java$" nil t)
 		(replace-match ""))
 	    (buffer-substring-no-properties (point-min) (point-max))))
