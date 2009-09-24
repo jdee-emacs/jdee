@@ -737,10 +737,10 @@ version of the JDE with the semantic parser."
 		  (setq group (aref bins i)
 			i     (1+ i)))
 		(when (car group)
-		  (previous-line 1)
+		  (forward-line -1)
 		  (if (not (string< (concat comment-start (car group))
 				    (thing-at-point 'line)))
-		      (next-line 1)))
+		      (forward-line 1)))
 		(setq group nil))
 	      ;; 3- Kill current imports
 	      (kill-region (point)

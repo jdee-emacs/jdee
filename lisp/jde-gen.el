@@ -3842,7 +3842,7 @@ After:
       (when (not (looking-at "}"))
 	(insert "}")
 	(c-indent-command))
-      (previous-line 1)
+      (forward-line -1)
       (c-indent-command))))
 
 (defun jde-electric-return ()

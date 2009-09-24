@@ -240,7 +240,7 @@ See `jde-htmlize-code-destinations'."
 	  (line-width (ceiling (log10 (count-lines (point-min) (point-max)))))
 	  (ln 0))
       (with-temp-buffer
-	(insert-buffer code-buf)
+	(insert-buffer-substring code-buf)
 	(untabify (point-min) (point-max))
 	(goto-char (point-min))
 	(if (not no-line-numbers-p)
