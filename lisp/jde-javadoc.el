@@ -1871,7 +1871,7 @@ END, the end position in the buffer."
   (save-excursion
     (save-restriction
       (narrow-to-region start end)
-      (beginning-of-buffer)
+      (goto-char (point-min))
       (while (re-search-forward
 	      "^\\([ \t]*\\/\\*\\(?:.\\|[.\n]\\)*?\\*\\/[ \t]*\n\\)"
 	      nil t)

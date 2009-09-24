@@ -733,7 +733,7 @@ Bean-specific interactive function"
   (funcall (intern-soft jde-desc))
   (find-file (jde-ejb-format-filename jde-ejb-class-format jde-current-ejb-name jde-ejb-dir))
   (funcall (intern-soft jde-bean))
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (search-forward "{")
   (backward-char 1)
   (c-indent-exp)

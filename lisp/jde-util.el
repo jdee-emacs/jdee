@@ -242,7 +242,7 @@ See `jde-htmlize-code-destinations'."
       (with-temp-buffer
 	(insert-buffer code-buf)
 	(untabify (point-min) (point-max))
-	(beginning-of-buffer)
+	(goto-char (point-min))
 	(if (not no-line-numbers-p)
 	    (while (not (eobp))
 	      (beginning-of-line)

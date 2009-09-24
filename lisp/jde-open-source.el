@@ -491,7 +491,7 @@ If it finds the source file, it opens the file in a buffer."
 		(if inner-class-pos
 		    (let ((inner-class (substring class (+ 1 inner-class-pos))))
 		      (when inner-class
-			(beginning-of-buffer)
+			(goto-char (point-min))
 			(senator-parse)
 			(senator-re-search-forward
 			 (concat "\\b" inner-class "\\b") nil t)))))))

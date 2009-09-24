@@ -61,12 +61,12 @@ replacement.  This adds a `this.' to each replacment."
       (save-restriction
 	(narrow-to-region start end)
 	(save-match-data
-	  (beginning-of-buffer)
+	  (goto-char (point-min))
 	  (while (re-search-forward (concat "m_" reg) nil t)
 	    (replace-match (concat (and local-replacement-p "this.")
 				   (downcase (match-string 1))
 				   (match-string 2))))
-	  (beginning-of-buffer)
+	  (goto-char (point-min))
 	  (while (re-search-forward (concat "\\<" reg "\\>") nil t)
 	    (replace-match (concat (downcase (match-string 1))
 				   (match-string 2)))))))))
