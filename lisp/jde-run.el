@@ -602,12 +602,15 @@ panel to specifying the applet document."
   "Returns the classpath argument for this vm."
   (let ((classpath
 	 (if jde-run-option-classpath
-	      (if (string= jde-run-option-classpath "global")
-		  jde-global-classpath
-		(unless (string= jde-run-option-classpath "none")
-		  jde-run-option-classpath))))
+	     (if (and (stringp jde-run-option-classpath)
+		      (string= jde-run-option-classpath "global"))
+		 jde-global-classpath
+	       (unless (and (stringp jde-run-option-classpath)
+			    (string= jde-run-option-classpath "none"))
+		 jde-run-option-classpath))))
 	(symbol
 	 (if (and jde-run-option-classpath
+		  (stringp jde-run-option-classpath)
 		  (string= jde-run-option-classpath "global"))
 	     'jde-global-classpath
 	   'jde-run-option-classpath)))
