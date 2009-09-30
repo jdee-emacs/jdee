@@ -311,16 +311,20 @@ any directories or jars that you want the command to search in your
 classpath, except jars implicitly included by the jvm, e.g.,
 rt.jar. The NO-ERRORS is used to avoid showing erros to the user."
   (interactive
-   (flet ((vfn
-	   (class)
-	   (let ((existing-import (jde-import-get-import (third class))))
-	     (if (null existing-import)
-		 class
-	       (message "Skipping: already imported %s" existing-import)
-	       'pass))))
-     (list (jde-read-class nil nil nil nil nil 'vfn) nil current-prefix-arg)))
-  (if (not (eq class 'pass))
-      (jde-import-insert-import (list class) (not no-exclude))))
+   (list (read-from-minibuffer "Class: "
+			       (thing-at-point 'symbol))
+	 nil
+	 current-prefix-arg))
+  (let (existing-import)
+    (setq existing-import (jde-import-get-import class))
+    (if (not (null existing-import))
+	(message "Skipping: already imported %s" existing-import)
+      (let ((imports (jde-import-get-qualified-names class)))
+	(setq imports (remove-duplicates imports :test 'equal))
+	(if imports
+	    (jde-import-insert-import imports (not no-exclude))
+	  (if (not no-errors)
+	      (message "Error: could not find %s." class)))))))
 
 (defun jde-import-exclude-imports (imports)
   "Remove imports from IMPORTS according to `jde-import-excluded-classes'."
