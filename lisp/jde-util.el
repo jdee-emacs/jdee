@@ -248,8 +248,9 @@ See `jde-htmlize-code-destinations'."
 	      (beginning-of-line)
 	      (insert (format (format "%%.%dd " line-width) (incf ln)))
 	      (forward-line)))
+	(rename-buffer (concat (buffer-name code-buf) ".html"))
 	(let ((buf (htmlize-buffer))
-	      (bname (concat (buffer-name code-buf) ".html")))
+	      (bname (buffer-name)))
 	  (unwind-protect
 	      (with-current-buffer buf
 		(set-visited-file-name
@@ -257,7 +258,9 @@ See `jde-htmlize-code-destinations'."
 		   (setq dir (expand-file-name dir))
 		   (if (file-exists-p dir)
 		       (return (expand-file-name bname dir)))))
-		(save-buffer))
+		(save-buffer)
+		(if (featurep 'browse-url)
+		    (browse-url (buffer-file-name))))
 	    (if (buffer-live-p buf)
 		(kill-buffer buf))))))))
 
