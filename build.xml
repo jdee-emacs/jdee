@@ -176,6 +176,11 @@
       <fileset dir="${build.lisp.dir}"/>
       <fileset file="${src.lisp.dir}/jtags*"/>
     </copy>
+    <chmod perm="ugo+x">
+      <fileset dir="${dist.lisp.dir}">
+        <include name="jtags*"/>
+      </fileset>
+    </chmod>
 
     <!-- this subdir contains all things Java -->
     <mkdir dir="${dist.java.lib.dir}"/>
