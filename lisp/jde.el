@@ -400,6 +400,7 @@ system command path."
 	  (setq proc
 		(start-process
 		 "java version" buf "java" "-version"))
+	  (set-process-query-on-exit-flag proc nil)
 	  (accept-process-output proc 10)
 	  (goto-char (point-min))
 	  (re-search-forward "[1-9][.][1-9]" (point-max) t)
