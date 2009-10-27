@@ -124,19 +124,40 @@ extends clause is updated"
 	      (forward-char))
 	    (insert (concat " " keyword " " interface " "))))))))
 
+(defun jde-dollar-name (name) 
+  "Convert pkg.Outer.Inner to pkg.Outer$Inner"
+  (let* ((ndx (string-match "^\\(.*\\)\\.\\([^.]*\\)$" name ))
+	 (pkg (substring name (match-beginning 1) (match-end 1)))
+	 (cls (substring name (match-beginning 2) (match-end 2))))
+    (concat pkg "$" cls))
+  )
+
+(defun jde-jeval-classname (fmt interface-name &optional eval-return)
+  "Try jde-jeval on the command derived from (format FMT INTERFACE-NAME),
+if that fails (as it will when INTERFACE-NAME is an inner-class name),
+then try after replacing INTERFACE-NAME with (jde-dollar-name INTERFACE-NAME).
+
+If EVAL-RETURN is t, then return (jde-jeval ... t), else return (read (jde-jeval ...))"
+  (flet ((jeval (name) (if eval-return
+			   (jde-jeval (format fmt name) t)
+			 (read (jde-jeval (format fmt name))))))
+    (let ((code (jeval interface-name)))
+      (if (and code (eq (car code) 'error))
+	  (jeval (jde-dollar-name interface-name)); try again if there was an error:
+	code)
+      )))
+
 (defun jde-wiz-generate-interface (interface-name)
   "*Generate a skeleton implementation of a specified interface."
   (let* ((code
-	  (read
-	   (jde-jeval
-	    (concat
-	     "jde.wizards.InterfaceFactory.makeInterfaceExpression(\""
-	     interface-name "\", true);")))))
-    (if  code
+	  (jde-jeval-classname 
+	   "jde.wizards.InterfaceFactory.makeInterfaceExpression(\"%s\",true);"
+	   interface-name)))
+    (if code
       (let ((required-imports
 	     (jde-jeval-r
 		"jde.wizards.InterfaceFactory.getImportedClasses();")))
-	  (eval code)
+	  (eval code)			;error may be thrown if bad intf name
 	  (if required-imports
 	      (jde-import-insert-imports-into-buffer required-imports t))
 	  (jde-wiz-update-implements-clause interface-name)))))
@@ -211,12 +232,9 @@ and fire every method of all listeners registered. It creates a data structure
 to store the listeners too."
   (condition-case err
       (let* ((pos (point))
-	     (code
-	      (read
-	       (jde-jeval
-		(concat
-		 "jde.wizards.EventSourceFactory.makeEventSourceSupportExpression(\""
-		 event-listener-interface-name "\", true);")))))
+	     (code (jde-jeval-classname
+		    "jde.wizards.EventSourceFactory.makeEventSourceSupportExpression(\"%s\", true);"
+		    event-listener-interface-name)))
 	(if code
 	    (let ((required-imports
 		   (jde-jeval-r
@@ -365,11 +383,10 @@ NOTE: this command works only if the overriding class
 	(setq pos (string-match "(" method-name))
 
 	(if qualified-super-class
-	    (let ((signatures
-		   (jde-jeval
-		    (concat
-		     "jde.wizards.MethodOverrideFactory.getCandidateSignatures(\""
-		     qualified-class-name "\",\"" (substring method-name 0 pos) "\");") t)))
+	    (let* ((fmt (concat
+			 "jde.wizards.MethodOverrideFactory.getCandidateSignatures"
+			 "(\"%s\",\"" (substring method-name 0 pos) "\");"))
+		   (signatures (jde-jeval-classname fmt qualified-class-name t)))
 	      (jde-wiz-override-method-internal method-name
 						signatures))
 	  (error "Cannot find parent class %s" super-class)))
@@ -510,12 +527,9 @@ function's documentation for more information."
 		   (car (jde-parse-declared-type-of delegee)) t)
 		  (read-string (concat "Enter fully qualified class name of "
 				       delegee ": "))))
-	     (code
-	      (read
-	       (jde-jeval
-		(concat
-		 "jde.wizards.DelegateFactory.makeDelegatorMethods(\""
-		 delegee "\", \"" class-name "\", true);")))))
+             (fmt (concat "jde.wizards.DelegateFactory.makeDelegatorMethods(\""
+			  delegee "\", \"%s\", true);"))
+	     (code (jde-jeval-classname fmt class-name)))
 	(if code
 	    (let ((required-imports
 		   (jde-jeval-r
@@ -539,12 +553,9 @@ function's documentation for more information."
 (defun jde-wiz-generate-abstract-class (class-name)
   "*Generate a skeleton implementation of a specified abstract class."
   (condition-case err
-      (let* ((code
-	      (read
-	       (jde-jeval
-		(concat
-		 "jde.wizards.AbstractClassFactory.makeAbstractClassExpression(\""
-		 class-name "\", true);")))))
+      (let* ((code (jde-jeval-classname
+		    "jde.wizards.AbstractClassFactory.makeAbstractClassExpression(\"%s\", true);"
+		    class-name)))
 	(if code
 	    (let ((required-imports
 		   (jde-jeval-r
