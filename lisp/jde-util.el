@@ -137,8 +137,8 @@ in the same directory that contains the JDE lisp directory."
   (let ((directory-sep-char ?/))
     (if (featurep 'xemacs)
 	(let ((dir (locate-data-directory "jde")))
-	  (if dir dir (jde-root))))
-    (jde-root)))
+	  (if dir dir (jde-root)))
+      (jde-root))))
 
 (defun jde-temp-directory ()
 "Get the location used by the host system to store temporary files."
