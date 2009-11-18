@@ -125,12 +125,9 @@ extends clause is updated"
 	    (insert (concat " " keyword " " interface " "))))))))
 
 (defun jde-dollar-name (name) 
-  "Convert pkg.Outer.Inner to pkg.Outer$Inner"
-  (let* ((ndx (string-match "^\\(.*\\)\\.\\([^.]*\\)$" name ))
-	 (pkg (substring name (match-beginning 1) (match-end 1)))
-	 (cls (substring name (match-beginning 2) (match-end 2))))
-    (concat pkg "$" cls))
-  )
+  "Convert pkg[.Outer].Inner[$Inner] to pkg[.Outer]$Inner[$Inner]"
+  ;; change last '.' to '$'
+  (replace-in-string name "[.]\\([^.]+$\\)" "$\\1"))  
 
 (defun jde-jeval-classname (fmt interface-name &optional eval-return)
   "Try jde-jeval on the command derived from (format FMT INTERFACE-NAME),
@@ -141,11 +138,15 @@ If EVAL-RETURN is t, then return (jde-jeval ... t), else return (read (jde-jeval
   (flet ((jeval (name) (if eval-return
 			   (jde-jeval (format fmt name) t)
 			 (read (jde-jeval (format fmt name))))))
-    (let ((code (jeval interface-name)))
-      (if (and code (eq (car code) 'error))
-	  (jeval (jde-dollar-name interface-name)); try again if there was an error:
+    (let ((code (jeval interface-name)) dollar-name)
+      (if (and code (eq (car code) 'error)
+	       (setq dollar-name (jde-dollar-name interface-name))
+	       ;; recurse as long as '.'s are changing:
+	       (not (string-equal dollar-name interface-name)))
+	  (jde-jeval-classname fmt dollar-name eval-return) ; try again with dollar-name
 	code)
-      )))
+      )
+    ))
 
 (defun jde-wiz-generate-interface (interface-name)
   "*Generate a skeleton implementation of a specified interface."
