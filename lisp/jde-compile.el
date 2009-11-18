@@ -157,11 +157,8 @@ don't know which classes were recompiled."
   :type 'boolean)
 
 (defun jde-compile-kill-buffer (buf)
-  (if jde-compile-enable-kill-buffer
-      (progn
-	(delete-windows-on buf)
-	(kill-buffer buf))))
-
+  (delete-windows-on buf)
+  (kill-buffer buf))
 
 ;; Thanks to Jack Donohue <donohuej@synovation.com>.
 (defun jde-compile-finish-kill-buffer (buf msg)
@@ -171,11 +168,16 @@ don't know which classes were recompiled."
     (if (null (or (string-match ".*exited abnormally.*" msg)
 		  (string-match ".*BUILD FAILED.*" (buffer-string))))
 	;;no errors, make the compilation window go away in a few seconds
-	(lexical-let ((compile-buffer buf))
-	  (run-at-time
-	   "2 sec" nil 'jde-compile-kill-buffer
-	   compile-buffer)
-	  (message "No compilation errors"))
+	(if (or (and (numberp jde-compile-enable-kill-buffer)
+		     (not (minusp jde-compile-enable-kill-buffer)))
+		jde-compile-enable-kill-buffer)
+	    (lexical-let ((compile-buffer buf))
+	      (run-at-time
+	       (format "%d sec" (if (numberp jde-compile-enable-kill-buffer)
+				    jde-compile-enable-kill-buffer 2))
+	       nil 'jde-compile-kill-buffer
+	       compile-buffer)
+	      (message "No compilation errors")))
       ;;there were errors, so jump to the first error
       (if jde-compile-jump-to-first-error (next-error 1)))))
 
@@ -532,11 +534,14 @@ source and class files.
   :group 'jde-compile-options
   :type 'boolean)
 
-(defcustom jde-compile-enable-kill-buffer nil
-  "* If true the 'jde-compile-finish-kill-buffer will kill the compilation
-buffer."
+(defcustom jde-compile-enable-kill-buffer -1
+  "* Time in seconds to display the compilation buffer before 
+'jde-compile-finish-kill-buffer will kill the compilation buffer.
+
+If less than zero (or nil), do not kill the compilation buffer.
+If t (or other non-nil non-number) then kill in 2 secs."
   :group 'jde-compile-options
-  :type 'boolean)
+  :type 'number)
 
 (defun jde-compile-show-options-buffer ()
   "Show the JDE Compile Options panel."
