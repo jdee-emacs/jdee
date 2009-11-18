@@ -149,7 +149,8 @@ public class DefaultNameFactory implements NameFactory {
       if (className.endsWith(";")) {
         className = className.substring(0, className.length()-1) + "Array";
       }
-      
+      if (className.equals("class")) className = "clazz";
+
       return className;
     }
 
