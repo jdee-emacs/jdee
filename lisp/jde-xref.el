@@ -594,6 +594,7 @@ and show it"
 	      :caller ,caller
 	      :notify jde-xref-notify)
 	  :dynargs 'jde-xref-tree-get-children-from-tree
+	  :expander 'jde-xref-tree-get-children-from-tree
 	  :sig caller-sig
 	  :has-children t))
      (list 'tree-widget :tag caller))) ;; class for next set of usages
@@ -621,6 +622,7 @@ and show it"
     (widget-create 'tree-widget
 		   :tag (jde-xref-signature-to-string sig)
 		   :dynargs 'jde-xref-tree-get-children-from-tree
+		   :expander 'jde-xref-tree-get-children-from-tree
 		   :has-children t
 		   :sig sig)
     (use-local-map widget-keymap)
