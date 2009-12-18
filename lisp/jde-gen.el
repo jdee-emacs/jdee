@@ -26,6 +26,30 @@
 
 (require 'tempo)
 
+
+;; Allow tempo to understand ~ as destination of point
+;; http://www.emacswiki.org/emacs/TempoMode#toc3
+(defvar tempo-initial-pos nil
+  "Initial position in template after expansion")
+
+(defadvice tempo-insert( around tempo-insert-pos act )
+  "Define initial position."
+  (if (eq element '~)
+      (setq tempo-initial-pos (point-marker))
+    ad-do-it))
+
+(defadvice tempo-insert-template( around tempo-insert-template-pos act )
+  "Set initial position when defined using ~."
+  (setq tempo-initial-pos nil)
+  ad-do-it
+  (if tempo-initial-pos
+      (progn
+        (put template 'no-self-insert t)
+        (goto-char tempo-initial-pos))
+    (put template 'no-self-insert nil)))
+
+
+
 (defgroup jde-gen nil
   "JDE Autocoder"
   :group 'jde
@@ -1901,7 +1925,7 @@ command, `jde-gen-main-method', as a side-effect."
 (defcustom  jde-gen-println
   '(
     "(end-of-line) '&"
-    "\"System.out.println(\" (P \"Print out: \") \");\" '>'n'>"
+    "\"System.out.println(\" ~ \");\" '>'n'>"
     )
   "*Template for generating a System.out.println statement."
   :group 'jde-gen
