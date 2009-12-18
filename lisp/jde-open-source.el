@@ -96,12 +96,14 @@ checks if it is a member of the base class(\"super\")."
        (fboundp 'jde-parse-find-completion-for-pair)))
 
 
-(defun jde-open-jump-to-class (parsed-symbol class-name)
+(defun jde-open-jump-to-class (parsed-symbol class-name) 
   "Place the cursor in the parsed variable"
   (let* (tags super-class (first-time t))
-    (search-forward "{" nil t)
-    (setq tags (semantic-tag-type-superclasses
-		  (semantic-current-tag-of-class 'type)))
+    ;; Searching only for the symbol '{' is not good enough. We can
+    ;; have, for example, '{@link }' in the javadoc before the class
+    ;; definition.
+    (search-forward-regexp "^[^\\*]*?{" nil t)
+    (setq tags (jde-get-parents))
     (setq super-class (car tags))
     (message "Superclass of %s is %s" class-name super-class)
     ;; Now let´s jump to the thing-of-interest. If this is a
@@ -116,30 +118,43 @@ checks if it is a member of the base class(\"super\")."
       (setq parsed-symbol (concat "\\b" parsed-symbol "\\b"))
       (while (not (senator-re-search-forward parsed-symbol nil t))
 	(message "Could not find %s in %s" parsed-symbol (buffer-name))
-	;; searching for the thing-of-interest has failed
-	;; let's try in the base class
-	  (progn
-	    (if (not super-class)
-		(error "Method not found"))
-	    (let ((jde-open-cap-ff-function-temp-override 'find-file))
-	      (jde-show-superclass-source-2 tags))
-	    (goto-char (point-min))
-	    (senator-parse)
-	    (search-forward "{" nil t)
-	    (setq tags (semantic-tag-type-superclasses
-			  (semantic-current-tag-of-class 'type)))
-	    ;;if it is the first time try in the class definition
-	    ;;itself.
-	    (if first-time
-		(progn
-		  (setq first-time nil)
-		  (senator-re-search-forward
-		   (progn
-		     (string-match ".*\\.\\([^.]+\\)$"
-				   (concat "." class-name))
-		     (match-string 1 (concat "." class-name)))
-		   nil t)))
-	    (setq super-class (car tags)))))))
+        ;; searching for the thing-of-interest has failed 
+        ;; let's try in the base class
+        (progn
+          (if (not super-class)
+              (error "Method not found"))
+          (let ((jde-open-cap-ff-function-temp-override 'find-file))
+            (jde-show-superclass-source-2 tags))
+          (goto-char (point-min))
+          (senator-parse)
+          (search-forward-regexp "^[^\\*]*?{" nil t)
+          (setq tags (jde-get-parents))
+          ;;if it is the first time try in the class definition
+          ;;itself.
+          (if first-time
+              (progn 
+                (setq first-time nil)
+                (senator-re-search-forward
+                 (progn
+                   (string-match ".*\\.\\([^.]+\\)$"
+                                 (concat "." class-name))
+                   (match-string 1 (concat "." class-name)))
+                 nil t)))
+          (setq super-class (car tags)))))))
+
+(defun jde-get-parents ()
+  "Returns a list with all the parents (super class and interfaces,
+if any) of the current class or interface."
+  (jde-remove-type 
+   (append (semantic-tag-type-superclasses
+	    (semantic-current-tag-of-class 'type))
+	   (semantic-tag-type-interfaces (semantic-current-tag-of-class 
+					  'type)))))
+
+(defun jde-remove-type (list) 
+  "Removes generics '<Type>' declaration from every given
+class/interface name."
+  (mapcar '(lambda(s) (replace-regexp-in-string "<.*>" "" s)) list))
 
 (defun jde-open-class-at-event (event)
   "Like `jde-open-class-at-point', but is mouse-bindable.
