@@ -97,6 +97,16 @@
 ;;    Initial Version
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
+(declare-function jde-normalize-path "jde" (path &optional sym))
+(declare-function jde-get-jdk-prog "jde" (progname))
+(declare-function jde-get-tools-jar "jde" nil)
+(declare-function jde-build-classpath "jde" (path &optional sym quote-path-p))
+(declare-function jde-create-prj-values-str "jde" nil)
+(declare-function jde-root-dir-p "jde" (dir))
+(declare-function jde-update-autoloaded-symbols "jde-project-file" nil)
+(declare-function jde-bsh-running-p "jde-bsh" nil)
+
 (defgroup jde-ant nil
   "JDE Ant"
   :group 'jde

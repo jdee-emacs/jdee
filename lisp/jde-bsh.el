@@ -35,6 +35,18 @@
 (require 'beanshell)
 (require 'jde-parse-expr)
 
+(declare-function jde-build-classpath "jde" (path &optional sym quote-path-p))
+(declare-function jde-get-tools-jar "jde" nil)
+(declare-function jde-get-project "jde-project-file" (sym proj))
+(declare-function jde-run-get-vm "jde-run" nil)
+(declare-function jde-pi-get-bsh-classpath "jde-plugins" nil)
+(declare-function jde-expand-classpath "jde" (classpath &optional sym))
+(declare-function jde-get-global-classpath "jde" nil)
+(declare-function jde-create-prj-values-str "jde" nil)
+(defvar jde-current-project)
+(defvar jde-devel-debug)
+
+
 (defcustom jde-bsh-separate-buffer nil
   "*Whether or not to use a separate buffer for errors."
   :group 'jde
@@ -157,7 +169,7 @@ the PRIMARY launch method is invoked."
 	      (cons (buffer-substring (region-beginning)
 				      (region-end))
 		    java-bsh-read-java-expression-history))
-	(jde-quote-expr (region-beginning) (region-end) t t))
+	(jde-bsh-quote-expr (region-beginning) (region-end) t t))
     (let ((bnd (if (eq major-mode 'jde-mode)
 		   (bounds-of-thing-at-point 'java-expression)))
 	  initial)

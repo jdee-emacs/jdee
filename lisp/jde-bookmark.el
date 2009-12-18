@@ -33,6 +33,8 @@
 (require 'jde-parse)
 (require 'jde-util)
 
+(declare-function jde-assert-mode "jde" (&optional no-raise-p))
+
 (defgroup jde-bookmark nil
   "JDEE Bookmarks"
   :group 'jde
