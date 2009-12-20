@@ -1924,7 +1924,7 @@ command, `jde-gen-main-method', as a side-effect."
 
 (defcustom  jde-gen-println
   '(
-    "(end-of-line) '&"
+    "(beginning-of-line)"
     "\"System.out.println(\" ~ \");\" '>'n'>"
     )
   "*Template for generating a System.out.println statement."
