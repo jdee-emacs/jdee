@@ -241,18 +241,17 @@ into the javadoc command line."
   (oset
    this
    comp-finish-fcn
-   (list
-    (lambda (buf msg)
-      (message msg)
-      (if (and
-	   jde-javadoc-display-doc
-	   (string-match "finished" msg))
-	  (browse-url-of-file
-	   (expand-file-name
-	    "index.html"
-	    (jde-normalize-path
-	     jde-javadoc-gen-destination-directory
-	     'jde-javadoc-gen-destination-directory)))))))
+   (lambda (buf msg)
+     (message msg)
+     (if (and
+	  jde-javadoc-display-doc
+	  (string-match "finished" msg))
+	 (browse-url-of-file
+	  (expand-file-name
+	   "index.html"
+	   (jde-normalize-path
+	    jde-javadoc-gen-destination-directory
+	    'jde-javadoc-gen-destination-directory))))))
 
   (oset
    this

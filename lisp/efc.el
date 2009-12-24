@@ -373,12 +373,12 @@ and a string describing how the process finished."))
       (kill-all-local-variables)
 
       ;; Clear out the compilation buffer and make it writable.
-      (setq buffer-read-only nil)
       (buffer-disable-undo (current-buffer))
       (erase-buffer)
       (buffer-enable-undo (current-buffer))
 
       (compilation-mode (oref this name))
+      (setq buffer-read-only nil)
 
       (if (boundp 'compilation-parse-errors-function)
 	  (set (make-local-variable 'compilation-parse-errors-function) parser))
