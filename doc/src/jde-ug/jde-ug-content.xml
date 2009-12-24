@@ -20,7 +20,7 @@
 
     <releaseinfo>
       <remark>
-	Revised for JDEE <productnumber>2.3.6</productnumber>
+	Revised for JDEE <productnumber>2.4.0</productnumber>
       </remark>
     </releaseinfo>
 
@@ -167,13 +167,13 @@
 	    latest versions of Eric Ludlam's <symbol>speedbar</symbol>, 
 	    <symbol>semantic</symbol>, and
 	    <symbol>eieio</symbol> packages available for download from
-	    <ulink url="http://cedet.sourceforge.net">the CDET home page</ulink>
+	    <ulink url="http://cedet.sourceforge.net">the CEDET home page</ulink>
 	  </para></listitem>
 
 	<listitem>
 	  <para>
 	    The elib package available from the 
-	    <ulink url="http://jdee.sunsite.dk">JDE web site</ulink>
+	    <ulink url="http://jdee.sourceforge.net">JDE web site</ulink>
 	  </para></listitem>
 
 
@@ -319,7 +319,7 @@
 	<title><anchor id="LatestVersion"/>Latest Version</title>
 
 
-      <para>See <ulink url="http://jdee.sunsite.dk/rootpage.html#Downloading">
+      <para>See <ulink url="http://sourceforge.net/projects/jdee/files/">
 	  Downloading the JDE</ulink> on the JDE website for instructions on
 	downloading the most recent version of the JDE. 
       </para>
@@ -329,7 +329,7 @@
 
     <sect3>
       <title><anchor id="InstallingJDE"/>Installing the JDE</title>
-      <para>See the <ulink url="http://jdee.sunsite.dk/install.html">
+      <para>See the <ulink url="http://jdee.sourceforge.net/install.html">
 	JDE Installation Guide</ulink> on the JDE website for information
       on installing the JDE on your system.</para>
     </sect3>

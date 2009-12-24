@@ -247,7 +247,7 @@ The Java Development Environment (JDE) is an Emacs Lisp
                   <fo:list-item-body>
                      <fo:block>
 	    The elib package available from the 
-	    <fo:simple-link external-destination="http://sunsite.auc.dk/jde/">JDE web site</fo:simple-link> [http://sunsite.auc.dk/jde/]
+	    <fo:simple-link external-destination="http://jdee.sourceforge.net/">JDE web site</fo:simple-link> [http://jdee.sourceforge.net/]
 	  </fo:block>
                   </fo:list-item-body>
                </fo:list-item>
@@ -501,16 +501,16 @@ The Java Development Environment (JDE) is an Emacs Lisp
             <fo:block font-size="16pt" font-weight="bold" space-before.minimum="1em" space-before.optimum="1.5em" space-before.maximum="2em">
                <fo:block color="red">&lt;anchor&gt;&lt;/anchor&gt;</fo:block>Latest Version
             </fo:block>
-            <fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">See <fo:simple-link external-destination="http://sunsite.auc.dk/jde/rootpage.html#Downloading">
-	  Downloading the JDE</fo:simple-link> [http://sunsite.auc.dk/jde/rootpage.html#Downloading] on the JDE website for instructions on
+            <fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">See <fo:simple-link external-destination="http://sourceforge.net/projects/jdee/files/">
+	  Downloading the JDE</fo:simple-link> [http://sourceforge.net/projects/jdee/files/] on the JDE website for instructions on
 	downloading the most recent version of the JDE. 
       </fo:block>
          </fo:block>
          <fo:block id="c41b2b1b6">
             <fo:block font-size="16pt" font-weight="bold" space-before.minimum="1em" space-before.optimum="1.5em" space-before.maximum="2em">
                <fo:block color="red">&lt;anchor&gt;&lt;/anchor&gt;</fo:block>Installing the JDE</fo:block>
-            <fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">See the <fo:simple-link external-destination="http://sunsite.auc.dk/jde/install.html">
-	JDE Installation Guide</fo:simple-link> [http://sunsite.auc.dk/jde/install.html] on the JDE website for information
+            <fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">See the <fo:simple-link external-destination="http://jdee.sourceforge.net/install.html">
+	JDE Installation Guide</fo:simple-link> [http://jdee.sourceforge.net/install.html] on the JDE website for information
       on installing the JDE on your system.</fo:block>
          </fo:block>
          <fo:block id="c41b2b1b7">

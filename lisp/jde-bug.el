@@ -29,7 +29,7 @@
 ;; Java Development Environment (JDE) for Emacs. See the
 ;; JDE User's Guide for more information.
 ;; The latest version of the JDE is available at
-;; <URL:http://sunsite.auc.dk/jde/>.
+;; <URL:http://jdee.sourceforge.net/>.
 
 ;; Please send any comments, bugs, or upgrade requests to
 ;; Paul Kinnucan at paulk@mathworks.com.

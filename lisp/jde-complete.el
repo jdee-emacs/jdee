@@ -48,7 +48,7 @@
 ;; class info can be loaded in the background.
 
 ;; The latest version of the JDEE is available at
-;; <URL:http://jde.sunsite.dk>.
+;; <URL:http://jdee.sourceforge.net>.
 
 ;; Please send any comments, bugs, or upgrade requests to
 ;; Paul Kinnucan at pkinnucan@attbi.com

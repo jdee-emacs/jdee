@@ -10,7 +10,7 @@
  
 
 <xsl:template match="/">
-<xsl:text>0  ; JDE Website                 ; 14 ; 3 ; http://sunsite.auc.dk/jde/   ; _top
+<xsl:text>0  ; JDE Website                 ; 14 ; 3 ; http://jdee.sourceforge.net/   ; _top
 </xsl:text>
 <xsl:for-each select="book/chapter">
 <xsl:text>0 ; </xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text> ; 0 ; ../html/jde-ug/jde-ug-content.html#</xsl:text><xsl:value-of select="title/anchor/@id"/><xsl:text>

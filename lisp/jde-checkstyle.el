@@ -34,7 +34,7 @@
 ;;; Commentary:
 
 ;;; This package provides an interface from JDE (see
-;;; http://jde.sunsite.dk/) to Oliver Burn's CheckStyle (see
+;;; http://jdee.sourceforge.net/) to Oliver Burn's CheckStyle (see
 ;;; http://checkstyle.sourceforge.net/) a development tool
 ;;; to help programmers write Java code that adheres to a coding
 ;;; standard.

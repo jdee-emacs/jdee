@@ -35,7 +35,7 @@
 ;; JDE User's Guide for more information.
 
 ;; The latest version of the JDE is available at
-;; <URL:http://jde.sunsite.dk>.
+;; <URL:http://jdee.sourceforge.net>.
 
 ;; Please send any comments, bugs, or upgrade requests to
 ;; Paul Kinnucan at pkinnucan@comcast.net.

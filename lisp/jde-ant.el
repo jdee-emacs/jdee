@@ -34,7 +34,7 @@
 ;;
 ;; Notes:
 ;; -- The JDE (Java Development Environment for Emacs) can be
-;;    downloaded at http://jdee.sunsite.dk
+;;    downloaded at http://jdee.sourceforge.net
 ;;
 ;; -- Apache Ant is a Java & XML build system that can be downloaded
 ;;    at http://jakarta.apache.org/ant/
