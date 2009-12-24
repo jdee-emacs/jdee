@@ -2445,10 +2445,7 @@ This command splits the window and shows the locals buffer."
     (if (and
 	 jdebug-help
 	 (file-exists-p jdebug-help))
-	(browse-url (concat "file://" (jde-convert-cygwin-path jdebug-help))
-		    (if (boundp 'browse-url-new-window-flag)
-			'browse-url-new-window-flag
-		      browse-url-new-window-p))
+	(browse-url (concat "file://" (jde-convert-cygwin-path jdebug-help)))
       (signal 'error '("Cannot find JDEbug User's Guide.")))))
 
 (defun jde-bug-keys ()

@@ -1466,10 +1466,7 @@ the debuggee process at (e.g., jdbconn)."
     (if (and
 	 jdb-ug-path
 	 (file-exists-p jdb-ug-path))
-	(browse-url (concat "file://" (jde-convert-cygwin-path jdb-ug-path))
-		    (if (boundp 'browse-url-new-window-flag)
-			'browse-url-new-window-flag
-		      browse-url-new-window-p))
+	(browse-url (concat "file://" (jde-convert-cygwin-path jdb-ug-path)))
       (signal 'error '("Cannot find jdb user guide.")))))
 
 

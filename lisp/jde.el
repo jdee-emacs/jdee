@@ -1727,10 +1727,7 @@ jde.el."
     (if (and
 	 jde-help
 	 (file-exists-p jde-help))
-	(browse-url (concat "file://" (jde-convert-cygwin-path jde-help))
-		    (if (boundp 'browse-url-new-window-flag)
-			'browse-url-new-window-flag
-		      browse-url-new-window-p))
+	(browse-url (concat "file://" (jde-convert-cygwin-path jde-help)))
       (signal 'error '("Cannot find JDE help file.")))))
 
 

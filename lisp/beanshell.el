@@ -80,6 +80,8 @@
 (require 'comint)
 (require 'lmenu)
 
+(declare-function jde-find-jde-doc-directory "jde" nil)
+
 (defgroup bsh nil
   "Customizations for the Emacs inteface to Pat Neimeyer's Java
 interpreter, the Beanshell."
@@ -870,28 +872,6 @@ by Pat Niemeyer."
       (message "The beanshell is not running"))))
 
 
-(defun bsh-find-bsh-data-directory ()
-  "Return the path of the bsh data directory.
-Returns the path of the directory containing the documentation directory;  nil if the
-directory cannot be found. If XEmacs, returns the location of
-the data directory in the XEmacs distribution hierarchy. On all other Emacs versions,
-the bsh expects to find the documentation
-in the same directory that contains the bsh.el file."
-  (let (dir)
-    (flet ((find-data-dir
-	    ()
-	    (expand-file-name
-	     "../"
-	     (file-name-directory (locate-library "beanshell")))))
-      (if (featurep 'xemacs)
-	  (progn
-	    (setq dir (locate-data-directory "beanshell"))
-	    (if (not dir)
-		(setq dir (find-data-dir))))
-	(setq dir (find-data-dir))))
-      dir))
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Beanshell mode                                            ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -915,16 +895,14 @@ in the same directory that contains the bsh.el file."
 (defun bsh-script-help ()
   "Display BeanShell User's Guide."
   (interactive)
-  (let* ((bsh-dir (bsh-find-bsh-data-directory))
+  (let* ((jde-dir (jde-find-jde-doc-directory))
 	 (bsh-help
-	  (if bsh-dir
-	      (expand-file-name "bsh-ug.html" bsh-dir))))
+	  (if jde-dir
+	      (expand-file-name "doc/html/bsh-ug/bsh-ug.html" jde-dir))))
     (if (and
 	 bsh-help
 	 (file-exists-p bsh-help))
-	(browse-url (concat "file://" bsh-help)
-		    (if (boundp 'browse-url-new-window-flag)
-			browse-url-new-window-flag))
+	(browse-url (concat "file://" bsh-help))
       (signal 'error '("Cannot find BeanShell help file.")))))
 
 (defcustom bsh-script-menu-definition

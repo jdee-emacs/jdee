@@ -100,7 +100,6 @@
 
 (if jde-emacs21p
     (progn
-      (defvar browse-url-new-window-p nil)
       (defun hscroll-window-column (&rest args))))
 
 ;; Avoid undefined function error when compiling jde-help.

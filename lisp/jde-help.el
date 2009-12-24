@@ -530,24 +530,14 @@ for CLASS actually documents the selected class member."
 (defun jde-help-beanshell ()
   "Displays the BeanShell documentation."
   (interactive)
-    (browse-url
-    "http://www.beanshell.org/manual/contents.html"
-     (if (boundp
-	 'browse-url-new-window-flag)
-	 browse-url-new-window-flag
-       browse-url-new-window-p)))
+  (browse-url "http://www.beanshell.org/manual/contents.html"))
 
 ;;;###autoload
 (defun jde-help-browse-jdk-doc ()
   "Displays the JDK doc in a web browser. This function uses the URL
 stored in the variable jde-jdk-doc-url to locate the JDK documentation."
   (interactive)
-  (browse-url
-   (jde-help-get-jdk-doc-url)
-   (if (boundp
-	'browse-url-new-window-flag)
-       browse-url-new-window-flag
-     browse-url-new-window-p)))
+  (browse-url (jde-help-get-jdk-doc-url)))
 
 (provide 'jde-help)
 

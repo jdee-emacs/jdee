@@ -615,12 +615,7 @@ browser."
 	   (substring jdk-url 0 (string-match "index" jdk-url))
 	   (if (eq system-type 'windows-nt) "tooldocs/windows/" "tooldocs/solaris/")
 	   "javadoc.html")))
-    (browse-url
-     javadoc-url
-     (if (boundp
-	  'browse-url-new-window-flag)
-	 browse-url-new-window-flag
-       browse-url-new-window-p))))
+    (browse-url javadoc-url)))
 
 
 (provide 'jde-javadoc-gen)

@@ -1470,10 +1470,7 @@ file."
 	  (if (or
 	       (string= jde-run-applet-viewer "")
 	       (string-match "browse-url" jde-run-applet-viewer))
-	      (browse-url applet-doc
-			  (if (boundp 'browse-url-new-window-flag)
-			      'browse-url-new-window-flag
-			    browse-url-new-window-p))
+	      (browse-url applet-doc)
 	    (jde-run-applet-internal (concat default-directory applet-doc))))
       (signal 'error "Could not find html document to display applet."))))
 
