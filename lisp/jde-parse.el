@@ -25,7 +25,22 @@
 
 (require 'semantic-sb)
 (require 'semantic-ctxt)
-(require 'avltree)
+(if (< emacs-major-version 23)
+    (progn
+      (require 'avltree)  ;; use elib's avltree with local compatibility kludges
+      (defalias 'avl-tree-clear   'avltree-clear)
+      (defalias 'avl-tree-copy    'avltree-copy)
+      (defalias 'avl-tree-create  'avltree-create)
+      (defalias 'avl-tree-delete  'avltree-delete)
+      (defalias 'avl-tree-empty   'avltree-empty)
+      (defalias 'avl-tree-enter   'avltree-enter)
+      (defalias 'avl-tree-first   'avltree-first)
+      (defalias 'avl-tree-flatten 'avltree-flatten)
+      (defalias 'avl-tree-last    'avltree-last)
+      (defalias 'avl-tree-map     'avltree-map)
+      (defalias 'avl-tree-member  'avltree-member)
+      (defalias 'avl-tree-size    'avltree-size))
+  (require 'avl-tree)) ;; use emacs's avl-tree
 (require 'thingatpt)
 (require 'eieio)
 (require 'jde-imenu)                    ; All the imenu stuff is here now!
@@ -907,7 +922,7 @@ in a method; otherwise, nil."
 
 (defclass jde-avl-tree ()
   ((tree        :initarg tree
-		:type list
+		:type sequence
 		:documentation
 		"The tree")
    (compare-fcn :initarg compare-fcn
@@ -925,51 +940,51 @@ in a method; otherwise, nil."
 
   (assert (typep  (oref this compare-fcn)  'function))
 
-  (oset this  tree (avltree-create (oref this compare-fcn))))
+  (oset this  tree (avl-tree-create (oref this compare-fcn))))
 
 (defmethod jde-avl-tree-add ((this jde-avl-tree) item)
   "Inserts ITEM in this tree."
-  (avltree-enter (oref this tree) item))
+  (avl-tree-enter (oref this tree) item))
 
 (defmethod jde-avl-tree-delete ((this jde-avl-tree) item)
   "Deletes ITEM from THIS tree."
-  (avltree-delete (oref this tree) item))
+  (avl-tree-delete (oref this tree) item))
 
 (defmethod jde-avl-tree-is-empty ((this jde-avl-tree))
   "Return t if THIS tree is empty, otherwise return nil."
-  (avltree-empty (oref this tree)))
+  (avl-tree-empty (oref this tree)))
 
 (defmethod jde-avl-tree-find ((this jde-avl-tree) item)
   "Return the element in THIS tree that matches item."
-  (avltree-member (oref this tree) item))
+  (avl-tree-member (oref this tree) item))
 
 (defmethod jde-avl-tree-map ((this jde-avl-tree) map-function)
   "Applies MAP-FUNCTION to all elements of THIS tree."
-  (avltree-map map-function (oref this tree)))
+  (avl-tree-map map-function (oref this tree)))
 
 (defmethod jde-avl-tree-first ((this jde-avl-tree))
   "Return the first item in THIS tree."
-  (avltree-first (oref this tree)))
+  (avl-tree-first (oref this tree)))
 
 (defmethod jde-avl-tree-last ((this jde-avl-tree))
   "Return the last item in THIS tree."
-  (avltree-last (oref this tree)))
+  (avl-tree-last (oref this tree)))
 
 (defmethod jde-avl-tree-copy ((this jde-avl-tree))
   "Return a copy of THIS tree."
-  (avltree-copy (oref this tree)))
+  (avl-tree-copy (oref this tree)))
 
 (defmethod jde-avl-tree-flatten ((this jde-avl-tree))
   "Return a sorted list containing all elements of THIS tree."
-  (avltree-flatten (oref this tree)))
+  (avl-tree-flatten (oref this tree)))
 
 (defmethod jde-avl-tree-size ((this jde-avl-tree))
   "Return the number of elements in THIS tree."
-  (avltree-size (oref this tree)))
+  (avl-tree-size (oref this tree)))
 
 (defmethod jde-avl-tree-clear ((this jde-avl-tree))
   "Delete all elements of THIS tree."
-  (avltree-clear (oref this tree)))
+  (avl-tree-clear (oref this tree)))
 
 (defclass jde-parse-method-map (jde-avl-tree)
   ()
