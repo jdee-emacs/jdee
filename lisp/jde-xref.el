@@ -376,9 +376,9 @@ circumstance we just create tiny hashes to conserve memory."
 			   called-package-caller-hash)))))))))
 
 (defun jde-xref-class-and-token-to-signature (class token)
-  (let ((ttype  (semantic-token-type token))
-	(tclass (semantic-token-token token))
-	(tname  (semantic-token-name token)))
+  (let ((ttype  (semantic-tag-type token))
+	(tclass (semantic-tag-class token))
+	(tname  (semantic-tag-name token)))
     (list tclass
 	  class
 	  (if (equal tname (jde-parse-get-unqualified-name class))
@@ -391,8 +391,8 @@ circumstance we just create tiny hashes to conserve memory."
 	  (if (eq tclass 'function)
 	      (mapcar (lambda (arg)
 			(jde-parse-get-unqualified-name
-			 (semantic-token-type arg)))
-		      (semantic-token-function-args token))
+			 (semantic-tag-type arg)))
+		      (semantic-tag-function-arguments token))
 	    (list (jde-parse-get-unqualified-name ttype))))))
 
 (defun jde-xref-get-current-class ()
@@ -401,12 +401,12 @@ circumstance we just create tiny hashes to conserve memory."
 
 (defun jde-xref-get-current-signature ()
   (unless (member
-	   (semantic-token-token (semantic-current-nonterminal))
+	   (semantic-tag-class (semantic-current-tag))
 		'(function variable))
     (error "The cursor must be in a function or class variable to get the callers"))
   (jde-xref-class-and-token-to-signature
    (jde-xref-get-current-class)
-   (semantic-current-nonterminal)))
+   (semantic-current-tag)))
 
 ;;;###autoload
 (defun jde-xref-first-caller (strict)
@@ -630,9 +630,9 @@ and show it"
 
 (defun jde-xref-get-class-variables (class-token)
   (mapcan (lambda (token)
-	    (when (eq (semantic-token-token token) 'variable)
+	    (when (eq (semantic-tag-class token) 'variable)
 	      (list token)))
-	  (semantic-nonterminal-children class-token)))
+	  (semantic-tag-children-compatibility class-token)))
 
 ;;;###autoload
 (defun jde-xref-list-uncalled-functions (strict)
@@ -651,7 +651,7 @@ while. If it does, you might want to consider increasing
   (jde-xref-load-subclasses-table-if-necessary)
   (save-excursion
     (flet ((get-unused-string (token)
-	     (goto-char (semantic-token-start token))
+	     (goto-char (semantic-tag-start token))
 	     (unless (jde-xref-get-callers
 		      (jde-xref-class-and-token-to-signature
 		       (jde-xref-get-current-class) token) strict)
@@ -666,7 +666,7 @@ while. If it does, you might want to consider increasing
 	  (unreferenced-variables
 	    (mapcan 'get-unused-string
 		    (mapcan 'jde-xref-get-class-variables
-			    (semantic-find-nonterminal-by-type "class"
+			    (semantic-brute-find-tag-by-type "class"
 							       (current-buffer)
 							       t))))
 	  (outbuf (get-buffer-create "Unreferenced Methods and Members")))
@@ -720,8 +720,8 @@ call list of all files modified in emacs"
 		  (mapcar (lambda (class-token)
 			    (concat (jde-parse-get-package-name)
 				    (when (jde-parse-get-package-name) ".")
-				    (semantic-token-name class-token)))
-			  (semantic-find-nonterminal-by-type
+				    (semantic-tag-name class-token)))
+			  (semantic-brute-find-tag-by-type
 			   "class" (current-buffer) t))))))
 
 ;;;###autoload

@@ -119,7 +119,7 @@ match `jde-auto-parse-max-buffer-size' threshold."
   ;; in some versions of XEmacs. Hence the following
   ;; guard.
   (if (eq major-mode 'jde-mode)
-      (semantic-bovinate-toplevel t)))
+      (semantic-fetch-tags)))
 
 (defsubst jde-parse-should-auto-parse-buffer-p ()
   "Return non-nil if the JDE should automatically reparse the buffer."
@@ -181,7 +181,7 @@ replaced by that range.  See also `semantic-change-hooks'."
   (let* ((top-level-classes
 	  (semantic-find-nonterminal-by-token
 	   'type
-	   (semantic-bovinate-toplevel)))
+	   (semantic-fetch-tags)))
 	 (top-level-class-count (length top-level-classes)))
     (or
      (>  top-level-class-count 1)
@@ -220,7 +220,7 @@ See also `semantic-after-toplevel-cache-change-hook'."
   "Hook run after Semantic updated the token cache.
 TOKENS is the list of updated tokens.
 See also `semantic-after-partial-cache-change-hook'."
-  (jde-parse-update-after-parse (semantic-bovinate-toplevel)))
+  (jde-parse-update-after-parse (semantic-fetch-tags)))
 
 
 (defun jde-parse-get-top-of-class (&optional class-regexp no-move-point)
@@ -243,7 +243,7 @@ moved also."
 	  (if (null class-name) (error "point is not in a class definition"))
 	  (setq class-regexp (regexp-quote class-name)))))
 
-  (let* ((tokens (semantic-bovinate-toplevel t))
+  (let* ((tokens (semantic-fetch-tags))
 	 (classes (semantic-find-nonterminal-by-token 'type tokens))
 	 class-parts pos)
 
@@ -296,7 +296,7 @@ MODIFIERS creteria as an exact match or subset.  This defaults to `subset'."
 
   (if (null member-name-regexp) (setq member-name-regexp ".*"))
 
-  (let* ((tokens (semantic-bovinate-toplevel))
+  (let* ((tokens (semantic-fetch-tags))
 	 (classes (semantic-find-nonterminal-by-token 'type tokens))
 	 cmp-fn vars var-parts var-name var-modifiers i)
 
@@ -914,7 +914,7 @@ in a method; otherwise, nil."
 					  (cons method-start method-end)))))))))
 
     (let* ((pos (if position position (point)))
-	   (tokens (semantic-bovinate-toplevel))
+	   (tokens (semantic-fetch-tags))
 	   (classes (semantic-find-nonterminal-by-token 'type tokens)))
       (catch 'found
 	(loop for class in classes
@@ -1026,7 +1026,7 @@ in a method; otherwise, nil."
 		      (cons class-name method-name)
 		      (cons method-start method-end))))))))
 
-    (let* ((tokens (semantic-bovinate-toplevel))
+    (let* ((tokens (semantic-fetch-tags))
 	   (classes (semantic-find-nonterminal-by-token 'type tokens)))
       (loop for class in classes do
 	    (add-methods class)))))
@@ -1497,7 +1497,7 @@ For example:
 It uses the semantic parser table to find the 'package' and 'import'
 statements. It implicitly adds the java.lang.* package. See also
 `jde-split-import-token'."
-  (let* ((tokens   (semantic-bovinate-toplevel t))
+  (let* ((tokens   (semantic-fetch-tags))
 	 (packages (semantic-find-nonterminal-by-token 'package tokens))
 	 (imports  (semantic-find-nonterminal-by-token 'include tokens))
 	 lst)

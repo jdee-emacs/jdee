@@ -716,7 +716,7 @@ the tokens of `class-name', returns nil if no token are found"
 	temp-parts inner-classes)
     (if (not parts)
 	(while tokens
-	  (setq temp-parts (semantic-token-type-parts (car tokens)))
+	  (setq temp-parts (semantic-tag-type-members (car tokens)))
 	  (setq inner-classes (semantic-find-nonterminal-by-token 'type temp-parts))
 	  (setq parts (jde-wiz-get-class-parts class-name inner-classes))
 	  (if parts
@@ -731,9 +731,9 @@ return otherwise"
   (let (parts current-class)
     (while tokens
       (setq current-class (car tokens))
-      (if (string= class-name (semantic-token-name current-class))
+      (if (string= class-name (semantic-tag-name current-class))
 	  (progn
-	    (setq parts (semantic-token-type-parts current-class))
+	    (setq parts (semantic-tag-type-members current-class))
 	    (setq tokens nil)))
       (setq tokens (cdr tokens)))
     parts))
@@ -774,7 +774,7 @@ defined in the current buffer."
 	 (class (jde-parse-get-class-at-point));;class name
 	 (classes (split-string class "\\."))
 	 (class-name (nth (- (length classes) 1) classes))
-	 (tokens (semantic-bovinate-toplevel t));;buffer tokens
+	 (tokens (semantic-fetch-tags));;buffer tokens
 	 (type (semantic-find-nonterminal-by-token 'type tokens));;class tokens
 	 (parts (jde-wiz-get-class-parts class-name type))
 	 (variables (semantic-find-nonterminal-by-token 'variable parts));;declared variables
@@ -799,10 +799,10 @@ defined in the current buffer."
 
     (while non-public-variables
       (setq var (car non-public-variables))
-      (setq name (semantic-token-name var));;variable name
-      (setq type (semantic-token-type var));;variable type i.e. boolean
-      (setq staticp (member "static" (semantic-token-variable-modifiers var)));;is it static
-      (setq finalp  (member "final" (semantic-token-variable-modifiers var)));;is it final
+      (setq name (semantic-tag-name var));;variable name
+      (setq type (semantic-tag-type var));;variable type i.e. boolean
+      (setq staticp (member "static" (semantic-tag-modifiers var)));;is it static
+      (setq finalp  (member "final" (semantic-tag-modifiers var)));;is it final
 
       (setq
        report
@@ -812,10 +812,10 @@ defined in the current buffer."
 	 "%-60.60s"
 	 (concat
 	  type " " name " "
-	  (and (semantic-token-variable-modifiers var)
+	  (and (semantic-tag-modifiers var)
 	       ;; only if some modifiers are present
 	       ;; print them
-	       (format "%s" (semantic-token-variable-modifiers var)))))))
+	       (format "%s" (semantic-tag-modifiers var)))))))
 
       (setq report (concat report "\t"))
 
@@ -948,7 +948,7 @@ defined in the current buffer."
   (let (token name filtered-methods)
     (while tokens
       (setq token (car tokens))
-      (setq name (semantic-token-name token))
+      (setq name (semantic-tag-name token))
       (if (or (string-match "^get" name)
 	      (string-match "^set" name)
 	      (string-match "^is" name))
@@ -962,7 +962,7 @@ protected modifiers"
   (let (token modifiers filtered-tokens)
     (while tokens
       (setq token (car tokens))
-      (setq modifiers (semantic-token-variable-modifiers token))
+      (setq modifiers (semantic-tag-modifiers token))
       (if (not (member "public" modifiers))
 	  (setq filtered-tokens (append filtered-tokens (list token))))
       (setq tokens (cdr tokens)))
@@ -1160,7 +1160,7 @@ If `jde-wiz-tostring-postfix' is defined, it is appended to the string. "
 	   class-name
 	   (semantic-find-nonterminal-by-token
 	    'type
-	    (semantic-bovinate-toplevel t)
+	    (semantic-fetch-tags)
 	    ))))
 	(method
 	 (concat
@@ -1179,7 +1179,7 @@ If `jde-wiz-tostring-postfix' is defined, it is appended to the string. "
    (setq variables (jde-wiz-filter-variables-by-typemodifier variables))
 
    (if jde-wiz-tostring-sort-variables
-       (setq variables (semantic-sort-tokens-by-name-increasing variables)))
+       (setq variables (semantic-sort-tags-by-name-increasing variables)))
 
    ;; Remove static members.
    (unless jde-wiz-tostring-static-members
@@ -1192,7 +1192,7 @@ If `jde-wiz-tostring-postfix' is defined, it is appended to the string. "
 	  (let ((staticp
 		 (member
 		  "static"
-		  (semantic-token-variable-modifiers var))))
+		  (semantic-tag-modifiers var))))
 	    (unless staticp var)))
 	variables))))
 
@@ -1202,8 +1202,8 @@ If `jde-wiz-tostring-postfix' is defined, it is appended to the string. "
 
    (while variables
      (let* ((var (car variables))
-	   (name (semantic-token-name var))  ;;variable name
-	   (type (semantic-token-type var))) ;;variable type i.e. boolean
+	   (name (semantic-tag-name var))  ;;variable name
+	   (type (semantic-tag-type var))) ;;variable type i.e. boolean
 
        (setq
 	method

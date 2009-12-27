@@ -48,10 +48,6 @@ Should be run when Semantic is ready to parse, that is, via
      ((boundp 'global-semantic-idle-scheduler-mode)
       (or global-semantic-idle-scheduler-mode
 	  (semantic-idle-scheduler-mode 1)))
-     ;; Since Semantic 1.4beta12
-     ((boundp 'global-semantic-auto-parse-mode)
-      (or global-semantic-auto-parse-mode
-	  (semantic-auto-parse-mode 1)))
      (t
       ;; Default to JDE's auto-parse
       (make-local-hook 'semantic-change-hooks)
