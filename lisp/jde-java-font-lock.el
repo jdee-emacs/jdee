@@ -103,6 +103,17 @@
     (require 'cc-fonts)
   (error nil))
 
+
+;; quiet "reference to free variable" build-time warnings
+(defvar jde-java-font-lock-javadoc-tag-keyword)
+(defvar jde-java-font-lock-javadoc-param-name-keyword)
+(defvar jde-java-font-lock-javadoc-exception-type-keyword)
+(defvar jde-java-font-lock-javadoc-docroot-keyword)
+(defvar jde-java-font-lock-javadoc-link-keyword)
+(defvar jde-java-font-lock-javadoc-see-ref-keyword)
+(defvar jde-java-font-lock-html-keywords)
+
+
 (defcustom jde-use-font-lock t
   "*Turn on font-locking if non-nil.
 Set to nil to disable the use of font-locking."

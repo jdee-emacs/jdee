@@ -44,6 +44,13 @@
 (require 'jde-widgets)
 (jde-require 'tree-widget)
 
+
+;; quiet "reference to free variable" build-time warnings
+(defvar jde-bug-debug)
+(defvar jde-bug-debugger-command-timeout)
+(defvar jde-bug-debugger-host-address)
+
+
 ;; Need jde-run only to get the definition for
 ;; save-w32-show-window macro.
 (eval-when-compile

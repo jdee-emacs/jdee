@@ -50,7 +50,8 @@
 
 
 (defcustom jde-project-key-bindings nil
-  "Specifies key bindings for JDE's project-related commands.")
+  "Specifies key bindings for JDE's project-related commands."
+  :group 'jde-project)
 
 (if (and
      (or
@@ -90,10 +91,9 @@
 
 (defclass jde-project-create-dialog (efc-dialog)
   ((project    :initarg :project
-	      :type 'jde-project
 	      :documentation
 	      "Project that this dialog creates.")
-  (name-field :initarg :name-field
+   (name-field :initarg :name-field
 	      :documentation
 	      "Field for entering project name.")
    (dir-field :initarg :dir-field
@@ -124,42 +124,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                           ;;
-;; Application Project Class                                                 ;;
+;; Application Create Dialog Class                                           ;;
 ;;                                                                           ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Application Project Class
-
-(defclass jde-project-application (jde-project)
-  ()
-  "Class of JDE application projects")
-
-
-(defmethod jde-project-create ((this jde-project-application))
-    (if (not (file-exists-p proj-dir))
-	(if (yes-or-no-p
-	      (format "%s does not exist. Should I create it?" proj-dir))
-	    (make-directory proj-dir)
-	  (error "Cannot create project.")))
-
-    ;; Make source directory
-    (setq dir (expand-file-name "src" proj-dir))
-    (if (not (file-exists-p dir)) (make-directory dir))
-
-    ;; Make classes directory
-    (setq dir (expand-file-name "classes" proj-dir))
-    (if (not (file-exists-p dir)) (make-directory dir))
-)
-
-
-(defmethod jde-project-show-creation-dialog ((this jde-project-application))
-  "Shows the dialog for creating a Java application project."
-  (let ((dialog
-	 (jde-project-application-create-dialog
-	  "project create dialog"
-	  :project this)))
-    (efc-dialog-show dialog)))
-
 
 (defclass jde-project-application-create-dialog (jde-project-create-dialog)
   ()
@@ -176,6 +143,43 @@ the Application Project Creation dialog."
     (oset project :dir proj-dir)
     (jde-project-create project)
     (call-next-method)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                           ;;
+;; Application Project Class                                                 ;;
+;;                                                                           ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defclass jde-project-application (jde-project)
+  ()
+  "Class of JDE application projects")
+
+
+(defmethod jde-project-create ((this jde-project-application))
+    (if (not (file-exists-p (oref this dir)))
+	(if (yes-or-no-p
+	      (format "%s does not exist. Should I create it?" (oref this dir)))
+	    (make-directory (oref this dir))
+	  (error "Cannot create project.")))
+
+    ;; Make source directory
+    (setq dir (expand-file-name "src" (oref this dir)))
+    (if (not (file-exists-p dir)) (make-directory dir))
+
+    ;; Make classes directory
+    (setq dir (expand-file-name "classes" (oref this dir)))
+    (if (not (file-exists-p dir)) (make-directory dir))
+)
+
+
+(defmethod jde-project-show-creation-dialog ((this jde-project-application))
+  "Shows the dialog for creating a Java application project."
+  (let ((dialog
+	 (jde-project-application-create-dialog
+	  "project create dialog"
+	  :project this)))
+    (efc-dialog-show dialog)))
 
 
 ;;; utility functions

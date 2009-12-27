@@ -41,6 +41,13 @@
 (jde-require 'tree-widget)
 (require 'jde-widgets)
 
+
+;; quiet "reference to free variable" build-time warnings
+(defvar jde-bug-local-variables)
+(defvar jde-bug-stack-info)
+(defvar jde-bug-raise-frame-p)
+
+
 (defclass jde-dbo-thread ()
   ((id      :initarg :id)
    (name    :initarg :name)

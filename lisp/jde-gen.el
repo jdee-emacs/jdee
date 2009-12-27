@@ -27,6 +27,10 @@
 (require 'tempo)
 
 
+;; quiet "reference to free variable" build-time warnings
+(defvar jde-package-unknown-package-name)
+
+
 ;; Allow tempo to understand ~ as destination of point
 ;; http://www.emacswiki.org/emacs/TempoMode#toc3
 (defvar tempo-initial-pos nil

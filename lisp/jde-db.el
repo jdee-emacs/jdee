@@ -43,6 +43,12 @@
   (require 'overlay))
 
 
+;; quiet "reference to free variable" build-time warnings
+(defvar jde-global-classpath)
+(defvar jde-sourcepath)
+(defvar jde-debugger)
+
+
 ;; ======================================================================
 ;; jde-db variables
 

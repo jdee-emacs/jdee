@@ -29,6 +29,11 @@
   (require 'senator)
   (require 'jde-which-method))
 
+
+;; quiet "reference to free variable" build-time warnings
+(defvar jde-enable-senator)
+
+
 (defun jde-parse-semantic-default-setup ()
   "Setup the semantic bovinator for the JDE.
 Should be run when Semantic is ready to parse, that is, via

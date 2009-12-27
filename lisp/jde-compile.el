@@ -41,6 +41,12 @@
 (require 'cl)
 (require 'compile)
 
+
+;; quiet "reference to free variable" build-time warnings
+(defvar jde-complete-last-compiled-class)
+(defvar jde-classpath-separator)
+
+
 (defgroup jde-compile-options nil
   "JDE Compiler Options"
   :group 'jde

@@ -113,7 +113,7 @@ checks if it is a member of the base class(\"super\")."
     ;; have senator!
     (when (and (fboundp 'senator-search-forward) (not (string= parsed-symbol "")))
       (goto-char (point-min))
-      (setq xtags (semantic-fetch-tags))
+      (semantic-fetch-tags)
       (senator-parse)
       (setq parsed-symbol (concat "\\b" parsed-symbol "\\b"))
       (while (not (senator-re-search-forward parsed-symbol nil t))

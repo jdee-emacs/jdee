@@ -276,22 +276,27 @@ string describing how the compilation finished."
 	   (lambda (buf msg)
 	     (run-hook-with-args 'jde-checkstyle-finish-hook buf msg)
 	     (setq compilation-finish-function nil)))
-      (set (make-local-variable 'compilation-parse-errors-function) parser)
-      (set (make-local-variable 'compilation-error-message) error-message)
+      (if (boundp 'compilation-parse-errors-function)
+	  (set (make-local-variable 'compilation-parse-errors-function) parser))
+      (if (boundp 'compilation-error-message)
+	  (set (make-local-variable 'compilation-error-message) error-message))
       (set (make-local-variable 'compilation-error-regexp-alist)
 	     error-regexp-alist)
-      (if (not jde-xemacsp)
-	  (progn
-	    (set (make-local-variable 'compilation-enter-directory-regexp-alist)
-		 enter-regexp-alist)
-	    (set (make-local-variable 'compilation-leave-directory-regexp-alist)
-		 leave-regexp-alist)
-	    (set (make-local-variable 'compilation-file-regexp-alist)
-		 file-regexp-alist)
-	    (set (make-local-variable 'compilation-nomessage-regexp-alist)
-	      nomessage-regexp-alist)))
-      (setq default-directory thisdir
-	    compilation-directory-stack (list default-directory)))))
+      (when (not (featurep 'xemacs))
+	(dolist (elt `((compilation-enter-directory-regexp-alist
+			,enter-regexp-alist)
+		       (compilation-leave-directory-regexp-alist
+			,leave-regexp-alist)
+		       (compilation-file-regexp-alist
+			,file-regexp-alist)
+		       (compilation-nomessage-regexp-alist
+			,nomessage-regexp-alist)))
+	  (if (boundp (car elt))
+	      (set (make-local-variable (car elt)) (second elt)))))
+
+      (if (boundp 'compilation-directory-stack)
+	  (setq default-directory thisdir
+		compilation-directory-stack (list default-directory))))))
 
 (defmethod jde-checkstyle-get-property-args ((this jde-checkstyle-checker))
     "Get property arguments."

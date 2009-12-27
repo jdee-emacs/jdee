@@ -29,6 +29,11 @@
 (require 'eieio)
 (require 'jde-util)
 
+
+;; quiet "reference to free variable" build-time warnings
+(defvar jde-jdk-doc-url)
+
+
 (defcustom jde-help-docsets
   (list (list "JDK API"
 	      "http://java.sun.com/javase/6/docs/api"
