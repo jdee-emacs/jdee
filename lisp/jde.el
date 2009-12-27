@@ -56,6 +56,10 @@
 (unless (fboundp 'custom-set-default)
    (defalias 'custom-set-default 'set-default))
 
+;; Use the full Java 1.5 grammar to parse Java files
+;; http://www.mail-archive.com/jde@sunsite.dk/msg07334.html
+(autoload 'wisent-java-default-setup "wisent-java" "Hook run to setup Semantic in `java-mode'." nil nil)
+
 ;; Autoloads must be loaded first since move to sole `(require 'jde)' style.
 (require 'jde-autoload)
 
