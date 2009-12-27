@@ -70,6 +70,14 @@ displayed in the mode line."
   "Format for the JDE source buffer mode line."
   :group 'jde
   :type 'sexp)
+  
+(defcustom jde-which-full-class-name nil
+  "Display full inner-class name in JDE's which method mode. 
+If nil then display only the last component of class name.
+\(see `jde-which-method-max-length', `jde-which-method-class-min-length')
+"
+  :group 'jde-which-method
+  :type  'boolean)
 
 (defcustom jde-which-method-max-length 20
   "Specify the maximum length of the which-method-string \(see
@@ -147,7 +155,7 @@ is not nil. If the full method name is still greater than
 		     ))
 		(if name
 		    (let* ((name-pair (car name))
-			   (class (car name-pair))
+			   (class (jde-which-method-class-name name))
 			   (method (cdr name-pair))
 			   (bounds (cdr name))
 			   (class-length (length class))
@@ -190,7 +198,7 @@ is not nil. If the full method name is still greater than
 		      (setq jde-which-method-current-point-loc p)
 		      (setq jde-which-method-current-method-bounds bounds))
 		  (progn
-		    (setq name (jde-parse-get-innermost-class-at-point))
+		    (setq name (jde-which-class-name (jde-parse-get-innermost-class-at-point)))
 		    (setq jde-which-method-current-point-loc p)
 		    (setq jde-which-method-current-method-bounds (cons -1 -1))
 		    (if name
@@ -212,6 +220,27 @@ is not nil. If the full method name is still greater than
 	 (cancel-timer jde-which-method-idle-timer)
 	 (setq jde-which-method-idle-timer nil)
 	 (message "Error in jde-which-method-update: %s" info)))))
+
+(defun jde-which-full-class-namef (name) 
+  ;; name and return value is: (string . point) or nil.
+  (save-excursion
+    (do ((rv name)) ((not name) rv)
+      (goto-char (cdr name))
+      (setq name (jde-parse-get-innermost-class-at-point))
+      (if name (setf (car rv) (concat (car name) "." (car rv)))))))
+
+(defun jde-which-class-name(name) 
+  ;; use given name or gather full-name:
+  (if jde-which-full-class-name
+      (jde-which-full-class-namef name)
+    name
+    ))
+
+(defun jde-which-method-class-name(name)
+  (if jde-which-full-class-name
+      (car (jde-which-full-class-namef (jde-parse-get-innermost-class-at-point)))
+    (caar name)
+    ))
 
 (defun jde-which-method-update-on-entering-buffer ()
   ;; This is a hook function. Catch all errors to

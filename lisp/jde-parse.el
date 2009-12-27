@@ -522,7 +522,7 @@ Returns nil, if no class could be found."
 	  ;; classname:
 	  "\\([a-zA-Z0-9_]+\\)"
 	  ;; everything between classname and curly brace:
-	  "\\(?:" jde-parse-java-comment-or-ws-re "\\|[a-zA-Z0-9_.,()]\\)*"
+	  "\\(?:" jde-parse-java-comment-or-ws-re "\\|[a-zA-Z0-9_.,()<>]\\)*"
 	  "\\=")
   "Regular expression matching class declarations before point.
 Point must be at opening curly brace of class.
