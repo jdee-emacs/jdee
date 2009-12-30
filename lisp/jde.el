@@ -27,6 +27,10 @@
 
 ;;; Code:
 
+;; quiet "reference to free variable" build-time warnings
+(defvar cedet-version)
+(defvar browse-url-new-window-p)
+
 ;;;###autoload
 (defconst jde-version "@@{project.version}@@"
   "JDE version number.")

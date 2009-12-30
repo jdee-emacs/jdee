@@ -29,6 +29,11 @@
 
 ;;; Code:
 
+;; quiet "reference to free variable" build-time warnings
+(defvar browse-url-new-window-p)
+(defvar jde-global-classpath)
+(defvar jde-sourcepath)
+
 (defgroup jde-javadoc nil
   "Javadoc template generator"
   :group 'jde
