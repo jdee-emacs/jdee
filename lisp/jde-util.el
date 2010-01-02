@@ -93,9 +93,9 @@ Unless optional argument INPLACE is non-nil, return a new string."
 
 (if (not (fboundp 'replace-in-string))
     (defun replace-in-string  (string regexp newtext &optional literal)
-      "Replace REGEXP with NEWTEXT in STRING."
+      "Replace REGEXP with NEWTEXT in STRING. see: `replace-match'"
       (if (string-match regexp string)
-	  (replace-match newtext nil nil string)
+	  (replace-match newtext nil literal string)
 	string)))
 
 

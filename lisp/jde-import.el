@@ -165,6 +165,15 @@ inserted."
   :group 'jde-project
   :type 'boolean)
 
+(defcustom jde-import-exclude-inner-imports t
+  "Exclude imports for classes that appear to be included as inner-classes or by import some.package.*
+This avoids offers for some.package.Outer.Inner when some.package.Outer is already imported.
+Which is correct if your code refers to Outer.Inner, rather than just Inner;
+in the latter case, supplying the no-exclude argument to `jde-import-all' will find all the classes."
+  :group 'jde-project
+  :type 'boolean)
+
+
 (defun jde-import-current-package-p (class)
   "Returns non-nil if the fully qualified classname CLASS belongs to
 the same package as the class in the current buffer."
@@ -241,7 +250,10 @@ return the beginning of the buffer."
 	    (setq insertion-point 1)))
      (save-excursion
        (goto-char insertion-point)
-       (unless (and (bolp) (eolp)) (insert "\n")))
+       (forward-line 1)
+       (setq insertion-point (point))
+       (unless (and (bolp) (eolp)) (insert "\n"))
+       )
      insertion-point))
 
 (defun jde-import-import (class)
@@ -924,6 +936,51 @@ are not the names of inner or outer classes declared in this buffer."
 		       (member name imported-classes))
 		(add-to-list 'classes-to-import  name t)))))))))
 
+(defun jde-import-is-included0(name import0)
+  "check single qualified name against a single qualified class name."
+  (and import0 
+       (let* ((len0 (length import0))
+	      (dotstar (eq t (compare-strings import0 (- len0 2) len0 ".*" nil nil nil)))
+	      (import (if dotstar (substring import0 0 (- len0 2)) import0))
+	      (len (length import)))
+	 (or
+	  (string-equal import name)	; name.equals(import)
+	  (and 
+	   (eq t (compare-strings name 0 len import nil nil nil))  ; name.startsWith(import)
+	   (eq t (compare-strings name len (1+ len) "." nil nil )) ; name[len] == "."
+	   ))
+	 )))
+
+(defun jde-import-is-included1 (name classes) 
+  "check single qualified name against list of qualified classes"
+  (and name
+       (do* ((imports classes (cdr imports))
+	     (import (car imports) (car imports))
+	     (incl (jde-import-is-included0 name import) (jde-import-is-included0 name import)))
+	   ((or (null import) incl) incl)
+	 )))
+
+(defun jde-import-is-included (names classes) 
+  "check single or list of qualified names against qualified classes"
+  (if (listp names) 
+      (do* ((nlist names (cdr nlist))
+	    (name (car nlist) (car nlist))
+	    (incl (jde-import-is-included1 name classes) (jde-import-is-included1 name classes))
+	    )
+	  ((or (null name) incl) incl))
+    (jde-import-is-included1 names classes)
+    ))
+
+(defun jde-import-filter-inner-imports (qualified-names) 
+  "remove names that are imported by outer classes or some.package.*" 
+  (let* ((import-tags (semantic-brute-find-tag-by-class 'include (current-buffer)))
+	 (imported-classes (mapcar (lambda (import-tag) (semantic-tag-name import-tag)) import-tags))
+	 (imports nil))
+    (dolist (qnames qualified-names imports)
+      (if (not (jde-import-is-included qnames imported-classes)) 
+	  (setq imports (cons qnames imports))))
+    ))
+
 (defun jde-import-all-show ()
   "Display a list of the class names referenced in this
 buffer that are not declared or explicitly imported into this
@@ -941,7 +998,10 @@ buffer and hence may need to be imported."
 (defun jde-import-all-filter (unqualified-imports &optional no-exclude)
   "Generate a list of fully qualified names of classes to
 import from UNQUALIFIED-IMPORTS, excluding classes specified
-by `jde-import-exclude-imports' if NO-EXCLUDE is nil."
+by `jde-import-exclude-imports' if NO-EXCLUDE is nil.
+If `jde-import-exclude-inner-imports' is non-nil, then also remove
+any classes that appear to be included by outer-class imports."
+  (let ((imports
   (mapcar
    (lambda (unqualified-class)
      (let ((qualified-imports (jde-import-get-qualified-names unqualified-class)))
@@ -949,6 +1009,10 @@ by `jde-import-exclude-imports' if NO-EXCLUDE is nil."
 	   qualified-imports
 	 (jde-import-exclude-imports qualified-imports))))
    unqualified-imports))
+	)
+    (if (or no-exclude (not jde-import-exclude-inner-imports))
+	imports
+      (jde-import-filter-inner-imports imports))))
 
 (defun jde-import-all-unique ()
   "Import all classes uniquely referenced by unqualified class
