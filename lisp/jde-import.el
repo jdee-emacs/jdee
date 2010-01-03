@@ -306,7 +306,7 @@ semantic Java parser and requires JDE 2.1.6-beta24 and above."
 		(sort-lines reverse start end)
 		(goto-char start)))))))
 
-(defun jde-import-find-and-import (class &optional no-errors no-exclude)
+(defun jde-import-find-and-import (class &optional no-errors no-exclude qualifiedp)
   "*Insert an import statement for a class in the current buffer.
 CLASS is an unqualified class name. This function searches
 the classpath for a class (or classes) that match CLASS. If it
@@ -323,20 +323,28 @@ any directories or jars that you want the command to search in your
 classpath, except jars implicitly included by the jvm, e.g.,
 rt.jar. The NO-ERRORS is used to avoid showing erros to the user."
   (interactive
-   (list (read-from-minibuffer "Class: "
-			       (thing-at-point 'symbol))
-	 nil
-	 current-prefix-arg))
-  (let (existing-import)
-    (setq existing-import (jde-import-get-import class))
-    (if (not (null existing-import))
-	(message "Skipping: already imported %s" existing-import)
-      (let ((imports (jde-import-get-qualified-names class)))
-	(setq imports (remove-duplicates imports :test 'equal))
-	(if imports
-	    (jde-import-insert-import imports (not no-exclude))
-	  (if (not no-errors)
-	      (message "Error: could not find %s." class)))))))
+   (flet ((vfn
+	   (class)
+	   (let ((existing-import (jde-import-get-import (third class))))
+	     (if (null existing-import)
+		 class
+	       (message "Skipping: already imported %s" existing-import)
+	       'pass))))
+     (list (jde-read-class nil nil nil nil nil 'vfn) nil current-prefix-arg t)))
+  (if qualifiedp
+      (unless (eq class 'pass)
+	(jde-parse-class-exists "java.util.List")
+	(jde-import-insert-import (list class) (not no-exclude)))
+    (let (existing-import)
+      (setq existing-import (jde-import-get-import class))
+      (if (not (null existing-import))
+	  (message "Skipping: already imported %s" existing-import)
+	(let ((imports (jde-import-get-qualified-names class)))
+	  (setq imports (remove-duplicates imports :test 'equal))
+	  (if imports
+	      (jde-import-insert-import imports (not no-exclude))
+	    (if (not no-errors)
+		(message "Error: could not find %s." class))))))))
 
 (defun jde-import-exclude-imports (imports)
   "Remove imports from IMPORTS according to `jde-import-excluded-classes'."
