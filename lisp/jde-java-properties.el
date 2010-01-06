@@ -98,6 +98,12 @@
   'jde-java-properties-font-lock-comment-face
   "Face name to use for comments.")
 
+(defvar jde-java-properties-mode-map nil
+  "Keymap for Java-Properties mode.")
+(if jde-java-properties-mode-map
+    nil
+  (setq jde-java-properties-mode-map (make-keymap)))
+
 
 ;;;###autoload
 (defun jde-java-properties-mode ()
@@ -124,14 +130,6 @@
   (use-local-map jde-java-properties-mode-map)
   (font-lock-mode t)
   (run-hooks 'jde-java-properties-mode-hook))
-
-
-(defvar jde-java-properties-mode-map nil
-  "Keymap for Java-Properties mode.")
-
-(if jde-java-properties-mode-map
-    nil
-  (setq jde-java-properties-mode-map (make-keymap)))
 
 
 (defvar jde-java-properties-font-lock-keywords
@@ -172,7 +170,7 @@ BUFFER is the buffer to get the properties and defaults the current buffer."
     (save-excursion
       (if buffer (set-buffer buffer))
       (save-match-data
-	(beginning-of-buffer)
+	(goto-char (point-min))
 	(while (re-search-forward "^\\(.*?\\)=\\(.*\\)$" nil t)
 	  (let ((key (match-string 1))
 		(val (match-string 2)))
