@@ -81,6 +81,16 @@ Note: According to the Java Code Convention [section 6.4], this value should
   :group 'jde-gen
   :type  'boolean)
 
+(defcustom jde-gen-create-javadoc t
+  "*If non-nil, generate Javadoc for all jde-gen-* code generation functions."
+  :group 'jde-gen
+  :type  'boolean)
+
+(defcustom jde-gen-space-after-castings t
+  "*If non-nil, add space between a class casting and what comes after it."
+  :group 'jde-gen
+  :type  'boolean)
+
 ; There must be some cleverer way to do this ...
 (defun jde-gen-delete-preceding-whitespace ()
   "Delete any syntactical whitespace (including newlines)
@@ -676,11 +686,12 @@ It then moves the point to the location to the constructor."
     "'&'> (progn (require 'jde-javadoc) nil)"
 
     ;; create the javadoc (todo: only generate if turned on)
-    "(jde-javadoc-insert-start-block)"
+    "(when jde-gen-create-javadoc "
+    "'(l (jde-javadoc-insert-start-block)"
     "\"* Create a deep clone of this object.\" '>'n"
     "\"*\" '>'n"
     "\"* @return a deep clone of this object.\" '>'n"
-    "'> (jde-javadoc-insert-end-block)"
+    "'> (jde-javadoc-insert-end-block)))"
 
     ;; create method declaration
     "(let (jde-gen-final-methods)"
@@ -702,7 +713,9 @@ It then moves the point to the location to the constructor."
     "  (insert \"ret = (\")"
     "  (insert (file-name-sans-extension"
     "    (file-name-nondirectory buffer-file-name)))"
-    "  (insert \") super.clone();\")"
+    "  (insert \")\") "
+    "  (if jde-gen-space-after-castings (insert \" \"))"
+    "  (insert \"super.clone();\")"
     "  (jde-gen-try-catch-wrapper beg (point))"
     ;; at this point we are at the place to add what exception to catch
     "  (insert \"CloneNotSupportedException\")"
@@ -806,22 +819,25 @@ moved also."
     "(P \"Variable type: \" type t)"
     "(P \"Variable name: \" name t)"
     "'&'n'>"
-    "(progn (require 'jde-javadoc) (jde-javadoc-insert-start-block))"
-    "\"* Describe \" (s name) \" here.\" '>'n"
-    "'> (jde-javadoc-insert-end-block)"
+    "(when jde-gen-create-javadoc "
+    " (progn (require 'jde-javadoc) (jde-javadoc-insert-start-block))"
+    " '(l \"* Describe \" (s name) \" here.\" '>'n"
+    "'> (jde-javadoc-insert-end-block)))"
     "'& \"private \" (s type) \" \""
     "(s name) \";\" '>"
     "(progn (goto-char (marker-position (tempo-lookup-named 'mypos))) nil)"
 
     "(jde-gen-blank-lines 2 -1)"
     ;;we begin by the getter
-    "'> (jde-javadoc-insert-start-block)"
+    "(when jde-gen-create-javadoc "
+    "'(l '> (jde-javadoc-insert-start-block)"
     "\"* Get the <code>\" (jde-gen-lookup-and-capitalize 'name) \"</code> value.\" '>'n"
     "'> (jde-javadoc-insert-empty-line)"
     "'>"
     "(let ((type (tempo-lookup-named 'type)))"
     "  (jde-gen-save-excursion (jde-javadoc-insert 'tempo-template-jde-javadoc-return-tag)))"
-    "'> (jde-javadoc-insert-end-block)"
+    "'> (jde-javadoc-insert-end-block)))"
+
     "(jde-gen-method-signature"
     "  \"public\""
     "  (jde-gen-lookup-named 'type)"
@@ -838,13 +854,15 @@ moved also."
     "'n"
 
     ;;we continue with the setter
-    "'> (jde-javadoc-insert-start-block)"
+    "(when jde-gen-create-javadoc "
+    "'(l '> (jde-javadoc-insert-start-block)"
     "\"* Set the <code>\" (jde-gen-lookup-and-capitalize 'name) \"</code> value.\" '>'n"
     "\"*\" '>'n"
     ;; ToDo: use jde-wiz-get-set-variable-prefix
     "\"* @param new\" (jde-gen-lookup-and-capitalize 'name)"
     "\" The new \" (jde-gen-lookup-and-capitalize 'name) \" value.\" '>'n"
-    "'> (jde-javadoc-insert-end-block)"
+    "'> (jde-javadoc-insert-end-block)))"
+
     ;; name the method
     "(jde-gen-method-signature "
     "  \"public\""
@@ -2970,18 +2988,20 @@ then used instead of the result of `semantic-current-tag'.
 ;;;###autoload
 (defcustom jde-gen-tostring-method-template
   '("'>"
+    "(when jde-gen-create-javadoc"
+    "'(l "
     "\"/**\" '> 'n"
     "\" * Get a string representation of this object.\" '> 'n"
     "\" * \" '> 'n"
     "\" * @return a string representation of this object.\" '> 'n"
     "\" * \" '> 'n"
     "\" * @see java.lang.Object#toString\" '> 'n"
-    "\" */\" '> 'n"
+    "\" */\" '> 'n))"
     "(jde-gen-method-signature \"public\" \"String\" \"toString\" \"\")"
     "(jde-gen-electric-brace)"
     "(jde-gen-tostring-return) '> 'n"
-    "\"}\" '> 'n '>"
-    "(jde-import-one-class \"org.apache.commons.lang.builder.ToStringBuilder\")")
+    "\"}\" '>"
+    )
   "*Template for creating an toString method.
 Setting this variable defines a template instantiation
 command `jde-gen-tostring-method', as a side-effect."
@@ -3000,23 +3020,30 @@ command `jde-gen-tostring-method', as a side-effect."
 (defun jde-gen-tostring-return (&optional class)
   "Generate a body of an appropriate override for the
 java.lang.Object#toString function. This gets the member variables
-of the current class from semantic via `semantic-current-tag'.
-
-This uses the ToStringBuilder class from the jakarta commons lang project.
-"
+of the current class from semantic via `semantic-current-tag'."
   (interactive)
   (let* ((class-tag (or class (semantic-current-tag)))
 	 (class-name (semantic-tag-name class-tag))
 	 (members (jde-parse-get-member-variables class-tag))
 	 (super (car (semantic-tag-type-superclasses class-tag)))
-	 (extends (and super (not (string= "Object" super)))))
+	 (extends (and super (not (string= "Object" super))))
+	 (first t)
+	 (str-bld-type (if (< 1.4 (string-to-number (caar jde-jdk-registry)))
+			   "StringBuilder"
+			 "StringBuffer")))
     (list 'l '>
-	  "return new ToStringBuilder(this)" ' > 'n
-	  (if extends (list 'l ".appendSuper(super.toString())" '> 'n))
+	  (format "return new %s(" str-bld-type)
 	  (cons 'l (mapcar
-	      (lambda (tag)
-		(let ((name (semantic-tag-name tag)))
-		  (list 'l ".append(\"" name "\", " name ")" '> 'n))) members))
+		    (lambda (tag)
+		      (let ((name (semantic-tag-name tag)))
+			(prog1
+			    (list 'l (concat (if (not first) ".append(")
+					     "\""
+					     (if (not first) ", "))
+				  name "=\" + " name ")"
+				  '> 'n)
+			  (setq first nil))))
+		    members))
 	  ".toString();")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
