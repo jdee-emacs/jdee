@@ -98,11 +98,8 @@
   'jde-java-properties-font-lock-comment-face
   "Face name to use for comments.")
 
-(defvar jde-java-properties-mode-map nil
+(defvar jde-java-properties-mode-map (make-keymap)
   "Keymap for Java-Properties mode.")
-(if jde-java-properties-mode-map
-    nil
-  (setq jde-java-properties-mode-map (make-keymap)))
 
 
 ;;;###autoload
@@ -176,8 +173,7 @@ BUFFER is the buffer to get the properties and defaults the current buffer."
 		(val (match-string 2)))
 	    (set-text-properties 0 (length key) nil key)
 	    (set-text-properties 0 (length val) nil val)
-	    (setq prop-alist (append prop-alist (list (cons key val))))
-	    ))))
+	    (setq prop-alist (append prop-alist (list (cons key val))))))))
     prop-alist))
 
 ;;;###autoload
@@ -199,8 +195,7 @@ found."
             (message "Properties file is valid")
           (goto-char dangle-pos)
           (message (format "Found dangling continuation on line %d"
-                           (line-number)
-                           )))))
+                           (line-number-at-pos))))))
     (if goto (goto-char dangle-pos))
     dangle-pos))
 
