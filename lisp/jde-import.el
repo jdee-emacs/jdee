@@ -250,10 +250,7 @@ return the beginning of the buffer."
 	    (setq insertion-point 1)))
      (save-excursion
        (goto-char insertion-point)
-       (forward-line 1)
-       (setq insertion-point (point))
-       (unless (and (bolp) (eolp)) (insert "\n"))
-       )
+       (unless (and (bolp) (eolp)) (insert "\n")))
      insertion-point))
 
 (defun jde-import-import (class)
@@ -944,7 +941,7 @@ are not the names of inner or outer classes declared in this buffer."
 		       (member name imported-classes))
 		(add-to-list 'classes-to-import  name t)))))))))
 
-(defun jde-import-is-included0(name import0)
+(defun jde-import-is-included0 (name import0)
   "check single qualified name against a single qualified class name."
   (and import0 
        (let* ((len0 (length import0))
