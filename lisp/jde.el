@@ -523,7 +523,7 @@ The semicolons in the classpath confuse the shell."
   :type 'boolean)
 
 ;; (makunbound 'jde-lib-directory-names)
-(defcustom jde-lib-directory-names (list "^lib" "^jar")
+(defcustom jde-lib-directory-names (list "/lib$" "/jar$")
   "Regular expressions that matches names of jar/zip directories for
 the current project. See `jde-expand-classpath-p' and
 `jde-expand-classpath' for more information"
@@ -1533,11 +1533,9 @@ existing paths are already normalized."
 	      (if (and
 		   (file-exists-p path)
 		   (file-directory-p path)
-		   (let ((dir-name (file-name-nondirectory path)))
-		     (member-if
-		      (lambda (lib-name)
-			(string-match lib-name dir-name))
-		      jde-lib-directory-names)))
+		   (member-if
+		    (lambda (lib-name) (string-match lib-name path))
+		    jde-lib-directory-names))
 		  (progn
 		    (setq paths
 			  (append
