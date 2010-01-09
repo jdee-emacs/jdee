@@ -181,6 +181,10 @@ the PRIMARY launch method is invoked."
       (read-string "Expression: " initial
 		   'java-bsh-read-java-expression-history))))
 
+(defvar jde-jeval-debug nil
+  "*Whether or not turn on debug logging.
+This logs requests and responses to *Bsh Debug Log*")
+
 ;;;###autoload
 (defun jde-jeval (java-statement &optional eval-return no-print-p)
   "Uses the JDEE's instance of the BeanShell
@@ -196,14 +200,24 @@ command yeilding the output.  This is going to need to be true
 for most things since unless `show()' was invoked and output
 prints out, Emacs has nothing to evaluate or report."
   (interactive (list (jde-bsh-read-java-expression)))
-  (let ((the-bsh (oref 'jde-bsh the-bsh)))
-    (when (not (bsh-running-p the-bsh))
-      (bsh-launch the-bsh)
-      (bsh-eval the-bsh (jde-create-prj-values-str)))
-    (when (not no-print-p)
-      (if (string= (substring java-statement -1) ";")
-	  (setq java-statement (substring java-statement 0 -1)))
-      (setq java-statement (format "\
+  (flet ((log
+	  (msg logtype)
+	  (when jde-jeval-debug
+	    (save-excursion
+	      (set-buffer (get-buffer-create "*Bsh Debug Log*"))
+	      (goto-char (point-max))
+	      (insert (format "%S<" logtype))
+	      (insert (if (stringp msg) msg (prin1-to-string msg)))
+	      (insert ">")
+	      (newline)))))
+    (let ((the-bsh (oref 'jde-bsh the-bsh)))
+      (when (not (bsh-running-p the-bsh))
+	(bsh-launch the-bsh)
+	(bsh-eval the-bsh (jde-create-prj-values-str)))
+      (when (not no-print-p)
+	(if (string= (substring java-statement -1) ";")
+	    (setq java-statement (substring java-statement 0 -1)))
+	(setq java-statement (format "\
 {
   boolean _prevShowValue = this.interpreter.getShowResults();
   Object _retVal = null;
@@ -215,22 +229,24 @@ prints out, Emacs has nothing to evaluate or report."
   }
   if (_retVal != null) print(_retVal);
 }" java-statement)))
-    (let ((output (bsh-eval the-bsh java-statement eval-return))
-	  len)
-      (when (stringp output) 
-	(when (> (length output) 0)
-	  (setq len (length output))
-	  (if (eq ?\n (elt output (1- len)))
-	      (setq output (substring output 0 (1- len)))))
-	(if (= 0 (length output)) (setq output nil)))
-      (when (interactive-p)
-	(if output (kill-new output))
-	(message (if output
-		     (concat "Copied `"
-			     (replace-regexp-in-string "%" "%%" output t t)
-			     "'")
-		   "No result")))
-      output)))
+      (log java-statement 'request)
+      (let ((output (bsh-eval the-bsh java-statement eval-return))
+	    len)
+	(when (stringp output) 
+	  (when (> (length output) 0)
+	    (setq len (length output))
+	    (if (eq ?\n (elt output (1- len)))
+		(setq output (substring output 0 (1- len)))))
+	  (if (= 0 (length output)) (setq output nil)))
+	(log output 'response)
+	(when (interactive-p)
+	  (if output (kill-new output))
+	  (message (if output
+		       (concat "Copied `"
+			       (replace-regexp-in-string "%" "%%" output t t)
+			       "'")
+		     "No result")))
+	output))))
 
 (defun jde-jeval-r (java-statement)
   "Uses the JDEE's instance of the BeanShell to
