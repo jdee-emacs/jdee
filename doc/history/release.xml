@@ -2,7 +2,7 @@
 
 <revision-log>
     <release version="2.4.0">
-	<repo start-revision="83" end-revision="HEAD"/>
+	<repo start-revision="83" end-revision="196"/>
 	<summary>
 	    This is a "catchup" release that contains many patches and other
 	    contributions that have been queuing up over the last few years.
