@@ -2,7 +2,14 @@
 
 <revision-log>
     <release version="2.4.0">
-	<repo start-revision="83" end-revision="193"/>
+	<repo start-revision="83" end-revision="HEAD"/>
+	<summary>
+	    This is a "catchup" release that contains many patches and other
+	    contributions that have been queuing up over the last few years.
+	    While there are many new JDK 1.5 features added, the next (2.4.1)
+	    release will contain more or hopefully the remainder of those
+	    language changes.
+	</summary>
 
 	<change commiter="paullandes">
 	    <msg>The old CVS Log entries have now moved to doc/history/cvs-revision-log.xml.</msg>
@@ -19,7 +26,6 @@
 	</change>
 
 	<change commiter="lentrig">
-	    <author>TODO: look up in the logs who made these contributed these patches</author>
 	    <msg>More 1.5 and 1.6 support.</msg>
 	</change>
 

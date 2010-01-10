@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<project name="jdee" default="dist">
+<project name="jdee" default="bindist">
   <!--
      For compilation and installation instructions, see doc/install.html
      -->
@@ -167,8 +167,8 @@
 	  description="compile all JDEE source code"/>
 
 
-  <target name="dist" depends="build"
-	  description="create the &quot;binary&quot; distribution">
+  <target name="bindist" depends="build"
+	  description="create the &quot;binary&quot; distribution, which only includes what you need to run the JDEE">
     <!-- create dist java lib directory -->
     <mkdir dir="${dist.lisp.dir}"/>
     <!-- keep mod times to avoid .el being newer than .elc -->
@@ -189,43 +189,20 @@
       <fileset dir="${lib.java.dir}"/>
     </copy>
 
-    <!-- for those who want to look at the Java source -->
-    <mkdir dir="${dist.java.src.dir}"/>
-    <copy todir="${dist.java.src.dir}">
-      <fileset dir="${src.java.dir}"/>
-    </copy>
-
-    <!-- user guide docs -->
-    <mkdir dir="${dist.doc.html.dir}"/>
-    <copy todir="${dist.doc.html.dir}">
-      <!-- use the checked in generated docs for now -->
-      <fileset dir="./doc/html" includes="**"/>
-    </copy>
-
     <!-- create the JDE jar file -->
     <jar destfile="${dist.jar.jde.file}"
 	 basedir="${build.java.dir}"
 	 includes="**/*.class"/>
-
-    <!--javadoc sourcepath="${src.java.dir}"
-	     destdir="${dist.doc.java.api.dir}"
-	     classpathref="compile.classpath"
-	     author="true" version="true" use="true"
-	     windowtitle="JDEE Java API"
-	     /-->
   </target>
 
-  <target name="create-release-props" depends="init">
-      <xslt in="${build.release.info.xml}"
+  <target name="release-info" depends="init">
+      <taskdef resource="org/apache/ant/svn/antlib.xml"/>
+      <xslt in="${build.release.xml}"
 	    out="${build.release.properties.xml}"
 	    style="${build.release.properties.xsl}">
 	  <param name="version" expression="${project.version}"/>
       </xslt>
       <xmlproperty file="${build.release.properties.xml}"/>
-  </target>
-
-  <target name="package" depends="create-release-props">
-      <taskdef resource="org/apache/ant/svn/antlib.xml"/>
       <mkdir dir="${build.etc.dir}"/>
       <echo message="creating change log for revisions ${release.revision.start} - ${release.revision.end}"/>
       <changelog dir="." destfile="${build.hist.changelog.xml}"
@@ -237,9 +214,56 @@
 	  <param name="title" expression="JDEE ChangeLog"/>
 	  <param name="repo" expression="https://jdee.svn.sourceforge.net/svnroot/jdee/"/>
       </xslt>
+      <xslt in="${build.release.xml}"
+	    out="${build.hist.release.html}"
+	    style="${build.release.notes.xsl}">
+	  <param name="title" expression="JDEE ${project.version} Release Notes"/>
+	  <param name="version" expression="${project.version}"/>
+      </xslt>
+      <mkdir dir="${dist.etc.dir}"/>
+      <copy todir="${dist.etc.dir}">
+	  <fileset dir="${build.etc.dir}" includes="*.html"/>
+      </copy>
+      <copy todir="${dist.etc.dir}">
+	  <fileset dir="${build.doc.dir}/flat"/>
+      </copy>
   </target>
 
-  <target name="install" depends="dist"
+  <target name="source-doc" depends="init">
+    <!-- user guide docs -->
+    <mkdir dir="${dist.doc.html.dir}"/>
+    <copy todir="${dist.doc.html.dir}">
+      <!-- use the checked in generated docs for now -->
+      <fileset dir="./doc/html" includes="**"/>
+    </copy>
+
+    <!-- JDEE Java api docs -->
+    <javadoc sourcepath="${src.java.dir}"
+	     destdir="${dist.doc.java.api.dir}"
+	     classpathref="compile.classpath"
+	     author="true" version="true" use="true"
+	     windowtitle="JDEE ${project.version} Java API"/>
+  </target>
+
+  <target name="srcdist" depends="bindist,source-doc,release-info"
+	  description="create the &quot;source&quot; distribution, which includes binaries, the docs, and the Java source">
+      <!-- for those who want to look at the Java source -->
+      <mkdir dir="${dist.java.src.dir}"/>
+      <copy todir="${dist.java.src.dir}">
+	  <fileset dir="${src.java.dir}"/>
+      </copy>
+  </target>
+
+  <target name="package" depends="srcdist"
+	  description="create distribution zip, gzip and bzip2 tarballs that are put on the dist site">
+      <mkdir dir="${build.package.dir}"/>
+      <mkdir dir="${package.dir}"/>
+      <package-dist type="src"/>
+      <package-dist type="bin" includes="${package.prefix}/java/lib/**,${package.prefix}/etc/**,${package.prefix}/lisp/**"/>
+  </target>
+
+
+  <target name="install" depends="bindist"
 	  description="install the derived objects (the entire dist)">
       <mkdir dir="${prefix.dir}"/>
       <copy todir="${prefix.dir}" preservelastmodified="true">
@@ -254,7 +278,7 @@
   <target name="clean" depends="init"
 	  description="delete all derived objects EXCEPT the user edited configuration file">
     <delete dir="${build.dir}"/>
-    <delete dir="${dist.dir}"/>
+    <delete dir="${dist.base.dir}"/>
   </target>
 
   <target name="clean-all" depends="clean"
@@ -272,6 +296,23 @@
       <sequential>
 	  <propertyregex property="@{property}" input="@{value}" regexp="\\"
 			 defaultValue="@{value}" replace="/" global="true"/>
+      </sequential>
+  </macrodef>
+
+  <!-- create distribution zip, gzip and bzip2 tarballs -->
+  <macrodef name="package-dist">
+      <attribute name="includes" default="${package.prefix}/**"/>
+      <attribute name="type"/>
+      <sequential>
+	  <tar destfile="${build.package.dir}/jdee-@{type}-${project.version}.tar" basedir="${dist.base.dir}" includes="@{includes}"/>
+	  <zip destfile="${package.dir}/jdee-@{type}-${project.version}.zip" basedir="${dist.base.dir}" includes="@{includes}"/>
+	  <checksum file="${package.dir}/jdee-@{type}-${project.version}.zip" forceOverwrite="yes" fileext=".md5"/>
+
+	  <gzip destfile="${package.dir}/jdee-@{type}-${project.version}.tar.gz" src="${build.package.dir}/jdee-@{type}-${project.version}.tar"/>
+	  <checksum file="${package.dir}/jdee-@{type}-${project.version}.tar.gz" forceOverwrite="yes" fileext=".md5"/>
+
+	  <bzip2 destfile="${package.dir}/jdee-@{type}-${project.version}.tar.bz2" src="${build.package.dir}/jdee-@{type}-${project.version}.tar"/>
+	  <checksum file="${package.dir}/jdee-@{type}-${project.version}.tar.bz2" forceOverwrite="yes" fileext=".md5"/>
       </sequential>
   </macrodef>
 
