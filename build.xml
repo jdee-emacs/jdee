@@ -307,10 +307,6 @@
 	  <tar destfile="${build.package.dir}/jdee-@{type}-${project.version}.tar" basedir="${dist.base.dir}" includes="@{includes}"/>
 	  <zip destfile="${package.dir}/jdee-@{type}-${project.version}.zip" basedir="${dist.base.dir}" includes="@{includes}"/>
 	  <checksum file="${package.dir}/jdee-@{type}-${project.version}.zip" forceOverwrite="yes" fileext=".md5"/>
-
-	  <gzip destfile="${package.dir}/jdee-@{type}-${project.version}.tar.gz" src="${build.package.dir}/jdee-@{type}-${project.version}.tar"/>
-	  <checksum file="${package.dir}/jdee-@{type}-${project.version}.tar.gz" forceOverwrite="yes" fileext=".md5"/>
-
 	  <bzip2 destfile="${package.dir}/jdee-@{type}-${project.version}.tar.bz2" src="${build.package.dir}/jdee-@{type}-${project.version}.tar"/>
 	  <checksum file="${package.dir}/jdee-@{type}-${project.version}.tar.bz2" forceOverwrite="yes" fileext=".md5"/>
       </sequential>
