@@ -1,6 +1,14 @@
 <?xml version="1.0"?>
 
 <revision-log>
+    <release version="2.4.1">
+	<repo start-revision="200" end-revision="HEAD"/>
+	<summary>
+	    The goal of this release is to get caught up to JDK 1.5.  I will
+	    also contain some minor patches and jde-help enhancements.
+	</summary>
+    </release>
+
     <release version="2.4.0">
 	<repo start-revision="83" end-revision="196"/>
 	<summary>
@@ -73,11 +81,5 @@
 	    <author>Paul Landes</author>
 	    <msg>More parsing ability (i.e. reverse camel notation parsing, which replaces some key bindings, convert from reverse camel notation to other variable formats like SQL, Java properties, hungarian notation, C constants, etc. parse Beanshell/Java expressions).</msg>
 	</change>
-
     </release>
-
-    <!--
-	TODO add ReleaseNotes.txt for previous releases here and delete
-	ReleaseNotes.txt
-    -->
 </revision-log>
