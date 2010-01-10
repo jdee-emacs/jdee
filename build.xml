@@ -215,6 +215,30 @@
 	     /-->
   </target>
 
+  <target name="create-release-props" depends="init">
+      <xslt in="${build.release.info.xml}"
+	    out="${build.release.properties.xml}"
+	    style="${build.release.properties.xsl}">
+	  <param name="version" expression="${project.version}"/>
+      </xslt>
+      <xmlproperty file="${build.release.properties.xml}"/>
+  </target>
+
+  <target name="package" depends="create-release-props">
+      <taskdef resource="org/apache/ant/svn/antlib.xml"/>
+      <mkdir dir="${build.etc.dir}"/>
+      <echo message="creating change log for revisions ${release.revision.start} - ${release.revision.end}"/>
+      <changelog dir="." destfile="${build.hist.changelog.xml}"
+		 start="${release.revision.start}"
+		 end="${release.revision.end}"/>
+      <xslt in="${build.hist.changelog.xml}"
+	    out="${build.hist.changelog.html}"
+	    style="${build.hist.changelog.xsl}">
+	  <param name="title" expression="JDEE ChangeLog"/>
+	  <param name="repo" expression="https://jdee.svn.sourceforge.net/svnroot/jdee/"/>
+      </xslt>
+  </target>
+
   <target name="install" depends="dist"
 	  description="install the derived objects (the entire dist)">
       <mkdir dir="${prefix.dir}"/>

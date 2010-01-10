@@ -2,6 +2,8 @@
 
 <revision-log>
     <release version="2.4.0">
+	<repo start-revision="83" end-revision="193"/>
+
 	<change commiter="paullandes">
 	    <msg>The old CVS Log entries have now moved to doc/history/cvs-revision-log.xml.</msg>
 	</change>
