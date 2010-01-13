@@ -1720,8 +1720,9 @@ codeing standard).
 The first two elements of the list are `nil' if CLASSNAME isn't fully qualifed."
   (flet ((is-first-cap
 	  (str)
-	  (let ((char (substring str 0 1)))
-	    (string= char (upcase char))))
+	  (unless (= 0 (length str))
+	    (let ((char (substring str 0 1)))
+	      (string= char (upcase char)))))
 	 (is-all-cap
 	  (str)
 	  (string= str (upcase str)))
@@ -1739,7 +1740,9 @@ The first two elements of the list are `nil' if CLASSNAME isn't fully qualifed."
 			 (is-first-cap classname))
 		(if (and (> (length classname) 1)
 			 (is-all-cap classname))
-		    (list nil nil pkg)
+		    ;; looks like <class>.<sym> (i.e. Color.WHITE)
+		    ;;(list nil nil pkg)
+		    nil
 		  (list fq pkg classname)))))))
     (if (eq classname 'point)
 	;; TODO: a fully qualified class name looks like a file name
