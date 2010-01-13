@@ -1718,19 +1718,29 @@ or `nil' if the passed class name doesn't look like a class (by the Sun Java
 codeing standard).
 
 The first two elements of the list are `nil' if CLASSNAME isn't fully qualifed."
-  (flet ((parse-at-point
+  (flet ((is-first-cap
+	  (str)
+	  (let ((char (substring str 0 1)))
+	    (string= char (upcase char))))
+	 (is-all-cap
+	  (str)
+	  (string= str (upcase str)))
+	 (parse-at-point
 	  (classname)
-	  (let (end-pos fq pkg)
+	  (let ((nopkgclass classname)
+		end-pos fq pkg)
 	    (when (> (length classname) 0)
 	      (setq end-pos (position ?. classname :from-end t))
 	      (if end-pos
 		  (setq fq classname
 			pkg (substring fq 0 end-pos)
 			classname (substring fq (1+ end-pos))))
-	      (when (> (length classname) 0)
-		(let ((char (substring classname 0 1)))
-		  (if (string= char (upcase char))
-		      (list fq pkg classname))))))))
+	      (when (and (> (length nopkgclass) 0)
+			 (is-first-cap classname))
+		(if (and (> (length classname) 1)
+			 (is-all-cap classname))
+		    (list nil nil pkg)
+		  (list fq pkg classname)))))))
     (if (eq classname 'point)
 	;; TODO: a fully qualified class name looks like a file name
 	;; (i.e. [a-zA-Z.])  but this need to be refined to use the Sun Java
