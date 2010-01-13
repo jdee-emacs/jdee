@@ -517,7 +517,7 @@ If a parameter to this function is empty or nil, then it is omitted
    "(jde-gen-get-package-statement)"
    "(when jde-gen-create-javadoc"
    "(progn (require 'jde-javadoc) (jde-javadoc-insert-start-block))"
-   "'l( \" * Describe class \""
+   "'(l \" * Describe class \""
    "    (file-name-sans-extension (file-name-nondirectory buffer-file-name))"
    "    \" here.\" 'n"
    "    \" \" (jde-javadoc-insert-empty-line)"
