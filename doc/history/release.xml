@@ -7,6 +7,40 @@
 	    The goal of this release is to get caught up to JDK 1.5.  I will
 	    also contain some minor patches and jde-help enhancements.
 	</summary>
+
+	<change commiter="paullandes">
+	    <msg><![CDATA[
+<pre>
+New jde-help now provides the following:
+- When class found in more than one docset, user is prompted to select one.
+- Now supports using beanshell as a method of documentation existence (instead of just wget and w3).
+
+Variable jde-help-docsets now has a different format.  To convert to the new format, execute the following:
+
+(let ((sets (mapcar '(lambda (docset)
+		       (let ((type (car docset))
+			     (url (second docset))
+			     version)
+			 (if (equal type "JDK API")
+			     (setq version
+				   (cond ((string-match "6" url) "1.6")
+					 ((string-match "5" url) "1.5")
+					 ((string-match "4" url) "1.4"))))
+			 (if (not (string-match "^http" url))
+			     (setq url (concat "file://" url)))
+			 (list nil url version)))
+		    jde-help-docsets)))
+  (customize-set-variable 'jde-help-docsets sets)
+  (customize-variable 'jde-help-docsets)
+  (save-excursion
+    (set-buffer (get-buffer-create "*Temp Convert jde-help-docsets*"))
+    (insert "If on windows, translate correct file URLs (i.e. file://C|/path...)
+Now, confirm customized variables are set correctly and then click the State
+button and save.")
+    (display-buffer (current-buffer))))
+</pre>
+]]></msg>
+	</change>
     </release>
 
     <release version="2.4.0">

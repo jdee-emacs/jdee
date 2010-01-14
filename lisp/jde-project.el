@@ -32,7 +32,7 @@
 (defgroup jde-project nil
   "JDE Project Options"
   :group 'jde
-  :prefix "jde-project")
+  :prefix "jde-project-")
 
 
 (defvar jde-project-menu-definition

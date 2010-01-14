@@ -264,6 +264,12 @@ See `jde-htmlize-code-destinations'."
 	    (if (buffer-live-p buf)
 		(kill-buffer buf))))))))
 
+(defun jde-create-default-prompt (prompt default)
+  "Format a prompt with optional default formatting."
+  (format "%s%s"
+	  prompt (if default
+		     (format " (default %s): " default) ": ")))
+
 (provide 'jde-util)
 
 ;; End of jde-util.el
