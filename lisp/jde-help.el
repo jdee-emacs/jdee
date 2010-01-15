@@ -492,7 +492,10 @@ try {
 	      (progn
 		(princ "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\" \"http://www.w3.org/TR/html4/frameset.dtd\">\n")
 		(princ "<html>\n<head>\n")
-		(princ "<title>JDEE Javadoc Window</title>\n</head>\n")
+		(princ
+		 (format "<title>%s (%s)</title>\n</head>\n"
+			 (oref (oref url :docset) :description)
+			 (oref url :class)))
 		(princ "<frameset cols=\"20%,80%\" onload=\"window.focus()\">\n")
 		(princ "<frameset rows=\"30%,70%\">\n")
 		(princ
@@ -516,9 +519,11 @@ try {
 	       (format "<meta http-equiv=\"Refresh\" content=\"0; URL=%s\">\n"  doc-url))
 	      (princ "</head>\n<body onload=\"window.focus()\">\n</body>\n</html>")))
 	  (save-buffer))
-	(display-buffer buf)
 	(kill-buffer buf)
 	(setq doc-url metafile)))
+    (message "Displaying %s from %s"
+	     (oref url :class)
+	     (oref (oref url :docset) :description))
     (jde-jdhelper-show-document this doc-url)))
 
 (defmethod jde-jdhelper-show-document ((this jde-jdhelper) doc-url &rest args)
@@ -530,7 +535,7 @@ try {
 	  ((string= jde-help-browser-function "w3m-browse-url")
 	   'w3m-browse-url)
 	  (t 'browse-url))))
-  (apply browser-function doc-url args)))
+    (apply browser-function doc-url args)))
 
 (defvar jde-jdhelper-singleton (jde-jdhelper nil)
   "The JDHelper singleton instance.")
