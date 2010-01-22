@@ -5,7 +5,13 @@
 
     <xsl:param name="version"/>
 
-    <xsl:template match="/revision-log/release[@version=$version]">
+    <xsl:template match="/">
+	<xsl:for-each select="/revision-log/release[@version=$version]">
+	    <xsl:call-template name="release"/>
+	</xsl:for-each>
+    </xsl:template>
+
+    <xsl:template name="release">
 	<release>
 	    <revision>
 		<xsl:call-template name="repo"/>

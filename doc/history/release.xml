@@ -9,14 +9,15 @@
 	</summary>
 
 	<change commiter="paullandes">
-	    <msg><![CDATA[
-<pre>
+	    <msg>
 New jde-help now provides the following:
-- When class found in more than one docset, user is prompted to select one.
-- Now supports using beanshell as a method of documentation existence (instead of just wget and w3).
-
+<ul>
+<li>When class found in more than one docset, user is prompted to select one.</li>
+<li>Now supports using beanshell as a method of documentation existence (instead of just wget and w3)</li>
+</ul>
 Variable jde-help-docsets now has a different format.  To convert to the new format, execute the following:
-
+<div class="code">
+<pre>
 (let ((sets (mapcar '(lambda (docset)
 		       (let ((type (car docset))
 			     (url (second docset))
@@ -39,7 +40,8 @@ Now, confirm customized variables are set correctly and then click the State
 button and save.")
     (display-buffer (current-buffer))))
 </pre>
-]]></msg>
+</div>
+</msg>
 	</change>
     </release>
 
