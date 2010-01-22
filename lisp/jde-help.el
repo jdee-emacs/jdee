@@ -308,15 +308,12 @@ This defaults to false."
 	       :documentation "The wget program."
 	       )
    (tries :initarg :tries
-	  :initform (lambda () jde-help-wget-tries)
 	  :type (or null number)
 	  )
    (timeout :initarg :timeout
-	    :initform (lambda () jde-help-wget-timeout)
 	    :type (or null number)
 	    )
    (options :initarg :options
-	    :initform (lambda () jde-help-wget-command-line-options)
 	    :type (or null string)
 	    )
    ))
@@ -328,7 +325,12 @@ This defaults to false."
 		 (if (eq system-type 'windows-nt) "wget.exe" "wget"))))
       (unless exec
 	(error "Cannot find wget. You might want to use the beanshell resolver instead."))
-      (oset this :executable exec))))
+      (oset this :executable exec)))
+  (dolist (elt '((:tries . jde-help-wget-tries)
+		 (:timeout . jde-help-wget-timeout)
+		 (:options . jde-help-wget-command-line-options)))
+    (unless (slot-boundp this (car elt))
+      (set-slot-value this (car elt) (symbol-value (cdr elt))))))
 
 (defmethod jde-jdurl-resolver-url-exists ((this jde-jdurl-wget-resolver) url)
   (with-slots (tries timeout options) this
