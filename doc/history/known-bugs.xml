@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<known-bugs>
+    <bug>
+	<descovery version="2.4.1" by="Livin Stephen Sharma"/>
+	<lisp-function>jde-wiz-extend-abstract-class</lisp-function>
+	<description>Implementation-stubs for the abstract methods in MyAbstract do *NOT* appear in the body of the new class which could be a little better - since 'extend' is used in the prompts that jde-gen-class creates, it would be nice to have the jde-wiz-extend-abstract-class functionality kick in *if* the specified 'parent' class is abstract.</description>
+	<research author="paullandes">To my recollection, this at one time did work but must have been broken at some point from the old CVS version.  I did start to look at this and pinned it down to a NullPointerException in the JDEE Java code, but that is as far as I've gotten.</research>
+    </bug>
+</known-bugs>
