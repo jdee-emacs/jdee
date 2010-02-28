@@ -539,6 +539,30 @@ try {
 	  (t 'browse-url))))
     (apply browser-function doc-url args)))
 
+(defmethod jde-jdhelper-describe-docsets ((this jde-jdhelper))
+  (let* ((cols (mapcar '(lambda (docset)
+			  (list (oref docset :description)
+				(jde-url-name (oref docset :url))
+				(if (oref docset :jdkp)
+				    (oref docset :version))))
+		       (oref this :docsets)))
+	 (max-len (apply 'max (mapcar '(lambda (col)
+					 (length (first col)))
+				      cols))))
+    (save-excursion
+      (set-buffer (get-buffer-create "*JDEE Docsets*"))
+      (erase-buffer)
+      (dolist (col cols)
+	(insert (format "%s: %s%s%s\n"
+			(first col)
+			(make-string (- max-len (length (first col))) ? )
+			(second col)
+			(if (third col)
+			    (format " (ver %s)" (third col))
+			  ""))))
+      (goto-char (point-min))
+      (pop-to-buffer (current-buffer)))))
+
 (defvar jde-jdhelper-singleton (jde-jdhelper nil)
   "The JDHelper singleton instance.")
 
@@ -548,6 +572,11 @@ try {
 
 
 (defvar jde-help-read-url-history nil)
+
+(defun jde-help-describe-docsets ()
+  (interactive)
+  (let ((this jde-jdhelper-singleton))
+    (jde-jdhelper-describe-docsets this)))
 
 (defun jde-help-class (class)
   "Return help for fully qualified CLASS."
