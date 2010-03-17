@@ -213,7 +213,7 @@ if there is no import statement for UNQUALIFIED-CLASS."
 	    (throw 'found import))))))
 
 (defun jde-import-get-import-insertion-point ()
-   "Determine where to insert an import statement.
+  "Determine where to insert an import statement.
 If the buffer contains an import statement, return
 the beginning of the next line; otherwise, if
 the buffer contains a package statement, insert
@@ -222,36 +222,37 @@ the second empty line; otherwise, if the buffer
 contains a class definition, return the beginning
 of the line before the class definition; otherwise,
 return the beginning of the buffer."
-   (let* ((tags (semantic-fetch-tags))
-	  (import-tag
-	   (car (last (semantic-brute-find-tag-by-class
-		       'include tags))))
-	  (package-tag (car (semantic-brute-find-tag-by-class
-			     'package tags)))
-	  (class-tag (car (semantic-brute-find-tag-by-class
-			   'type tags)))
-	  insertion-point)
-     (cond (import-tag
-	    (setq insertion-point (+ (semantic-tag-end import-tag) 1)))
-	   (package-tag
-	    (save-excursion
-	      (goto-char (semantic-tag-end package-tag))
-	      (forward-line)
-	      (insert "\n")
-	      (setq insertion-point (point))))
-	   (class-tag
-	    (setq insertion-point
-		  (let ((comment-token (semantic-documentation-for-tag
-					class-tag 'lex)))
-		    (if comment-token
-			(semantic-lex-token-start comment-token)
-		      (semantic-tag-start class-tag)))))
-	   (t
-	    (setq insertion-point 1)))
-     (save-excursion
-       (goto-char insertion-point)
-       (unless (and (bolp) (eolp)) (insert "\n")))
-     insertion-point))
+  (flet ((insertion-point-after (tag-end)
+	  (goto-char tag-end)
+	  (if (eolp) (forward-char 1)(forward-line 1)) ;skip comment
+	  (point)
+	  ))
+    (let* ((tags (semantic-fetch-tags)) ;(xx (message "tags = %s" tags))
+	   (import-tag (car
+			(last (semantic-brute-find-tag-by-class
+			       'include tags))))
+	   (package-tag (car (semantic-brute-find-tag-by-class
+			      'package tags)))
+	   (class-tag (car (semantic-brute-find-tag-by-class
+			    'type tags)))
+	   )
+      (save-excursion
+	(cond (import-tag
+	       (insertion-point-after (semantic-tag-end import-tag)))
+	      (package-tag
+	       (insertion-point-after (semantic-tag-end package-tag))
+	       (insert "\n")		;empty line before new imports
+	       (unless (eolp)		;empty line after new imports
+		 (save-excursion (insert "\n")))
+	       (point))
+	      (class-tag
+	       (let ((comment-token (semantic-documentation-for-tag
+				     class-tag 'lex)))
+		 (if comment-token
+		     (semantic-lex-token-start comment-token)
+		   (semantic-tag-start class-tag))))
+	      (t 1)))
+      )))
 
 (defun jde-import-import (class)
   "*Insert an import statement for a class in the current buffer.
@@ -408,14 +409,16 @@ inserts the selected import in the buffer."
       (setq new-imports (jde-import-exclude-imports new-imports)))
     (loop for new-import in new-imports do
 	  (when (> (length new-import) 0) ;; added to avoid insert empty import statements.
-	    (insert
-	     (concat "import " new-import ";\n"))
+	    (insert (concat "import " new-import ";\n"))
 	    (message "Imported %s" new-import)))
     (if jde-import-auto-collapse-imports
 	(let (jde-import-auto-collapse-imports) ;; setting this to avoid infinite recursion
 	  (jde-import-collapse-imports)))
     (if jde-import-auto-sort
-	(funcall jde-import-auto-sort-function))))
+	(funcall jde-import-auto-sort-function))
+    (semantic-fetch-tags)
+    (semantic-parse-changes)
+    ))
 
 
 (defun jde-import-already-imports-class (class-name existing-imports)
