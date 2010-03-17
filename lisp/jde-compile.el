@@ -479,14 +479,11 @@ source files.
 	   (const "1.6"))))
 
 ;;(makunbound 'jde-compile-option-target)
-(defcustom jde-compile-option-target (list "1.1")
+(defcustom jde-compile-option-target (list "default")
 "*Generate class files that will work on VMs with the specified version.
 
-The default is to generate class files to be compatible with both
-1.1 and 1.2 VMs. The versions supported by javac in JDK1.2 are:
-
   1.1     Ensure that generated class files will be compatible
-	  with 1.1 and 1.2 VMs. This is the default.
+	  with 1.1 and 1.2 VMs.
 
   1.2     Generate class files that will run on 1.2 VMs, but
 	  not on 1.1 VMs.
@@ -497,6 +494,16 @@ The default is to generate class files to be compatible with both
 
   1.4     Generate class files that are compatible only with
 	  1.4 VMs.
+
+  1.5     Generate class files that are compatible only with
+	  1.5 VMs.
+
+  1.6     Generate class files that are compatible only with
+	  1.6 VMs.
+
+Select \"default\" to use the source features that the compiler
+supports by default, i.e., to not include the -target switch on
+the compiler command line.
 
 By default, classes are compiled against the bootstrap and extension classes
 of the JDK that javac shipped with. But javac also supports cross-compiling,
@@ -509,10 +516,13 @@ cross-compiling."
 	  (radio-button-choice
 	   :format "%t \n%v"
 	   :tag "Target VM:"
+	   (const "default")
 	   (const "1.1")
 	   (const "1.2")
 	   (const "1.3")
-	   (const "1.4"))))
+	   (const "1.4")
+	   (const "1.5")
+	   (const "1.6"))))
 
 (defcustom jde-compile-option-bootclasspath nil
 "*Cross-compile against the specified set of boot classes.
@@ -768,7 +778,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 (defmethod jde-compile-target-arg ((this jde-compile-compiler))
   "Get compiler target argument for this compiler."
     (let ((target (car jde-compile-option-target)))
-      (if (not (string= target "1.1"))
+      (if (not (string= target "default"))
 	  (list "-target" target))))
 
 (defmethod jde-compile-source-arg ((this jde-compile-compiler))
@@ -1130,6 +1140,9 @@ If t (or other non-nil non-number) then kill in 2 secs."
 (defmethod jde-compile-get-args ((this jde-compile-javac-16))
   (append
    (jde-compile-classpath-arg this)
+   (jde-compile-sourcepath-arg this)
+   (jde-compile-bootclasspath-arg this)
+   (jde-compile-extdirs-arg this)
    (jde-compile-encoding-arg this)
    (jde-compile-debug-arg this)
    (jde-compile-output-dir-arg this)
@@ -1143,6 +1156,8 @@ If t (or other non-nil non-number) then kill in 2 secs."
    (jde-compile-vm-args this)
    (jde-compile-verbose-arg this)
    (jde-compile-nowarn-arg this)
+   (jde-compile-target-arg this)
+   (jde-compile-source-arg this)
    (jde-compile-command-line-args this)))
 
 
