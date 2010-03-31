@@ -546,9 +546,7 @@ only confuse JDE.  Paths may contain environment variables."
   :group 'jde-project
   :type '(repeat (file :tag "Path")))
 
-
-;; (makunbound 'jde-build-function)
-(defcustom jde-build-function '(jde-make)
+(defcustom jde-build-function 'jde-make
   "*Function that will be invoked by the `jde-build' command.
 The `jde-make' function uses a make
 program to rebuild the project. The `jde-ant-build' function
@@ -557,14 +555,10 @@ specify a custom function to use. The custom function must
 be an interactive function that can be called by
 `call-interactively'."
   :group 'jde-project
-  :type '(list
-	  (radio-button-choice
-	   :format "%t \n%v"
-	   :tag "Function: "
-	   :entry-format " %b %v"
-	   (const jde-make)
-	   (const jde-ant-build)
-	   (function my-custom-build-function))))
+  :type '(radio
+	  (const :tag "Make" jde-make)
+	  (const :tag "Ant" jde-ant-build)
+	  (function :tag "Custom function" identity)))
 
 ;;(makunbound 'jde-debugger)
 (defcustom jde-debugger (list "jdb")
@@ -824,7 +818,7 @@ interpreter."
   "Rebuild the entire project.
 This command invokes the function defined by `jde-build-function'."
   (interactive)
-  (call-interactively (car jde-build-function)))
+  (call-interactively jde-build-function))
 
 ; (define-derived-mode
 ;   jde-mode java-mode "JDE"
