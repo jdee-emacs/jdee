@@ -521,6 +521,7 @@ this function at the end of autoloaded JDEE packages
 to register and  initialize customization variables
 defined by the current project's project file."
   (jde-symbol-list t)
+  (jde-custom-adjust-groups)
   (jde-load-project-file))
 
 
