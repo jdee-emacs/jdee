@@ -1164,6 +1164,7 @@ Does nothing but return nil if `jde-log-max' is nil."
 		    ["Make"            jde-make-show-options t]
 		    ["Ant"             jde-ant-show-options t]
 		    ["Complete"        jde-show-complete-options t]
+		    ["JUnit"           jde-junit-show-options t]
 		    ["Wiz"             jde-show-wiz-options t]
 		    )
 	      (list "Project File"
