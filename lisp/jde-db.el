@@ -47,7 +47,7 @@
 (defvar jde-global-classpath)
 (defvar jde-sourcepath)
 (defvar jde-debugger)
-
+(declare-function jde-expand-wildcards-and-normalize "jde" (path &optional symbol))
 
 ;; ======================================================================
 ;; jde-db variables
@@ -2000,17 +2000,14 @@ name, e.g. A$B if point is in inner class B of A."
   "Return true if one of `jde-sourcepath'
 matches FILE."
   (let* ((directory-sep-char ?/)
-	 (filename (jde-normalize-path file)))
+		 (filename (jde-normalize-path file)))
     (find-if
      (lambda (dir-x)
        (string-match
-	(concat
-	 "^"
-	 (jde-normalize-path
-	  dir-x
-	  'jde-sourcepath))
-	filename))
-     jde-sourcepath)))
+		(concat "^" dir-x)
+		filename))
+     (jde-expand-wildcards-and-normalize jde-sourcepath 'jde-sourcepath))))
+
 
 (provide 'jde-db)
 

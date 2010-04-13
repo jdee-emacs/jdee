@@ -542,7 +542,7 @@ the current project. See `jde-expand-classpath-p' and
 source files corresponding to class files.  When entering paths in the
 custom buffer, enter each path as a separate item in a separate edit
 field. Do NOT put more than one path in the same edit field. You'll
-only confuse JDE.  Paths may contain environment variables."
+only confuse JDE.  Paths may contain environment variables or wildcards."
   :group 'jde-project
   :type '(repeat (file :tag "Path")))
 
@@ -1482,6 +1482,30 @@ SYMBOL is unnecessary."
 	  (setq p (expand-file-name p))))
     (setq p (jde-convert-cygwin-path p))
     p))
+
+(defcustom jde-expand-wildcards-in-paths-p t
+  "Expands entries in the 'jde-sourcepath which are wildcards patterns into a list of matching files or directories which are interpolated into the sourcepath list."
+   :group 'jde-project
+   :type 'boolean)
+
+(defun jde-expand-wildcards-and-normalize (path &optional symbol)
+  "Expand any entries with wildcard patterns in path and interpolate them into the result"
+  (if jde-expand-wildcards-in-paths-p
+      (mapcan
+       (lambda (path)
+	 (let ((exp-paths (file-expand-wildcards path)))
+	   (if exp-paths exp-paths (list path))))
+       (jde-normalize-paths path symbol))
+    (jde-normalize-paths path symbol)
+    ))
+
+(defmacro jde-normalize-paths (pathlist &optional symbol)
+  "Normalize all paths of the list PATHLIST and returns a list with the
+expanded paths."
+  `(mapcar (lambda (path)
+			 (jde-normalize-path path ,symbol))
+		   ,pathlist))
+
 
 (defun jde-directory-files-recurs (dir &optional include-regexp)
   "Get all the files in DIR, and any subdirectories of DIR, whose

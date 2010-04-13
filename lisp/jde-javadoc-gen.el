@@ -33,6 +33,7 @@
 (defvar browse-url-new-window-p)
 (defvar jde-global-classpath)
 (defvar jde-sourcepath)
+(declare-function jde-expand-wildcards-and-normalize "jde" (path &optional symbol))
 
 (defgroup jde-javadoc nil
   "Javadoc template generator"
@@ -328,8 +329,7 @@ by the jde-javadoc-gen variables."
 	       (list
 		"-sourcepath"
 		(jde-build-classpath
-		 jde-sourcepath
-		 'jde-sourcepath)))))
+		 (jde-expand-wildcards-and-normalize jde-sourcepath 'jde-sourcepath))))))
 
 
     ;; Insert bootclasspath

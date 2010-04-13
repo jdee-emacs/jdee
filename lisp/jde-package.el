@@ -152,7 +152,7 @@ That is to say the first non-nil value found in the variables given by
    (jde-package-get-classpath)))
 
 
-(defun jde-package-seach-package-directories ()
+(defun jde-package-search-package-directories ()
   "Return a list of package directory candidates or nil if not found."
   (let ((dir (jde-normalize-path default-directory))
 	;; case-insensitive for Windows
@@ -166,9 +166,8 @@ That is to say the first non-nil value found in the variables given by
      (append (jde-package-get-directories-in-classpath)
 	     (mapcar
 	      (lambda (p)
-		(file-name-as-directory
-		 (jde-normalize-path p 'jde-sourcepath)))
-	      jde-sourcepath)))))
+		(file-name-as-directory p))
+	      (jde-expand-wildcards-and-normalize jde-sourcepath 'jde-sourcepath))))))
 
 (defun jde-package-best-package-candidate (candidates)
   "Return the best package directory candidate from CANDIDATES.
@@ -181,7 +180,7 @@ The best is the shortest one that could be found."
   "Return the package directory, if found; otherwise,
 `jde-package-unknown-package-name'."
   (or (jde-package-best-package-candidate
-       (jde-package-seach-package-directories))
+       (jde-package-search-package-directories))
       jde-package-unknown-package-name))
 
 

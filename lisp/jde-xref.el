@@ -190,7 +190,12 @@ FILENAME must be created by `jde-xref-pickle-hash'"
     (when (and (eq major-mode 'jde-mode) jde-sourcepath)
       (let ((first-prefix (car (split-string (jde-parse-get-package-name)
 					     "\\."))) (prefixes))
-	(dolist (path (remove-if-not (lambda (path) (file-exists-p path)) jde-sourcepath) prefixes)
+	(dolist (path (remove-if-not
+				   (lambda (path)
+					 (file-exists-p path))
+				   (jde-expand-wildcards-and-normalize jde-sourcepath
+													   'jde-sourcepath))
+				  prefixes)
 	  (when (member first-prefix (directory-files path nil "[^.]$"))
 	    (message (concat "path = " path))
 	    (add-to-list 'prefixes (get-prefix path first-prefix))))))))
