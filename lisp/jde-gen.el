@@ -3845,18 +3845,12 @@ time to enable or disable eelctric return mode."
 	  (setq jde-electric-return-mode val)
 	  (set-default sym val)))
 
-(defcustom jde-newline-function  '(newline)
-  "Indent command that `jde-electric-return' calls."
+(defcustom jde-newline-function  'newline-and-indent
+  "Indent command that `jde-electric-return' calls.  Functions
+that may be useful include newline, newline-and-indent,
+align-newline-and-indent, or your own custom function."
   :group 'jde-gen
-  :type '(list
-	  (radio-button-choice
-	   :format "%t \n%v"
-	   :tag "Function: "
-	   :entry-format " %b %v"
-	   (const newline)
-	   (const newline-and-indent)
-	   (const align-newline-and-indent)
-	   (function my-custom-newline-function))))
+  :type 'function)
 
 (defun jde-gen-embrace()
   "Match an open brace at the end of a line
@@ -3910,7 +3904,7 @@ After:
 	  (re-search-backward "{\\s-*" (line-beginning-position) t))
 	(looking-at "}?\\s-*$"))
       (jde-gen-embrace)
-    (call-interactively (car jde-newline-function))))
+    (call-interactively jde-newline-function)))
 
 (defvar jde-electric-return-mode nil
   "Nonnil indicates that electric return mode is on.")
