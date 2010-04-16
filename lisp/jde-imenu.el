@@ -216,7 +216,10 @@ See also `semantic-prototype-nonterminal'."
 					  tag-cat))))
     (if (fboundp prototyper)
 	(funcall prototyper tag parent color)
-      (semantic-format-prototype-tag-java-mode tag parent color))))
+      (if (fboundp 'semantic-format-prototype-tag-java-mode)
+	  (semantic-format-prototype-tag-java-mode tag parent color) ;; cedet-1.0pre6 and earlier
+	(semantic-format-tag-prototype-java-mode tag parent color)) ;; cedet-1.0pre7
+      )))
 
 (defun jde-imenu-prototype-function (tag &optional parent color)
   "Return a function (method) prototype for TAG.
