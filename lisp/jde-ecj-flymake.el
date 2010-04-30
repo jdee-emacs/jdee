@@ -149,8 +149,8 @@ To use this funtion set the java line in `flymake-allowed-file-name-masks' to
              (local-file  (file-relative-name
                            temp-file
                            (file-name-directory buffer-file-name))))
-        (list "java" (append  (jde-compile-classpath-arg (jde-compile-get-the-compiler))
-                              (list "-jar" (oref  (jde-compile-get-ejc) path) "-noExit" "-Xemacs")
+        (list "java" (append  (list "-jar" (oref  (jde-compile-get-ejc) path) "-noExit" "-Xemacs")
+			      (jde-compile-classpath-arg (jde-compile-get-the-compiler))
                               jde-ecj-command-line-args
                               (list local-file))))))
 
