@@ -192,7 +192,7 @@ the Application Project Creation dialog."
     (jde-project-show-creation-dialog project)))
 
 ;;;###autoload
-(defun jde-describe-path (path-type)
+(defun jde-describe-path (path-type &optional buf)
   "Prints and gives file existance for each path.
 PATH-TYPE is either `global classpath' for `jde-global-classpath' or
 `source path' for `jde-sourcepath'."
@@ -206,7 +206,9 @@ PATH-TYPE is either `global classpath' for `jde-global-classpath' or
       (setq path-name "Global Classpath"
 	      path jde-global-classpath))
     (save-excursion
-      (set-buffer (get-buffer-create (format "*JDEE %s*" path-name)))
+      (set-buffer
+       (or buf
+	   (get-buffer-create (format "*JDEE %s*" path-name))))
       (setq truncate-lines t)
       (erase-buffer)
       (insert (format "%s:
@@ -221,7 +223,7 @@ blank:  path doesn't exist
 	(setq file (replace-regexp-in-string "~/" user-home file nil t))
 	(insert (format "[%s]  %s\n" desc file)))
       (goto-char (point-min))
-      (pop-to-buffer (current-buffer)))))
+      (unless buf (pop-to-buffer (current-buffer))))))
 
 (provide 'jde-project)
 

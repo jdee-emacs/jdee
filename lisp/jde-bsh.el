@@ -65,11 +65,6 @@
 		     :documentation
 		     "Path of the BeanShell commmand directory.")
 
-   (maven-ant-task-jar  :initarg :maven-ant-task-jar
-			:type string
-			:documentation
-			"Path of the the maven ant tasks jar.")
-
    (checkstyle-jar  :initarg :checkstyle-jar
 		    :type string
 		    :documentation
@@ -105,9 +100,6 @@
 	   "java/")))
 
     (oset this bsh-cmd-dir (expand-file-name "bsh-commands" jde-java-directory))
-    (oset this maven-ant-task-jar
-	  (car (file-expand-wildcards (expand-file-name
-				       "lib/maven-ant-tasks*.jar" jde-java-directory) t)))
     (oset this checkstyle-jar  (expand-file-name "lib/checkstyle-all.jar" jde-java-directory))
     (oset this regexp-jar (expand-file-name "lib/jakarta-regexp.jar" jde-java-directory))
     (oset this jde-classes-dir (expand-file-name "classes" jde-java-directory))
@@ -150,7 +142,6 @@ the PRIMARY launch method is invoked."
 		      (list
 		       (oref this jar)
 		       (oref this bsh-cmd-dir)
-		       (oref this maven-ant-task-jar)
 		       (oref this checkstyle-jar)
 		       (oref this regexp-jar)
 		       (if jde-devel-debug
