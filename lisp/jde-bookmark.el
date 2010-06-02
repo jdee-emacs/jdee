@@ -30,6 +30,8 @@
 
 ;;; Code:
 
+(eval-when-compile
+  (require 'jde))
 (require 'jde-parse)
 (require 'jde-util)
 
