@@ -23,7 +23,8 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
-(require 'semantic-util)
+(jde-semantic-require 'semantic-util)
+(jde-semantic-require 'semantic-idle)
 (require 'beanshell)
 (require 'jde-complete)
 (require 'efc)

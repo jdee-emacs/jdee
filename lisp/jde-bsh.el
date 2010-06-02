@@ -32,7 +32,8 @@
 ;;; Code:
 
 (require 'eieio)
-(require 'beanshell)
+(eval-when-compile
+  (require 'beanshell))
 (require 'jde-parse-expr)
 
 (declare-function jde-build-classpath "jde" (path &optional sym quote-path-p))

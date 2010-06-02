@@ -79,6 +79,8 @@
 (require 'eieio)
 (require 'comint)
 (require 'lmenu)
+(eval-when-compile
+  (require 'cl))
 
 (declare-function jde-find-jde-doc-directory "jde" nil)
 

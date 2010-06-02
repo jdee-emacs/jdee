@@ -28,8 +28,8 @@
 
 ;;; Code:
 
-(require 'semantic-java)
-(require 'semantic-imenu)
+(jde-semantic-require 'semantic-java)
+(jde-semantic-require 'semantic-imenu)
 (require 'regexp-opt)
 
 ;;; Compatibility

@@ -25,7 +25,7 @@
 (require 'jde-parse)
 (require 'jde-util)
 (require 'jde-bsh)
-(require 'senator)
+(jde-semantic-require 'senator)
 
 (defcustom jde-open-class-at-point-find-file-function 'find-file-other-window
   "Define the function for opening the class at point. See

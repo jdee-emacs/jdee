@@ -23,8 +23,8 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
-(require 'semantic-sb)
-(require 'semantic-ctxt)
+(jde-semantic-require 'semantic-ctxt)
+(jde-semantic-require 'semantic-sb)
 (if (< emacs-major-version 23)
     (progn
       (require 'avltree)  ;; use elib's avltree with local compatibility kludges

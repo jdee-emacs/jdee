@@ -32,7 +32,7 @@
 (defvar browse-url-new-window-p)
 
 ;;;###autoload
-(defconst jde-version "@@{project.version}@@"
+(defconst jde-version "2.4.1"
   "JDE version number.")
 
 (defconst jde-revision "$Revision$"
@@ -63,13 +63,23 @@
 ;; Use the full Java 1.5 grammar to parse Java files
 (autoload 'wisent-java-default-setup "wisent-java" "Hook run to setup Semantic in `java-mode'." nil nil)
 
+(defun jde-semantic-require (sym)
+  (require
+   (if (< emacs-major-version 23)
+       sym
+     (cond ((string= sym 'senator) 'semantic/senator)
+	   (t (intern (replace-in-string (symbol-name sym) "-" "/" t)))))))
+
 ;; Autoloads must be loaded first since move to sole `(require 'jde)' style.
 (require 'jde-autoload)
 
 (require 'jde-util)
 (require 'jde-custom)
 (require 'jde-help)
-(require 'semantic-load)
+;; starting with Emacs 23 (from source ftp.gnu.org), cedet is now included
+(require (if (< emacs-major-version 23)
+	     'semantic-load
+	   'semantic))
 (require 'easymenu)
 (require 'cl)
 (require 'font-lock)
