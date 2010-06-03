@@ -665,7 +665,7 @@ while. If it does, you might want to consider increasing
 		       (jde-xref-get-current-class) token))))))
     (let ((uncalled-methods
 	    (mapcan 'get-unused-string
-		    (semantic-find-nonterminal-by-token 'function
+		    (semantic-brute-find-tag-by-class 'function
 							(current-buffer)
 							t)))
 	  (unreferenced-variables

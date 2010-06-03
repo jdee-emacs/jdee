@@ -179,7 +179,7 @@ replaced by that range.  See also `semantic-change-hooks'."
 (defun jde-parse-buffer-contains-multiple-classes-p ()
   "Return non-nil if buffer contains multiple class definitions."
   (let* ((top-level-classes
-	  (semantic-find-nonterminal-by-token
+	  (semantic-brute-find-tag-by-class
 	   'type
 	   (semantic-fetch-tags)))
 	 (top-level-class-count (length top-level-classes)))
@@ -189,7 +189,7 @@ replaced by that range.  See also `semantic-change-hooks'."
       (= top-level-class-count 1)
       (let* ((inner-class-parts (semantic-tag-type-members (car top-level-classes)))
 	     (inner-classes
-	      (semantic-find-nonterminal-by-token
+	      (semantic-brute-find-tag-by-class
 	       'type inner-class-parts)))
 	(>= (length inner-classes) 1))))))
 
@@ -244,7 +244,7 @@ moved also."
 	  (setq class-regexp (regexp-quote class-name)))))
 
   (let* ((tokens (semantic-fetch-tags))
-	 (classes (semantic-find-nonterminal-by-token 'type tokens))
+	 (classes (semantic-brute-find-tag-by-class 'type tokens))
 	 class-parts pos)
 
     (setq pos
@@ -297,7 +297,7 @@ MODIFIERS creteria as an exact match or subset.  This defaults to `subset'."
   (if (null member-name-regexp) (setq member-name-regexp ".*"))
 
   (let* ((tokens (semantic-fetch-tags))
-	 (classes (semantic-find-nonterminal-by-token 'type tokens))
+	 (classes (semantic-brute-find-tag-by-class 'type tokens))
 	 cmp-fn vars var-parts var-name var-modifiers i)
 
     (setq cmp-fn
@@ -328,7 +328,7 @@ MODIFIERS creteria as an exact match or subset.  This defaults to `subset'."
 		      (string-equal class-name (semantic-tag-name class)))
 
 	      (setq var-parts (semantic-tag-type-members class)
-		    vars (semantic-find-nonterminal-by-token
+		    vars (semantic-brute-find-tag-by-class
 			  'variable var-parts)
 		    i 0)
 
@@ -896,8 +896,8 @@ in a method; otherwise, nil."
 	  (class pos)
 	  (let* ((class-name       (semantic-tag-name class))
 		 (class-parts      (semantic-tag-type-members class))
-		 (class-subclasses (semantic-find-nonterminal-by-token 'type class-parts))
-		 (class-methods    (semantic-find-nonterminal-by-token 'function class-parts)))
+		 (class-subclasses (semantic-brute-find-tag-by-class 'type class-parts))
+		 (class-methods    (semantic-brute-find-tag-by-class 'function class-parts)))
 
 	    ;; Is point in a method of a subclass of this class?
 	    (loop for subclass in class-subclasses do
@@ -915,7 +915,7 @@ in a method; otherwise, nil."
 
     (let* ((pos (if position position (point)))
 	   (tokens (semantic-fetch-tags))
-	   (classes (semantic-find-nonterminal-by-token 'type tokens)))
+	   (classes (semantic-brute-find-tag-by-class 'type tokens)))
       (catch 'found
 	(loop for class in classes
 	      do (search-class class pos))))))
@@ -1008,8 +1008,8 @@ in a method; otherwise, nil."
 	  (class)
 	  (let* ((class-name       (semantic-tag-name class))
 		 (class-parts      (semantic-tag-type-members class))
-		 (class-subclasses (semantic-find-nonterminal-by-token 'type class-parts))
-		 (class-methods    (semantic-find-nonterminal-by-token 'function class-parts)))
+		 (class-subclasses (semantic-brute-find-tag-by-class 'type class-parts))
+		 (class-methods    (semantic-brute-find-tag-by-class 'function class-parts)))
 
 	    ;; Add methods of subclasses
 	    (loop for subclass in class-subclasses do
@@ -1027,7 +1027,7 @@ in a method; otherwise, nil."
 		      (cons method-start method-end))))))))
 
     (let* ((tokens (semantic-fetch-tags))
-	   (classes (semantic-find-nonterminal-by-token 'type tokens)))
+	   (classes (semantic-brute-find-tag-by-class 'type tokens)))
       (loop for class in classes do
 	    (add-methods class)))))
 
@@ -1498,8 +1498,8 @@ It uses the semantic parser table to find the 'package' and 'import'
 statements. It implicitly adds the java.lang.* package. See also
 `jde-split-import-token'."
   (let* ((tokens   (semantic-fetch-tags))
-	 (packages (semantic-find-nonterminal-by-token 'package tokens))
-	 (imports  (semantic-find-nonterminal-by-token 'include tokens))
+	 (packages (semantic-brute-find-tag-by-class 'package tokens))
+	 (imports  (semantic-brute-find-tag-by-class 'include tokens))
 	 lst)
     (setq lst (append
 	       (mapcar (function

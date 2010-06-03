@@ -718,7 +718,7 @@ the tokens of `class-name', returns nil if no token are found"
     (if (not parts)
 	(while tokens
 	  (setq temp-parts (semantic-tag-type-members (car tokens)))
-	  (setq inner-classes (semantic-find-nonterminal-by-token 'type temp-parts))
+	  (setq inner-classes (semantic-brute-find-tag-by-class 'type temp-parts))
 	  (setq parts (jde-wiz-get-class-parts class-name inner-classes))
 	  (if parts
 	      (setq tokens nil)
@@ -776,12 +776,12 @@ defined in the current buffer."
 	 (classes (split-string class "\\."))
 	 (class-name (nth (- (length classes) 1) classes))
 	 (tokens (semantic-fetch-tags));;buffer tokens
-	 (type (semantic-find-nonterminal-by-token 'type tokens));;class tokens
+	 (type (semantic-brute-find-tag-by-class 'type tokens));;class tokens
 	 (parts (jde-wiz-get-class-parts class-name type))
-	 (variables (semantic-find-nonterminal-by-token 'variable parts));;declared variables
+	 (variables (semantic-brute-find-tag-by-class 'variable parts));;declared variables
 	 ;;non public variables
 	 (non-public-variables (jde-wiz-filter-variables-by-typemodifier variables))
-	 (functions (semantic-find-nonterminal-by-token 'function parts));;functions
+	 (functions (semantic-brute-find-tag-by-class 'function parts));;functions
 	 (set-get-functions (jde-wiz-get-get-set-methods functions));;get,set,is functions
 	 var name staticp finalp report temp pos)
 
@@ -1155,11 +1155,11 @@ If `jde-wiz-tostring-postfix' is defined, it is appended to the string. "
 	 (jde-parse-get-unqualified-name
 	  (jde-parse-get-class-at-point)))
 	(variables
-	 (semantic-find-nonterminal-by-token
+	 (semantic-brute-find-tag-by-class
 	  'variable
 	  (jde-wiz-get-class-parts
 	   class-name
-	   (semantic-find-nonterminal-by-token
+	   (semantic-brute-find-tag-by-class
 	    'type
 	    (semantic-fetch-tags)
 	    ))))

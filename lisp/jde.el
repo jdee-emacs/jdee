@@ -64,11 +64,17 @@
 (autoload 'wisent-java-default-setup "wisent-java" "Hook run to setup Semantic in `java-mode'." nil nil)
 
 (defun jde-semantic-require (sym)
-  (require
-   (if (< emacs-major-version 23)
-       sym
-     (cond ((string= sym 'senator) 'semantic/senator)
-	   (t (intern (replace-in-string (symbol-name sym) "-" "/" t)))))))
+  (cond ((string= sym 'senator)
+	 (or (require sym nil t)
+	     (require 'semantic/senator)))
+	(t (or (require sym nil t)
+	       (require
+		(intern (replace-in-string (symbol-name sym) "-" "/" t)))))))
+(when (fboundp 'font-lock-add-keywords)
+  (font-lock-add-keywords 'emacs-lisp-mode
+			  '(("(\\(jde-semantic-require\\)[ \t]+'?\\(.*?\\))"
+			     (1 font-lock-keyword-face)
+			     (2 font-lock-constant-face)))))
 
 ;; Autoloads must be loaded first since move to sole `(require 'jde)' style.
 (require 'jde-autoload)

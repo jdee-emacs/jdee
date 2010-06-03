@@ -309,9 +309,9 @@ index to go to class definition."
   "Creates an imenu index for class parts in TAGS.
 When`jde-imenu-include-signature' is non-nil the
 index menu displays full method signatures and field types."
-  (let ((methods (semantic-find-nonterminal-by-token 'function tags))
-	(fields  (semantic-find-nonterminal-by-token 'variable tags))
-	(classes (semantic-find-nonterminal-by-token 'type     tags))
+  (let ((methods (semantic-brute-find-tag-by-class 'function tags))
+	(fields  (semantic-brute-find-tag-by-class 'variable tags))
+	(classes (semantic-brute-find-tag-by-class 'type     tags))
 	index)
 
     (setq methods (jde-imenu-sort-tags methods))
@@ -375,9 +375,9 @@ This function uses the semantic bovinator to index the buffer."
     (semantic-fetch-tags)
 
     (let* ((tags   (semantic-fetch-tags))
-	   (packages (semantic-find-nonterminal-by-token 'package tags))
-	   (depends  (semantic-find-nonterminal-by-token 'include tags))
-	   (classes  (semantic-find-nonterminal-by-token 'type tags))
+	   (packages (semantic-brute-find-tag-by-class 'package tags))
+	   (depends  (semantic-brute-find-tag-by-class 'include tags))
+	   (classes  (semantic-brute-find-tag-by-class 'type tags))
 	   depend-index
 	   index)
 
