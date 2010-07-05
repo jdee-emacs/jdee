@@ -900,7 +900,7 @@ expressions."
 	    '(1 'font-lock-warning-face t)))
 	;; package and imports
 	`(,(c-make-font-lock-search-function
-	    "\\<\\(package\\|import\\(?:\\s-+static\\)?\\)\\s-+\\(\\(?:[a-z*][a-zA-Z0-9]*\\.?\\)*\\)"
+	    "\\<\\(package\\|import\\(?:\\s-+static\\)?\\)\\s-+\\(\\(?:[a-z_$*][a-zA-Z0-9_$]*\\.?\\)*\\)"
 	    '(1 'font-lock-keyword-face t)
 	    '(2 'jde-java-font-lock-package-face t)))
 	;; constructor
