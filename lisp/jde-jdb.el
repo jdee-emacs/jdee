@@ -669,7 +669,7 @@ expression at poing")
   (oset
    this
    :marker-regexp
-   "^.*: thread=.*, \\(\\(.*[.]\\)*\\)\\([^\$]*\\)\\(\$.*\\)*[.].+(), line=\\([0-9,.]*\\),")
+   "^.*: thread=.*, \\(\\(.*[.]\\)*\\)\\([^\$]*\\)\\(\$.*\\)*[.].+(), line=\\([0-9,. ]*\\),")
   ;; Regular expression to match a breakpoint message that lacks a line
   ;; number because the breakpoint occurs in a class compiled without deug
   ;; information.
@@ -738,7 +738,7 @@ expression at poing")
     (oset this
 	  :marker-acc (concat
 		       (oref this :marker-acc)
-		       input))
+		       (string-make-unibyte input)))
 
     ;; (message (format "<acc-start>%s<acc-end>" (oref this :marker-acc)))
 
@@ -1186,6 +1186,28 @@ JDK.")
    :marker-regexp
    "^.*: \"thread=.*\", \\(\\(.*[.]\\)*\\)\\([^$]*\\)\\($.*\\)*[.].+(), line=\\([0-9,.]*\\)"))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                            ;;
+;; JDK 1.6.0 Support                                                          ;;
+;;                                                                            ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defclass jde-db-jdb-1-6 (jde-db-jdb)
+  ()
+  (:allow-nil-initform t)
+  "Class of JPDA-based jdb shipped with J2SDK 1.6")
+
+(defmethod initialize-instance ((this jde-db-jdb-1-6) &rest fields)
+  "Constructor for jdb-1.6."
+  (call-next-method)
+  ;; Regular expression used to find a jdb breakpoint position marker.
+  ;; The regular expression has two subexpressions. The first matches
+  ;; the name of the class in which the breakpoint occurs; the second, the
+  ;; line number at which the breakpoint occurs."
+  (oset (oref this bp-listener)
+   :marker-regexp
+   "^.*: \"thread=.*\", \\(\\(.*[.]\\)*\\)\\([^$]*\\)\\($.*\\)*[.].+(), line=\\([0-9,.\240]*\\)"))
+
+
 (defun jde-jdb-get-jdb ()
   "Gets the version of jdb specified for the
 current project."
@@ -1193,14 +1215,18 @@ current project."
     (cond
      ((string= (car jde-debugger) "jdb")
       (cond
-       ((and (< (jde-java-major-version) 2)
-	     (< (jde-java-minor-version) 2))
-	(setq jdb (jde-db-jdb-1-1 "jdb 1.1")))
-       ((and (< (jde-java-major-version) 2)
-	     (= (jde-java-minor-version) 3))
-	(setq jdb (jde-db-jdb-1-3 "jdb 1.3")))
+       ((< (jde-java-major-version) 2)
+	(cond
+	 ((< (jde-java-minor-version) 2)
+	  (setq jdb (jde-db-jdb-1-1 "jdb 1.1")))
+	 ((= (jde-java-minor-version) 3)
+	  (setq jdb (jde-db-jdb-1-3 "jdb 1.3")))
+	 ((= (jde-java-minor-version) 4)
+	  (setq jdb (jde-db-jdb-1-4 "jdb 1.4")))
+	 (t
+	  (setq jdb (jde-db-jdb-1-6 "jdb 1.6")))))
        (t
-	(setq jdb (jde-db-jdb-1-4 "jdb 1.4")))))
+	(setq jdb (jde-db-jdb-1-6 "jdb 1.6")))))
      ((string= (car jde-debugger) "old jdb")
       (if (and (< (jde-java-major-version) 2)
 	       (< (jde-java-minor-version) 2))
