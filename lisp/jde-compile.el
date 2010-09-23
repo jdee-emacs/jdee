@@ -937,6 +937,8 @@ If t (or other non-nil non-number) then kill in 2 secs."
       (save-excursion
 	(set-buffer (oref (oref this buffer) buffer))
 
+	(insert "CompileServer output:\n\n")
+
 	(let* ((inhibit-read-only t)
 	       flag
 	       (arg-string
@@ -954,7 +956,6 @@ If t (or other non-nil non-number) then kill in 2 secs."
 			 x))))
 		 args " ")))
 
-	  (insert "CompileServer output:\n\n")
 	  (insert arg-string " " source-path "\n")))
 
       (if (not (jde-bsh-running-p))
@@ -1257,12 +1258,10 @@ If t (or other non-nil non-number) then kill in 2 secs."
 
       (setq arg-array (concat arg-array "}"))
      
-	
       (save-excursion
 	(set-buffer (oref (oref this buffer) buffer))
 
-	(insert "CompileServer output:\n")
-	(insert "\n")
+	(insert "CompileServer output:\n\n")
 
 	(let (flag temp)
 	  (setq temp
@@ -1292,7 +1291,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
        (jde-ecj-get-bsh)
        (concat
 	(format
-         "if ((new org.eclipse.jdt.internal.compiler.batch.Main(new java.io.PrintWriter(System.out), new java.io.PrintWriter(System.out), true)).compile(%s)) { print (\"0\");} else {print (\"1\");};"
+         "if ((new org.eclipse.jdt.internal.compiler.batch.Main(new java.io.PrintWriter(System.out), new java.io.PrintWriter(System.out), true, null, null)).compile(%s)) { print (\"0\");} else {print (\"1\");};"
          arg-array)
 	"\n")
        (oref this buffer))))
