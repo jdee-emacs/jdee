@@ -1281,14 +1281,14 @@ If t (or other non-nil non-number) then kill in 2 secs."
 	  (insert temp " "))
 	(insert source-path "\n"))
 
-      (if (not (jde-ecj-bsh-running-p))
+      (if (not (jde-bsh-running-p))
 	  (progn
-	    (bsh-launch (jde-ecj-get-bsh))
-	    (bsh-eval (jde-ecj-get-bsh) (jde-create-prj-values-str))))
-      (bsh-eval (jde-ecj-get-bsh)
+	    (bsh-launch (oref 'jde-bsh the-bsh))
+	    (bsh-eval (oref 'jde-bsh the-bsh) (jde-create-prj-values-str))))
+      (bsh-eval (oref 'jde-bsh the-bsh)
                    (format "addClassPath(\"%s\");" (oref this :path)))
       (bsh-buffer-eval
-       (jde-ecj-get-bsh)
+       (oref 'jde-bsh the-bsh)
        (concat
 	(format
          "if ((new org.eclipse.jdt.internal.compiler.batch.Main(new java.io.PrintWriter(System.out), new java.io.PrintWriter(System.out), true, null, null)).compile(%s)) { print (\"0\");} else {print (\"1\");};"
