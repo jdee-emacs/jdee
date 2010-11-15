@@ -2870,6 +2870,8 @@ Or, with `jde-gen-equals-trailing-and-operators' set to t:
 ;;;###autoload
 (defcustom jde-gen-hashcode-method-template
   '("'>"
+    "(when jde-gen-create-javadoc"
+    "'(l "
     "\"/**\" '> 'n"
     "\" * Calculate the hash code for this object.\" '> 'n"
     "\" * \" '> 'n"
@@ -2879,7 +2881,7 @@ Or, with `jde-gen-equals-trailing-and-operators' set to t:
     "\" * @return the hash code.\" '> 'n"
     "\" * \" '> 'n"
     "\" * @see java.lang.Object#hashCode\" '> 'n"
-    "\" */\" '> 'n"
+    "\" */\" '> 'n))"
     "(jde-gen-method-signature \"public\"\ \"int\" \"hashCode\" nil)"
     "(jde-gen-electric-brace)"
     "(jde-gen-hashcode-body) '> 'n"
