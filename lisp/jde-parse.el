@@ -1738,18 +1738,22 @@ The first two elements of the list are `nil' if CLASSNAME isn't fully qualifed."
 			classname (substring fq (1+ end-pos))))
 	      (when (and (> (length nopkgclass) 0)
 			 (is-first-cap classname))
-		;; can't return `nil' for all caps classes
-		;; (i.e. com.google.gwt.core.client.GWT without class name)
-;; 		(if (and (> (length classname) 1)
-;; 			 (is-all-cap classname))
+		;; either a class can be all caps with a package behind it
+		;; (i.e. com.google.gwt.core.client.GWT) or it can be class
+		;; with a constant in front of it (i.e. Color.WHITE), currently
+		;; support the latter instead of kludging this now
+		;; --PL 2010-06-30
+ 		(if (and (> (length classname) 1)
+ 			 (is-all-cap classname))
 		    ;; looks like <class>.<sym> (i.e. Color.WHITE)
-		    ;;nil
-		  (list fq pkg classname))))))
+		    nil
+		  (list fq pkg classname)))))))
     (if (eq classname 'point)
 	;; TODO: a fully qualified class name looks like a file name
 	;; (i.e. [a-zA-Z.])  but this need to be refined to use the Sun Java
 	;; standards of class name parsing
-	(or (parse-at-point (thing-at-point 'filename))
+	(or (let ((thing-at-point-file-name-chars "-~/[:alnum:]_.${}#%:"))
+	      (parse-at-point (thing-at-point 'filename)))
 	    (parse-at-point (thing-at-point 'word))
 	    (parse-at-point (thing-at-point 'symbol)))
       (parse-at-point classname))))
