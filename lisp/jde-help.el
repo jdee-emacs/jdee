@@ -35,8 +35,8 @@
   :prefix "jde-help-")
 
 (defcustom jde-help-docsets
-  '((nil "http://java.sun.com/javase/6/docs/api" "1.5")
-    (nil "http://java.sun.com/j2se/1.5.0/docs/api" "1.6"))
+  '((nil "http://java.sun.com/javase/6/docs/api" "1.6")
+    (nil "http://java.sun.com/j2se/1.5.0/docs/api" "1.5"))
   "*Lists collections of HTML files documenting Java classes.
 This list is used by the `jde-help-class' command to find help for
 a class. You can specify the following information for each docset:
