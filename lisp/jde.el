@@ -2344,7 +2344,7 @@ defined, otherwise the classpath specified by the CLASSPATH
 environment variable."
   (let* ((directory-sep-char ?/)  ;; Override NT/XEmacs setting
 	 (classpath
-	      (jde-build-path-arg nil (jde-get-global-classpath) t)))
+	      (jde-build-path-arg nil (jde-get-global-classpath) t 'jde-global-classpath)))
     (format "jde.util.JdeUtilities.setProjectValues(\"%s\", %s);"
 	    jde-current-project
 	    classpath)))
