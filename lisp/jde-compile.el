@@ -237,9 +237,9 @@ don't know which classes were recompiled."
     (if (null (or (string-match ".*exited abnormally.*" msg)
 		  (string-match ".*BUILD FAILED.*" (buffer-string))))
 	;;no errors, make the compilation window go away in a few seconds
-	(if (or (and (numberp jde-compile-enable-kill-buffer)
-		     (not (minusp jde-compile-enable-kill-buffer)))
-		jde-compile-enable-kill-buffer)
+	(if (if (numberp jde-compile-enable-kill-buffer)
+		(not (minusp jde-compile-enable-kill-buffer))
+	      jde-compile-enable-kill-buffer)
 	    (lexical-let ((compile-buffer buf))
 	      (run-at-time
 	       (format "%d sec" (if (numberp jde-compile-enable-kill-buffer)
@@ -611,7 +611,7 @@ source and class files.
 
 (defcustom jde-compile-enable-kill-buffer -1
   "* Time in seconds to display the compilation buffer before 
-'jde-compile-finish-kill-buffer will kill the compilation buffer.
+`jde-compile-finish-kill-buffer' will kill the compilation buffer.
 
 If less than zero (or nil), do not kill the compilation buffer.
 If t (or other non-nil non-number) then kill in 2 secs."
