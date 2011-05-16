@@ -1148,7 +1148,7 @@ standard `java-mode'."
 (defconst c-doc-face-name 'jde-java-font-lock-javadoc-face)
 
 ;; By default, enable extra fontification in `jde-mode'.
-(add-hook 'jde-mode-hook #'jde-setup-syntax-coloring)
+(add-hook 'java-mode-hook #'jde-setup-syntax-coloring)
 
 (provide 'jde-java-font-lock)
 
