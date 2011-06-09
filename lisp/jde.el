@@ -398,12 +398,28 @@ function displays an error message."
 (defun jde-get-tools-jar ()
   "Gets the correct tools.jar or equivalent. Signals an
 error if it cannot find the jar."
-  (let ((tools
-	 (expand-file-name
-	  (if (eq system-type 'darwin)
-	      "Classes/classes.jar"
-	    "lib/tools.jar")
-	  (jde-get-jdk-dir))))
+  (let* ((jdk-dir (jde-get-jdk-dir))
+         (tools
+	  (expand-file-name
+	   (if (eq system-type 'darwin)
+	       (let ((classes-jar
+		      (cond
+		       ((file-exists-p
+			 (expand-file-name
+			  "Classes/classes.jar" jdk-dir))
+			"Classes/classes.jar")
+		       ((file-exists-p
+			 (expand-file-name
+			  "../Classes/classes.jar" jdk-dir))
+			"../Classes/classes.jar")
+		       ((file-exists-p
+			 (expand-file-name
+			  "bundle/Classes/classes.jar" jdk-dir))
+			"bundle/Classes/classes.jar")
+		       (t nil))))
+		 classes-jar)
+	     "lib/tools.jar")
+	   jdk-dir)))
     (if (file-exists-p tools)
 	tools
       (error (concat "Cannot find JDK's tools jar file (or equivalent)."
