@@ -157,7 +157,7 @@ FILENAME must be created by `jde-xref-pickle-hash'"
     (puthash (car item) (cdr item) hash)))
 
 (defun jde-xref-get-db-directory ()
-  (concat (jde-normalize-path jde-xref-db-base-directory) "/xrefdb"))
+  (concat (jde-normalize-path 'jde-xref-db-base-directory) "/xrefdb"))
 
 (defun jde-xref-guess-and-set-prefixes ()
   (let ((prefixes (jde-xref-guess-prefixes)))
