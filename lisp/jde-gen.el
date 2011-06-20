@@ -107,7 +107,7 @@ ids and return as \"id1, id2, ...\"."
    (lambda (arg)
      (nth 1 (split-string
 	     (replace-in-string
-	      (replace-in-string arg "^[ \t\n\f\l]+" "")
+	      (jde-replace-in-string arg "^[ \t\n\f\l]+" "")
 	      "[ \t\n\f\l]+$" ""))))
    (split-string params "[,]") ", "))
 
@@ -2230,7 +2230,7 @@ command, `jde-gen-main-method', as a side-effect."
   '(
     "(p \"Listener class (fully qualified): \" listenerFQN 'noinsert)"
     "(tempo-save-named 'listener-class "
-    " (replace-in-string (tempo-lookup-named 'listenerFQN)"
+    " (jde-replace-in-string (tempo-lookup-named 'listenerFQN)"
     "                    \"[^\\\\.]+\\\\.\" \"\"))"
     "(tempo-save-named 'listener-vector "
     " (concat (jde-wiz-downcase-initials (tempo-lookup-named 'listener-class))"
@@ -2312,7 +2312,7 @@ command, `jde-gen-main-method', as a side-effect."
     "(p \"Method name: \" return-type 'noinsert)"
     "(p \"Method name: \" params 'noinsert)"
     "(tempo-save-named 'listener-class "
-    " (replace-in-string (tempo-lookup-named 'listenerFQN)"
+    " (jde-replace-in-string (tempo-lookup-named 'listenerFQN)"
     "                    \"[^\\\\.]+\\\\.\" \"\"))"
     "(tempo-save-named 'listener-vector "
     " (concat (jde-wiz-downcase-initials (tempo-lookup-named 'listener-class))"

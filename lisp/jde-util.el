@@ -91,12 +91,11 @@ Unless optional argument INPLACE is non-nil, return a new string."
 	      (aset newstr i tochar)))
 	newstr)))
 
-(if (not (fboundp 'replace-in-string))
-    (defun replace-in-string  (string regexp newtext &optional literal)
-      "Replace REGEXP with NEWTEXT in STRING. see: `replace-match'"
-      (if (string-match regexp string)
-	  (replace-match newtext nil literal string)
-	string)))
+(defun jde-replace-in-string  (string regexp newtext &optional literal)
+  "Replace REGEXP with NEWTEXT in STRING. see: `replace-match'"
+  (if (string-match regexp string)
+      (replace-match newtext nil literal string)
+    string))
 
 
 (defun jde-get-line-at-point (&optional pos)

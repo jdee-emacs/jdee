@@ -128,7 +128,7 @@ extends clause is updated"
 (defun jde-dollar-name (name) 
   "Convert pkg[.Outer].Inner[$Inner] to pkg[.Outer]$Inner[$Inner]"
   ;; change last '.' to '$'
-  (replace-in-string name "[.]\\([^.]+$\\)" "$\\1"))  
+  (jde-replace-in-string name "[.]\\([^.]+$\\)" "$\\1"))  
 
 (defun jde-jeval-classname (fmt interface-name &optional eval-return)
   "Try jde-jeval on the command derived from (format FMT INTERFACE-NAME),

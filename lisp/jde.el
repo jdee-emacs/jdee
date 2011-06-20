@@ -69,7 +69,7 @@
 	     (require 'semantic/senator)))
 	(t (or (require sym nil t)
 	       (require
-		(intern (replace-in-string (symbol-name sym) "-" "/" t)))))))
+		(intern (jde-replace-in-string (symbol-name sym) "-" "/" t)))))))
 (when (fboundp 'font-lock-add-keywords)
   (font-lock-add-keywords 'emacs-lisp-mode
 			  '(("(\\(jde-semantic-require\\)[ \t]+'?\\(.*?\\))"
@@ -1019,10 +1019,10 @@ this version of the JDEE."
 
 (defun jde-earlier-versionp (ver1 ver2)
   "Return non-nil if VER1 is earlier than VER2"
-  (let ((ver1n (replace-in-string ver1 "beta" "zb"))
-	(ver2n (replace-in-string ver2 "beta" "zb")))
-    (setq ver1n (replace-in-string ver1n "pre" "zp"))
-    (setq ver2n (replace-in-string ver2n "pre" "zp"))
+  (let ((ver1n (jde-replace-in-string ver1 "beta" "zb"))
+	(ver2n (jde-replace-in-string ver2 "beta" "zb")))
+    (setq ver1n (jde-replace-in-string ver1n "pre" "zp"))
+    (setq ver2n (jde-replace-in-string ver2n "pre" "zp"))
     (if (string-match "z" ver1n)
 	(unless (string-match "z" ver2n)
 	  (setq ver2n (concat ver2n "zz")))
