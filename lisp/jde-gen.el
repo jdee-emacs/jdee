@@ -106,7 +106,7 @@ ids and return as \"id1, id2, ...\"."
   (mapconcat
    (lambda (arg)
      (nth 1 (split-string
-	     (replace-in-string
+	     (jde-replace-in-string
 	      (jde-replace-in-string arg "^[ \t\n\f\l]+" "")
 	      "[ \t\n\f\l]+$" ""))))
    (split-string params "[,]") ", "))
