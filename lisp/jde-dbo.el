@@ -207,7 +207,8 @@ See also the hook `tree-widget-after-toggle-fucntions'."
 	  (mapcar 'delete-overlay (car all))
 	  (mapcar 'delete-overlay (cdr all))))
 
-      (make-local-hook 'tree-widget-after-toggle-functions)
+      (when jde-xemacsp
+	(make-local-hook 'tree-widget-after-toggle-functions))
       (add-hook 'tree-widget-after-toggle-functions
 		'jde-dbo-locals-update-open-nodes nil t)
 

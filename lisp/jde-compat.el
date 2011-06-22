@@ -82,7 +82,7 @@
       (defun add-menu (&rest args))
       (defun easy-menu-create-keymaps (&rest args))
       (defun locate-data-directory (&rest args))
-      (defun temp-directory (&rest args))
+      (defun temp-directory (&rest args) temporary-file-directory)
       (defun extent-at (&rest args))
       (defun make-extent (&rest args))
       (defun set-extent-face (&rest args))

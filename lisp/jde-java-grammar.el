@@ -55,17 +55,20 @@ Should be run when Semantic is ready to parse, that is, via
 	  (semantic-idle-scheduler-mode 1)))
      (t
       ;; Default to JDE's auto-parse
-      (make-local-hook 'semantic-change-hooks)
+      (when jde-xemacsp
+	(make-local-hook 'semantic-change-hooks))
       (add-hook 'semantic-change-hooks
 		'jde-parse-buffer-changed-hook t t))))
 
   ;; Track full reparses
-  (make-local-hook 'semantic-after-toplevel-cache-change-hook)
+  (when jde-xemacsp
+    (make-local-hook 'semantic-after-toplevel-cache-change-hook))
   (add-hook 'semantic-after-toplevel-cache-change-hook
 	    'jde-parse-update-after-parse nil t)
 
   ;; Track partial reparses
-  (make-local-hook 'semantic-after-partial-cache-change-hook)
+  (when jde-xemacsp
+    (make-local-hook 'semantic-after-partial-cache-change-hook))
   (add-hook 'semantic-after-partial-cache-change-hook
 	    'jde-parse-update-after-partial-parse nil t)
 

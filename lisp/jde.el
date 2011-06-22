@@ -901,7 +901,8 @@ This command invokes the function defined by `jde-build-function'."
 	;; This feature loads the appropriate project settings whenever
 	;; a user switches from a Java buffer belonging to one project
 	;; to a buffer belonging to another.
-	(make-local-hook 'post-command-hook) ;; necessary for XEmacs (see below)
+	(when jde-xemacsp
+	  (make-local-hook 'post-command-hook)) ;; necessary for XEmacs (see below)
 	(add-hook 'post-command-hook
 		  'jde-detect-java-buffer-activation
 		  nil
