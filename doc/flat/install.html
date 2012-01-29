@@ -319,6 +319,130 @@ cedet.dir=${third.party.lib.dir}/cedet-1.0beta3b
 	    </li>
 	</ul>
 
+
+	<h2>Known Working Configurations</h2>
+
+	<i>Thanks to Edwin Helbert Aponte Angarita for this.</i>
+
+	<ol>
+	  <li>Install elib</li>
+
+	  <li>
+	      Install CEDET-1.0pre7 from
+	      <a href="http://sourceforge.net/projects/cedet/files/cedet/">http://sourceforge.net/projects/cedet/files/cedet/</a>
+	      Installation of CEDET is quite straightforward. Just 
+
+	      <ol>
+		  <li>download</li>
+		  <li>unpack to an appropriate directory, such as ~/opt/lib/</li>
+
+		  <li>cd to directory where CEDET was unpacked</li>
+		  <li>make</li>
+
+		  <li>add this to your ~/.emacs file.
+		  <div class="code">
+<pre>
+(load-file "/home/edwinh/opt/lib/lisp/cedet-1.0pre7/common/cedet.el") 
+(semantic-load-enable-guady-code-helpers)
+</pre>
+		  </div>
+		  </li>
+	      </ol>
+	  </li>
+
+	  <li>
+	      Install JDEE.
+	      <ol>
+		  <li>
+		      Download from the SVN repository using
+		  <div class="code">
+<pre>
+svn co https://jdee.svn.sourceforge.net/svnroot/jdee/trunk jdee
+cd jdee
+</pre>
+		  </div>
+		  (I followed the instructions in the file
+		  jdee/jdee/doc/flat/install.html)
+		  </li>
+
+		  <li>Configure (check the paths in your system)
+		  <div class="code">
+<pre>
+env CLASSPATH=/usr/share/java/ant-contrib-1.0b2.jar
+           JAVA_HOME=/path/to/jdk1.7.0_02/ ant configure
+</pre>
+		  </div>
+		  </li>
+
+		  <li>
+		      Edit directly the file build.properties just created or
+		      copy it to
+		  <br/>
+		  ~/.jdee-config.properties
+		  <br/>
+		  and edit it (see jdee/jdee/doc/flat/install.html) so that:
+		  <div class="code">
+		      <pre>
+cedet.dir=/path/to/cedet-1.0pre7/
+elib.dir=/path/to/elib/ 
+prefix.dir=/path/where/jdee/will/be/installed/
+build.bin.emacs=emacs
+</pre>
+		  </div>
+		  </li>
+
+		  <li>
+		  Configure again.
+		  <div class="code">
+<pre>
+env CLASSPATH=/usr/share/java/ant-contrib-1.0b2.jar
+           JAVA_HOME=/path/to/jdk1.7.0_02/ ant configure
+</pre>
+		  </div>
+		  </li>
+
+		  <li>Build
+		  <div class="code">
+<pre>
+env CLASSPATH=/usr/share/java/ant-contrib-1.0b2.jar
+           JAVA_HOME=/path/to/jdk1.7.0_02/ ant build
+</pre>
+		  </div>
+		  </li>
+
+		  <li>Create the distribution
+		  <div class="code">
+<pre>
+env CLASSPATH=/usr/share/java/ant-contrib-1.0b2.jar
+           JAVA_HOME=/path/to/jdk1.7.0_02/ ant bindist
+</pre>
+		  </div>
+		  </li>
+
+		  <li>
+		      Install
+		  <div class="code">
+<pre>
+env CLASSPATH=/usr/share/java/ant-contrib-1.0b2.jar
+           JAVA_HOME=/path/to/jdk1.7.0_02/ ant install
+</pre>
+		  </div>
+
+		  <li>
+		      Load into Emacs by adding the following to ~/.emacs file (after
+		      having loaded CEDET)
+		  <div class="code">
+<pre>
+(add-to-list 'load-path "/path/to/jdee/lisp/") 
+(load "jde-autoload")
+</pre>
+		  </div>
+		  </li>
+		  </li>
+	      </ol>
+	  </li>
+	</ol>
+
 	<hr></hr>
 	<i>Paul Landes</i>
 	<!-- Created: Aug 05 22:58:21 CDT 2009 -->
