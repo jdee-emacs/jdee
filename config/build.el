@@ -46,7 +46,10 @@ AUTOLOAD-LIBNAME the name of the generated autoload file."
 	(add-to-list 'load-path elib-dir t))
     (when (and cedet-paths (> (length cedet-dir) 0))
       (dolist (path cedet-paths)
-	(add-to-list 'load-path (expand-file-name path cedet-dir) t)))
+	(add-to-list 'load-path (expand-file-name path cedet-dir)
+                     ;; emacs 23.2 added CEDET
+                     (and (< emacs-major-version 24)
+                          (< emacs-minor-version 2)))))
     (add-to-list 'load-path lisp-src-dir t)
     (eval-buffer autoload-buf)
     (message "load path: %s" (mapconcat #'identity load-path ":"))
