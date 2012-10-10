@@ -40,7 +40,7 @@
 
 (defconst jde-cedet-min-version "1.0beta2"
   "Cedet minimum version")
-(defconst jde-cedet-max-version "1.0"
+(defconst jde-cedet-max-version "1.1"
   "Cedet maximum version")
 
 (defconst jde-xemacsp (string-match "XEmacs" (emacs-version))
@@ -361,7 +361,12 @@ function displays an error message."
 		 (format "The path specified by %s does not exist: %s"
 			 (nth 1 jde-java-environment-variables)
 			 jdk-dir))))
-	(progn
+	(if (and (eq system-type 'darwin)
+		 (file-executable-p "/usr/libexec/java_home"))
+	    ;; Mac OS X 10.5 and later Java packaging 
+	    (setq jdk-dir 
+		  (substring (shell-command-to-string "/usr/libexec/java_home")
+			     0 -1))
 	  (setq jdk-dir
 		(executable-find "javac"))
 	  (if jdk-dir

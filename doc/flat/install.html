@@ -64,41 +64,152 @@
 	This is a guide that not only tries to explain the process to compile
 	JDEE, but also how to install it (separate step if you download the
 	binaries).
-
+	<p>
+	    If you just want to use JDEE from the binary distribution,
+	    and not build the code from source, you can <a
+	    href="#install-elisp-dep">skip directly to installing the
+	    run time dependencies</a>.
+	</p>
+	<p>
+	    <i><font color="red"><font size="-1">If you are using GNU
+	    Emacs version 23.2 or later it is recommended that you
+	    build from the latest source. If you are using GNU Emacs
+	    24 you must build from the latest source (the JDEE 2.4.0.1
+	    binary distribution will not work).</font></font></i>
+	</p>
 
 	<h2>Dependencies</h2>
+	<p>
+	    There are Emacs Lisp runtime dependencies you have to
+	    install before you can use JDEE.  In addition, there are
+	    compile time dependencies if you choose to build JDEE from
+	    source.
+	</p>
 
-	There are Emacs Lisp runtime dependencies you have to install before
-	you can use JDEE.  In addition, there are compile time dependencies.
-
+	<h3>Getting the latest source</h3>
+	<p>
+	    The JDEE source code is maintained in a <a
+	    href="http://subversion.apache.org/">Subversion</a>
+	    repository. You will need a Subversion client to download
+	    the source code. The installation of a subversion client
+	    is beyond the scope of this document, but your host
+	    operating system should have a easy to install package
+	    available. See the <a
+	    href="http://subversion.apache.org/packages.html">
+	    Subversion Binary Package</a> to get started.
+	</p>
+	<p>
+	    Once the Subversion client is installed you can check out
+	    the latest ("trunk") code into a directory named
+	    <tt>jdee</tt> as follows
+	</p>
+	<div class="code">
+	    <pre>
+svn co https://jdee.svn.sourceforge.net/svnroot/jdee/trunk jdee
+</pre>
+	</div>
 
 	<h3>Compile Time Dependencies</h3>
 
-	To build the JDEE, you have to first install the Ant.  If you just want
-	to use JDEE and not build the code from source, you can <a
-	href="#install-elib-dep">skip</a> this step.
-
 	<p>
-	    Download Ant 1.7 and the contrib library from <a
+	    Building JDEE requires both <a
+	    href="http://ant.apache.org/">Apache Ant</a>, a Java based
+	    build tool, and the <a
+	    href="http://ant-contrib.sourceforge.net/">ant-contrib</a>
+	    task library. Your host operating system should be the
+	    first place to look for these.  Most Linux distributions
+	    provide packages named <tt>ant</tt> and
+	    <tt>ant-contrib</tt> that you can install with the system
+	    package manager. For example, on a Debian system (and
+	    derivatives, like Ubuntu) with Java already installed you
+	    might do the following
+	</p>
+	<div class="code">
+	    <pre>
+$ sudo apt-get install ant ant-contrib
+$ mkdir -p ~/.ant/lib
+$ ln -s /usr/share/java/ant-contrib.jar ~/.ant/lib
+</pre>
+	</div>
+	<p>
+	    Note that even with the native ant-contrib packages
+	    installed you still need to install the
+	    <tt>ant-contrib</tt> JAR file to your <tt>~/.ant/lib</tt>
+	    directory. This is because the JDEE build file expects
+	    that Ant will find the ant-contrib JAR file in its class
+	    path automatically.  On most RPM based systems
+	    (e.g. Fedora, CentOS, OpenSUSE) replacing <tt>apt-get</tt>
+	    with the native package manager (like <tt>yum</tt>) in the
+	    commands above should get you going.
+	</p>
+	<p>
+	    Mac OS X provides Apache Ant as part of its Java
+	    development tool set (XCode is a free download, and it is
+	    also on the install DVD if you got one). So you will need
+	    to download only the <a
+	    href="http://sourceforge.net/projects/ant-contrib/files/ant-contrib/"><tt>ant-contrib</tt></a>
+	    library (you could also choose to get both ant and
+	    ant-contrib, and also GNU Emacs and much more, via the <a
+	    href="http://www.macports.org/">Mac Ports</a> project, but
+	    that is beyond the scope of this document). So, after you
+	    have downloaded the ant-contrib distribution you would do
+	    the following
+	</p>
+	<div class="code">
+	    <pre>
+$ tar zxf ~/Downloads/ant-contrib-1.0b2-bin.tar.gz 
+$ mkdir -p ~/.ant/lib
+$ cp ant-contrib/lib/ant-contrib.jar ~/.ant/lib
+</pre>
+	</div>
+	<p>
+	    The JDEE project makes available a version of both
+	    tools (but they are relatively old). You may
+	    download Ant 1.7 and the contrib library from <a
 	    href="https://sourceforge.net/projects/jdee/files/">here</a>.
 	    Follow the instructions to installing both.
 	</p>
 
 	<p>
 	    <i><font color="red"><font size="-1">In place ant installation
-	    documents here would be nice</font></font></i>
+	    documents for Windows here would be nice</font></font></i>
 	</p>
 
 
-	<h3>Run time Dependencies</h3>
-	<a name="install-elib-dep"/>
+	<h3>Run time Dependencies<a name="install-elisp-dep"/></h3>
 
-	Download CEDET <a
-	href="https://sourceforge.net/projects/jdee/files/">here</a>.  Follow
-	the instructions to installing the library.  Note that you'll refer to
-	this path in the configuration stage.
-
-
+	<p>
+	    JDEE depends on the <a
+	    href="http://cedet.sourceforge.net/">CEDET</a> Emacs Lisp
+	    library. Large parts of CEDET have been included in GNU
+	    Emacs 23.2 releases and later. However the JDEE binary
+	    releases and the current source code on the Subversion
+	    trunk <em>has not been integrated with the CEDET included
+	    in GNU Emacs</em>. Hence you must always install and use
+	    an upstream version of CEDET.
+	</p>
+	<p>
+	    If you are using the binary distribution, download CEDET
+	    <a
+	    href="https://sourceforge.net/projects/jdee/files/">here</a>.
+	    Follow the instructions to installing the library.  Note
+	    that you'll refer to this path in the configuration stage.
+	</p>
+	<p>
+	    If you are building from source on subversion trunk get <a
+	    href="https://sourceforge.net/projects/cedet/files/cedet/cedet-1.1.tar.gz/download">CEDET
+	    1.1</a> instead. It is worth noting that CEDET releases
+	    prior to 1.1 will not work with GNU Emacs 24.
+	</p>
+	<p>
+	    The JDEE build process allows for the configuration of the
+	    location of an <a
+	    href="http://www.gnu.org/software/elib/">elib</a>
+	    installation. GNU Emacs includes elib since Emacs 22. If
+	    your Emacs version does not include elib you can get it
+	    from <a
+	    href="http://sourceforge.net/projects/jdee/files/latest/download?source=files">here</a>.
+	</p>
 	<h2>Installing from Binaries</h2>
 
 	After <a
@@ -177,12 +288,13 @@ ant configure
 			<div class="code">
 <pre>
 #user editable build configuration parameters
-#Wed Aug 05 23:18:22 CDT 2009
-cedet.dir=/usr/local/share/emacs/cedet
-elib.dir=/usr/local/share/emacs/elib
-build.bin.emacs=/Users/landes/Applications/Emacs.app/Contents/MacOS/Emacs
-config.time=2009/08/05 23\:18
+#Sun, 07 Oct 2012 16:43:21 -0700
+
+config.time=2012/10/07 16\:43
+cedet.dir=
+elib.dir=
 prefix.dir=/usr/local/jdee
+build.bin.emacs=emacs
 </pre>
 			</div>
 		    </li>
@@ -241,7 +353,7 @@ ant build
 		    To create the distribution:
 		<div class="code">
 <pre>
-ant dist
+ant bindist
 </pre>
 		</div>
 		This has everything with which the binaries are released.
@@ -280,7 +392,20 @@ ant install
 (load "jde-autoload")
 </pre>
 	</div>
-
+	<p>
+	    On GNU Emacs 23.2 and later since CEDET is built into
+	    Emacs it is important to load the JDEE version of CEDET
+	    1.1 as early as possible. So use the following fragment in
+	    your ~/.emacs file instead
+	</p>
+	<div class="code">
+	    <pre>
+;; get local cedet load set up early
+(load-file "/path/to/cedet/dir/common/cedet.elc")
+(add-to-list 'load-path "/path/to/jdee/installation/lisp")
+(load "jde-autoload")
+</pre>
+	</div>
 
 	<h2>Project Build Configuration</h2>
 	<a name="config-build"/>
@@ -317,8 +442,10 @@ cedet.dir=${third.party.lib.dir}/cedet-1.0beta3b
 		library exists on the file system.
 
 		<p>
-		    <b>Note:</b> This property and need for elib will soon be
-		    going away.
+		    <b>Note:</b> This property and the elib
+		    installation is only required if your Emacs does
+		    not include it. GNU Emacs has not required this
+		    after version 22.
 		</p>
 	    </li>
 	</ul>
@@ -326,6 +453,83 @@ cedet.dir=${third.party.lib.dir}/cedet-1.0beta3b
 
 	<h2>Known Working Configurations</h2>
 
+	<h3>Debian</h3>
+	<p>
+	    <a href="http://www.debian.org/releases/wheezy/">Debian
+	    Wheezy</a> (the <i>testing</i> release as of October 2012)
+	    no longer includes a JDEE package. You should build the
+	    JDEE package from the JDEE trunk source as discussed
+	    above. No special set up is required. The following
+	    configuration is known to work just fine:
+	</p>
+	<ul style="line-height: .1em;">
+	    <li>Package <tt>sun-java6-jdk</tt> (from the non-free archive)</li>
+	    <li>Package <tt>ant</tt> and <tt>ant-contrib</tt></li>
+	    <li>Package <tt>subversion</tt></li>
+	    <li>Package <tt>emacs23</tt> (GNU Emacs 23.4.1)</li>
+	    <li>CEDET-1.1</li>
+	</ul>
+	<p>
+	    An example build.properties file would look like this
+	</p>
+	<div class="code">
+	    <pre>
+#user editable build configuration parameters
+#Sun, 07 Oct 2012 17:18:45 -0700
+config.time=2012/10/07 17\:18
+cedet.dir=/home/shyamal/.emacs.d/cedet-1.1
+elib.dir=
+prefix.dir=/home/shyamal/.emacs.d/jdee-sandbox
+build.bin.emacs=emacs
+</pre>
+	</div>
+	<p>
+	    With the example configuration above and the sun-java6-jdk
+	    package installed the following code fragment is all that
+	    is required to let JDEE start up correctly
+	</p>
+	<div class="code">
+	    <pre>
+(load-file "~/.emacs.d/cedet-1.1/common/cedet.elc")
+(add-to-list 'load-path "~/.emacs.d/jdee-sandbox/lisp")
+(load "jde-autoload")
+(setq jde-jdk-registry '(("1.6.0" . "/usr/lib/jvm/java-6-sun")))
+</pre>
+	</div>
+
+	<h3>Mac OS X</h3>
+	<p>
+	    GNU Emacs 24 is available for Mac OS X via the <a
+	    href="http://www.macports.org/">Mac Ports</a> project
+	    (among other ways to get it). JDEE is easily installed on
+	    such a system from source using the instructions
+	    above. The currently released binary distributions will
+	    not work with this version of Emacs. The following
+	    configuration is known to work
+	</p>
+	<ul style="line-height: .1em;">
+	    <li>Mac OS X (10.6.8 was used for this test)</li>
+	    <li>Native Mac OS X JDK (1.6.0 as of this writing)</li>
+	    <li>Apache Ant (1.8.4 as of this writing) from Mac OS or
+		Mac Ports</li>
+	    <li>ant-contrib-1.0b3 from Mac Ports or upstream JAR</li>
+	    <li>Emacs 24.2.1 (from Mac Ports)</li>
+	    <li>CEDET-1.1</li>
+	</ul>
+	<p>
+	    The JDEE trunk code will automatically detect the default
+	    Mac OS X Java installation, so all you have to do in your
+	    ~/.emacs file is load JDEE, for example:
+	</p>
+	<div class="code">
+	    <pre>
+(load-file "~/.emacs.d/cedet-1.1/common/cedet.elc")
+(add-to-list 'load-path "~/.emacs.d/jdee-sandbox/lisp")
+(load "jde-autoload")
+</pre>
+	</div>
+
+	<h3>Open SUSE</h3>
 	<i>Thanks to Edwin Helbert Aponte Angarita for this.</i>
 
 	<h4>Environment:</h4>
