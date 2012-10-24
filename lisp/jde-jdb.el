@@ -961,8 +961,7 @@ expression at poing")
 
     (oset this :buffer (get-buffer-create (oref this :buffer-name)))
 
-    (save-excursion
-      (set-buffer (oref this :buffer))
+    (with-current-buffer (oref this :buffer)
       ;; Do not erase the last transcript; user may wish to view it.
       ;; (erase-buffer)
       (goto-char (point-max))

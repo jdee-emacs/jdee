@@ -592,8 +592,7 @@ to the string form required by the vm."
 (defmethod bsh-detect-java-eval-error ((this bsh) bsh-output)
   (if (string-match "// Error:" bsh-output)
       (if (oref this separate-error-buffer)
-	  (save-excursion
-	    (set-buffer (get-buffer-create "*Beanshell Error*"))
+	  (with-current-buffer (get-buffer-create "*Beanshell Error*")
 	    (erase-buffer)
 	    (insert (format "Expression: %s" (oref this java-expr)))
 	    (newline)
@@ -722,8 +721,7 @@ with the buffer named BUFFER-NAME."
   (let (bsh-object
 	(buffer (get-buffer buffer-name)))
     (if buffer
-	(save-excursion
-	  (set-buffer buffer)
+	(with-current-buffer buffer
 	  (setq bsh-object bsh-the-bsh)))
     bsh-object))
 

@@ -548,8 +548,7 @@ process-specific information about a breakpoint")
 		      (format "*Process %s(%d)*"
 			      (oref this main-class)
 			      (oref this id))))
-  (save-excursion
-    (set-buffer (oref this msg-buf))
+  (with-current-buffer (oref this msg-buf)
     (erase-buffer)
     (goto-char (point-min))
     (insert
@@ -878,8 +877,7 @@ for the breakpoint."
  (let ((buffer
 	 (oref debugger buffer)))
     (if buffer
-	(save-excursion
-	  (set-buffer buffer)
+	(with-current-buffer buffer
 	  (goto-char (process-mark (get-buffer-process buffer)))
 	  (insert-before-markers (concat message "\n"))))))
 
@@ -947,8 +945,7 @@ for the breakpoint."
 	(setq jde-dbs-debugger-output nil)
 
 
-	(save-excursion
-	  (set-buffer debugger-buffer)
+	(with-current-buffer debugger-buffer
 	  (erase-buffer)
 	  ;; Set working directory
 	  (if (and

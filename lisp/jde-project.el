@@ -205,10 +205,8 @@ PATH-TYPE is either `global classpath' for `jde-global-classpath' or
 	    path jde-sourcepath)
       (setq path-name "Global Classpath"
 	      path jde-global-classpath))
-    (save-excursion
-      (set-buffer
-       (or buf
-	   (get-buffer-create (format "*JDEE %s*" path-name))))
+    (with-current-buffer
+	(or buf (get-buffer-create (format "*JDEE %s*" path-name)))
       (setq truncate-lines t)
       (erase-buffer)
       (insert (format "%s:

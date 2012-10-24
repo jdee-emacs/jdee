@@ -683,8 +683,7 @@ Returns nil if it cannot find a project file in DIR or an ascendant directory."
   (let ((targets nil )
 	(temp-buf (get-buffer-create "*jde-ant-get-target-list-temp-buffer*")))
     (unwind-protect
-	(save-excursion
-	  (set-buffer temp-buf)
+	(with-current-buffer temp-buf
 	  (erase-buffer)
 	  (insert-file-contents buildfile)
 	  (goto-char (point-min))

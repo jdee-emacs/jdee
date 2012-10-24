@@ -487,8 +487,7 @@ try {
 		   temporary-file-directory))
 	(setq buf (find-file-noselect metafile nil t)
 	      standard-output buf)
-	(save-excursion
-	  (set-buffer buf)
+	(with-current-buffer buf
 	  (erase-buffer)
 	  (if jde-help-use-frames
 	      (progn
@@ -549,8 +548,7 @@ try {
 	 (max-len (apply 'max (mapcar #'(lambda (col)
 					  (length (first col)))
 				      cols))))
-    (save-excursion
-      (set-buffer (get-buffer-create "*JDEE Docsets*"))
+    (with-current-buffer (get-buffer-create "*JDEE Docsets*")
       (erase-buffer)
       (dolist (col cols)
 	(insert (format "%s: %s%s%s\n"

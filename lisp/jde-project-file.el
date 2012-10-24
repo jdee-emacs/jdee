@@ -156,8 +156,7 @@ Emacs startup values."
   "Loads the project file associated with each Java source buffer."
   (mapc
    (lambda (java-buffer)
-     (save-excursion
-       (set-buffer java-buffer)
+     (with-current-buffer java-buffer
        (message "Loading project file for %s ..."
 		(buffer-file-name java-buffer))
        (jde-load-project-file)))
@@ -177,8 +176,7 @@ current buffer."
 (defun jde-save-delete (symbol buffer)
   "Delete the call to SYMBOL from project file in BUFFER.
 Leave point at the location of the call, or after the last expression."
-  (save-excursion
-    (set-buffer buffer)
+  (with-current-buffer buffer
     (goto-char (point-min))
     (catch 'found
       (while t
@@ -251,8 +249,7 @@ if none. To test if SYMBOL has any value for PROJECT, use
 	buffer standard-output)	; creating a new file
     (setq buffer (find-file-noselect project))
     (setq standard-output buffer)
-    (save-excursion
-      (set-buffer buffer)
+    (with-current-buffer buffer
       (goto-char (point-min))
       (jde-save-delete 'jde-project-file-version buffer)
       (delete-blank-lines)
@@ -277,8 +274,7 @@ if none. To test if SYMBOL has any value for PROJECT, use
     (if buffer
       (progn
 	(princ ")\n")
-	(save-excursion
-	  (set-buffer buffer)
+	(with-current-buffer buffer
 	  (save-buffer))
 	(jde-log-msg "jde-save-close-buffer: Closing buffer for %s" project)
 	(kill-buffer buffer))
@@ -414,8 +410,7 @@ hierarchical projects."
 	  (princ "(jde-project-file-version ")
 	  (prin1 jde-project-file-version)
 	  (princ ")\n(jde-set-variables)\n")
-	  (save-excursion
-	    (set-buffer standard-output)
+	  (with-current-buffer standard-output
 	    (save-buffer))
 	  (kill-buffer standard-output)
 	  (setq projects (nconc projects (list prj-file)))))

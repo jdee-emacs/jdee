@@ -430,8 +430,7 @@ compiler process.")
 	 (executable-path (oref this exec-path))
 	 (args (get-args this)))
 
-    (save-excursion
-      (set-buffer outbuf)
+    (with-current-buffer outbuf
 
       (insert (format "cd %s\n" default-directory))
 

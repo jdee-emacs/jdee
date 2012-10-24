@@ -439,8 +439,7 @@ system command path."
   (if (not jde-java-version-cache)
       (let ((buf (get-buffer-create "java version"))
 	    proc)
-	(save-excursion
-	  (set-buffer buf)
+	(with-current-buffer buf
 	  (setq proc
 		(start-process
 		 "java version" buf "java" "-version"))
@@ -1050,8 +1049,7 @@ Optional ARGS are used to `format' MSG.
 Does nothing if `jde-log-max' is nil."
   (if jde-log-max
       (save-match-data
-	(save-excursion
-	  (set-buffer (get-buffer-create "*jde-log*"))
+	(with-current-buffer (get-buffer-create "*jde-log*")
 	  (goto-char (point-max))
 	  (insert (apply 'format msg args))
 	  (insert "\n")
@@ -2384,8 +2382,7 @@ version of speedar is installed."
   (let* ((default-directory (expand-file-name "lisp" (jde-find-jde-data-directory)))
 	 (generated-autoload-file (expand-file-name "jde-autoload.el" default-directory)))
     (mapc 'update-file-autoloads (directory-files "." nil "\\.el$"))
-    (save-excursion
-      (set-buffer  "jde-autoload.el")
+    (with-current-buffer "jde-autoload.el"
       (save-buffer))
     (kill-buffer "jde-autoload.el")))
 

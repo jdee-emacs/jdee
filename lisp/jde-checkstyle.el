@@ -354,8 +354,7 @@ string describing how the compilation finished."
 		    (list "-r" (jde-normalize-path jde-checkstyle-source-dir))
 		  (list source-file)))))
 
-    (save-excursion
-      (set-buffer outbuf)
+    (with-current-buffer outbuf
 
       (insert (format "cd %s\n" default-directory))
 

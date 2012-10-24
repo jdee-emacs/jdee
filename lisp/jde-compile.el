@@ -232,8 +232,7 @@ don't know which classes were recompiled."
 ;; Thanks to Jack Donohue <donohuej@synovation.com>.
 (defun jde-compile-finish-kill-buffer (buf msg)
   "Removes the jde-compile window after a few seconds if no errors."
-  (save-excursion
-    (set-buffer buf)
+  (with-current-buffer buf
     (if (null (or (string-match ".*exited abnormally.*" msg)
 		  (string-match ".*BUILD FAILED.*" (buffer-string))))
 	;;no errors, make the compilation window go away in a few seconds
@@ -877,8 +876,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 		(oref this :interactive-args)
 		(list source-file))))
 
-    (save-excursion
-      (set-buffer outbuf)
+    (with-current-buffer outbuf
 
       (let ((inhibit-read-only t)) ; make compilation buffer temporarily writable
 	(insert (format "cd %s\n" default-directory))
@@ -934,8 +932,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 
       (setq arg-array (concat arg-array "}"))
 
-      (save-excursion
-	(set-buffer (oref (oref this buffer) buffer))
+      (with-current-buffer (oref (oref this buffer) buffer)
 
 	(insert "CompileServer output:\n\n")
 
@@ -1258,8 +1255,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 
       (setq arg-array (concat arg-array "}"))
      
-      (save-excursion
-	(set-buffer (oref (oref this buffer) buffer))
+      (with-current-buffer (oref (oref this buffer) buffer)
 
 	(insert "CompileServer output:\n\n")
 

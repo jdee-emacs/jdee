@@ -307,8 +307,7 @@ to be used for debugging the JDEE's debuggers."
 	(when (not buf)
 	  (setq buf (get-buffer-create  "debugger output"))
 	  (pop-to-buffer buf))
-	(save-excursion
-	  (set-buffer buf)
+	(with-current-buffer buf
 	  (goto-char (point-max))
 	  (insert-string output)))))
 
@@ -535,8 +534,7 @@ uses overlays as markers in Emacs and extents in XEmacs.")
 
 (defmethod jde-db-breakpoint-get-line ((this jde-db-breakpoint))
   "Get the number of the line at which this breakpoint is set."
-  (save-excursion
-    (set-buffer (find-file-noselect (oref this file)))
+  (with-current-buffer (find-file-noselect (oref this file))
     (if (oref this marker)
 	(let ((marker-start
 	       (if (featurep 'xemacs)
@@ -614,8 +612,7 @@ and sets the status of all breakpoints to `specified'."
 	    (file (oref xbp file))
 	    (buf (find-buffer-visiting file)))
        (if buf
-	   (save-excursion
-	     (set-buffer buf)
+	   (with-current-buffer buf
 	     (let ((xmarker (oref xbp marker)))
 	       (jde-db-breakpoint-marker-delete xmarker))))))
       jde-db-breakpoints)
@@ -830,8 +827,7 @@ class. Otherwise, it returns nil."
 	(progn
 	  (if (not (get-buffer-window buffer))
 	      (set-window-buffer window buffer))
-	  (save-excursion
-	    (set-buffer buffer)
+	  (with-current-buffer buffer
 	    (save-restriction
 	      (widen)
 	      (goto-line line)
@@ -1317,8 +1313,7 @@ command list."
 	  (oset this next-cmd (cdr (oref this next-cmd)))
 	  (oset this last-cmd curr-cmd)
 	  (jde-db-cmd-init curr-cmd)
-	  (save-excursion
-	    (set-buffer (oref this buffer))
+	  (with-current-buffer (oref this buffer)
 	    (let ((proc (oref this process))
 		  (cmd-line (jde-db-cmd-make-command-line curr-cmd)))
 	      (if cmd-line

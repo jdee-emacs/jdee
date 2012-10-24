@@ -329,8 +329,7 @@ find the source for the class, it returns nil."
 			     (class-file-name (concat  pkg-path "/" file))
 			     success)
 			(setq buffer (get-buffer-create bufname))
-			(save-excursion
-			  (set-buffer buffer)
+			(with-current-buffer buffer
 			  (setq buffer-file-name (expand-file-name (concat path ":" class-file-name)))
 			  (setq buffer-file-truename file)
 			  (let ((exit-status

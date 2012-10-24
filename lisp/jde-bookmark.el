@@ -100,8 +100,7 @@ Function `jde-find-class-source' is used to visit these Java source files (see
 			     (mapcar #'(lambda (arg)
 					 (length (car arg)))
 				     jde-bookmark-class-bookmarks))))
-    (save-excursion
-      (set-buffer (get-buffer-create "*JDEE Bookmarks*"))
+    (with-current-buffer (get-buffer-create "*JDEE Bookmarks*")
       (setq buffer-read-only nil)
       (erase-buffer)
       (dolist (entry jde-bookmark-class-bookmarks)

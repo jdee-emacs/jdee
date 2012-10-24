@@ -204,8 +204,7 @@ prints out, Emacs has nothing to evaluate or report."
   (flet ((log
 	  (msg logtype)
 	  (when jde-jeval-debug
-	    (save-excursion
-	      (set-buffer (get-buffer-create "*Bsh Debug Log*"))
+	    (with-current-buffer (get-buffer-create "*Bsh Debug Log*")
 	      (goto-char (point-max))
 	      (insert (format "%S<" logtype))
 	      (insert (if (stringp msg) msg (prin1-to-string msg)))
@@ -302,8 +301,7 @@ a file in the current directory:
 	  (funcall compilation-process-setup-function)))
 
 
-    (save-excursion
-      (set-buffer native-buf)
+    (with-current-buffer native-buf
 
       (if buffer-head
 	  (insert buffer-head)

@@ -193,8 +193,7 @@ See also the hook `tree-widget-after-toggle-fucntions'."
 	 (locals (jde-dbs-cmd-exec cmd))
 	 var)
 
-    (save-excursion
-      (set-buffer (oref process locals-buf))
+    (with-current-buffer (oref process locals-buf)
       (kill-all-local-variables)
       (let ((inhibit-read-only t))
 	(erase-buffer))
@@ -517,8 +516,7 @@ The remaining elements are arguments to pass to the handler."
   is called with name to return a true or false value (this is used
   for caching the state). If CLEAR is true then the buffer is cleared
   before creating the tree-widget."
-  (save-excursion
-    (set-buffer buf)
+  (with-current-buffer buf
     (when clear
       (erase-buffer))
     (let* ((var-tag (format "%s %s [id: %s]" (oref var-value jtype) name
