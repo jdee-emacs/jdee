@@ -45,7 +45,7 @@ This command searches the directories in `exec-path'."
 (defun which-find-executable (exe directory-list) 
   "Show the full path name of an executable in DIRECTORY-LIST."
   (catch 'answer
-    (mapcar
+    (mapc
      '(lambda (dir)
 (mapcar
 '(lambda (suf)
@@ -60,9 +60,9 @@ windows-suffixes))
 (defun which-find-all-executables (exe directory-list) 
   "Show the full path name of an executable in DIRECTORY-LIST."
   (let ((answers))
-    (mapcar
+    (mapc
      '(lambda (dir)
-(mapcar
+(mapc
 '(lambda (suf)
     (let ((try (expand-file-name (concat exe suf) dir)))
       (and (file-executable-p try)

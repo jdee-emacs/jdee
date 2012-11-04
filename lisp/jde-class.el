@@ -174,7 +174,7 @@ the strings in LIST exist at the end of STR"
 (defun jde-remove-all-from-directory (dir)
   (if (file-directory-p dir)
     (progn
-      (mapcar 'jde-remove-all-from-directory
+      (mapc 'jde-remove-all-from-directory
 	      (directory-files dir t "[^\\.]$"))
       (delete-directory dir))
     (delete-file dir)))

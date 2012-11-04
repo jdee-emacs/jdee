@@ -188,7 +188,7 @@ Note that anonymous classes are implicitly final."
       (let ((comma nil)
 	    (arg-list (split-string method-args ",")))
 	(setq method-args "")
-	(mapcar
+	(mapc
 	 (lambda (arg)
 	   (if (string-match "\\<final\\>" arg)
 	       (setq method-args (concat method-args comma arg))

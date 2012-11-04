@@ -203,8 +203,8 @@ See also the hook `tree-widget-after-toggle-fucntions'."
 		 (delete-extent extent)
 		 nil))
 	(let ((all (overlay-lists)))
-	  (mapcar 'delete-overlay (car all))
-	  (mapcar 'delete-overlay (cdr all))))
+	  (mapc 'delete-overlay (car all))
+	  (mapc 'delete-overlay (cdr all))))
 
       (when jde-xemacsp
 	(make-local-hook 'tree-widget-after-toggle-functions))

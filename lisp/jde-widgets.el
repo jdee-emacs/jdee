@@ -134,7 +134,8 @@
   (let ((inhibit-read-only t))
     (erase-buffer))
   (let ((all (overlay-lists)))
-    (mapcar 'delete-overlay (car all))    (mapcar 'delete-overlay (cdr all)))
+    (mapc 'delete-overlay (car all))
+    (mapc 'delete-overlay (cdr all)))
 
   (widget-insert "Test tree widget. \n\n")
 
@@ -437,7 +438,8 @@ expand button causes the widget to display the values of the array."
   (let ((inhibit-read-only t))
     (erase-buffer))
   (let ((all (overlay-lists)))
-    (mapcar 'delete-overlay (car all))    (mapcar 'delete-overlay (cdr all)))
+    (mapc 'delete-overlay (car all))
+    (mapc 'delete-overlay (cdr all)))
 
   (widget-insert "Test object tree. \n\n")
 
@@ -534,8 +536,8 @@ expand button causes the widget to display the values of the array."
   (let ((inhibit-read-only t))
     (erase-buffer))
   (let ((all (overlay-lists)))
-    (mapcar 'delete-overlay (car all))
-    (mapcar 'delete-overlay (cdr all)))
+    (mapc 'delete-overlay (car all))
+    (mapc 'delete-overlay (cdr all)))
 
   (widget-insert "Test panel widget. \n\n")
 

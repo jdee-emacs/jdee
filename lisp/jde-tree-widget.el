@@ -459,8 +459,8 @@ where:
   (let ((inhibit-read-only t))
     (erase-buffer))
   (let ((all (tree-widget-sample-overlay-lists)))
-    (mapcar #'tree-widget-sample-delete-overlay (car all))
-    (mapcar #'tree-widget-sample-delete-overlay (cdr all)))
+    (mapc #'tree-widget-sample-delete-overlay (car all))
+    (mapc #'tree-widget-sample-delete-overlay (cdr all)))
 
   (widget-insert (format "%s. \n\n" (buffer-name)))
 
@@ -505,8 +505,8 @@ Reuse the cached :args property value if exists."
   (let ((inhibit-read-only t))
     (erase-buffer))
   (let ((all (tree-widget-sample-overlay-lists)))
-    (mapcar #'tree-widget-sample-delete-overlay (car all))
-    (mapcar #'tree-widget-sample-delete-overlay (cdr all)))
+    (mapc #'tree-widget-sample-delete-overlay (car all))
+    (mapc #'tree-widget-sample-delete-overlay (cdr all)))
 
   (widget-insert (format "%s. \n\n" (buffer-name)))
 

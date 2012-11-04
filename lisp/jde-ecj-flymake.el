@@ -179,7 +179,7 @@ orginal file."
          (true-tmp-dir (file-truename (flymake-get-temp-dir))))
     (when (equal true-tmp-dir (substring true-dir-name 0 (length true-tmp-dir)))
       (while (not (equal true-tmp-dir true-dir-name)) 
-        (mapcar 'jde-ecj-safe-delete-file (directory-files true-dir-name t))
+        (mapc 'jde-ecj-safe-delete-file (directory-files true-dir-name t))
         (flymake-safe-delete-directory true-dir-name)
         (setq true-dir-name (file-name-directory (directory-file-name true-dir-name)))))))
 

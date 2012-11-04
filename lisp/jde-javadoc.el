@@ -714,7 +714,7 @@ Local to checker report buffer.")
 	(define-key (current-local-map) "f" 'jde-javadoc-checker-fix)
 	(insert (car report))
 	(newline 2)
-	(mapcar (function
+	(mapc   (function
 		 (lambda (line)
 		   (let* ((from (point))
 			  (to (progn
