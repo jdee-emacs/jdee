@@ -661,8 +661,9 @@ particular breakpoint and to select breakpoints to be clear."
 				     (progn
 				       (find-file-other-window
 					(widget-get widget :file))
-				       (goto-line
-					(widget-get widget :line))))
+				       (goto-char (point-min))
+				       (forward-line 
+					(1- (widget-get widget :line)))))
 
 			   :button-face
 			    (cond
@@ -763,7 +764,8 @@ already highlighted."
 		 (status (oref bp status)))
 	    (if (string-equal file (oref bp file))
 		(progn
-		  (goto-line line)
+		  (goto-char (point-min))
+		  (forward-line (1- line))
 		  (oset bp
 			marker
 			(jde-db-breakpoint-marker "breakpoint marker"))
@@ -830,7 +832,8 @@ class. Otherwise, it returns nil."
 	  (with-current-buffer buffer
 	    (save-restriction
 	      (widen)
-	      (goto-line line)
+	      (goto-char (point-min))
+	      (forward-line (1- line))
 	      (setq pos (point))
 	      (setq overlay-arrow-string "=>")
 	      (or overlay-arrow-position

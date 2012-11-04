@@ -209,7 +209,8 @@ currently selected source buffer."
 	  (if (null file)
 	      (error "Java source for class `%s' not found" full-class)))))
     (find-file-other-window file)
-    (goto-line line)))
+    (goto-char (point-min))
+    (forward-line (1- line))))
 
 ;;;###autolaod
 (defalias 'jde-goto-exception 'jde-exception-goto)

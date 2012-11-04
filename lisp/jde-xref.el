@@ -434,7 +434,8 @@ the requested function are considered."
 
 (defun jde-xref-goto-caller (caller)
   (jde-find-class-source (car caller))
-  (goto-line (nth 4 caller)))
+  (goto-char (point-min))
+  (forward-line (1- (nth 4 caller))))
 
 ;;;###autoload
 (defun jde-xref-next-caller ()

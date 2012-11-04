@@ -1549,7 +1549,8 @@ Here goes all the error message parsing."
 	    (progn
 	      (setq buf (if file (find-file-noselect file)))
 	      (set-buffer buf)
-	      (goto-line line)
+	      (goto-char (point-min))
+	      (forward-line (1- line))
 	      (set-marker there (point) buf))
 	  (error err))))
     jde-run-etrace-current-marker))
