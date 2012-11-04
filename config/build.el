@@ -53,6 +53,7 @@ AUTOLOAD-LIBNAME the name of the generated autoload file."
     (add-to-list 'load-path lisp-src-dir t)
     (eval-buffer autoload-buf)
     (message "load path: %s" (mapconcat #'identity load-path ":"))
+    (setq byte-compile-warnings '(not cl-functions)) ; we use them!
     (byte-recompile-directory dir 0)))
 
 
