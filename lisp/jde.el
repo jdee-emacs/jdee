@@ -421,7 +421,10 @@ error if it cannot find the jar."
 			 (expand-file-name
 			  "bundle/Classes/classes.jar" jdk-dir))
 			"bundle/Classes/classes.jar")
-		       (t nil))))
+		       ;; starting with 1.7 (Oracle's JDK release) the
+		       ;; tools.jar location has become a little more
+		       ;; standardized
+		       (t "lib/tools.jar"))))
 		 classes-jar)
 	     "lib/tools.jar")
 	   jdk-dir)))
