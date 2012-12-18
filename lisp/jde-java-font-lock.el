@@ -1145,7 +1145,13 @@ standard `java-mode'."
 ;; Java has a different font for comments than Emacs Lisp, but by default,
 ;; `jde-java-font-lock-javadoc-face' inherits from `font-lock-doc-face', which
 ;; is the mapping for `c-doc-face-name' Emacs 22 and up
-(defconst c-doc-face-name 'jde-java-font-lock-javadoc-face)
+(if (> emacs-major-version 23)
+    (defconst c-doc-face-name 'jde-java-font-lock-javadoc-face)
+  ;; starting with 24, cc-fonts clobbers this because of some change of order
+  ;; of loading
+  (eval-after-load
+      "cc-fonts"
+    '(defconst c-doc-face-name 'jde-java-font-lock-javadoc-face)))
 
 ;; By default, enable extra fontification in `jde-mode'.
 (add-hook 'java-mode-hook #'jde-setup-syntax-coloring)
