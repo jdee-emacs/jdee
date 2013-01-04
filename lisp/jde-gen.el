@@ -2745,9 +2745,11 @@ Or, with `jde-gen-equals-trailing-and-operators' set to t:
 ;;;###autoload
 (defcustom jde-gen-equals-method-template
   '("'>"
-    "\"/**\" '> 'n"
-    "\" * Check if this object is equal (equivalent) to another object.\" '> 'n"
-    "\" */\" '> 'n"
+   "(when jde-gen-create-javadoc"
+    "'(l \"/**\" '> 'n"
+    "    \" * Check if this object is equal (equivalent) to another object.\" '> 'n"
+    "    \" */\" '> 'n"
+    "))"
     "(jde-gen-method-signature \"public\" \"boolean\" \"equals\" \"Object obj\")"
     "(jde-gen-electric-brace)"
     "\"if (obj == this) return true;\" '> 'n"
