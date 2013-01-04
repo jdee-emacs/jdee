@@ -510,11 +510,26 @@ If a parameter to this function is empty or nil, then it is omitted
 	  ()))))
   sig))
 
+(defcustom jde-gen-class-create-constructor t
+  "*If non-nil, generate constructor for `jde-gen-class-buffer'."
+  :group 'jde-gen
+  :type  'boolean)
+
+(defcustom jde-gen-class-create-package 'jde-gen-get-package-statement
+  "*If non-nil, generate constructor for `jde-gen-class-buffer'."
+  :group 'jde-gen
+  :type  '(choice
+	   (const :tag "Prompt for package" jde-gen-get-package-statement)
+	   (const :tag "Package updates automatically" jde-package-update)))
+
 ;;(makunbound 'jde-gen-class-buffer-template)
 (defcustom jde-gen-class-buffer-template
   (list
    "(funcall jde-gen-boilerplate-function)"
-   "(jde-gen-get-package-statement)"
+   "(let ((s (funcall jde-gen-class-create-package)))"
+   "  (if (or (null s) (not (string-match \"\n\n$\" s)))"
+   "      (list 'l s 'n)"
+   "    s))"
    "(when jde-gen-create-javadoc"
    "(progn (require 'jde-javadoc) (jde-javadoc-insert-start-block))"
    "'(l \" * Describe class \""
@@ -542,10 +557,14 @@ If a parameter to this function is empty or nil, then it is omitted
    " (jde-gen-save-excursion"
    "  (jde-gen-get-interface-implementation t))"
    " (jde-gen-save-excursion"
-   "  (jde-wiz-gen-method \"public\" \"\""
-   "   (file-name-sans-extension (file-name-nondirectory buffer-file-name)) \"\" \"\" \"\")))"
+   "  (if jde-gen-class-create-constructor"
+   "     (jde-wiz-gen-method \"public\" \"\""
+   "       (file-name-sans-extension (file-name-nondirectory buffer-file-name)) \"\" \"\" \"\"))))"
    ";; Move to constructor body. Set tempo-marks to nil in order to prevent tempo moving to mark."
-   "(progn (re-search-forward \"^[ \\t]*$\") (setq tempo-marks nil) nil)")
+   "(progn (re-search-forward \"^[ \\t]*$\") (setq tempo-marks nil) nil)"
+   "(when jde-gen-class-create-constructor"
+   "  (up-list)"
+   "  (forward-char))")
   "*Template for new Java class.
 Setting this variable defines a template instantiation
 command `jde-gen-class', as a side-effect."
@@ -790,8 +809,7 @@ NO-MOVE-POINT if nil move the point, either way, we return the position.
     pos))
 
 
-(defun jde-gen-insert-at-class-top (&optional class-regexp
-						     no-move-point)
+(defun jde-gen-insert-at-class-top (&optional class-regexp no-move-point)
   "Position point at top of class, inserting space if needed.
 
 CLASS-REGEXP the symbol used to find the class to find the top of.  See
@@ -803,6 +821,14 @@ moved also."
       (insert "\n"))
   (insert "\n")
   (backward-char 1))
+
+(defun jde-gen-get-set-member-annotations (type name)
+  "This is meant to override returning template symbols for private members.
+Members include the private encapsulated data of the class.
+TYPE is the type of member.
+NAME is the member name.
+See `jde-gen-get-set-var-template'."
+  nil)
 
 ;;(makunbound 'jde-gen-get-set-var-template)
 (defcustom jde-gen-get-set-var-template
@@ -824,6 +850,9 @@ moved also."
     " (progn (require 'jde-javadoc) (jde-javadoc-insert-start-block))"
     " '(l \"* Describe \" (s name) \" here.\" '>'n"
     "'> (jde-javadoc-insert-end-block)))"
+    "(jde-gen-get-set-member-annotations"
+    "  (tempo-lookup-named 'type)"
+    "  (tempo-lookup-named 'name))"
     "'& \"private \" (s type) \" \""
     "(s name) \";\" '>"
     "(progn (goto-char (marker-position (tempo-lookup-named 'mypos))) nil)"
@@ -962,6 +991,82 @@ It then moves the point to the location of the constructor."
   (interactive "F")
   (find-file file)
   (jde-gen-bean))
+
+;(makunbound 'jde-gen-hibernate-pojo-equals-method-template)
+(defcustom jde-gen-hibernate-pojo-equals-method-template
+  '("'>"
+    "(when jde-gen-create-javadoc"
+    "'(l \"/**\" '> 'n"
+    "    \" * Check if this object is equal (equivalent) to another object.\" '> 'n"
+    "    \" */\" '> 'n"
+    "))"
+    "(jde-gen-method-signature \"protected\" \"boolean\" \"equalsHelper\" \"Object obj\")"
+    "(jde-gen-electric-brace)"
+    "(jde-gen-equals-return \"obj\" \"o\") '> 'n"
+    "\"}\" '> 'n '>))"
+    )
+  "*Template for creating an equals method in a hibernate pojo.
+The generated class would extend a persistable pojo used by hibernate.
+Setting this variable defines a template instantiation command
+`jde-gen-equals-method', as a side-effect."
+  :group 'jde-gen
+  :type '(repeat string)
+  :set '(lambda (sym val)
+	  (defalias 'jde-gen-hibernate-pojo-equals-method
+	    (tempo-define-template
+	     "java-hibernate-pojo-equals-method"
+	     (jde-gen-read-template val)
+	     nil
+	     "Create an equals method at the current point."))
+	  (set-default sym val)))
+
+;(makunbound 'jde-gen-hibernate-pojo-template)
+(defcustom jde-gen-hibernate-pojo-buffer-template
+  '("'>"
+    "(jde-gen-class)"
+    "(flet ((jde-gen-get-set-member-annotations (type name)"
+    "         (format \"@Column(name = \\\"%s\\\", nullable = false)\" name)))"
+    "   (call-interactively 'jde-gen-get-set-methods)"
+    "    nil)"
+    "'n"
+    "(progn"
+    "  (semantic-fetch-tags)"
+    "  (jde-gen-hashcode-method)"
+    "  'n)"
+    "(progn"
+    "  (jde-gen-hibernate-pojo-equals-method)"
+    "  'n)"
+    "(progn"
+    "  (jde-gen-tostring-method)"
+    "  nil)"
+    "(progn"
+    "  (jde-parse-get-top-of-class)"
+    "  (beginning-of-line)"
+    "  nil)"
+    "(jde-import-insert-import '(\"javax.persistence.Entity\"))"
+    "(jde-import-insert-import '(\"javax.persistence.Table\"))"
+    "(jde-import-insert-import '(\"javax.persistence.Column\"))"
+    "(progn (jde-import-organize) nil)"
+    " '> \"@Entity\" 'n"
+    " '> \"@Table(name = \\\"\" "
+    "(progn (tempo-save-named 'table-pos (point-marker)) nil)"
+    " (file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+    "\"\\\") \" 'n"
+    "(progn (goto-char (marker-position (tempo-lookup-named 'table-pos))) nil)"
+    )
+  "*Template for creating an equals method.
+Setting this variable defines a template instantiation command
+`jde-gen-equals-method', as a side-effect."
+  :group 'jde-gen
+  :type '(repeat string)
+  :set '(lambda (sym val)
+	  (defalias 'jde-gen-hibernate-pojo
+	    (tempo-define-template
+	     "java-hibernate-pojo-buffer-template"
+	     (jde-gen-read-template val)
+	     nil
+	     "Create an equals method at the current point."))
+	  (set-default sym val)))
 
 (defcustom jde-gen-jfc-app-buffer-template
   (list
