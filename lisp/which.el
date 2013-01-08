@@ -46,9 +46,9 @@ This command searches the directories in `exec-path'."
   "Show the full path name of an executable in DIRECTORY-LIST."
   (catch 'answer
     (mapc
-     '(lambda (dir)
+     #'(lambda (dir)
 (mapcar
-'(lambda (suf)
+#'(lambda (suf)
     (let ((try (expand-file-name (concat exe suf) dir)))
       (and (file-executable-p try)
    (null (file-directory-p try))
@@ -61,9 +61,9 @@ windows-suffixes))
   "Show the full path name of an executable in DIRECTORY-LIST."
   (let ((answers))
     (mapc
-     '(lambda (dir)
+     #'(lambda (dir)
 (mapc
-'(lambda (suf)
+#'(lambda (suf)
     (let ((try (expand-file-name (concat exe suf) dir)))
       (and (file-executable-p try)
    (null (file-directory-p try))

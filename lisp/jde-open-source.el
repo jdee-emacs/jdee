@@ -154,7 +154,7 @@ if any) of the current class or interface."
 (defun jde-remove-type (list)
   "Removes generics '<Type>' declaration from every given
 class/interface name."
-  (mapcar '(lambda(s) (replace-regexp-in-string "<.*>" "" s)) list))
+  (mapcar #'(lambda(s) (replace-regexp-in-string "<.*>" "" s)) list))
 
 (defun jde-open-class-at-event (event)
   "Like `jde-open-class-at-point', but is mouse-bindable.
