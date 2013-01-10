@@ -1002,8 +1002,8 @@ It then moves the point to the location of the constructor."
     "))"
     "(jde-gen-method-signature \"protected\" \"boolean\" \"equalsHelper\" \"Object obj\")"
     "(jde-gen-electric-brace)"
-    "(jde-gen-equals-return \"obj\" \"o\") '> 'n"
-    "\"}\" '> 'n '>))"
+    "(jde-gen-equals-return \"obj\" \"o\" nil \"equalsHelper\") '> 'n"
+    "\"}\" '> 'n))"
     )
   "*Template for creating an equals method in a hibernate pojo.
 The generated class would extend a persistable pojo used by hibernate.
@@ -2855,13 +2855,13 @@ Or, with `jde-gen-equals-trailing-and-operators' set to t:
     "    \" * Check if this object is equal (equivalent) to another object.\" '> 'n"
     "    \" */\" '> 'n"
     "))"
-    "(jde-gen-method-signature \"public\" \"boolean\" \"equals\" \"Object obj\")"
+    "(jde-gen-method-signature \"public\" \"boolean\" \"equals\" \"Persistable obj\")"
     "(jde-gen-electric-brace)"
     "\"if (obj == this) return true;\" '> 'n"
     "\"if ((obj == null) || !getClass().equals(obj.getClass())) return false;\" '> 'n"
     "'> 'n"
     "(jde-gen-equals-return \"obj\" \"o\") '> 'n"
-    "\"}\" '> 'n '>))"
+    "\"}\" '> 'n))"
     )
   "*Template for creating an equals method.
 Setting this variable defines a template instantiation command
@@ -2878,7 +2878,7 @@ Setting this variable defines a template instantiation command
 	  (set-default sym val)))
 
 ;;;###autoload
-(defun jde-gen-equals-return (&optional parm-name var-name class)
+(defun jde-gen-equals-return (&optional parm-name var-name class super-method)
   "Generate a body of an appropriate override for the
 java.lang.Object#equals(Object) function. This function gets the
 list of member variables from`jde-parse-get-serializable-members'.
@@ -2922,11 +2922,12 @@ Or, with `jde-gen-equals-trailing-and-operators' set to t:
 			'jde-parse-compare-member-types))
 	 (super (car (semantic-tag-type-superclasses class-tag)))
 	 (extends (and super (not (string= "Object" super)))))
+    (setq super-method (or super-method "equals"))
     (list 'l '>
 	  class-name " " var " = (" class-name ") " parm ";" '>'n '>'n
 	  "return "
 	  (if jde-gen-equals-parens-around-expression "(")
-	  (if extends (list 'l "super.equals(" var ")")) '>
+	  (if extends (list 'l (format "super.%s(" super-method) var ")")) '>
 	  (cons 'l (mapcar
 	      (lambda (tag)
 		(let ((name (semantic-tag-name tag))
