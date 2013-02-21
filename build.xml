@@ -18,6 +18,14 @@
   <!-- everything depends on this initialization target -->
   <target name="init">
     <tstamp/>
+    <condition property="msw-dqec" value="\" else="">
+	<or>
+	    <os family="dos"/>
+	    <os family="windows" />
+	    <os family="winnt" />
+	    <os family="win9x" />
+	</or>
+    </condition>
     <!-- developers will usually have the following config file (i.e. source
 	 installed libs) -->
     <property name="config.devel.build.file"
@@ -104,7 +112,7 @@
       <arg value="--no-site-file"/>
       <arg value="--batch"/>
       <arg value="--eval"/>
-      <arg value="(message &quot;%S&quot; (if (featurep 'xemacs) 'true 'false))"/>
+      <arg value="(message ${msw-dqec}&quot;%S${msw-dqec}&quot; (if (featurep 'xemacs) 'true 'false))"/>
     </exec>
     <if>
 	<equals arg1="${build.lisp.is-xemacs}" arg2="true"/>
