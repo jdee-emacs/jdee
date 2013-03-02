@@ -167,6 +167,7 @@
 	  description="compile the JDEE Java source code">
     <mkdir dir="${build.java.dir}"/>
     <javac srcdir="${src.java.dir}" destdir="${build.java.dir}"
+	   source="1.4" target="1.4"
 	   debug="true" classpathref="compile.classpath"/>
   </target>
 
