@@ -266,7 +266,7 @@ script.  Conversion of lisp types is done as follows:
 		   "\\r")
 		  (t
 		   (char-to-string c))))
-	     (string-to-sequence string 'list) ""))
+	     (string-to-list string) ""))
 
 
 

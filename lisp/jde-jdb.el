@@ -718,7 +718,7 @@ expression at poing")
 			     msg
 			     (match-beginning 1)
 			     (match-end 1)))
-		     (line (string-to-int
+		     (line (string-to-number
 			    (substring
 			     msg
 			     (match-beginning 2)
@@ -1889,7 +1889,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 and converts the result to an integer."
   (if (string-match "[^[:digit:]]" number)
       (setq number (replace-match "" nil nil number)))
-  (string-to-int number))
+  (string-to-number number))
 
 (provide 'jde-jdb)
 

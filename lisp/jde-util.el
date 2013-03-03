@@ -204,7 +204,7 @@ currently selected source buffer."
 			   "like an exception stack trace line")))
 	(let ((full-class (match-string 1))
 	      (method (match-string 2)))
-	  (setq line (string-to-int (match-string 3)))
+	  (setq line (string-to-number (match-string 3)))
 	  (setq file (jde-find-class-source-file full-class))
 	  (if (null file)
 	      (error "Java source for class `%s' not found" full-class)))))

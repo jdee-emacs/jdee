@@ -309,7 +309,7 @@ to be used for debugging the JDEE's debuggers."
 	  (pop-to-buffer buf))
 	(with-current-buffer buf
 	  (goto-char (point-max))
-	  (insert-string output)))))
+	  (insert output)))))
 
 (defun jde-db-get-debuggee-status ()
   "Get the`jde-db-debuggee-status' of the
