@@ -1420,10 +1420,10 @@ uses the compiler executable specified by
 	  (setq last-nonmenu-event temp))
       (save-some-buffers (not compilation-ask-about-save) nil))
 
-    (setq compilation-finish-function
+    (setq compilation-finish-functions
       (lambda (buf msg)
 	(run-hook-with-args 'jde-compile-finish-hook buf msg)
-	(setq compilation-finish-function nil)))
+	(setq compilation-finish-functions nil)))
 
     (let ((compiler (jde-compile-get-the-compiler)))
       (if compiler

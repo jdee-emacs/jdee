@@ -272,10 +272,10 @@ string describing how the compilation finished."
       (compilation-mode)
       (setq buffer-read-only nil)
 
-      (set (make-local-variable 'compilation-finish-function)
+      (set (make-local-variable 'compilation-finish-functions)
 	   (lambda (buf msg)
 	     (run-hook-with-args 'jde-checkstyle-finish-hook buf msg)
-	     (setq compilation-finish-function nil)))
+	     (setq compilation-finish-functions nil)))
       (if (boundp 'compilation-parse-errors-function)
 	  (set (make-local-variable 'compilation-parse-errors-function) parser))
       (if (boundp 'compilation-error-message)

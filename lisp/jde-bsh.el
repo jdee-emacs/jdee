@@ -285,10 +285,10 @@ a file in the current directory:
 
     (if finish-fcn
 	(lexical-let ((finish finish-fcn))
-	  (setq compilation-finish-function
+	  (setq compilation-finish-functions
 		(lambda (buf msg)
 		  (funcall finish buf msg)
-		  (setq compilation-finish-function nil)))))
+		  (setq compilation-finish-functions nil)))))
 
 
     (if (not (featurep 'xemacs))

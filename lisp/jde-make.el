@@ -151,10 +151,10 @@ enter to the make program along with the arguments specified by
 	  (setq last-nonmenu-event temp))
       (save-some-buffers (not compilation-ask-about-save) nil))
 
-    (setq compilation-finish-function
+    (setq compilation-finish-functions
       (lambda (buf msg)
 	(run-hook-with-args 'jde-make-finish-hook buf msg)
-	(setq compilation-finish-function nil)))
+	(setq compilation-finish-functions nil)))
 
     (cd default-directory)
     (compile-internal make-command "No more errors")
