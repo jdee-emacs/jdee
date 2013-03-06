@@ -36,6 +36,10 @@
     <path id="compile.classpath">
 	<fileset dir="${lib.java.dir}"/>
     </path>
+    <fileset id="src.lisp.fileset" dir="${src.lisp.dir}">
+      <include name="*.el"/>
+      <exclude name=".dir-locals.el"/>
+    </fileset>
 
     <condition property="build.bin.emacs"
 	       value="/Applications/Emacs.app/Contents/MacOS/Emacs">
@@ -65,9 +69,12 @@
     <condition property="lisp.uptodate">
       <and>
 	<available file="${build.lisp.autoload.file}"/>
+        <uptodate srcfile="${build.lisp.autoload.file}">
+          <mapper type="glob" from="*.el" to="*.elc"/>
+        </uptodate>
 	<uptodate>
-	  <srcfiles dir="${build.lisp.dir}" includes="*.el"/>
-	  <mapper type="glob" from="*.el" to="*.elc"/>
+	  <srcfiles refid="src.lisp.fileset"/>
+	  <mapper type="glob" from="*.el" to="${build.lisp.dir}/*.elc"/>
 	</uptodate>
       </and>
     </condition>
@@ -101,10 +108,7 @@
 	  unless="lisp.uptodate">
     <!-- copy the lisp to the build directory -->
     <copy todir="${build.lisp.dir}">
-      <fileset dir="${src.lisp.dir}">
-	<include name="*.el"/>
-	<exclude name=".dir-locals.el"/>
-      </fileset>
+      <fileset refid="src.lisp.fileset"/>
     </copy>
 
     <exec outputproperty="build.lisp.is-xemacs"
