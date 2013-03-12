@@ -63,13 +63,6 @@
 ;; Use the full Java 1.5 grammar to parse Java files
 (autoload 'wisent-java-default-setup "wisent-java" "Hook run to setup Semantic in `java-mode'." nil nil)
 
-(defun jde-semantic-require (sym)
-  (cond ((string= sym 'senator)
-	 (or (require sym nil t)
-	     (require 'semantic/senator)))
-	(t (or (require sym nil t)
-	       (require
-		(intern (jde-replace-in-string (symbol-name sym) "-" "/" t)))))))
 (when (fboundp 'font-lock-add-keywords)
   (font-lock-add-keywords 'emacs-lisp-mode
 			  '(("(\\(jde-semantic-require\\)[ \t]+'?\\(.*?\\))"
