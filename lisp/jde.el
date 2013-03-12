@@ -762,7 +762,7 @@ comment."
 	 (if (featurep 'xemacs) abbrev t)
 	 (lambda ()
 	   (unless (jde-parse-comment-or-quoted-p)
-	     (delete-backward-char (length abbrev)) ; remove abbreviation and
+	     (delete-char (- (length abbrev))) ; remove abbreviation and
 	     (insert expansion)))                   ; insert expansion
 	 0)))
    jde-mode-abbreviations)

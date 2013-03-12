@@ -1639,7 +1639,7 @@ requests to cancel."
 			    (oref process threads-buf)))
 	     (msg-buffer (when (slot-boundp process 'msg-buf)
 			(oref process msg-buf)))
-	     (frame (new-frame '((name . "JDebug") (minibuffer . nil))))
+	     (frame (make-frame '((name . "JDebug") (minibuffer . nil))))
 	     (height (/ (frame-height frame) (count-if 'identity
 						       (list cli-buffer
 							     locals-buffer

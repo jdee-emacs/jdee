@@ -3769,7 +3769,7 @@ Returns t, if the template has been inserted, otherwise nil."
 	   (template (assoc-string abbrev jde-gen-abbrev-templates t)))
       (if template
 	  (progn
-	    (delete-backward-char (length abbrev))
+	    (delete-char (- (length abbrev)))
 	    ;; Following let avoids infinite expansion.
 	    ;; Infinite expansions could be caused by
 	    ;; (newline) in templates.
