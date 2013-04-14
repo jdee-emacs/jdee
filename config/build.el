@@ -35,9 +35,10 @@
        "             (require 'semantic/senator)))\n"
        "        (t (or (require sym nil t)\n"
        "               (require\n"
+       "                (intern\n"
        "                 (if (string-match \"-\" (symbol-name sym))\n"
        "                     (replace-match \"/\"  nil t (symbol-name sym))\n"
-       "                   (symbol-name sym)))))))\n")
+       "                   (symbol-name sym))))))))\n")
 
       ;; users can now use (require 'jde); which in turn, loads the autoloads
       (insert (format "\n(provide '%s)\n" libname))
