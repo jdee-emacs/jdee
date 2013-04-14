@@ -1803,33 +1803,15 @@ the debuggee process at (e.g., jdbconn)."
     km)
   "Keymap for Jdb minor mode.")
 
-(defvar jde-jdb-minor-mode nil
-  "Non-nil if jdb minor mode is enabled.")
-(make-variable-buffer-local 'jde-jdb-minor-mode)
-
-(defun jde-jdb-minor-mode (&optional arg)
-  "Toggle jdb minor mode.
-With prefix argument ARG, turn on if positive, otherwise off..
-
-\\{jde-jdb-mode-map}"
-  (interactive
-   (list (or current-prefix-arg
-	     (if jde-jdb-minor-mode 0 1))))
-
-  (setq jde-jdb-minor-mode
-	(if arg
-	    (>
-	     (prefix-numeric-value arg)
-	     0)
-	  (not jde-jdb-minor-mode)))
-
+(define-minor-mode jde-jdb-minor-mode nil
+  :keymap jde-jdb-mode-map
   (if jde-jdb-minor-mode
       (if (featurep 'xemacs)
 	    (easy-menu-add jde-jdb-xemacs-menu-spec jde-jdb-mode-map))
     (if (featurep 'xemacs)
       (easy-menu-remove jde-jdb-xemacs-menu-spec))))
 
-(semantic-add-minor-mode 'jde-jdb-minor-mode " jdb" jde-jdb-mode-map)
+(semantic-add-minor-mode 'jde-jdb-minor-mode " jdb")
 
 
 ;; (fmakunbound 'jde-jdb-key-bindings)
