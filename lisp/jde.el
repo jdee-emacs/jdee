@@ -60,9 +60,6 @@
 (unless (fboundp 'custom-set-default)
    (defalias 'custom-set-default 'set-default))
 
-;; Use the full Java 1.5 grammar to parse Java files
-(autoload 'wisent-java-default-setup "wisent-java" "Hook run to setup Semantic in `java-mode'." nil nil)
-
 (when (fboundp 'font-lock-add-keywords)
   (font-lock-add-keywords 'emacs-lisp-mode
 			  '(("(\\(jde-semantic-require\\)[ \t]+'?\\(.*?\\))"
@@ -109,6 +106,19 @@
 (require 'jde-open-source)
 (require 'jde-annotations)
 (require 'regress)
+
+(defconst jde-emacs-cedet-p 
+  (and jde-emacs23p
+       (fboundp 'semantic-mode)
+       (boundp 'semantic-new-buffer-setup-functions))
+  "Non-nil if we are using a CEDET bundled with Emacs")
+
+(unless jde-emacs-cedet-p
+    ;; Use the full Java 1.5 grammar to parse Java files
+    ;; (legacy code I moved down here (shyamalprasad))
+    (autoload 'wisent-java-default-setup "wisent-java" 
+      "Hook run to setup Semantic in `java-mode'."
+      nil nil))
 
 (if (not (fboundp 'custom-set-default))
     (defalias 'custom-set-default 'set-default))
@@ -873,6 +883,11 @@ This command invokes the function defined by `jde-build-function'."
   (condition-case err
       (progn
 	(jde-check-versions)
+	(when jde-emacs-cedet-p
+	  ;; GNU Emacs has global semantic mode, no senator minor mode
+	  (setq jde-enable-senator nil)
+	  (add-to-list 'semantic-new-buffer-setup-functions
+		       '(jde-mode . jde-parse-semantic-default-setup)))
 	(java-mode)
 	(if (get 'java-mode 'special)
 	    (put 'jde-mode 'special t))
@@ -953,9 +968,17 @@ This command invokes the function defined by `jde-build-function'."
 
 	(jde-wiz-set-bsh-project)
 
-	;; Setup Semantic stuff needed by the JDEE when Semantic is ready to
-	;; parse!
-	(add-hook 'semantic-init-hooks  'jde-parse-semantic-default-setup)
+	(cond
+	 ;; In GNU Emacs provided CEDET there is no need for a hook,
+	 ;; semantic-new-buffer-setup-functions will invoke
+	 ;; jde-parse-semantic-default-setup automagically, but we
+	 ;; should make sure semantic mode is turned on
+	 (jde-emacs-cedet-p
+	  (wisent-java-default-setup)
+	  (semantic-mode 1))
+	 (t
+	  ;; Upstream CEDET - set up for when semantic is ready!
+	  (add-hook 'semantic-init-hook 'jde-parse-semantic-default-setup)))
 
 	;; Install debug menu.
 	(if (string= (car jde-debugger) "JDEbug")

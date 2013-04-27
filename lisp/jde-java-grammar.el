@@ -37,10 +37,11 @@
 (defun jde-parse-semantic-default-setup ()
   "Setup the semantic bovinator for the JDE.
 Should be run when Semantic is ready to parse, that is, via
-`semantic-init-hooks'."
+`semantic-init-hook'."
 
-  ;; Remove me from `semantic-init-hooks'
-  (remove-hook 'semantic-init-hooks 'jde-parse-semantic-default-setup)
+  (unless jde-emacs-cedet-p
+    ;; Remove me from `semantic-init-hook'
+    (remove-hook 'semantic-init-hook 'jde-parse-semantic-default-setup))
 
   (when jde-auto-parse-enable
     ;; JDE delegates auto-parse to Semantic if possible.  Since
