@@ -46,10 +46,9 @@ Java development tools. </p>
 
 <p>The Java Development Environment (JDE)&nbsp; is an Emacs Lisp
 package that interfaces Emacs to third-party Java application
-development tools, such as those provided by JavaSoft's Java
+development tools, such as those provided by Oracle's Java
 Development Kit (JDK). The result is an integrated development
-environment (IDE) comparable in power to many commercial Java
-IDEs. Features include: </p>
+environment (IDE) whose features include: </p>
 
 <ul>
     <li>source code editing with syntax highlighting and auto
@@ -68,10 +67,10 @@ IDEs. Features include: </p>
         or a tree-structured speedbar.</li>
     <li>supports latest version of JavaSoft's Java Development
         Kit</li>
-    <li>runs on any platform supported by Emacs and Sun's Java
-        SDK (e.g., Win95/NT and Solaris)</li>
+    <li>runs on any platform supported by GNU Emacs 23.4 or later and
+        Java Development Kit like Oracle's SE or OpenJDK (e.g.,
+        GNU/Linux, Mac OS X, and Windows)</li> 
     <li>easily and infinitely customizable</li>
-    <li>works with FSF Emacs and XEmacs</li>
 </ul>
 
 <a name="JDERequirements"><h3>JDE Requirements</h3></a>
@@ -79,68 +78,19 @@ IDEs. Features include: </p>
 <p>The JDE requires the following software: </p>
 
 <ul>
-    <li><a href="http://www.gnu.org/">FSF Emacs</a> or <a
-        href="http://www.xemacs.org/">XEmacs</a> on Unix
-        platforms; the 20.6.1 version of <a
-        href="http://www.cs.washington.edu/homes/voelker/ntemacs.html">NT/Emacs</a>
-        on Windows platforms, for general source file editing and
-        tool integration functions.</li>
-    <li><a
-        href="http://www.javasoft.com/products/jdk/1.1/index.html">Java
-        Development Kit (JDK)</a> or compatible set of Java
-        development tools (compiler, virtual machine, debugger,
-        class libraries, etc.)</li>
-    <li>Web browser (e.g., Netscape or Internet Explorer) for
-        viewing documentation.</li>
-    <li>latest versions of Eric Ludlam's speedbar and semantic bovinator packages
-        available for download from
-        <a href="http://www.ultranet.com/~zappo/semantic.shtml">Eric's home page</a></li>
-    <li><a href="http://www.cygnus.com/misc/gnu-win32/">bash</a>
-        or other Unix-style shell highly recommended for Windows95/NT
-        environments.</li>
-</ul>
-
-<a name="JDEComponents">
-<h3>JDE Components</h3>
-</a>
-
-<p>The JDE distribution includes the following files: </p>
-
-<ul>
-    <li><a href="../../lisp/jde.el"><code>jde.el</code></a>. Defines jde-mode, a major
-        Emacs mode for developing Java code.</li>
-    <li><a href="../../lisp/jde-run.el"><code>jde-run.el</code></a>. Runs Java
-        applications and applets</li>
-    <li><a href="../../lisp/jde-db.el"><code>jde-db.el</code></a>. Interfaces Emacs to
-        <code>jdb</code>, the command-line debugger that comes with the JDK.</li>
-    <li><a href="../../lisp/jde-gen.el"><code>jde-gen.el</code></a>. Contains code
-        generation templates.</li>
-    <li><code>bsh.jar</code>. Compiled files for the <a
-        href="http://www.beanshell.org/">BeanShell</a>, a
-        Java source code interpreter developed by Pat Neimeyer.</li>
-    <li><a href="../../lisp/beanshell.el"><code>beanshell.el</code></a>. Provides an
-        Emacs interface to the BeanShell interpreter.</li>
-    <li><a href="../../lisp/jde-wiz.el"><code>jde-wiz.el</code></a>. Provides &quot;wizards&quot;
-        that generate skeleton implementations of interfaces and
-        skeleton overrides of methods declared by superclasses.</li>
-    <li><a href="../../lisp/jde-complete.el"><code>jde-complete.el</code></a>. Automatic field
-        and method completion package.</li>
-    <li><a href="../../lisp/jde-parse.el"><code>jde-parse.el</code></a>. 
-        Java parser package.</li>
-    <li><a href="../../lisp/java.bnf"><code>java.bnf</code></a>. 
-        Java grammar used to generate the JDE's lisp-based Java parser.</li>
-    <li><a href="../../lisp/jde-bug.el"><code>jde-bug.el</code></a>. 
-        JDEbug user interface package.</li>
-    <li><a href="../../lisp/jde-dbs.el"><code>jde-dbs.el</code></a>. 
-        JDEbug low-level command interface package.</li>
-    <li><a href="../../lisp/jde-dbo.el"><code>jde-dbo.el</code></a>. 
-        JDEbug output processing functions.</li>
-    <li>source code, jar files, and documentation for the 
-        <a href="../../java/">Java components</a> of the JDE.</li>
-    <li><a href="../../lisp/jtags"><code>jtags</code></a> is a bash shell script that
-        tags Java source hierarchies.</li>
-    <li><a href="../../lisp/jtags.csh"><code>jtags.csh</code></a> is a c shell script
-        that tags Java source heierarchies.</li>
+    <li><a href="http://www.gnu.org/">GNU Emacs</a> version 23.4 or
+    later.</li>
+    <li>A Java Development environment. JDEE is know to work with the
+	<a target="_top" href="http://www.oracle.com/us/technologies/java/standard-edition/overview/index.html">
+	  Oracle JDK</a> and the <a target="_top"
+	  href="http://openjdk.java.net/">OpenJDK</a> platforms.</li>
+    <li>Any Web browser supported by the Emacs <tt>browse-url</tt>
+	  interface for viewing documentation (this includes Firefox,
+	  Safari, Internet Explorer and many others).</li>
+    <li><a target="_top" href="http://www.cygwin.com/">Cygwin</a> or
+        other Unix-style shell highly recommended for Windows
+	  environments. The JDEE software is know to work on GNU/Linux
+	  and Mac OS X platorms without any additional software.</li>
 </ul>
 
 <a name="LatestVersion">
@@ -151,12 +101,13 @@ IDEs. Features include: </p>
 Page</a> for instructions on downloading and installing the most
 recent version of the JDE. </p>
 
-<a name="ContactingAuthor">
-<h3>Contacting the Author</h3>
+<a name="GettingHelp">
+<h3>GettingHelp</h3>
 </a>
 
 <p>Please send bug reports and enhancement suggestions to 
-<a href="mailto:paulk@mathworks.com">Paul Kinnucan</a>.
+<a href="http://sourceforge.net/mail/?group_id=210946">JDE mailing
+	lists</a>.
 </p>
 
 <a name="EditingJavaSourceFiles">
@@ -167,8 +118,9 @@ recent version of the JDE. </p>
 buffer by executing <tt>C-x C-f</tt>. Loading a Java source file
 into a buffer causes the buffer to enter into <tt>jde-mode</tt>,
 a variant of <tt>java-mode</tt>, which is in turn a variant of
-the standard Emacs <tt>cc-mode</tt> for editing source files
-written in C and related languages. Jde mode offers all the
+the standard Emacs <tt>java-mode</tt> for editing source files
+written in Java (this mode is based on <tt>cc-mode</tt> which supports
+C and related languages. Jde mode offers all the
 specialized source file editing commands of <tt>cc-mode</tt> plus
 functions for compiling, running, and debugging Java source files.
 You can invoke the commands by selecting them from the <b>JDE</b>
