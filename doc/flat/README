@@ -16,65 +16,13 @@ environment for developing Java applications. Features include:
 
   * browse JDK doc, using the browser of your choice
 
-  * browse your source code, using the Emacs etags
-    facility or a tree-structured speedbar.
+  * browse your source code
 
-  * supports latest version of JavaSoft's Java Development
-    Kit
+  * supports Oracle/OpenJDK Java 7
 
-  * runs on any platform supported by Emacs and Sun's
-    Java SDK (e.g., Win95/NT and Solaris)
+  * runs on any platform supported by GNU Emacs 23.4 and later
 
   * easily and infinitely customizable
-
-  * works with FSF Emacs and XEmacs
-
-The IDE integrates several Emacs program
-development packages (cc-mode, gud, and
-compile) with JavaSoft's JDK.
-
-This package includes:
-
-   -- jde.el
-
-   -- jde-run.el
-
-   -- jde-db.el 
-
-   -- speedbar.el
-
-   -- shell script that tags java files,
-      using the etags program. This script
-      comes in two versions, one for 
-      csh and the other for bash shells.
-
-It requires:
-
-   -- latest version of cc-mode.el
-
-      (available from
-       ftp://ftp.python.org/pub/emacs/cc-mode.tar.gz)
-
-   -- andersl-java-font-lock.el
-
-      (available from
-       http:\\www.csd.uu.se\~andersl\emacs.shtml
-       ftp:\\ftp.csd.uu.se\pub\users\andersl\emacs\)
-
-      This is required for syntax highlighting.
-
-   -- Java Development Kit (jdk) 
-     
-      (available from
-        http://java.sun.com/javase/downloads/index.jsp)
-
-   -- Web browser
-
-      (e.g., Netscape or Internet Explorer)
-
-   -- Unix-style shell for Windows 95 or Windows/NT
-
-      I recommend bash, available from www.cygnus.com.
 
 To install, please read install.html in this directory.
 
