@@ -254,8 +254,49 @@ java enviroment variables."
       (customize-set-value 'jde-jdk nil)))
   (set-default sym val))
 
+(defun jde-default-jdk-registry ()
+  "Attempts to build a default value for jde-jdk-registry.
+This function uses platform specific rules and/or heuristics to
+pick a sensible default for jde-jdk-registry."
+  (let (version dir)
+    ;; Set version and dir for the current system
+    (cond
+     ;; Mac OS X: find default
+     ((eq system-type 'darwin)
+      (when (file-executable-p "/usr/libexec/java_home")
+	(setq dir (substring (shell-command-to-string "/usr/libexec/java_home")
+			     0 -1))
+	(if (string-match "\\(1\\.[4567]\\)\\.[0-9]" dir)
+	    (setq version (match-string 1 dir)))))
+
+     ;; On Linux use the default javac if it is installed
+     ((eq system-type 'gnu/linux)
+      (when (file-executable-p "/usr/bin/javac")
+	(let ((javac "/usr/bin/javac"))
+	  (while (file-symlink-p javac)
+	    (setq javac (file-symlink-p javac)))
+	  (setq dir (expand-file-name ".." (file-name-directory javac)))
+	  (cond
+	   ;; java-1.6.0-openjdk-amd64 or jdk1.7.0_21 etc.
+	   ((string-match "\\(1\\.[4567]\\)\\.[0-9]" dir)
+	    (setq version (match-string 1 dir)))
+
+	   ;; j2sdk1.6-oracle etc
+	   ((string-match "[^0-9]\\(1\\.[4567]\\)\\-" dir)
+	    (setq version (match-string 1 dir)))
+
+	   ;; java-7-openjdk-amd64 etc
+	   ((string-match "-\\([4567]\\)-" dir)
+	    (setq version (concat "1." (match-string 1 dir))))))))
+     ;; On other systems the user needs to customize this to get a
+     ;; fully functional install (patches welcome!)
+     (t
+      nil))
+    (and version dir (list (cons version dir)))))
+
+
 ;; (makunbound 'jde-jdk-registry)
-(defcustom jde-jdk-registry nil
+(defcustom jde-jdk-registry (jde-default-jdk-registry)
   "Specifies the versions and locations of the JDKs installed on your
 system.  For each JDK to be registered, enter the version number
 \(e.g., 1.4.0) of the JDK in the Version field. Enter the path of the
@@ -271,14 +312,28 @@ first."
 	   (string :tag "Path")))
   :set 'jde-set-jdk-dir-type)
 
-(defcustom jde-jdk nil
-  "Specifies the version of the JDK to be used to develop the current
-project. The version must be one of the versions listed in the
-`jde-jdk-registry'. If you specify nil (the default), the JDE uses the
+(defcustom jde-jdk (if (and (null (getenv
+				   (nth 1
+				   jde-java-environment-variables)))
+			    jde-jdk-registry)
+		       (list (caar jde-jdk-registry))
+		     nil)
+  "Specifies the version of the JDK to be used to develop the
+current project.
+
+This will be set to nil by default if the Java version
+environment variable (see `jde-java-enviroment-variables') is
+set. Otherwise it defaults to the first JDK registered in
+`jde-jdk-registry'. If that variable is nil, then this will
+default to nil.
+
+The version must be one of the versions listed in the
+`jde-jdk-registry'. If you specify nil, the JDE uses the
 JDK specified by the Java version environment variable (see
-`jde-java-enviroment-variables', if set; otherwise, the first JDK
-located on the system command path specified by te PATH environment
-variable.
+`jde-java-enviroment-variables'), if set; otherwise, the first JDK
+located on the system command path specified by the PATH environment
+variable is used (on Mac OS X the default Java installation is tried
+first).
 
 You must customize `jde-jdk-registry' first, then `jde-jdk'. After you
 have customized jde-jdk-registry, the customization buffer for`
@@ -302,31 +357,6 @@ the current project."
   (interactive)
   (message "JDEE %s" jde-version))
 
-(defun jde-find-jdk-in-exec-path ()
-  "Search for a JDK in `exec-path' and return the path of
-the root directory of the first JDK that is found.  Return nil if a
-JDK is not found anywhere in exec-path."
-  (let ((list exec-path)
-	(command "java")
-	file)
-    (while list
-      (setq list
-	    (if (and (setq file (expand-file-name command (car list)))
-		     (let ((suffixes executable-binary-suffixes)
-			   candidate)
-		       (while suffixes
-			 (setq candidate (concat file (car suffixes)))
-			 (if (and (file-executable-p candidate)
-				  (not (file-directory-p candidate)))
-			     (setq suffixes nil)
-			   (setq suffixes (cdr suffixes))
-			   (setq candidate nil)))
-		       (setq file candidate)))
-		nil
-	      (setq file nil)
-	      (cdr list))))
-    file))
-
 (defun jde-get-jdk-dir ()
   "Get the root directory of the JDK currently being used by the
 JDE. The directory is the directory of the version of the JDK
@@ -339,47 +369,51 @@ nor the Java home environment variable specify a JDK directory, this
 function displays an error message."
   (interactive)
 
-  (if jde-jdk
-      (let* ((jdk (assoc (car jde-jdk) jde-jdk-registry))
-	     (jdk-dir (cdr jdk)))
-	(when (null jdk)
+  (cond
+   ;; If jde-jdk is set, we try to find it in jde-jdk-registry and
+   ;; make sure the directory exists
+   (jde-jdk
+    (let* ((jdk-alias (car jde-jdk))
+	   (registry-entry (assoc jdk-alias jde-jdk-registry)))
+      (if (null registry-entry)
 	  (error (format
 		  "No mapping in the jde-jdk-registry found for JDK version %s"
-		  (car jde-jdk))))
-	(if (not (string= jdk-dir ""))
-	    (progn
-	      (setq jdk-dir (substitute-in-file-name jdk-dir))
-	      (if (not (file-exists-p jdk-dir))
-		  (error
-		   (format "The path specified for JDK %s does not exist: %s"
-			   jde-jdk
-			   jdk-dir)))))
-	jdk-dir)
-    (let ((jdk-dir (getenv (nth 1 jde-java-environment-variables))))
-      (if jdk-dir
-	  (progn
-	    (setq jdk-dir (substitute-in-file-name jdk-dir))
-	    (if (not (file-exists-p jdk-dir))
-		(error
-		 (format "The path specified by %s does not exist: %s"
-			 (nth 1 jde-java-environment-variables)
-			 jdk-dir))))
-	(if (and (eq system-type 'darwin)
-		 (file-executable-p "/usr/libexec/java_home"))
-	    ;; Mac OS X 10.5 and later Java packaging 
-	    (setq jdk-dir 
-		  (substring (shell-command-to-string "/usr/libexec/java_home")
-			     0 -1))
-	  (setq jdk-dir
-		(executable-find "javac"))
-	  (if jdk-dir
-	      (setq jdk-dir
-		    (expand-file-name
-		     ".."
-		     (file-name-directory jdk-dir)))
-	    (error "Cannot find the JDK directory. See `jde-jdk'."))))
-      jdk-dir)))
+		  jdk-alias))
+	;; check if directory exists. Originally this was only done if
+	;; the string was non-empty I'm not sure why, I have not
+	;; preserved that (shyamalprasad)
+	(let ((jdk-dir (substitute-in-file-name (cdr registry-entry))))
+	  (if (file-exists-p jdk-dir)
+	      jdk-dir
+	    (error (format "The path specified for JDK %s does not exist: %s"
+			   jdk-alias jdk-dir)))))))
 
+   ;; otherwise use JAVA_HOME if set
+   ((getenv (nth 1 jde-java-environment-variables))
+    (let ((jdk-dir (substitute-in-file-name
+		    (getenv (nth 1 jde-java-environment-variables)))))
+      (if (file-exists-p jdk-dir)
+	  jdk-dir
+	(error (format "The path specified by %s does not exist: %s"
+		       (nth 1 jde-java-environment-variables) jdk-dir)))))
+
+   ;; otherwise, use Apple Java Policy on Mac OS X
+   ((and (eq system-type 'darwin)
+	 (file-executable-p "/usr/libexec/java_home"))
+    (substring (shell-command-to-string "/usr/libexec/java_home") 0 -1))
+
+   ;; Otherwise default to java in $PATH
+   (t
+    (let* ((javac (executable-find "javac")))
+      (if javac
+	  ;; follow symbolic links since gnu/linux systems might be
+	  ;; using /etc/alternatives to the final installation
+	  (let ((javac-symlink (file-symlink-p javac)))
+	    (while javac-symlink
+	      (setq javac javac-symlink)
+	      (setq javac-symlink (file-symlink-p javac)))
+	    (expand-file-name ".." (file-name-directory javac)))
+	(error "Cannot find the JDK directory. See `jde-jdk'."))))))
 
 (defun jde-get-jdk-prog (progname)
    "Returns the full path of the program passed in.  By default, assume

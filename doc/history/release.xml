@@ -11,6 +11,16 @@
 
         <change commiter="shyamalprasad">
             <msg>
+              Automatically set jde-jdk-registry on Mac OS X and
+              GNU/Linux systems to default JDK if it can be
+              determined. Default value of jde-jdk is this auto
+              detected JDK as long as JAVA_HOME is not set by the
+              user.
+            </msg>
+        </change>
+
+        <change commiter="shyamalprasad">
+            <msg>
                 Enable support for CEDET bundled in GNU Emacs 23.4 and
                 later.
             </msg>

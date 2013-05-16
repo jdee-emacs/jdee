@@ -1,11 +1,22 @@
 Welcome to the Java IDE for Emacs, an Emacs-based integrated development
 environment for developing Java applications. Features include:
 
-  * source code editing with syntax highlighting and
-    auto indendation
+  * source code editing with syntax highlighting,
+    auto indentation using the native GNU Emacs Java mode
+
+  * Symbol completion (jde-complete-in-line)
+
+  * Code generation: templates, import insertion/deletion/ordering
+    etc.
+
+  * browse JDK doc, using the browser of your choice
+    (jde-help-symbol and jde-help-docsets)
+
+  * browse your source code (jde-find-class* and semantic integration)
 
   * compilation with automatic jump from error messages
-    to responsible line in the source code.
+    to responsible line in the source code using ant
+    (jde-ant-build).
 
   * run Java application in an interactive (comint)
     Emacs buffer
@@ -13,10 +24,7 @@ environment for developing Java applications. Features include:
   * integrated debugging with interactive debug
     command buffer and automatic display of
     current source file/line when stepping through code
-
-  * browse JDK doc, using the browser of your choice
-
-  * browse your source code
+    (jde-debug)
 
   * supports Oracle/OpenJDK Java 7
 
@@ -26,5 +34,17 @@ environment for developing Java applications. Features include:
 
 To install, please read install.html in this directory.
 
+Known issues:
+
+  * Static imports don't quite work
+
+  * Limited support for Java template beyond basic highlighting,
+    parsing, and indenting.
+
+  * Indentation after an annotation might be unexpected
+
+  * It's a little crufty after all these years - patches welcome :-)
+
 Paul Kinnucan (original author and contributor)
 Paul Landes (current maintainer)
+Shyamal Prasad (current maintainer)
