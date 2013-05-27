@@ -22,7 +22,10 @@
         <change commiter="shyamalprasad">
             <msg>
                 Enable support for CEDET bundled in GNU Emacs 23.4 and
-                later.
+                later. Many people contributed to getting us here.
+                Particular thanks go to Vincent Belaiche and Eric
+                Ludlam for help with getting us over the last few
+                bumps.
             </msg>
         </change>
 
