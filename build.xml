@@ -11,7 +11,7 @@
 
   <!-- basic properties, the rest are taken from ${config.dir}/build. -->
   <property name="project.dir" location="./"/>
-  <property name="project.version" value="2.4.1"/>
+  <property name="project.version" value="2.4.2"/>
   <property name="config.dir" location="./config"/>
 
 

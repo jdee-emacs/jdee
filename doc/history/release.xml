@@ -1,8 +1,14 @@
 <?xml version="1.0"?>
 
 <revision-log>
+    <release version="2.4.2">
+	<repo start-version="293" end-version="HEAD"/>
+	<summary>
+	    The goal of this release is still TBD.
+	</summary>
+    </release>
     <release version="2.4.1">
-	<repo start-revision="200" end-revision="HEAD"/>
+	<repo start-revision="200" end-revision="292"/>
 	<summary>
 	    The goal of this release is to include support for GNU
 	    Emacs 24 and its bundled CEDET distribution. Also included
