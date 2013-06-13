@@ -157,7 +157,7 @@ enter to the make program along with the arguments specified by
 	(setq compilation-finish-functions nil)))
 
     (cd default-directory)
-    (compile-internal make-command "No more errors")
+    (compilation-start make-command)
     (cd save-default-directory)))
 
 ;;;###autoload
