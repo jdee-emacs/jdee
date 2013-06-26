@@ -30,7 +30,7 @@
 (require 'wid-edit)
 (require 'eieio)
 (require 'efc)
-(jde-require 'tree-widget)
+(require 'tree-widget)
 
 
 ;; ----------------------------------------------------------------------

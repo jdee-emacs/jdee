@@ -45,7 +45,7 @@
 (require 'eieio)
 (require 'jde-imenu)                    ; All the imenu stuff is here now!
 (require 'efc)
-(jde-require 'sregex)
+(require 'rx)
 
 (defcustom jde-auto-parse-enable t
   "Enables automatic reparsing of a Java source buffer.
@@ -96,7 +96,7 @@ the type of a class could not be found an it tried to import it")
 
 ;; (makunbound 'jde-parse-java-symbol-re)
 (defvar jde-parse-java-symbol-re
-  (sregexq
+  (rx
    (1+              ;; A Java symbol comprises one or more of the following:
     (char (?A . ?Z)   ;;   - upper case characters
 	  (?a . ?z)   ;;   - lower case characters
@@ -673,14 +673,14 @@ If called interactively, add the name in the mini-buffer."
 	     name ""))
 
 (defvar jde-parse-java-symbol-declare-re
-  (sregexq
+  (rx
    (1+              ;; A Java symbol comprises one or more of the following:
     (char (?A . ?Z)   ;;   - upper case characters
 	  (?a . ?z)   ;;   - lower case characters
 	  (?0 . ?9)   ;;   - digits
 	  "[]"        ;;   - square brackets
 	  "?"         ;;   - question mark
-      "<,> \t\n\r";;   - java1.5 generic support
+	  "<,> \t\n\r";;   - java1.5 generic support
 	  "_"         ;;   - underscore
 	  "."         ;;   - period
 	  (160 . 255) ;;   - accented characters

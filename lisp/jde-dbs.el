@@ -42,7 +42,7 @@
 (require 'jde-db)
 (require 'eieio)
 (require 'jde-widgets)
-(jde-require 'tree-widget)
+(require 'tree-widget)
 
 
 ;; quiet "reference to free variable" build-time warnings

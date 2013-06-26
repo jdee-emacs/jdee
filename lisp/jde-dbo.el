@@ -38,7 +38,7 @@
 ;;; Code:
 
 (require 'eieio)
-(jde-require 'tree-widget)
+(require 'tree-widget)
 (require 'jde-widgets)
 
 
