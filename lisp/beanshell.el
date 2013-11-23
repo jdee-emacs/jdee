@@ -78,7 +78,6 @@
 
 (require 'eieio)
 (require 'comint)
-(require 'lmenu)
 (eval-when-compile
   (require 'cl))
 
@@ -905,36 +904,20 @@ by Pat Niemeyer."
 	(browse-url (concat "file://" bsh-help))
       (signal 'error '("Cannot find BeanShell help file.")))))
 
-(defcustom bsh-script-menu-definition
-  (list "Bsh"
-	["Help" bsh-script-help t])
-  "Definition of menu for BeanShell script buffers."
-  :group 'bsh
-  :type 'sexp
-  :set '(lambda (sym val)
-	  (set-default sym val)
-	  ; Define Bsh script menu for FSF Emacs.
-	  (if (or (not (featurep 'xemacs))
-		  (featurep 'infodock))
+(if (not (featurep 'xemacs))
+    (defcustom bsh-script-menu-definition
+      (list "Bsh"
+	    ["Help" bsh-script-help t])
+      "Definition of menu for BeanShell script buffers."
+      :group 'bsh
+      :type 'sexp
+      :set '(lambda (sym val)
+	      (set-default sym val)
+	      ; Define Bsh script menu for FSF Emacs.
 	      (easy-menu-define bsh-script-menu
 				bsh-script-mode-map
 				"Menu for BeanShell Script Buffer."
-				val))
-	  (if (and (featurep 'xemacs)
-		   (eq major-mode 'bsh-script-mode))
-	      (bsh-script-insert-menu-in-xemacs-menubar))))
-
-(defun bsh-script-insert-menu-in-xemacs-menubar ()
-  "Insert BeanShell script menu in the XEmacs menu bar."
-  (if (and
-       (not (featurep 'infodock))
-       (boundp 'c-emacs-features)
-       (not (memq 'infodock c-emacs-features))
-       (boundp 'current-menubar)
-       current-menubar)
-      (if (fboundp 'add-submenu)
-	  (add-submenu nil bsh-script-menu-definition)
-	(add-menu nil "Bsh" (cdr bsh-script-menu-definition)))))
+				val))))
 
 (provide 'beanshell)
 
