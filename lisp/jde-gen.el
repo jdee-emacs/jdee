@@ -1050,7 +1050,7 @@ Setting this variable defines a template instantiation command
     " '> \"@Entity\" 'n"
     " '> \"@Table(name = \\\"\" "
     "(progn (tempo-save-named 'table-pos (point-marker)) nil)"
-    " (file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+    "(downcase (file-name-sans-extension (file-name-nondirectory buffer-file-name)))"
     "\"\\\") \" 'n"
     "(progn (goto-char (marker-position (tempo-lookup-named 'table-pos))) nil)"
     )
@@ -3753,6 +3753,64 @@ and then space. Note that abbrev mode must be enabled. See
 	  (jde-gen-define-abbrev-template
 	   "finally"
 	   (jde-gen-read-template val))
+	  (set-default sym val)))
+
+(defcustom jde-gen-log-member-template
+  '(
+    "(jde-gen-insert-at-class-top)"
+    "'& '>"
+    "\"private static final Log log = LogFactory.getLog(\""
+    "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+    "\".class);\""
+    "(jde-gen-save-excursion"
+    " (jde-import-insert-import '(\"org.apache.commons.logging.Log\"))"
+    " (jde-import-insert-import '(\"org.apache.commons.logging.LogFactory\")))"
+    )
+  "*Template for creating an a commons log instance member.
+Setting this variable defines a template instantiation
+command `jde-gen-log-member', as a side-effect."
+  :group 'jde-gen
+  :type '(repeat string)
+  :set '(lambda (sym val)
+	  (defalias 'jde-gen-log-member
+	    (tempo-define-template
+	     "java-log-member"
+	     (jde-gen-read-template val)
+	     nil
+	     "Create a log member at the current point."))
+	  (set-default sym val)))
+
+(defcustom jde-gen-log-statement-template
+  '(
+    "(let ((choices '(trace debug info warn error)))"
+    "  (tempo-save-named 'level"
+    "    (read-completing-choice \"Level\" choices t t nil nil \"debug\" nil t t)))"
+    "'& '>"
+    "\"if (log.is\""
+    "(capitalize (tempo-lookup-named 'level))"
+    "\"Enabled())\""
+   "(if jde-gen-k&r "
+   "\" \""
+   "'> 'n)"
+   "\"{\"'>'n'>"
+   " \"log.\" (tempo-lookup-named 'level) \"(String.format(\\\"\" "
+   "'p"
+   " \"\\\"));\" "
+   "'n \"}\" '>"
+   "(tempo-forward-mark)"
+    )
+  "*Template for creating an a commons log statement.
+Setting this variable defines a template instantiation
+command `jde-gen-log-statement', as a side-effect."
+  :group 'jde-gen
+  :type '(repeat string)
+  :set '(lambda (sym val)
+	  (defalias 'jde-gen-log-statement
+	    (tempo-define-template
+	     "java-log-statement"
+	     (jde-gen-read-template val)
+	     nil
+	     "Create an log statement method at the current point."))
 	  (set-default sym val)))
 
 (defun jde-gen-abbrev-hook ()
