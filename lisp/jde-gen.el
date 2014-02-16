@@ -2855,7 +2855,7 @@ Or, with `jde-gen-equals-trailing-and-operators' set to t:
     "    \" * Check if this object is equal (equivalent) to another object.\" '> 'n"
     "    \" */\" '> 'n"
     "))"
-    "(jde-gen-method-signature \"public\" \"boolean\" \"equals\" \"Persistable obj\")"
+    "(jde-gen-method-signature \"public\" \"boolean\" \"equals\" \"Object obj\")"
     "(jde-gen-electric-brace)"
     "\"if (obj == this) return true;\" '> 'n"
     "\"if ((obj == null) || !getClass().equals(obj.getClass())) return false;\" '> 'n"
