@@ -698,6 +698,22 @@ It then moves the point to the location to the constructor."
   (find-file file)
   (jde-gen-console))
 
+(defun jde-gen-deep-clone-copies ()
+  (let* ((class-tag (semantic-current-tag))
+	 (class-name (semantic-tag-name class-tag))
+	 (members (sort (jde-parse-get-serializable-members class-tag)
+			'jde-parse-compare-member-types)))
+    (apply #' append '(l)
+	      (mapcar #'(lambda (elt)
+			  (let ((e (car elt)))
+			    (list (format "if (%s != null) ret.%s = %s.clone();" e e e) '> 'n)))
+		      members))))
+
+(defcustom jde-gen-deep-clone-catch-exception t
+  "*Whether or not to catch CloneNotSupportedException."
+  :group 'jde-gen
+  :type  'boolean)
+
 ;;(makunbound 'jde-gen-deep-clone-template)
 (defcustom jde-gen-deep-clone-template
   '(
@@ -717,7 +733,8 @@ It then moves the point to the location to the constructor."
     "(let (jde-gen-final-methods)"
     " (jde-gen-method-signature"
     "   \"public\""
-    "   \"Object\""
+    "   (file-name-sans-extension (file-name-nondirectory buffer-file-name)) "
+;    "   \"Object\""
     "   \"clone\""
     "   nil"
     " ))"
@@ -726,9 +743,16 @@ It then moves the point to the location to the constructor."
 
     ;; return declaration
     "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
-    "\" ret = null;\" '>'n'n"
+    "\" ret = \" "
+    " (if jde-gen-deep-clone-catch-exception "
+    "    '(l \"null;\") "
+    "  '(l \"(\" (file-name-sans-extension"
+    "    (file-name-nondirectory buffer-file-name))"
+    "    \")super.clone();\")) "
+    " '>'n'n "
 
     ;; must catch CloneNotSupported exception
+    "(when jde-gen-deep-clone-catch-exception "
     "(let ((beg (point)))"
     "  (insert \"ret = (\")"
     "  (insert (file-name-sans-extension"
@@ -739,24 +763,30 @@ It then moves the point to the location to the constructor."
     "  (jde-gen-try-catch-wrapper beg (point))"
     ;; at this point we are at the place to add what exception to catch
     "  (insert \"CloneNotSupportedException\")"
-    "  nil)"
+    "  nil))"
 
-    "(progn"
+    "(when jde-gen-deep-clone-catch-exception "
     ;; first go out of the catch exception ()s
     " (goto-char (scan-lists (point) 1 1))"
     ;; now go into the catch {}s definition part
     " (goto-char (scan-lists (point) 1 -1))"
     " (end-of-line)"
     " 'n)"
-    "\"throw new InternalError(\\\"clone should be supported (forgot?)\\\");\""
-    "'>'%"
 
-    "(progn (goto-char (scan-lists (point) 1 1)) (end-of-line) '(l n))"
+    "(when jde-gen-deep-clone-catch-exception "
+    "'(l \"throw new InternalError(\\\"clone should be supported (forgot?)\\\");\""
+    "'(l '>'%)"
+    "))"
 
-    ;; todo: detect which members need cloning and generate assignments
-    "(if jde-gen-comments "
-    " '(l \" // add non-immutable member clone assignments here\" '>'n))"
-    "'p'n"
+    "(when jde-gen-deep-clone-catch-exception "
+    "'(l (progn (goto-char (scan-lists (point) 1 1)) (end-of-line) '(l n))"
+    "''p 'n)"
+    ")"
+
+    ;; clone members
+    ;; todo: only add those that implement Cloneable
+    "(jde-gen-deep-clone-copies) 'n"
+
     ;; add return statement and finish method
     "\"return ret;\" '>'n"
     "\"}\" '>'n"
