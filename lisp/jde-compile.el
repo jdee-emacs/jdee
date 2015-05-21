@@ -515,6 +515,10 @@ source files.
 
   1.6     Enables 1.6-specific features.
 
+  1.7     Enables 1.7-specific features.
+
+  1.8     Enables 1.8-specific features.
+
   Select \"default\" to use the source features that
   the compiler supports by default, i.e., to not include the -source
   switch on the compiler command line. For example, the javac compiler
@@ -534,7 +538,9 @@ source files.
 	   (const "1.3")
 	   (const "1.4")
 	   (const "1.5")
-	   (const "1.6"))))
+	   (const "1.6")
+	   (const "1.7")
+	   (const "1.8"))))
 
 ;;(makunbound 'jde-compile-option-target)
 (defcustom jde-compile-option-target (list "default")
@@ -559,6 +565,12 @@ source files.
   1.6     Generate class files that are compatible only with
 	  1.6 VMs.
 
+  1.7     Generate class files that are compatible only with
+	  1.7 VMs.
+
+  1.8     Generate class files that are compatible only with
+	  1.8 VMs.
+
 Select \"default\" to use the source features that the compiler
 supports by default, i.e., to not include the -target switch on
 the compiler command line.
@@ -580,7 +592,9 @@ cross-compiling."
 	   (const "1.3")
 	   (const "1.4")
 	   (const "1.5")
-	   (const "1.6"))))
+	   (const "1.6")
+	   (const "1.7")
+	   (const "1.8"))))
 
 (defcustom jde-compile-option-bootclasspath nil
 "*Cross-compile against the specified set of boot classes.
@@ -1219,6 +1233,40 @@ If t (or other non-nil non-number) then kill in 2 secs."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                            ;;
+;; J2SDK 1.7 Compiler                                                         ;;
+;;                                                                            ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defclass jde-compile-javac-17 (jde-compile-javac-16)
+  ()
+  "Class of JDK 1.7 javac compilers.")
+
+(defmethod initialize-instance ((this jde-compile-javac-17) &rest fields)
+ ;; Call parent initializer.
+
+  (call-next-method)
+
+  ;; Set compiler version.
+  (oset this version "1.7"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                            ;;
+;; J2SDK 1.8 Compiler                                                         ;;
+;;                                                                            ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defclass jde-compile-javac-18 (jde-compile-javac-17)
+  ()
+  "Class of JDK 1.7 javac compilers.")
+
+(defmethod initialize-instance ((this jde-compile-javac-18) &rest fields)
+ ;; Call parent initializer.
+
+  (call-next-method)
+
+  ;; Set compiler version.
+  (oset this version "1.8"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                            ;;
 ;; Eclipse Compiler                                                             ;;
 ;;                                                                            ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1302,7 +1350,9 @@ If t (or other non-nil non-number) then kill in 2 secs."
    (jde-compile-javac-13 "javac 1.3.x")
    (jde-compile-javac-14 "javac 1.4.x")
    (jde-compile-javac-15 "javac 1.5.x")
-   (jde-compile-javac-16 "javac 1.6.x"))
+   (jde-compile-javac-16 "javac 1.6.x")
+   (jde-compile-javac-17 "javac 1.7.x")
+   (jde-compile-javac-18 "javac 1.8.x"))
   "List of supported javac compilers.")
 
 (defun jde-compile-get-javac ()
