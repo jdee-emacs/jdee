@@ -266,7 +266,7 @@ pick a sensible default for jde-jdk-registry."
       (when (file-executable-p "/usr/libexec/java_home")
 	(setq dir (substring (shell-command-to-string "/usr/libexec/java_home")
 			     0 -1))
-	(if (string-match "\\(1\\.[4567]\\)\\.[0-9]" dir)
+	(if (string-match "\\(1\\.[45678]\\)\\.[0-9]" dir)
 	    (setq version (match-string 1 dir)))))
 
      ;; On Linux use the default javac if it is installed
@@ -286,7 +286,7 @@ pick a sensible default for jde-jdk-registry."
 	    (setq version (match-string 1 dir)))
 
 	   ;; java-7-openjdk-amd64 etc
-	   ((string-match "-\\([4567]\\)-" dir)
+	   ((string-match "-\\([45678]\\)-" dir)
 	    (setq version (concat "1." (match-string 1 dir))))))))
      ;; On other systems the user needs to customize this to get a
      ;; fully functional install (patches welcome!)

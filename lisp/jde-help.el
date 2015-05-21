@@ -35,7 +35,8 @@
   :prefix "jde-help-")
 
 (defcustom jde-help-docsets
-  '((nil "http://docs.oracle.com/javase/7/docs/api" "1.7")
+  '((nil "http://docs.oracle.com/javase/8/docs/api" "1.8")
+    (nil "http://docs.oracle.com/javase/7/docs/api" "1.7")
     (nil "http://docs.oracle.com/javase/6/docs/api" "1.6")
     (nil "http://docs.oracle.com/j2se/1.5.0/docs/api" "1.5"))
   "*Lists collections of HTML files documenting Java classes.
