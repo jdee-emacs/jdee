@@ -158,7 +158,7 @@ the PRIMARY launch method is invoked."
 
 (defun jde-bsh-running-p ()
   "Returns t if the JDEE's BeanShell instance is running."
-  (bsh-running-p (oref 'jde-bsh the-bsh)))
+  (bsh-running-p (oref-default 'jde-bsh the-bsh)))
 
 (defvar java-bsh-read-java-expression-history nil)
 
@@ -210,7 +210,7 @@ prints out, Emacs has nothing to evaluate or report."
 	      (insert (if (stringp msg) msg (prin1-to-string msg)))
 	      (insert ">")
 	      (newline)))))
-    (let ((the-bsh (oref 'jde-bsh the-bsh)))
+    (let ((the-bsh (oref-default 'jde-bsh the-bsh)))
       (when (not (bsh-running-p the-bsh))
 	(bsh-launch the-bsh)
 	(bsh-eval the-bsh (jde-create-prj-values-str)))
@@ -232,7 +232,7 @@ prints out, Emacs has nothing to evaluate or report."
       (log java-statement 'request)
       (let ((output (bsh-eval the-bsh java-statement eval-return))
 	    len)
-	(when (stringp output) 
+	(when (stringp output)
 	  (when (> (length output) 0)
 	    (setq len (length output))
 	    (if (eq ?\n (elt output (1- len)))
@@ -312,12 +312,12 @@ a file in the current directory:
 
       (if (not (jde-bsh-running-p))
 	  (progn
-	    (bsh-launch (oref 'jde-bsh the-bsh))
-	    (bsh-eval (oref 'jde-bsh the-bsh) (jde-create-prj-values-str))))
+	    (bsh-launch (oref-default 'jde-bsh the-bsh))
+	    (bsh-eval (oref-default 'jde-bsh the-bsh) (jde-create-prj-values-str))))
 
 
       (bsh-buffer-eval
-       (oref 'jde-bsh the-bsh)
+       (oref-default 'jde-bsh the-bsh)
        java-expr
        buffer-obj)
 
@@ -328,13 +328,13 @@ a file in the current directory:
 (defun jde-bsh-run()
   "*Starts the JDEE version of the BeanShell."
   (interactive)
-  (bsh-launch (oref 'jde-bsh the-bsh) t))
+  (bsh-launch (oref-default 'jde-bsh the-bsh) t))
 
 (defun jde-bsh-exit ()
   "Closes the existing beanshell process"
   (interactive)
   (if (jde-bsh-running-p)
-      (let ((process (bsh-get-process (oref 'jde-bsh the-bsh))))
+      (let ((process (bsh-get-process (oref-default 'jde-bsh the-bsh))))
 	(if (and
 	     (boundp 'jde-ant-invocation-method) ;; ant package may not be loaded.
 	     (string= (car (symbol-value 'jde-ant-invocation-method)) "Ant Server"))

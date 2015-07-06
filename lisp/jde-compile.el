@@ -144,7 +144,7 @@ compile.el version by checking if
                     2 3 nil 2 1 (6 compilation-error-face)
                     )
                   compilation-error-regexp-alist))
-      
+
       (setq compilation-error-regexp-alist
             (cons '("----------\n\\([0-9]+. WARNING in \\(.*\\)\n (at line \\([0-9]+\\))\n\\(\\(.*\n\\)+?\\).*^+\n\\(.*\n\\)\\)"
                     2 3 nil 1 1 (6 compilation-warning-face)
@@ -623,7 +623,7 @@ source and class files.
   :type 'boolean)
 
 (defcustom jde-compile-enable-kill-buffer -1
-  "* Time in seconds to display the compilation buffer before 
+  "* Time in seconds to display the compilation buffer before
 `jde-compile-finish-kill-buffer' will kill the compilation buffer.
 
 If less than zero (or nil), do not kill the compilation buffer.
@@ -971,11 +971,11 @@ If t (or other non-nil non-number) then kill in 2 secs."
 
       (if (not (jde-bsh-running-p))
 	  (progn
-	    (bsh-launch (oref 'jde-bsh the-bsh))
-	    (bsh-eval (oref 'jde-bsh the-bsh) (jde-create-prj-values-str))))
+	    (bsh-launch (oref-default 'jde-bsh the-bsh))
+	    (bsh-eval (oref-default 'jde-bsh the-bsh) (jde-create-prj-values-str))))
 
       (bsh-buffer-eval
-       (oref 'jde-bsh the-bsh)
+       (oref-default 'jde-bsh the-bsh)
        (concat
 	(format
 	 "jde.util.CompileServer.compile(%s);"
@@ -1289,7 +1289,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 	   (source-path
 	    (jde-normalize-path buffer-file-name))
 	   (arg-array (concat "new String[] {\"" source-path "\"")))
-    
+
       (if args
 	  (setq arg-array
 		(concat
@@ -1302,7 +1302,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 		  ","))))
 
       (setq arg-array (concat arg-array "}"))
-     
+
       (with-current-buffer (oref (oref this buffer) buffer)
 
 	(insert "CompileServer output:\n\n")
@@ -1327,12 +1327,12 @@ If t (or other non-nil non-number) then kill in 2 secs."
 
       (if (not (jde-bsh-running-p))
 	  (progn
-	    (bsh-launch (oref 'jde-bsh the-bsh))
-	    (bsh-eval (oref 'jde-bsh the-bsh) (jde-create-prj-values-str))))
-      (bsh-eval (oref 'jde-bsh the-bsh)
+	    (bsh-launch (oref-default 'jde-bsh the-bsh))
+	    (bsh-eval (oref-default 'jde-bsh the-bsh) (jde-create-prj-values-str))))
+      (bsh-eval (oref-default 'jde-bsh the-bsh)
                    (format "addClassPath(\"%s\");" (oref this :path)))
       (bsh-buffer-eval
-       (oref 'jde-bsh the-bsh)
+       (oref-default 'jde-bsh the-bsh)
        (concat
 	(format
          "if ((new org.eclipse.jdt.internal.compiler.batch.Main(new java.io.PrintWriter(System.out), new java.io.PrintWriter(System.out), true, null, null)).compile(%s)) { print (\"0\");} else {print (\"1\");};"

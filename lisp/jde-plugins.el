@@ -54,7 +54,7 @@ type `jde-plugin'."
   (oset-default
    'jde-plugin
    plugins
-   (cons plugin (oref 'jde-plugin plugins))))
+   (cons plugin (oref-default 'jde-plugin plugins))))
 
 
 (defun jde-pi-get-plugin-dir (plugin)
@@ -107,7 +107,7 @@ a file named jde-PLUGIN.el. This function loads jde-PLUGIN.el."
 
 (defun jde-pi-get-bsh-classpath ()
   "Get the plugin directories and jar files to include in the Beanshell classpath."
-  (let ((plugins (oref 'jde-plugin plugins))
+  (let ((plugins (oref-default 'jde-plugin plugins))
 	classpath)
     (loop for plugin in plugins do
 	  (setq classpath (append classpath (oref plugin bsh-cp))))
@@ -147,7 +147,7 @@ jar program is on the system path."
 
 
 (defun jde-plugin-make-menu-spec ()
-  (if (oref 'jde-plugin plugins)
+  (if (oref-default 'jde-plugin plugins)
       (append
        (list "JDEpi")
        (delq
@@ -155,7 +155,7 @@ jar program is on the system path."
 	(mapcan
 	 (lambda (plugin)
 	   (oref plugin menu-spec))
-	 (oref 'jde-plugin plugins))))))
+	 (oref-default 'jde-plugin plugins))))))
 
 (defvar jde-plugin-mode-map
   (let ((km (make-sparse-keymap))

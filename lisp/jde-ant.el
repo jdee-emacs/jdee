@@ -535,9 +535,9 @@ and there are no more errors. "
 	    ;; Clear out the compilation buffer and make it writable.
 	    (if (not (jde-bsh-running-p))
 		(progn
-		  (bsh-launch (oref 'jde-bsh the-bsh))
-		  (bsh-eval (oref 'jde-bsh the-bsh) (jde-create-prj-values-str))))
-	    (setq proc (bsh-get-process (oref 'jde-bsh the-bsh)))
+		  (bsh-launch (oref-default 'jde-bsh the-bsh))
+		  (bsh-eval (oref-default 'jde-bsh the-bsh) (jde-create-prj-values-str))))
+	    (setq proc (bsh-get-process (oref-default 'jde-bsh the-bsh)))
 	    (set-buffer outbuf)
 	    (compilation-mode)
 	    (setq buffer-read-only nil)

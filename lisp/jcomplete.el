@@ -161,11 +161,11 @@ car."
   (let ((guessed (prf2-guess-type-of name)) result)
     (if (stringp guessed)
 	(setq result (bsh-eval
-		      (oref 'jde-bsh the-bsh)
+		      (oref-default 'jde-bsh the-bsh)
 		      (concat "jde.util.Completion.getClassInfo(\"" guessed "\");")))
       (if (not (null name))
 	  (setq result (bsh-eval
-			(oref 'jde-bsh the-bsh)
+			(oref-default 'jde-bsh the-bsh)
 			(prf2-get-classinfo-javacode name guessed)))))
     (if (not (null result))
 	(eval (read result))

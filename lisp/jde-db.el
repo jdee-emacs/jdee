@@ -291,7 +291,7 @@ Java source or a debug buffer."
      (eq major-mode 'jde-mode)
      (and (slot-boundp 'jde-db-debugger 'the-debugger)
 	  (eq (current-buffer)
-	      (oref (oref 'jde-db-debugger the-debugger) buffer))))
+	      (oref (oref-default 'jde-db-debugger the-debugger) buffer))))
     nil
     "This command works only in a Java source or debug buffer."))
 
@@ -315,7 +315,7 @@ to be used for debugging the JDEE's debuggers."
   "Get the`jde-db-debuggee-status' of the
 current debuggee process."
   (if (slot-boundp 'jde-db-debugger 'the-debugger)
-      (let* ((debugger (oref 'jde-db-debugger the-debugger))
+      (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 	     (debuggee (oref debugger debuggee)))
 	(oref debuggee status))))
 
@@ -662,7 +662,7 @@ particular breakpoint and to select breakpoints to be clear."
 				       (find-file-other-window
 					(widget-get widget :file))
 				       (goto-char (point-min))
-				       (forward-line 
+				       (forward-line
 					(1- (widget-get widget :line)))))
 
 			   :button-face
@@ -698,7 +698,7 @@ particular breakpoint and to select breakpoints to be clear."
   "Deletes all the breakpoints found in `jde-db-bp-list'"
   (if jde-db-bp-list
       (if (jde-db-debuggee-running-p)
-	  (let* ((debugger (oref 'jde-db-debugger the-debugger))
+	  (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 		 (bp-cmd (oref (oref debugger cmd-set) clear-bp)))
 	    (oset
 	     bp-cmd
@@ -1253,7 +1253,7 @@ function that invokes `jde-db-process-debugger-output'."
    (oref this process)
    (lambda (process output)
      (jde-db-process-debugger-output
-      (oref 'jde-db-debugger the-debugger) output))))
+      (oref-default 'jde-db-debugger the-debugger) output))))
 
 (defmethod jde-db-notify-process-exit ((this jde-db-debugger) msg)
   "The default debugger process sentinel invokes this method
@@ -1305,7 +1305,7 @@ the debugger process changes. The default method invokes
    (oref this process)
    (lambda (process msg)
        (jde-db-notify-process-status-change
-	(oref 'jde-db-debugger the-debugger) msg))))
+	(oref-default 'jde-db-debugger the-debugger) msg))))
 
 (defmethod jde-db-exec-next-cmd ((this jde-db-debugger))
   "Executes the next command on the debugger's pending
@@ -1713,7 +1713,7 @@ file in the current buffer."
   "Start the current debuggee application."
   (interactive)
   (jde-assert-source-or-debug-buffer)
-  (let* ((debugger (oref 'jde-db-debugger the-debugger))
+  (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 	 (debuggee (oref debugger debuggee))
 	 (debuggee-status (oref debuggee status)))
     (if (and (oref debugger running-p)
@@ -1733,7 +1733,7 @@ file in the current buffer."
 stopping point."
   (interactive)
   (jde-assert-source-or-debug-buffer)
-  (let* ((debugger (oref 'jde-db-debugger the-debugger))
+  (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 	 (debuggee (oref debugger debuggee))
 	 (debuggee-status (oref debuggee status)))
     (if (and (oref debugger running-p)
@@ -1753,7 +1753,7 @@ stopping point."
   "Quit debugging the current application."
   (interactive)
   (jde-assert-source-or-debug-buffer)
-  (let* ((debugger (oref 'jde-db-debugger the-debugger))
+  (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 	 (debuggee (oref debugger debuggee))
 	 (debuggee-status (oref debuggee status)))
     (if (and (oref debugger running-p)
@@ -1768,7 +1768,7 @@ stopping point."
   "Step to the next line in the current stack frame."
   (interactive)
   (jde-assert-source-or-debug-buffer)
-  (let* ((debugger (oref 'jde-db-debugger the-debugger))
+  (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 	 (debuggee (oref debugger debuggee))
 	 (debuggee-status (oref debuggee status)))
     (if (and (oref debugger running-p)
@@ -1784,7 +1784,7 @@ stopping point."
   "Step to the next line in the current program."
   (interactive)
   (jde-assert-source-or-debug-buffer)
-  (let* ((debugger (oref 'jde-db-debugger the-debugger))
+  (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 	 (debuggee (oref debugger debuggee))
 	 (debuggee-status (oref debuggee status)))
     (if (and (oref debugger running-p)
@@ -1800,7 +1800,7 @@ stopping point."
   "Continue execution to the end of the current method."
   (interactive)
   (jde-assert-source-or-debug-buffer)
-  (let* ((debugger (oref 'jde-db-debugger the-debugger))
+  (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 	 (debuggee (oref debugger debuggee))
 	 (debuggee-status (oref debuggee status)))
     (if (and (oref debugger running-p)
@@ -1817,7 +1817,7 @@ stopping point."
   "Move up the stack."
   (interactive)
   (jde-assert-source-or-debug-buffer)
-  (let* ((debugger (oref 'jde-db-debugger the-debugger))
+  (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 	 (debuggee (oref debugger debuggee))
 	 (debuggee-status (oref debuggee status)))
     (if (and (oref debugger running-p)
@@ -1832,7 +1832,7 @@ stopping point."
   "Move down the stack."
   (interactive)
   (jde-assert-source-or-debug-buffer)
-  (let* ((debugger (oref 'jde-db-debugger the-debugger))
+  (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 	 (debuggee (oref debugger debuggee))
 	 (debuggee-status (oref debuggee status)))
     (if (and (oref debugger running-p)
@@ -1847,7 +1847,7 @@ stopping point."
   "Show current stopping point."
   (interactive)
   (jde-assert-source-or-debug-buffer)
-  (let* ((debugger (oref 'jde-db-debugger the-debugger))
+  (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 	 (debuggee (oref debugger debuggee))
 	 (debuggee-status (oref debuggee status)))
     (if (and (oref debugger running-p)
@@ -1887,7 +1887,7 @@ in the current buffer."
       (oset bp line line)
       (jde-db-breakpoints-add bp)
       (if (jde-db-debuggee-running-p)
-	  (let* ((debugger (oref 'jde-db-debugger the-debugger))
+	  (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 		 (bp-cmd (oref (oref debugger cmd-set) set-bp)))
 	    (oset bp-cmd breakpoints (list bp))
 	    (jde-db-exec-cmd debugger bp-cmd))))))
@@ -1901,7 +1901,7 @@ in the current buffer."
 	 (bp (jde-db-find-breakpoint file line)))
     (if bp
 	(if (jde-db-debuggee-running-p)
-	    (let* ((debugger (oref 'jde-db-debugger the-debugger))
+	    (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 		   (bp-cmd (oref (oref debugger cmd-set) clear-bp)))
 	      (oset bp-cmd breakpoints (list bp))
 	      (jde-db-exec-cmd debugger bp-cmd))
@@ -1926,7 +1926,7 @@ in the current buffer."
   (interactive)
   (if jde-db-breakpoints
       (if (jde-db-debuggee-running-p)
-	  (let* ((debugger (oref 'jde-db-debugger the-debugger))
+	  (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 		 (bp-cmd (oref (oref debugger cmd-set) clear-bp)))
 	    (oset
 	     bp-cmd

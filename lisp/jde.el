@@ -107,7 +107,7 @@
 (require 'jde-annotations)
 (require 'regress)
 
-(defconst jde-emacs-cedet-p 
+(defconst jde-emacs-cedet-p
   (and jde-emacs23p
        (fboundp 'semantic-mode)
        (boundp 'semantic-new-buffer-setup-functions))
@@ -116,7 +116,7 @@
 (unless jde-emacs-cedet-p
     ;; Use the full Java 1.5 grammar to parse Java files
     ;; (legacy code I moved down here (shyamalprasad))
-    (autoload 'wisent-java-default-setup "wisent-java" 
+    (autoload 'wisent-java-default-setup "wisent-java"
       "Hook run to setup Semantic in `java-mode'."
       nil nil))
 
@@ -998,7 +998,7 @@ This command invokes the function defined by `jde-build-function'."
 	(if (and
 	     (not jde-launch-beanshell-on-demand-p)
 	     (not (jde-bsh-running-p)))
-	    (bsh-launch (oref 'jde-bsh the-bsh)))
+	    (bsh-launch (oref-default 'jde-bsh the-bsh)))
 
 	(jde-wiz-set-bsh-project)
 
@@ -2395,9 +2395,9 @@ minibuffer."
   (interactive)
   (let ((dialog
 	 (progn
-	   (if (not (oref 'jde-find-dialog the-dialog))
+	   (if (not (oref-default 'jde-find-dialog the-dialog))
 	       (oset-default 'jde-find-dialog the-dialog (jde-find-dialog "find dialog")))
-	   (oref 'jde-find-dialog the-dialog))))
+	   (oref-default 'jde-find-dialog the-dialog))))
     (efc-dialog-show dialog)
     (when (oref dialog ok)
       (jde-find-grep-internal
@@ -2455,7 +2455,7 @@ feature in JDE (see `jde-complete-at-point')."
 	(if (and class-to-open (stringp class-to-open))
 	    (progn
 	      (bsh-eval
-	       (oref 'jde-bsh the-bsh)
+	       (oref-default 'jde-bsh the-bsh)
 	       (concat "exploreClass(\"" class-to-open "\");")))
 	  (error "Can not parse the thing at point!")))
     (message "You need JDE >= 2.2.6 and Senator for using this feature!")))

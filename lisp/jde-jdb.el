@@ -409,7 +409,7 @@ on the list."
 		  (jde-db-delete-breakpoint bp)
 		(if (string-match "Unable to set deferred breakpoint" output)
 		    (if (jde-db-debuggee-running-p)
-			(let* ((debugger (oref 'jde-db-debugger the-debugger))
+			(let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 			       (bp-cmd
 				(oref (oref debugger cmd-set) clear-bp)))
 			  (oset bp-cmd breakpoints (list bp))
@@ -1441,7 +1441,7 @@ the debuggee process at (e.g., jdbconn)."
   "Print expression at point."
   (interactive "sExpression: ")
   (jde-assert-source-or-debug-buffer)
-  (let* ((debugger (oref 'jde-db-debugger the-debugger))
+  (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 	 (debuggee (oref debugger debuggee))
 	 (debuggee-status (oref debuggee status)))
     (if (and (oref debugger running-p)
@@ -1525,7 +1525,7 @@ the debuggee process at (e.g., jdbconn)."
 	 jde-debug-run
 	 :active   (and
 		    (slot-boundp 'jde-db-debugger 'the-debugger)
-		    (let* ((debugger (oref 'jde-db-debugger the-debugger))
+		    (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 			   (debuggee (oref debugger debuggee))
 			   (debuggee-status (oref debuggee status)))
 		      (and (oref debugger running-p)
@@ -1533,7 +1533,7 @@ the debuggee process at (e.g., jdbconn)."
 
 	 :included (or
 		    (not (slot-boundp 'jde-db-debugger 'the-debugger))
-		    (let* ((debugger (oref 'jde-db-debugger the-debugger))
+		    (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 			   (debuggee (oref debugger debuggee))
 			   (debuggee-status (oref debuggee status)))
 		      (or (not (oref debugger running-p))
@@ -1610,7 +1610,7 @@ the debuggee process at (e.g., jdbconn)."
 	  jde-debug-down
 	  :active (and
 		   (jde-db-debuggee-stopped-p)
-		   (let* ((debugger (oref 'jde-db-debugger the-debugger))
+		   (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 			  (debuggee (oref debugger debuggee)))
 		     (> (jde-jdb-string-to-int
 			 (oref debuggee :stack-depth)) 1)))
@@ -1682,7 +1682,7 @@ the debuggee process at (e.g., jdbconn)."
 	 jde-debug-run
 	 :active   (and
 		    (slot-boundp 'jde-db-debugger 'the-debugger)
-		    (let* ((debugger (oref 'jde-db-debugger the-debugger))
+		    (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 			   (debuggee (oref debugger debuggee))
 			   (debuggee-status (oref debuggee status)))
 		      (and (oref debugger running-p)
@@ -1690,7 +1690,7 @@ the debuggee process at (e.g., jdbconn)."
 
 	 :included (or
 		    (not (slot-boundp 'jde-db-debugger 'the-debugger))
-		    (let* ((debugger (oref 'jde-db-debugger the-debugger))
+		    (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 			   (debuggee (oref debugger debuggee))
 			   (debuggee-status (oref debuggee status)))
 		      (or (not (oref debugger running-p))
@@ -1755,7 +1755,7 @@ the debuggee process at (e.g., jdbconn)."
 	  jde-debug-down
 	  :active (and
 		   (jde-db-debuggee-stopped-p)
-		   (let* ((debugger (oref 'jde-db-debugger the-debugger))
+		   (let* ((debugger (oref-default 'jde-db-debugger the-debugger))
 			  (debuggee (oref debugger debuggee)))
 		     (> (jde-jdb-string-to-int
 			 (oref debuggee :stack-depth)) 1)))]

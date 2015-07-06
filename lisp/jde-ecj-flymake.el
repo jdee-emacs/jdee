@@ -27,7 +27,7 @@
 
 
 ;;; Commentary:
-;; 
+;;
 ;; * Eclipse java compiler
 ;;
 ;; This library adds support for using flymake when the eclipse java
@@ -58,9 +58,9 @@
 ;; 1) jde-ecj-flymake-init : This is the simple, robust and painfully slow
 ;;    method, in which flymake forks a new jvm process each time it
 ;;    decides to error check the buffer.
-;; 
+;;
 ;; To use this funtion set the java line in
-;; `flymake-allowed-file-name-masks' to 
+;; `flymake-allowed-file-name-masks' to
 ;; (\"\\.java\\'\" jde-ecj-flymake-init jde-ecj-flymake-cleanup)"
 
 ;; 2) jde-ecj-server-flymake-init: This method involves flymake
@@ -86,7 +86,7 @@
 ;; the faces `flymake-errline' and `flymake-warnline' to change this
 ;; behavior. Red and yellow underlines for errors and warnings work
 ;; well:
-;; 
+;;
 ;; (custom-set-faces
 ;; ...
 ;;  '(flymake-errline ((((class color)) (:underline "OrangeRed"))))
@@ -98,7 +98,7 @@
 ;;
 ;; NOW - Integrated directly into jdee
 ;; 0.3 - bug fixes from James Ahlborn <jahlborn@healthmarketscience.com>
-;;       deleted unnecessary \n at the end of a bsh-eval string that was causing bsh-buffer-eval to fail occasionally. 
+;;       deleted unnecessary \n at the end of a bsh-eval string that was causing bsh-buffer-eval to fail occasionally.
 ;; 0.2 - Eclipse 3.2 and later support the -Xemacs option which makes
 ;;       it possible to the hook eclipse compiler into flymake.
 ;; 0.1 - Initial version
@@ -178,7 +178,7 @@ orginal file."
   (let* ((true-dir-name (file-truename dir-name))
          (true-tmp-dir (file-truename (flymake-get-temp-dir))))
     (when (equal true-tmp-dir (substring true-dir-name 0 (length true-tmp-dir)))
-      (while (not (equal true-tmp-dir true-dir-name)) 
+      (while (not (equal true-tmp-dir true-dir-name))
         (mapc 'jde-ecj-safe-delete-file (directory-files true-dir-name t))
         (flymake-safe-delete-directory true-dir-name)
         (setq true-dir-name (file-name-directory (directory-file-name true-dir-name)))))))
@@ -237,7 +237,7 @@ To use this funtion set the java line in `flymake-allowed-file-name-masks' to
                                        ",")))
 
       (setq arg-array (concat arg-array "\"" temp-file "\"}"))
-        
+
 
       (list (cons bsh-process ;; server process
                   "jde-eclipse-compiler-server-done")  ;; output end marker
@@ -266,7 +266,7 @@ the output stream."
   (let* ((source-buffer     (process-buffer process))
          (cleanup-f         (flymake-get-cleanup-function (buffer-file-name source-buffer)))
          (flymake-err-line-patterns jde-ecj-compiler-error-regexps))
-    
+
     (flymake-log 2 "server process %d \"exited\" with output %s" (process-id process) output)
     (condition-case err
         (progn
@@ -278,7 +278,7 @@ the output stream."
           (setq flymake-processes (delq process flymake-processes))
           (set-process-buffer process flymake-server-process-saved-buffer)
           (set-process-filter process flymake-server-process-saved-filter)
-            
+
           (when (buffer-live-p source-buffer)
             (with-current-buffer source-buffer
 
@@ -294,7 +294,7 @@ the output stream."
 ;;
 ;; flymake modifications to allow it to converse with a running
 ;; process instead of always starting a new "make" process
-;; 
+;;
 (defun jde-ecj-flymake-start-syntax-check-process (cmd args dir)
   "Start syntax check process."
   (let* ((process nil))
@@ -388,7 +388,7 @@ process and the output contains the end of output marker `flymake-process-server
 (jde-ecj-bsh "ecj BeanShell")
 
 (defun jde-ecj-get-bsh ()
-  (oref 'jde-ecj-bsh the-ecj-bsh))
+  (oref-default 'jde-ecj-bsh the-ecj-bsh))
 
 (defun jde-ecj-bsh-running-p ()
   (bsh-running-p (jde-ecj-get-bsh)))

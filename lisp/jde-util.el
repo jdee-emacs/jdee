@@ -188,11 +188,16 @@ currently selected source buffer."
     (if (eq major-mode 'jde-mode)
 	(current-buffer))))
 
+(defvar jde-exception-goto-regexp
+  "[ \t]+\\(?:at \\)?\\([a-zA-Z0-9.]+\\)\\(?:\\$?[a-zA-Z0-9]*\\)\\.\\([^(]+\\)([^:]+:\\([0-9]+\\))$"
+  "*Regular expression used to find the file and line number of a frame in a
+stack trace.")
+
 ;;;###autoload
 (defun jde-exception-goto ()
   "Go to the Java source file and line indicated by an exception stack trace."
   (interactive)
-  (let ((regexp "[ \t]+at \\([a-zA-Z0-9.]+\\)\\(?:\\$?[a-zA-Z0-9]*\\)\\.\\([^(]+\\)([^:]+:\\([0-9]+\\))$")
+  (let ((regexp jde-exception-goto-regexp)
 	file line end)
     (save-match-data
       (save-excursion
