@@ -167,6 +167,24 @@
     </exec>
   </target>
 
+  <target name="test-lisp" depends="build-lisp"
+	  description="test the JDEE Emacs lisp code">
+    <!-- invoke Emacs in batch mode to test emacs lisp -->
+    <echo message="Building using Emacs: ${build.bin.emacs}" />
+    <echo message="Lisp dir: ${build.lisp.dir}" />
+    <exec dir="test"
+	  executable="${build.bin.emacs}" failonerror="true">
+      <arg value="--no-site-file"/>
+      <arg value="--batch"/>
+      <arg value="-L"/>
+      <arg value="${build.lisp.dir}"/>
+      <arg value="--load"/>
+      <arg value="jde-util-test.el"/>
+      <arg value="-f"/>
+      <arg value="ert-run-tests-batch-and-exit"/>
+    </exec>
+  </target>
+
 
   <target name="build-java" depends="init"
 	  description="compile the JDEE Java source code">
