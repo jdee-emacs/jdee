@@ -37,7 +37,6 @@
 
 ;;; Code:
 
-(require 'regress)
 (require 'jde-dbo)
 (require 'jde-db)
 (require 'eieio)
@@ -661,24 +660,6 @@ for the breakpoint."
   "Process counter. Used to generate process IDs.")
 
 
-(eval-when-compile
-  ;; This code will not appear in the compiled (.elc) file
-  (put 'test-jde-dbs-proc 'regression-suite t)
-  (setq test-jde-dbs-proc
-   '("test-jde-dbs-proc"
-     ;; Each test in the suite is of the form:
-     ;;   ([description] probe grader)
-     ;;   DESCRIPTION - string
-     ;;   PROBE -  a sexp which runs the actual test
-     ;;   GRADER - the desired result or a sexp which determines
-     ;;   how we did
-     ("Test creation of a jde-dbs-proc instance"
-      (jde-dbs-proc
-       (format "process%d" 100) :id 100 :main-class "jmath.Test")
-      :test t)
-     )))
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                            ;;
 ;; Java Object                                                                ;;
@@ -688,7 +669,7 @@ for the breakpoint."
   ((jtype  :initarg :jtype
 	   :type string
 	   :documentation
-	  "Type of this object."))
+	   "Type of this object."))
   "Superclass of Java objects.")
 
 (defmethod jde-dbs-java-obj-to-string ((this jde-dbs-java-obj))
@@ -3327,14 +3308,6 @@ object.")
 		   (car (jde-dbo-command-result-data result)))))
 
     command-succeeded-p))
-
-(eval-when-compile
-  ;; This code will not appear in the compiled (.elc) file
-  (defun jde-dbs-self-test ()
-    "Runs jde-dbs self tests."
-    (interactive)
-    (apply 'regress
-	   (list test-jde-dbs-proc))))
 
 (provide 'jde-dbs)
 

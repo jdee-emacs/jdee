@@ -105,7 +105,6 @@
 (require 'etags)
 (require 'jde-open-source)
 (require 'jde-annotations)
-(require 'regress)
 
 (defconst jde-emacs-cedet-p
   (and jde-emacs23p

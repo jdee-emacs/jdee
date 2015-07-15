@@ -422,34 +422,6 @@ framework. For more information, see http://www.junit.org."
 ;; by this package.
 (jde-update-autoloaded-symbols)
 
-
-
-(eval-when-compile
-  ;; This code will not appear in the compiled (.elc) file
-  (put 'test-jde-junit 'regression-suite t)
-  (setq test-jde-junit
-   '("test-jde-junit"
-     ;; Each test in the suite is of the form:
-     ;;   ([description] probe grader)
-     ;;   DESCRIPTION - string
-     ;;   PROBE -  a sexp which runs the actual test
-     ;;   GRADER - the desired result or a sexp which determines
-     ;;   how we did
-     ("Test jde-junit-get-tester-name function"
-      (jde-junit-get-tester-name "DynamicClassLoader")
-      "TDynamicClassLoader"
-      )
-      )))
-
-
-(eval-when-compile
-  ;; This code will not appear in the compiled (.elc) file
-  (defun jde-junit-self-test ()
-    "Runs jde-dbs self tests."
-    (interactive)
-    (apply 'regress
-	   (list test-jde-dbs-proc))))
-
 (provide 'jde-junit)
 
 ;; End of jde-junit.el
