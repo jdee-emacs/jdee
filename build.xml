@@ -167,7 +167,7 @@
     </exec>
   </target>
 
-  <target name="test-lisp" depends="build-lisp"
+  <target name="test" depends="build-lisp"
 	  description="test the JDEE Emacs lisp code">
     <!-- invoke Emacs in batch mode to test emacs lisp -->
     <echo message="Building using Emacs: ${build.bin.emacs}" />
