@@ -25,22 +25,7 @@
 
 (jde-semantic-require 'semantic-ctxt)
 (jde-semantic-require 'semantic-sb)
-(if (< emacs-major-version 23)
-    (progn
-      (require 'avltree)  ;; use elib's avltree with local compatibility kludges
-      (defalias 'avl-tree-clear   'avltree-clear)
-      (defalias 'avl-tree-copy    'avltree-copy)
-      (defalias 'avl-tree-create  'avltree-create)
-      (defalias 'avl-tree-delete  'avltree-delete)
-      (defalias 'avl-tree-empty   'avltree-empty)
-      (defalias 'avl-tree-enter   'avltree-enter)
-      (defalias 'avl-tree-first   'avltree-first)
-      (defalias 'avl-tree-flatten 'avltree-flatten)
-      (defalias 'avl-tree-last    'avltree-last)
-      (defalias 'avl-tree-map     'avltree-map)
-      (defalias 'avl-tree-member  'avltree-member)
-      (defalias 'avl-tree-size    'avltree-size))
-  (require 'avl-tree)) ;; use emacs's avl-tree
+(require 'avl-tree)
 (require 'thingatpt)
 (require 'eieio)
 (require 'jde-imenu)                    ; All the imenu stuff is here now!
