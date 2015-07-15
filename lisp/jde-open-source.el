@@ -477,7 +477,7 @@ When called interactively, select the class and copy it to the kill ring."
 	(if (= 0 (length classes))
 	    (error "Not match for %s" uq-name))
 	(setq fqc (jde-choose-class classes fq-prompt uq-name confirm-fq-p))))
-    (when (interactive-p)
+    (when (called-interactively-p 'interactive)
       (kill-new fqc)
       (message "Copied `%s'" fqc))
     fqc))

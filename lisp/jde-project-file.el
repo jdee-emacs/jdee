@@ -475,7 +475,7 @@ This function is used in JDEE project files."
 to the value it has at Emacs startup (i.e., before any projects
 have been loaded)."
   (interactive)
-  (if (or (interactive-p) msg)
+  (if (or (called-interactively-p 'interactive) msg)
       (message "Setting customized JDE variables to startup values..."))
   (if jde-dirty-variables
       (mapcar

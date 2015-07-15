@@ -287,7 +287,7 @@ semantic Java parser and requires JDE 2.1.6-beta24 and above."
   (or (and (local-variable-p 'semantic--parse-table (current-buffer))
 	   (symbol-value 'semantic--parse-table))
       (error "Semantic Java parser not found."))
-  (and (interactive-p)
+  (and (called-interactively-p 'interactive)
        (consp current-prefix-arg)
        (setq reverse t))
   (let* ((tags  (semantic-fetch-tags))
@@ -300,8 +300,8 @@ semantic Java parser and requires JDE 2.1.6-beta24 and above."
 	  (when (and start end)
 	    (require 'sort)
 	    (let (sort-fold-case)
-		(sort-lines reverse start end)
-		(goto-char start)))))))
+	      (sort-lines reverse start end)
+	      (goto-char start)))))))
 
 (defun jde-import-find-and-import (class &optional no-errors no-exclude qualifiedp)
   "*Insert an import statement for a class in the current buffer.
@@ -471,7 +471,7 @@ The current buffer must be in `jde-mode'."
   (interactive "P")
   (or (eq major-mode 'jde-mode)
       (error "Major mode must be 'jde-mode'"))
-  (and (interactive-p)
+  (and (called-interactively-p 'interactive)
        (consp current-prefix-arg)
        (setq comment t))
   (let* ((tags    (semantic-fetch-tags))
@@ -510,7 +510,7 @@ The current buffer must be in `jde-mode'."
 		   (case-fold-search nil)
 		   (number-of-matches
 		    (count-matches
-				(concat "\\b" classname "\\b"))))
+		     (concat "\\b" classname "\\b"))))
 	      (if (or
 		   ;; If name is already listed in the set
 		   ;; of required imports...
@@ -712,7 +712,7 @@ version of the JDE with the semantic parser."
   (interactive "P")
   (or (eq major-mode 'jde-mode)
       (error "Major mode must be 'jde-mode'"))
-  (and (interactive-p)
+  (and (called-interactively-p 'interactive)
        (consp current-prefix-arg)
        (setq force t))
   (save-excursion

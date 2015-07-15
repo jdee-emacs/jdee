@@ -228,7 +228,7 @@ setter, otherwise, make a getter."
 				    (capitalize (substring (car toks) 0 1))
 				    (substring (car toks) 1))
 			      (cdr toks)))))
-    (if (interactive-p)
+    (if (called-interactively-p 'interactive)
 	(let ((bounds (bounds-of-thing-at-point 'word)))
 	  (delete-region (car bounds) (cdr bounds))
 	  (insert (concat attr "(" (if getterp ")")))))

@@ -506,8 +506,8 @@ system command path."
 		      (jde-jeval-r "jde.util.JdeUtilities.getJavaVersion();"))
 		(setq java-version jde-java-version-cache))
 	    (setq java-version (jde-java-version-via-java)))))
-    (if (interactive-p)
-      (message java-version)
+    (if (called-interactively-p 'interactive)
+	(message java-version)
       java-version)))
 
 (defun jde-java-major-version ()

@@ -1068,7 +1068,7 @@ expressions."
 If optional REBUILD flag is non-nil create a new cache of regular
 expressions."
   (interactive "P")
-  (and (interactive-p)
+  (and (called-interactively-p 'interactive)
        (consp current-prefix-arg)
        (setq rebuild t))
 
@@ -1076,7 +1076,7 @@ expressions."
   (setq java-font-lock-keywords-4 (jde-java-font-lock-keywords rebuild))
 
   ;; Update fontification of buffers in `java-mode' and `jde-mode'.
-  (when (interactive-p)
+  (when (called-interactively-p 'interactive)
     (jde-java-font-lock-refontify)))
 
 ;; Setup `java-font-lock-keywords-4'

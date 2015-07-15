@@ -653,7 +653,7 @@ If called interactively, add the name in the mini-buffer."
 			 (file-name-nondirectory (buffer-file-name)))))
 	(if (and (not no-package-p) package-name)
 	    (setq class-name (concat package-name "." class-name)))
-	(when (interactive-p)
+	(when (called-interactively-p 'interactive)
 	  (kill-new class-name)
 	  (message (format "Copied `%s'" class-name)))
 	class-name)

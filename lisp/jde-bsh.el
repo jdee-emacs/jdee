@@ -239,7 +239,7 @@ prints out, Emacs has nothing to evaluate or report."
 		(setq output (substring output 0 (1- len)))))
 	  (if (= 0 (length output)) (setq output nil)))
 	(log output 'response)
-	(when (interactive-p)
+	(when (called-interactively-p 'interactive)
 	  (if output (kill-new output))
 	  (message (if output
 		       (concat "Copied `"
@@ -380,7 +380,7 @@ NO-QUOTE-WRAP-P, if non-nil, don't add double quotes around the whole statement.
 		     (goto-char (point-max))
 		     (insert "\""))
 		   (buffer-substring (point-min) (point-max))))
-      (when (interactive-p)
+      (when (called-interactively-p 'interactive)
 	(save-excursion
 	  (delete-region start end)
 	  (goto-char start)
