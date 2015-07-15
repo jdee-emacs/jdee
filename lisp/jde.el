@@ -2031,7 +2031,7 @@ for insertion of the .emacs file"
 	   (with-output-to-temp-buffer "*Help*"
 	       (princ (format "Binding for keymap %s is:\n" (symbol-name map)))
 	       (princ (substitute-command-keys "\\{val}" ))
-	       (print-help-return-message))))
+	       (help-print-return-message))))
 
 (defun jde-keys ()
   "Displays JDE key bindings. Use `jde-bug-keys' to display JDEbug
