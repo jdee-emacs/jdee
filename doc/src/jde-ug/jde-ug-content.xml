@@ -172,13 +172,6 @@
 
 	<listitem>
 	  <para>
-	    The elib package available from the 
-	    <ulink url="http://jdee.sourceforge.net">JDE web site</ulink>
-	  </para></listitem>
-
-
-	<listitem>
-	  <para>
 	    <command>bash</command> or another Unix-style shell highly
 	    recommended for Windows95/NT environments. The <ulink
 	      url="http://sources.redhat.com/cygwin">cygwin</ulink>

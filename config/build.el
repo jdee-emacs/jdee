@@ -46,25 +46,21 @@
       (eval-buffer buf)
       buf)))
 
-(defun jde-make-autoloads-and-compile (dir lisp-src-dir elib-dir cedet-dir
+(defun jde-make-autoloads-and-compile (dir lisp-src-dir cedet-dir
 					   cedet-paths autoload-libname)
   "Create autoloads and compile lisp code in DIR.
 LISP-SRC-DIR is the base directory for all third party lisp code use to
 compile.
-
-ELIB-DIR is the directory to elib-1.0 \(no longer needed for Emacs 23+).
 
 CEDET-DIR is the cedet lisp code base directory (see PATHS).
 
 CEDET-PATHS are sub directories under CEDET-DIR we use to compile.
 
 AUTOLOAD-LIBNAME the name of the generated autoload file."
-  (dolist (path (list dir lisp-src-dir elib-dir cedet-dir))
+  (dolist (path (list dir lisp-src-dir cedet-dir))
     (if (and (> (length path) 0) (not (file-directory-p path)))
 	(error "Doesn't exist or not a directory: %s" path)))
   (let ((autoload-buf (jde-make-autoloads dir autoload-libname)))
-    (if (> (length elib-dir) 0)
-	(add-to-list 'load-path elib-dir t))
     (when (and cedet-paths (> (length cedet-dir) 0))
       (dolist (path cedet-paths)
 	(add-to-list 'load-path (expand-file-name path cedet-dir)
@@ -82,7 +78,6 @@ AUTOLOAD-LIBNAME the name of the generated autoload file."
 (require 'autoload)
 (jde-make-autoloads-and-compile (expand-file-name "@{build.lisp.dir}")
 				"@{src.lisp.dir}"
-				"@{elib.dir}"
 				"@{cedet.dir}"
 				'("common"
 				  "eieio"
