@@ -73,7 +73,7 @@ public class LispWriter {
     this.autoQuoteLists = autoQuoteLists;
   }
 
-  public void writeList(List list) {
+  public void writeList(List<Cons> list) {
     if (isAutoQuoteLists() && !inQuote) {
       output.write("'");
       inQuote = true;
@@ -84,7 +84,7 @@ public class LispWriter {
     }
   }
 
-  public void writeForm(List list) {
+  public void writeForm(List<Cons> list) {
     output.print("(");
     for (int i = 0; i < list.size(); i++) {
       if (i > 0) {
@@ -95,10 +95,9 @@ public class LispWriter {
     output.print(")");
   }
 
-  public void writeAlist(Map map) {
-    List alist = new ArrayList();
-    for (Iterator i = map.entrySet().iterator(); i.hasNext(); ) {
-      Map.Entry e = (Map.Entry) i.next();
+  public void writeAlist(Map<Object,Object> map) {
+    List<Cons> alist = new ArrayList<Cons>();
+    for (Map.Entry<Object,Object> e : map.entrySet()) {
       alist.add(new Cons(e.getKey(), e.getValue()));
     }
     writeList(alist);

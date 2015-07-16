@@ -99,14 +99,14 @@ public class LispWriterTest
   }
 
   public void testMapAlist() {
-    Map m = new HashMap();
+    Map m = new LinkedHashMap();
     m.put("foo", new Symbol("bar"));
     m.put("baz", new Symbol("quux"));
     lwriter.writeAlist(m);
-    assertEquals("'((\"baz\" . quux) (\"foo\" . bar))", output.toString());
+    assertEquals("'((\"foo\" . bar) (\"baz\" . quux))", output.toString());
     reset();
     lwriter.writeUnknown(m);
-    assertEquals("'((\"baz\" . quux) (\"foo\" . bar))", output.toString());
+    assertEquals("'((\"foo\" . bar) (\"baz\" . quux))", output.toString());
   }
 
   public void testChars() {

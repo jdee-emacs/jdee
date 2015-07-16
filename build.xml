@@ -200,10 +200,42 @@
 	  description="compile the JDEE Java source code">
     <mkdir dir="${build.java.dir}"/>
     <javac srcdir="${src.java.dir}" destdir="${build.java.dir}"
-	   source="1.6" target="1.6"
-	   debug="true" classpathref="compile.classpath"/>
+	   source="1.6" target="1.6" includeantruntime="false"
+	   debug="true" classpathref="compile.classpath" />
   </target>
 
+  <target name="test-java" depends="build-java">
+      <mkdir dir="build/reports"/>
+      <mkdir dir="build/test-classes"/>
+
+      <javac srcdir="test/java" destdir="build/test-classes"
+             debug="true" debuglevel="lines,source"
+             includeantruntime="false">
+          <classpath>
+              <pathelement location="${build.java.dir}"/>
+              <pathelement path="${lib.java.dir}/junit.jar" />
+              <pathelement path="${lib.java.dir}/bsh.jar" />
+          </classpath>
+      </javac>
+
+      <junit printsummary="yes" haltonfailure="yes">
+          <classpath>
+              <pathelement location="build/test-classes"/>
+              <pathelement location="${build.java.dir}"/>
+              <pathelement path="${lib.java.dir}/junit.jar"/>
+              <pathelement path="${lib.java.dir}/bsh.jar" />
+          </classpath>
+
+          <formatter type="plain"/>
+
+          <batchtest fork="yes" todir="build/reports">
+              <fileset dir="test/java">
+                  <include name="**/*Test.java"/>
+              </fileset>
+              <formatter type="plain" usefile="false"/>
+          </batchtest>
+      </junit>
+  </target>
 
   <target name="build" depends="build-lisp,build-java"
 	  description="compile all JDEE source code"/>
