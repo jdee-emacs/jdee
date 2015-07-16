@@ -4,4 +4,5 @@ The JDEE is an add-on software package that turns Emacs into a comprehensive sys
 # Build options
 1. Available Ant targets: ```ant -p```
 2. Run unit tests: ```ant test```
+3. Run JUnit tests: ```ant test-java```
 3. Build project: ```ant bindist```
