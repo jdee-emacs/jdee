@@ -167,7 +167,8 @@
     </exec>
   </target>
 
-  <target name="run-test-on-file" depends="build-lisp">
+  <target name="run-test-on-file" depends="build-lisp"
+          description="Test a single elisp file">
     <echo message="Testing file: ${test.file}" />
     <exec executable="${build.bin.emacs}" failonerror="true">
         <arg value="--no-site-file"/>
@@ -188,7 +189,7 @@
     <echo message="Lisp dir: ${build.lisp.dir}" />
     <foreach target="run-test-on-file" param="test.file">
       <path>
-        <fileset dir="test" casesensitive="yes">
+        <fileset dir="test/lisp" casesensitive="yes">
             <filename name="**/*-test.el"/>
         </fileset>
       </path>
