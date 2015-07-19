@@ -39,13 +39,6 @@
 ;;; to help programmers write Java code that adheres to a coding
 ;;; standard.
 
-;;; Installation:
-;;
-;;  Put this file on your Emacs-Lisp load path and add following into your
-;;  ~/.emacs startup file
-;;
-;;      (require 'jde-checkstyle)
-
 ;;; Usage:
 ;;
 ;;  M-x `jde-checkstyle' to check the java file in the current buffer.
@@ -58,6 +51,13 @@
 ;;; Code:
 
 (require 'jde-compile)
+(require 'jde-project-file)
+(require 'jde-run)
+(require 'jde-util)
+
+;; FIXME: refactor
+(declare-function jde-build-classpath "jde" (paths &optional symbol quote-path-p))
+(declare-function jde-normalize-path "jde" (path &optional symbol))
 
 (defconst jde-checkstyle-version "3.1")
 
@@ -236,7 +236,6 @@ string describing how the compilation finished."
 				 compilation-file-regexp-alist))
 	  (nomessage-regexp-alist (if (boundp 'compilation-nomessage-regexp-alist)
 				      compilation-nomessage-regexp-alist))
-	  (parser compilation-parse-errors-function)
 	  (error-message "No further errors")
 	  (thisdir default-directory))
 
@@ -276,8 +275,6 @@ string describing how the compilation finished."
 	   (lambda (buf msg)
 	     (run-hook-with-args 'jde-checkstyle-finish-hook buf msg)
 	     (setq compilation-finish-functions nil)))
-      (if (boundp 'compilation-parse-errors-function)
-	  (set (make-local-variable 'compilation-parse-errors-function) parser))
       (if (boundp 'compilation-error-message)
 	  (set (make-local-variable 'compilation-error-message) error-message))
       (set (make-local-variable 'compilation-error-regexp-alist)

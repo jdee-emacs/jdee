@@ -34,7 +34,6 @@
 
 (require 'jde-parse)
 
-
 (defgroup jde-which-method nil
   "Mode to display the current function name in the modeline."
   :group 'jde)
@@ -70,9 +69,9 @@ displayed in the mode line."
   "Format for the JDE source buffer mode line."
   :group 'jde
   :type 'sexp)
-  
+
 (defcustom jde-which-full-class-name nil
-  "Display full inner-class name in JDE's which method mode. 
+  "Display full inner-class name in JDE's which method mode.
 If nil then display only the last component of class name.
 \(see `jde-which-method-max-length', `jde-which-method-class-min-length')
 "
@@ -136,6 +135,12 @@ is not nil. If the full method name is still greater than
 	(concat (substring str 0 (- str-length truncation))
 		jde-which-method-abbrev-symbol)
       str)))
+
+(defun jde-which-method-class-name(name)
+  (if jde-which-full-class-name
+      (car (jde-which-full-class-namef (jde-parse-get-innermost-class-at-point)))
+    (caar name)
+    ))
 
 (defun jde-which-method-update ()
   (interactive)
@@ -221,7 +226,7 @@ is not nil. If the full method name is still greater than
 	 (setq jde-which-method-idle-timer nil)
 	 (message "Error in jde-which-method-update: %s" info)))))
 
-(defun jde-which-full-class-namef (name) 
+(defun jde-which-full-class-namef (name)
   ;; name and return value is: (string . point) or nil.
   (save-excursion
     (do ((rv name)) ((not name) rv)
@@ -229,17 +234,11 @@ is not nil. If the full method name is still greater than
       (setq name (jde-parse-get-innermost-class-at-point))
       (if name (setf (car rv) (concat (car name) "." (car rv)))))))
 
-(defun jde-which-class-name(name) 
+(defun jde-which-class-name (name)
   ;; use given name or gather full-name:
   (if jde-which-full-class-name
       (jde-which-full-class-namef name)
     name
-    ))
-
-(defun jde-which-method-class-name(name)
-  (if jde-which-full-class-name
-      (car (jde-which-full-class-namef (jde-parse-get-innermost-class-at-point)))
-    (caar name)
     ))
 
 (defun jde-which-method-update-on-entering-buffer ()

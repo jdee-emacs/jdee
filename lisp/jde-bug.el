@@ -36,13 +36,22 @@
 
 ;;; Code:
 
-(require 'cl)
+(require 'cl-lib)
 (require 'jde-parse)
 (require 'jde-dbs)
 (require 'jde-dbo)
 (require 'jde-db)
+(require 'jde-run)
 (require 'efc)
+(require 'semantic/util-modes);; semantic-add-minor-mode
 
+;; FIXME: refactor
+(declare-function jde-convert-cygwin-path "jde" (path &optional separator))
+(declare-function jde-describe-map "jde" (map))
+(declare-function jde-find-jde-doc-directory "jde" ())
+(declare-function jde-java-major-version "jde" ())
+(declare-function jde-java-minor-version "jde" ())
+(declare-function jde-normalize-path "jde" (path &optional symbol))
 
 (defgroup jde-bug nil
   "JDEbug General Options"
@@ -549,6 +558,7 @@ consuming and slows down stepping through the code."
     km)
   "Keymap for JDEbug minor mode.")
 
+;;;###autoload
 (define-minor-mode jde-bug-minor-mode nil
   :keymap jde-bug-mode-map)
 
@@ -1253,7 +1263,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
    (lambda (id-x)
      (let ((request
 	    (cdr
-	     (find-if
+	     (cl-find-if
 	      (lambda (x) (= (car x) id-x))
 	     (oref this requests)))))
      (jde-bug-cancel-trace-request  (oref this process) request)))
@@ -1556,7 +1566,7 @@ field of an object or class of objects."
    (lambda (id-x)
      (let ((request
 	    (cdr
-	     (find-if
+	     (cl-find-if
 	      (lambda (x) (= (car x) id-x))
 	     (oref this requests)))))
      (jde-bug-cancel-watch-request  (oref this process) request)))
@@ -1588,7 +1598,8 @@ requests to cancel."
   (let* ((current-frame (selected-frame))
 	 (falist
 	  (cons
-	   (cons (if jde-xemacsp
+	   (cons (if (fboundp 'frame-property)
+		     ;; xemacs
 		     (frame-property current-frame 'name)
 		   (frame-parameter current-frame 'name))
 		 current-frame) nil))
@@ -1596,7 +1607,8 @@ requests to cancel."
     (while (not (eq frame current-frame))
       (progn
 	(setq falist (cons (cons
-			    (if jde-xemacsp
+			    (if (fboundp 'frame-property)
+				;; xemacs
 				(frame-property frame 'name)
 			      (frame-parameter frame 'name))
 			    frame) falist))
@@ -1622,11 +1634,12 @@ requests to cancel."
 	     (msg-buffer (when (slot-boundp process 'msg-buf)
 			(oref process msg-buf)))
 	     (frame (make-frame '((name . "JDebug") (minibuffer . nil))))
-	     (height (/ (frame-height frame) (count-if 'identity
-						       (list cli-buffer
-							     locals-buffer
-							     threads-buffer
-							     msg-buffer))))
+	     (height (/ (frame-height frame)
+			(cl-count-if 'identity
+				     (list cli-buffer
+					   locals-buffer
+					   threads-buffer
+					   msg-buffer))))
 	     (init-frame (selected-frame))
 	     (init-config (current-window-configuration))
 	     (prev-window))

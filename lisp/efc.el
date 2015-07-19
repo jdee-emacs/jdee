@@ -5,7 +5,7 @@
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: lisp, tools, classes
 
-;; Copyright (C) 2001, 2002, 2003, 2004, 2005 Paul Kinnucan.
+;; Copyright (C) 2001, 2002, 2003, 2004, 2005, 2015 Paul Kinnucan.
 ;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
@@ -29,6 +29,8 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+(require 'compile)
 (require 'eieio)
 (require 'wid-edit)
 
@@ -54,7 +56,7 @@ If nil then the default efc custom-based dialogs will be used."
 (defun efc-query-options-function-minibuf (options prompt title history default)
   (let (sel)
     ;; efc doesn't add the end colon
-    (setq prompt (format "%s%s" 
+    (setq prompt (format "%s%s"
 			 (or prompt "Select option")
 			 (if default
 			     (format " (default %s): " default)
@@ -341,10 +343,9 @@ and a string describing how the process finished."))
 	  (file-regexp-alist (if (boundp 'compilation-file-regexp-alist)
 				 compilation-file-regexp-alist))
 	  (nomessage-regexp-alist
-	   ;; silence the compiler warnings
-	   (if (boundp 'compilation-nomessage-regexp-alist)
-	       (if (not jde-xemacsp) compilation-nomessage-regexp-alist)))
-	  (parser compilation-parse-errors-function)
+	   (when (boundp 'compilation-nomessage-regexp-alist)
+	     ;; xemacs
+	       (compilation-nomessage-regexp-alist)))
 	  (error-message "No further errors")
 	  (thisdir default-directory))
 
@@ -380,8 +381,6 @@ and a string describing how the process finished."))
       (compilation-mode (oref this name))
       (setq buffer-read-only nil)
 
-      (if (boundp 'compilation-parse-errors-function)
-	  (set (make-local-variable 'compilation-parse-errors-function) parser))
       (if (boundp 'compilation-error-message)
 	  (set (make-local-variable 'compilation-error-message) error-message))
       (set (make-local-variable 'compilation-error-regexp-alist)
@@ -394,8 +393,11 @@ and a string describing how the process finished."))
 			,leave-regexp-alist)
 		       (compilation-file-regexp-alist
 			,file-regexp-alist)
-		       (compilation-nomessage-regexp-alist
-			,nomessage-regexp-alist)))
+		       (when (fboundp 'compilation-nomessage-regexp-alist)
+			 ;; xemacs
+			 ;; FIXME: for some reason, the byte compiler still complains here
+			 (compilation-nomessage-regexp-alist
+			  ,nomessage-regexp-alist))))
 	  (if (boundp (car elt))
 	      (set (make-local-variable (car elt)) (second elt)))))
 
@@ -479,7 +481,7 @@ type-compatible with a collection if the collection is heterogeneous or
 the item's type is the same as the collection's element type."
   (let ((element-type (oref this elem-type)))
     (or (eq element-type nil)
-	(typep item element-type))))
+	(cl-typep item element-type))))
 
 (defmethod efc-coll-iterator ((this efc-collection))
   "Returns an iterator for this collection."
@@ -583,7 +585,7 @@ is an object of efc-visitor class."
   "Iterator constructor."
   (call-next-method)
   (assert (oref this list-obj))
-  (assert (typep (oref this list-obj) efc-list))
+  (assert (cl-typep (oref this list-obj) efc-list))
   (oset this list (oref (oref this list-obj) items)))
 
 (defmethod efc-iter-has-next ((this efc-list-iterator))

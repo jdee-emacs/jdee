@@ -97,7 +97,10 @@
 ;;    Initial Version
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(require 'cl-lib)
+(require 'compile)
 
+;; FIXME: refactor to avoid this
 (declare-function jde-normalize-path "jde" (path &optional sym))
 (declare-function jde-get-jdk-prog "jde" (progname))
 (declare-function jde-get-tools-jar "jde" nil)
@@ -506,8 +509,7 @@ and there are no more errors. "
 	 leave-regexp-alist
 	 file-regexp-alist
 	 nomessage-regexp-alist
-	 (parser compilation-parse-errors-function)
-	  outbuf)
+	 outbuf)
 
     (save-excursion				       ;;getting or creating
       (setq outbuf (get-buffer-create "*compilation*"));;the compilation buffer
@@ -557,8 +559,6 @@ and there are no more errors. "
 	  (setq outwin (display-buffer outbuf))
 	  (save-excursion
 	    ;; (setq buffer-read-only t)  ;;; Non-ergonomic.
-	    (set (make-local-variable 'compilation-parse-errors-function)
-		 parser)
 	    (if (boundp 'compilation-error-message)
 		(set (make-local-variable 'compilation-error-message)
 		     error-message))
@@ -575,7 +575,7 @@ and there are no more errors. "
 			     (compilation-nomessage-regexp-alist
 			      ,nomessage-regexp-alist)))
 		(if (boundp (car elt))
-		    (set (make-local-variable (car elt)) (second elt)))))
+		    (set (make-local-variable (car elt)) (cadr elt)))))
 
 	    (if (boundp 'compilation-directory-stack)
 		(setq default-directory thisdir
@@ -666,7 +666,7 @@ function uses the same rules as `jde-ant-build' for finding the buildfile."
 (defun jde-ant-find-build-file (dir)
   "Find the next Ant build file upwards in the directory tree from DIR.
 Returns nil if it cannot find a project file in DIR or an ascendant directory."
-  (let ((file (find (cond ((string= jde-ant-buildfile "") "build.xml")
+  (let ((file (cl-find (cond ((string= jde-ant-buildfile "") "build.xml")
 			  (t jde-ant-buildfile))
 		    (directory-files dir) :test 'string=)))
 

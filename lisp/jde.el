@@ -24,12 +24,50 @@
 ;; Boston, MA 02111-1307, USA.
 
 ;;; Commentary:
+;;
+;; minimum Emacs version supported is 24.3
 
 ;;; Code:
 
-;; quiet "reference to free variable" build-time warnings
-(defvar cedet-version)
-(defvar browse-url-new-window-p)
+;; Autoloads and most of jde are required here to allow user to do
+;; just `(require 'jde)'
+(require 'jde-autoload)
+
+(require 'beanshell)
+(require 'browse-url)
+(require 'cc-defs)
+(require 'cc-mode)
+(require 'cedet)
+(require 'cl-lib)
+(require 'comint)
+(require 'compile)
+(require 'cus-edit)
+(require 'easymenu)
+(require 'efc)
+(require 'executable)  ;; in XEmacs' sh-script package
+(require 'jde-annotations)
+(require 'jde-bug)
+(require 'jde-bsh)
+(require 'jde-class)
+(require 'jde-compile)
+(require 'jde-complete)
+(require 'jde-custom)
+(require 'jde-db)
+(require 'jde-gen)
+(require 'jde-help)
+(require 'jde-import)
+(require 'jde-java-font-lock)
+(require 'jde-java-grammar)
+(require 'jde-jdb)
+(require 'jde-open-source)
+(require 'jde-plugins)
+(require 'jde-project-file)
+(require 'jde-run)
+(require 'jde-util)
+(require 'jde-which-method)
+(require 'jde-wiz)
+(require 'semantic)
+(require 'thingatpt)
 
 ;;;###autoload
 (defconst jde-version "2.4.2"
@@ -46,81 +84,9 @@
 (defconst jde-xemacsp (string-match "XEmacs" (emacs-version))
   "Non-nil if we are running in the XEmacs environment.")
 
-(defconst jde-xemacs20p (and jde-xemacsp (>= emacs-major-version 20)))
-
-(defconst jde-emacs21p (and (string-match "\\bEmacs\\b" (emacs-version))
-			    (>= emacs-major-version 21)))
-
-(defconst jde-emacs22p (and (string-match "\\bEmacs\\b" (emacs-version))
-			    (>= emacs-major-version 22)))
-
-(defconst jde-emacs23p (and (string-match "\\bEmacs\\b" (emacs-version))
-			    (>= emacs-major-version 23)))
-
 (unless (fboundp 'custom-set-default)
-   (defalias 'custom-set-default 'set-default))
-
-(when (fboundp 'font-lock-add-keywords)
-  (font-lock-add-keywords 'emacs-lisp-mode
-			  '(("(\\(jde-semantic-require\\)[ \t]+'?\\(.*?\\))"
-			     (1 font-lock-keyword-face)
-			     (2 font-lock-constant-face)))))
-
-;; Autoloads must be loaded first since move to sole `(require 'jde)' style.
-(require 'jde-autoload)
-
-(require 'jde-util)
-(require 'jde-custom)
-(require 'jde-help)
-;; starting with Emacs 23 (from source ftp.gnu.org), cedet is now included
-(require (if (< emacs-major-version 23)
-	     'semantic-load
-	   'semantic))
-(require 'easymenu)
-(require 'cl)
-(require 'font-lock)
-(require 'cc-mode)
-(require 'cus-edit)
-(require 'comint)
-(require 'jde-compile)
-(require 'jde-db)
-(require 'jde-bug)
-(require 'jde-jdb)
-(require 'jde-run)
-(require 'jde-gen)
-(require 'compile)
-(require 'imenu)
-(require 'browse-url)
-(require 'beanshell)
-(require 'jde-plugins)
-(require 'jde-wiz)
-(require 'jde-java-grammar)
-(require 'jde-complete)
-(require 'jde-which-method)
-(require 'jde-java-font-lock)
-(require 'jde-import)
-(require 'jde-class)
-(require 'executable)  ;; in XEmacs' sh-script package
-(require 'efc)
-(require 'etags)
-(require 'jde-open-source)
-(require 'jde-annotations)
-
-(defconst jde-emacs-cedet-p
-  (and jde-emacs23p
-       (fboundp 'semantic-mode)
-       (boundp 'semantic-new-buffer-setup-functions))
-  "Non-nil if we are using a CEDET bundled with Emacs")
-
-(unless jde-emacs-cedet-p
-    ;; Use the full Java 1.5 grammar to parse Java files
-    ;; (legacy code I moved down here (shyamalprasad))
-    (autoload 'wisent-java-default-setup "wisent-java"
-      "Hook run to setup Semantic in `java-mode'."
-      nil nil))
-
-(if (not (fboundp 'custom-set-default))
-    (defalias 'custom-set-default 'set-default))
+  ;; FIXME: for xemacs?
+  (defalias 'custom-set-default 'set-default))
 
 (defgroup jde nil
   "Java Development Environment"
@@ -612,6 +578,7 @@ the current project. See `jde-expand-classpath-p' and
 
 
 ;; (makunbound 'jde-sourcepath)
+;; FIXME: use compilation-search-path instead?
 (defcustom jde-sourcepath nil
   "*List of source directory paths.  The JDE uses this list to locate
 source files corresponding to class files.  When entering paths in the
@@ -670,26 +637,6 @@ directory instead of the jde.jar. This variable is intended for
 use in testing the JDEE's java classes."
   :group 'jde-project
   :type 'boolean)
-
-(defcustom jde-enable-senator t
-  "Enable senator minor mode.
-This mode provides Java-aware buffer navigation and searching
-commands."
-  :group 'jde-project
-  :type 'boolean
-  :set '(lambda (sym val)
-	  (set-default sym val)
-	  (unless (or (not (featurep 'jde)) ;; skip initial set.
-		      jde-loading-project ;; skip when set by project loading system
-		      (and (boundp 'global-senator-minor-mode)
-			   global-senator-minor-mode))
-	    (mapc
-	     (lambda (buff)
-	       (save-excursion
-		 (set-buffer buff)
-		 (senator-minor-mode (if val 1 -1))))
-	     (jde-get-java-source-buffers)))))
-
 
 (defcustom jde-enable-abbrev-mode nil
 "*Enable expansion of abbreviations in jde-mode.
@@ -833,13 +780,14 @@ See `jde-mode-abbreviations' for more information."
 "*Shows a popup menu containing all available expansions.
 See `jde-mode-abbreviations' for more information."
   (interactive)
-   (let* ((expansions
-	  (mapcar
-	    (lambda(x) (cons (cdr x) (car x)))
-	      jde-mode-abbreviations))
-	 (expansion (car (imenu--mouse-menu expansions (if jde-xemacsp nil
-t) "Abbreviations"))))
-  (insert expansion)))
+  (when (fboundp 'imenu--mouse-menu)
+    ;; not all users want imenu loaded
+    (let* ((expansions
+	    (mapcar
+	     (lambda(x) (cons (cdr x) (car x)))
+	     jde-mode-abbreviations))
+	   (expansion (car (imenu--mouse-menu expansions (if jde-xemacsp nil t) "Abbreviations"))))
+      (insert expansion))))
 
 
 (defvar jde-classpath-separator (if (member system-type '(cygwin32 cygwin))
@@ -895,6 +843,10 @@ This command invokes the function defined by `jde-build-function'."
   (interactive)
   (call-interactively jde-build-function))
 
+(defvar jde-monitor-post-command-hook-timer nil
+"Timer that runs `jde-monitor-post-command-hook' during
+idle moments.")
+
 ; (define-derived-mode
 ;   jde-mode java-mode "JDE"
 ;   "Major mode for developing Java applications and applets.
@@ -903,8 +855,7 @@ This command invokes the function defined by `jde-build-function'."
 ; )
 
 ;; The following is the expansion of the above macro.
-;; We include the expansion to permit automatic
-;; loading of the JDE.
+;; We include the expansion to permit autoload on jde-mode.
 (derived-mode-init-mode-variables 'jde-mode)
 (put 'jde-mode 'derived-mode-parent 'java-mode)
 
@@ -916,11 +867,10 @@ This command invokes the function defined by `jde-build-function'."
   (condition-case err
       (progn
 	(jde-check-versions)
-	(when jde-emacs-cedet-p
-	  ;; GNU Emacs has global semantic mode, no senator minor mode
-	  (setq jde-enable-senator nil)
-	  (add-to-list 'semantic-new-buffer-setup-functions
-		       '(jde-mode . jde-parse-semantic-default-setup)))
+
+	(add-to-list 'semantic-new-buffer-setup-functions
+		     '(jde-mode . jde-parse-semantic-default-setup))
+
 	(java-mode)
 	(if (get 'java-mode 'special)
 	    (put 'jde-mode 'special t))
@@ -949,8 +899,9 @@ This command invokes the function defined by `jde-build-function'."
 	;; This feature loads the appropriate project settings whenever
 	;; a user switches from a Java buffer belonging to one project
 	;; to a buffer belonging to another.
-	(when jde-xemacsp
-	  (make-local-hook 'post-command-hook)) ;; necessary for XEmacs (see below)
+	(when (fboundp 'make-local-hook)
+	  ;; xemacs
+	  (make-local-hook 'post-command-hook))
 	(add-hook 'post-command-hook
 		  'jde-detect-java-buffer-activation
 		  nil
@@ -1001,17 +952,8 @@ This command invokes the function defined by `jde-build-function'."
 
 	(jde-wiz-set-bsh-project)
 
-	(cond
-	 ;; In GNU Emacs provided CEDET there is no need for a hook,
-	 ;; semantic-new-buffer-setup-functions will invoke
-	 ;; jde-parse-semantic-default-setup automagically, but we
-	 ;; should make sure semantic mode is turned on
-	 (jde-emacs-cedet-p
-	  (wisent-java-default-setup)
-	  (semantic-mode 1))
-	 (t
-	  ;; Upstream CEDET - set up for when semantic is ready!
-	  (add-hook 'semantic-init-hook 'jde-parse-semantic-default-setup)))
+	(wisent-java-default-setup)
+	(semantic-mode 1)
 
 	;; Install debug menu.
 	(if (string= (car jde-debugger) "JDEbug")
@@ -1260,6 +1202,7 @@ Does nothing but return nil if `jde-log-max' is nil."
 		    ["Save"     jde-save-project t]
 		    ["Load"     jde-load-project-file t]
 		    ["Load All" jde-load-all-project-files t]
+		    ;; FIXME: need edit, show
 		    )
 	      )
 	(list "Refactor"
@@ -1305,7 +1248,8 @@ Does nothing but return nil if `jde-log-max' is nil."
        current-menubar)
       (if (fboundp 'add-submenu)
 	  (add-submenu nil jde-menu-definition)
-	(add-menu nil "JDE" (cdr jde-menu-definition)))))
+	(when (fboundp 'add-menu)
+	  (add-menu nil "JDE" (cdr jde-menu-definition))))))
 
 
 (defcustom jde-new-buffer-menu
@@ -1365,7 +1309,7 @@ nonnil). The converion requires that cygpath be in your path. If the
 	      (set-buffer buf-name)
 	      (let ((output (buffer-substring (point-min) (point-max))))
 		(kill-buffer buf-name)
-		(substitute ?\/ ?\\ (remove ?\n output)))))
+		(cl-substitute ?\/ ?\\ (cl-remove ?\n output)))))
 	(error "Cannot find cygpath executable."))
     path))
 
@@ -1411,7 +1355,7 @@ converts paths of the form: '//C/dir/file' or '/cygdrive/c/dir/file' to
 unless they begin with '//[a-z]/' or '/cygdrive/[a-z]/'."
   (interactive "sPath: ")
   (if (fboundp 'mswindows-cygwin-to-win32-path)
-      (substitute ?/ ?\\ (mswindows-cygwin-to-win32-path path))
+      (cl-substitute ?/ ?\\ (mswindows-cygwin-to-win32-path path))
     (let* ((path-re "/\\(cygdrive\\)?/\\([a-zA-Z]\\)/")
 	   (subexpr 2)
 	   (index1 (* 2 subexpr))
@@ -1433,7 +1377,7 @@ unless they begin with '//[a-z]/' or '/cygdrive/[a-z]/'."
 				(nth index2 (match-data)))
 		     ":/"
 		     (substring new-path (match-end 0)))))
-	    (substitute ?\\ ?\/ new-path))
+	    (cl-substitute ?\\ ?\/ new-path))
 	path))))
 
 (defcustom jde-cygwin-path-converter '(jde-cygwin-path-converter-internal)
@@ -1463,7 +1407,7 @@ the conversion function specified by `jde-cygwin-path-converter'."
   (interactive "sPath: ")
   (funcall (car jde-cygwin-path-converter)
 	   (if separator
-	       (substitute ?\: (string-to-char separator) path) path)))
+	       (cl-substitute ?\: (string-to-char separator) path) path)))
 
 (defcustom jde-resolve-relative-paths-p t
   "If this variable is non-nil, the JDE converts relative paths to
@@ -1580,7 +1524,7 @@ SYMBOL is unnecessary."
 (defun jde-expand-wildcards-and-normalize (path &optional symbol)
   "Expand any entries with wildcard patterns in path and interpolate them into the result"
   (if jde-expand-wildcards-in-paths-p
-      (mapcan
+      (cl-mapcan
        (lambda (path)
 	 (let ((exp-paths (file-expand-wildcards path)))
 	   (if exp-paths exp-paths (list path))))
@@ -1616,7 +1560,7 @@ root names match EXCLUDE-REGEXPS. Return the files normalized against SYMBOL."
   (mapcar
    (lambda (included-file)
      (jde-normalize-path included-file symbol))
-   (remove-if
+   (cl-remove-if
     (lambda (file-path)
       (let ((file-name
 	      (file-name-nondirectory file-path)))
@@ -1639,7 +1583,7 @@ existing paths are already normalized."
 	      (if (and
 		   (file-exists-p path)
 		   (file-directory-p path)
-		   (member-if
+		   (cl-member-if
 		    (lambda (lib-name) (string-match lib-name path))
 		    jde-lib-directory-names))
 		  (progn
@@ -1707,6 +1651,7 @@ that contain spaces."
     (cond
      ((and
        (fboundp 'ange-ftp-ftp-name)
+       (fboundp 'ange-ftp-get-file-entry)
        (ange-ftp-ftp-name dir))
       (ange-ftp-get-file-entry parent))
      ((eq system-type 'windows-nt)
@@ -1787,13 +1732,9 @@ by JDEE. If not, it adds the required hooks."
 	(when (not (member hook post-command-hook))
 	  (add-hook 'post-command-hook hook)))))
 
-(defvar jde-monitor-post-command-hook-timer nil
-"Timer that runs `jde-monitor-post-command-hook' during
-idle moments.")
-
 (defun jde-count-open-java-buffers ()
   "Returns non-nil if any java buffers are open."
-  (count
+  (cl-count
    ".java"
    (buffer-list)
    :test
@@ -2469,6 +2410,7 @@ buffer, otherwise, return whether or not it is a legitimate buffer."
 
 (eval-when-compile
   ;; This code will not appear in the compiled (.elc) file
+  ;; FIXME: move these to the test directory, with other tests
   (defun jde-self-test ()
     "Runs jde self tests."
     (interactive)

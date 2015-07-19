@@ -38,15 +38,27 @@
 ;;; Code:
 
 (require 'eieio)
-(require 'tree-widget)
 (require 'jde-widgets)
+(require 'tree-widget)
 
-
-;; quiet "reference to free variable" build-time warnings
+;; FIXME: refactor to eliminate these
 (defvar jde-bug-local-variables)
 (defvar jde-bug-stack-info)
 (defvar jde-bug-raise-frame-p)
+(defvar jde-dbs-the-debugger)
+(defvar jde-dbs-the-process-morgue)
+(defvar jde-dbs-the-process-registry)
 
+;; FIXME: these are all used here; merge this file with jde-dbs.el!
+;; jde-dbs-get-process, jde-dbs-proc-get-bpspec, jde-db-breakpoint-get-line,
+;; jde-db-mark-breakpoint-active, jde-dbs-proc-display-debug-message,
+;; jde-dbs-display-debug-message, jde-dbs-proc-state-info-set,
+;; jde-dbs-proc-set-contains-p, jde-dbs-proc-move-to-registry,
+;; jde-db-set-debug-cursor, jde-dbs-get-locals, jde-dbs-cmd-exec,
+;; jde-dbs-get-this, jde-dbs-java-null-p, jde-dbs-get-thread,
+;; jde-db-set-all-breakpoints-specified, jde-dbs-proc-set-state,
+;; jde-dbs-proc-move-to-morgue, jde-dbs-java-primitive-p,
+;; jde-dbs-java-udci-p, jde-dbs-get-string, jde-dbs-java-array-p
 
 (defclass jde-dbo-thread ()
   ((id      :initarg :id)
@@ -144,6 +156,12 @@ exception spec."
 	    (oset jde-dbs-the-process-registry :target-process process)))
       (message "Start Event Error: can't find process object for process id %d" process-id))))
 
+(defvar jde-dbo-current-process nil "Used to keep track of the process
+used in the last breakpoint hit event, and watch point hit event.")
+
+(defvar jde-dbo-current-thread-id nil "Used to keep track of the thread id
+used in the last breakpoint hit event, and watch point hit event.")
+
 (defun jde-dbo-break (process state-info state reason thread-id thread-name
 			      message proc-id class file line-no)
   (jde-dbs-proc-state-info-set state-info state reason
@@ -198,15 +216,19 @@ See also the hook `tree-widget-after-toggle-fucntions'."
       (let ((inhibit-read-only t))
 	(erase-buffer))
 
-      (if jde-xemacsp
-	  (map-extents (lambda (extent ignore)
-		 (delete-extent extent)
-		 nil))
+      (if (and (fboundp 'map-extents)
+	       (fboundp 'delete-extent))
+	  ;; xemacs
+	  (map-extents
+	   (lambda (extent ignore)
+	     (delete-extent extent)
+	     nil))
 	(let ((all (overlay-lists)))
 	  (mapc 'delete-overlay (car all))
 	  (mapc 'delete-overlay (cdr all))))
 
-      (when jde-xemacsp
+      (when (fboundp 'make-local-hook)
+	;; xemacs
 	(make-local-hook 'tree-widget-after-toggle-functions))
       (add-hook 'tree-widget-after-toggle-functions
 		'jde-dbo-locals-update-open-nodes nil t)
@@ -245,12 +267,6 @@ See also the hook `tree-widget-after-toggle-fucntions'."
 	 (stack (nth 5 thread-info)))
     (oset process :stack stack)
     (oset process :stack-ptr 0)))
-
-(defvar jde-dbo-current-process nil "Used to keep track of the process
-used in the last breakpoint hit event, and watch point hit event.")
-
-(defvar jde-dbo-current-thread-id nil "Used to keep track of the thread id
-used in the last breakpoint hit event, and watch point hit event.")
 
 (defun jde-dbo-breakpoint-hit-event (process-id process-status process-state spec-id location a2 a3)
   (let ((process (jde-dbs-get-process process-id)))

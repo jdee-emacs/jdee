@@ -28,25 +28,9 @@
 
 ;;; Code:
 
-(jde-semantic-require 'semantic-java)
-(jde-semantic-require 'semantic-imenu)
+(require 'semantic/java)
+(require 'semantic/imenu)
 (require 'regexp-opt)
-
-;;; Compatibility
-(cond
- ((fboundp 'char-valid-p)
-  (defalias 'jde-imenu-char-valid-p 'char-valid-p))
- ((fboundp 'char-int-p)
-  (defalias 'jde-imenu-char-valid-p 'char-int-p))
- (t
-  (defun jde-imenu-char-valid-p (object)
-    "Return t if OBJECT is a valid normal character."
-    (condition-case nil
-	(progn
-	  (char-to-string object)
-	  t)
-      (error nil))))
- )
 
 ;;;;
 ;;;; Global options
@@ -80,15 +64,15 @@ See also `jde-imenu-modifier-abbrev-alist'."
 (defconst jde-imenu-default-modifier-abbrev-alist
   '(
     ("public"        . ?+)              ; +
-    ("protected"     . 177)             ; ±
-    ("private"       . 172)             ; ¬
+    ("protected"     . 177)             ; Â±
+    ("private"       . 172)             ; Â¬
 
-    ("static"        . ?§)              ; §
+    ("static"        . ?Â§)              ; Â§
     ("transient"     . ?#)              ; #
     ("volatile"      . ?~)              ; ~
 
-    ("abstract"      . 170)             ; ª
-    ("final"         . 182)             ; ¶
+    ("abstract"      . 170)             ; Âª
+    ("final"         . 182)             ; Â¶
     ("native"        . ?$)              ; $
 
     ("synchronized"  . ?@)              ; @
@@ -120,7 +104,7 @@ Used by `jde-imenu-modifier-abbrev-alist' customization."
  Used by `jde-imenu-modifier-abbrev-alist' customization."
   (save-excursion
     (let ((value (widget-value widget)))
-      (if (jde-imenu-char-valid-p value)
+      (if (characterp value)
 	  nil
 	(widget-put widget :error
 		    (format "Invalid character value: %S" value))
@@ -197,7 +181,7 @@ also `jde-imenu-include-modifiers')."
 	      alist (cdr alist))
 	(if (member (car entry) modifiers)
 	    (setq abbrevs
-		  (concat abbrevs (if (jde-imenu-char-valid-p (cdr entry))
+		  (concat abbrevs (if (characterp (cdr entry))
 				      (char-to-string (cdr entry))
 				    "")))))
       (if (> (length abbrevs) 0)

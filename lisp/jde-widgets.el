@@ -32,6 +32,12 @@
 (require 'efc)
 (require 'tree-widget)
 
+;; FIXME: refactor
+;; jde-dbs-java-udci-p, jde-dbs-get-string, jde-dbs-cmd-exec,
+;; jde-dbo-locals-open-p, jde-dbs-java-array-p, jde-dbs-java-primitive-p,
+;; jde-dbs-java-null-p, jde-dbs-get-object, jde-dbs-get-array
+
+
 
 ;; ----------------------------------------------------------------------
 ;; The Tree Widget Code:

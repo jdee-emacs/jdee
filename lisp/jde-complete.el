@@ -56,9 +56,11 @@
 ;;jde-eldoc for completion signatures
 
 (require 'eldoc)
+(require 'jde-parse)
+(require 'semantic/idle)
 
-(eval-when-compile
-  (jde-semantic-require 'semantic-idle))
+;; FIXME: refactor
+(declare-function jde-jeval-r "jde-bsh" (java-statement))
 
 (defgroup jde-complete nil
   "JDE Completion"
@@ -181,7 +183,7 @@ previously cache is not going to be affected by this setting."
 
 ;; (makunbound 'jde-complete-function)
 (defcustom jde-complete-function 'jde-complete-menu
-  "*Function that will be invoked by the `jde-complete-select' command.
+  "*Function that will be invoked by the `jde-complete' command.
 The `jde-complete-menu' function displays completions for
 the symbol at point in a popup menu. The `jde-complete-minibuf' function
 displays completions in the minibuffer. You may also
@@ -739,33 +741,43 @@ or nil"
     result))
 
 
-(defun jde-complete-find-completion-for-pair (pair &optional exact-completion
-						   access-level)
+(defun jde-complete-find-completion-for-pair (pair &optional exact-completion access-level)
+  "PAIR is (PREFIX PARTIAL). EXACT-COMPLETION is nil or non-nil.
+ACCESS-LEVEL is one of: `jde-complete-private'
+`jde-complete-protected' nil. Return a list of possible
+completions from beanshell."
   (let ((type (jde-parse-eval-type-of (car pair))))
     (if type
-	(cond ((member type jde-parse-primitive-types)
-	       (error "Cannot complete primitive type: %s" type))
-	      ((string= type "void")
-	       (error "Cannot complete return type of %s is void." (car pair)))
-	      (access-level
-	       (let ((classinfo (jde-complete-get-classinfo
-				 type access-level)))
-		 (if classinfo
-		     (if (and (string= (nth 1 pair) "")
-			      (not exact-completion))
-			 (setq jde-complete-current-list classinfo)
-		       (setq jde-complete-current-list
-			     (jde-complete-find-all-completions
-			      pair classinfo exact-completion))))))
-	      (t
-	       (let ((classinfo (jde-complete-get-classinfo type)))
-		 (if classinfo
-		     (if (and (string= (nth 1 pair) "")
-			      (not exact-completion))
-			 (setq jde-complete-current-list classinfo)
-		       (setq jde-complete-current-list
-			     (jde-complete-find-all-completions
-			      pair classinfo exact-completion)))))))
+	(cond
+	 ((member type jde-parse-primitive-types)
+	  (error "Cannot complete primitive type: %s" type))
+
+	 ((string= type "void")
+	  (error "Cannot complete return type of %s is void." (car pair)))
+
+	 (access-level
+	  (let ((classinfo (jde-complete-get-classinfo type access-level)))
+	    ;; FIXME: when is classinfo nil?
+	    (when classinfo
+	      (if (and (string= (nth 1 pair) "")
+		       (not exact-completion))
+		  (setq jde-complete-current-list classinfo)
+		(setq jde-complete-current-list
+		      (jde-complete-find-all-completions
+		       pair classinfo exact-completion))))))
+
+	 (t
+	  (let ((classinfo (jde-complete-get-classinfo type)))
+	    ;; FIXME: when is classinfo nil?
+	    (when classinfo
+	      (if (and (string= (nth 1 pair) "")
+		       (not exact-completion))
+		  (setq jde-complete-current-list classinfo)
+		(setq jde-complete-current-list
+		      (jde-complete-find-all-completions
+		       pair classinfo exact-completion)))))))
+
+      ;; type is nil
       nil)))
 
 (defun jde-complete-in-line ()
@@ -791,8 +803,10 @@ menu."
        (>= (point) (marker-position jde-parse-current-beginning))
        (<= (point) (marker-position jde-parse-current-end))
        (eq last-command this-command))
+      ;; have current completion list
       (jde-complete-complete-cycle)
-    ;;else
+
+    ;; else start over
     (jde-complete-generic "in-line")))
 
 (defun jde-complete-choose-completion (&optional title initial-input use-menu)
@@ -809,12 +823,15 @@ before invoking the completion"
 	      ;; if only one item match, return it
 	      (car index-alist)
 	    (if use-menu
-		;; delegates menu handling to imenu :-)
-		(imenu--mouse-menu
-		 index-alist
-		 ;; Popup window at text cursor
-		 (jde-cursor-posn-as-event)
-		 (or title "Completion"))
+		(progn
+		  ;; delegates menu handling to imenu :-)
+		  (require 'imenu)
+		  (imenu--mouse-menu
+		   index-alist
+		   ;; Popup window at text cursor
+		   (jde-cursor-posn-as-event)
+		   (or title "Completion")))
+	      ;; not menu
 	      (assoc (completing-read (or title "Completion: ")
 				      index-alist
 				      nil ;;predicate
@@ -832,14 +849,17 @@ cursor position on XEmacs."
       (let* ((mouse-pos (mouse-pixel-position))
 	     (x (car (cdr mouse-pos)))
 	     (y (cdr (cdr mouse-pos))))
-	(make-event 'button-press `(button 1 modifiers nil x ,x y ,y)))
-    (let ((x (* (if jde-xemacsp (frame-width) (frame-char-width))
+	(if (fboundp 'make-event)
+	    (make-event 'button-press `(button 1 modifiers nil x ,x y ,y))))
+
+    ;; not xemacs
+    (let ((x (* (frame-char-width)
 		(if (and
 		     (boundp 'hscroll-mode)
 		     (fboundp 'hscroll-window-column))
 		    (hscroll-window-column)
 		  (mod (current-column) (window-width)))))
-	  (y  (* (if jde-xemacsp (frame-height) (frame-char-height))
+	  (y  (* (frame-char-height)
 		 (- (count-lines (point-min) (point))
 		    (count-lines (point-min) (window-start)))))
 	  (window (get-buffer-window (current-buffer))))
@@ -866,54 +886,63 @@ completions at point."
   (jde-complete-generic nil))
 
 (defun jde-complete-generic (completion-type)
-  "Generic implementation for jde-complete methods"
+  "Generic implementation for jde-complete methods.
+COMPLETION-TYPE is one of:
+
+nil - show completion list in the minibuffer
+
+t   - show completion list in a menu
+
+string -  show completions in-line, cycling thru them."
   (let* ((pair (jde-parse-java-variable-at-point))
 	 jde-parse-attempted-to-import)
-    ;;resetting jde-complete-current-list
+
+    ;; pair is (prefix  partial-identifier)
     (setq jde-complete-current-list nil)
     (if pair
 	(condition-case err
 	    (jde-complete-pair (jde-complete-get-pair pair nil) completion-type)
-	  (error (condition-case err
-		     (jde-complete-pair (jde-complete-get-pair pair t)
-					completion-type))
-		 (error (message "%s" (error-message-string err)))))
+	  (error
+	   (condition-case err
+	       (jde-complete-pair (jde-complete-get-pair pair t) completion-type))
+	   (error (message "%s" (error-message-string err)))))
+
       (message "No completion at this point"))))
 
 (defun jde-complete-pair (pair completion-type)
-  (let ((access (jde-complete-get-access pair))
-	completion-list)
-    (progn
-      (if access
-	  (setq completion-list
-		(jde-complete-find-completion-for-pair pair nil access))
-	(setq completion-list (jde-complete-find-completion-for-pair pair)))
-      ;;if the completion list is nil check if the method is in the current
-      ;;class(this)
-      (if (null completion-list)
-	  (setq completion-list (jde-complete-find-completion-for-pair
-				 (list (concat "this." (car pair)) "")
-				 nil jde-complete-private)))
-      ;;if completions is still null check if the method is in the
-      ;;super class
-      (if (null completion-list)
-	  (setq completion-list (jde-complete-find-completion-for-pair
-				 (list (concat "super." (car pair)) "")
-				 nil jde-complete-protected)))
+  "PAIR is (PREFIX PARTIAL). COMPLETION-TYPE is as for `jde-complete-generic'."
+  (let ((completion-list
+	 (jde-complete-find-completion-for-pair pair nil (jde-complete-get-access pair)))
 
-      (if completion-list
-	  (let ((title (concat (car pair) "."
-			       (car (cdr pair)) "[...]")))
-	    (if (null completion-type)
-		(jde-complete-choose-completion title (car (cdr pair)))
-	      (if (string= completion-type "in-line")
-		  (progn
-		    (setq jde-complete-current-list-index -1)
-		    (jde-complete-complete-cycle))
-		(jde-complete-choose-completion title (car (cdr pair)) t))))
-	(error "No completion at this point")))))
+    (if (null completion-list)
+	;; Check if PREFIX is in the current class
+	(setq completion-list
+	      (jde-complete-find-completion-for-pair
+	       (list (concat "this." (car pair)) "")
+	       nil jde-complete-private)))
+    ;;if completions is still null check if the method is in the
+    ;;super class
+    (if (null completion-list)
+	(setq completion-list (jde-complete-find-completion-for-pair
+			       (list (concat "super." (car pair)) "")
+			       nil jde-complete-protected)))
+
+    (if completion-list
+	(let ((title (concat (car pair) "."
+			     (car (cdr pair)) "[...]")))
+	  (if (null completion-type)
+	      (jde-complete-choose-completion title (car (cdr pair)))
+	    (if (string= completion-type "in-line")
+		(progn
+		  (setq jde-complete-current-list-index -1)
+		  (jde-complete-complete-cycle))
+	      (jde-complete-choose-completion title (car (cdr pair)) t))))
+      (error "No completion at this point"))))
 
 (defun jde-complete-get-access (pair)
+  "PAIR is (PREFIX PARTIAL). If PREFIX is \"this\", return
+`jde-complete-private'. If \"super\", return
+`jde-complete-protected'. Otherwise return nil."
   (let (access)
     (if (string= (car pair) "this")
 	(setq access jde-complete-private)
@@ -922,12 +951,20 @@ completions at point."
     access))
 
 (defun jde-complete-get-pair (pair op)
-  (let ((tmp (list (car pair) (cadr pair))))
+  "PAIR is (PREFIX  PARTIAL), OP is t or nil.
+If PREFIX is not \"\", return PAIR.
+Otherwise, if OP is nil, return (\"this\" PARTIAL),
+if OP is non-nil, return (PARTIAL PARTIAL)."
+
+  (let ((tmp (list (car pair) (cadr pair))));; copy of PAIR
     (if (and op
 	     (string= (car tmp) "" )
 	     (not (string= (cadr tmp) "")))
 	(setcar tmp (cadr tmp)))
+
     (if (string= (car tmp) "" )
+	;; PREFIX and PARTIAL both nil
+	;; FIXME: can we get here?
 	(setcar tmp "this"))
     tmp))
 
@@ -939,7 +976,7 @@ default method for displaying completions."
   (interactive)
   (call-interactively jde-complete-function))
 
-(define-mode-overload-implementation
+(define-mode-local-override
    semantic-idle-summary-current-symbol-info jde-mode ()
    "Collect information on current symbol."
    (or jde-complete-display-signature

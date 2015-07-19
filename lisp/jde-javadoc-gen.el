@@ -29,11 +29,19 @@
 
 ;;; Code:
 
-;; quiet "reference to free variable" build-time warnings
-(defvar browse-url-new-window-p)
+(require 'cl-lib)
+(require 'jde-compile)
+(require 'jde-help)
+
+;; FIXME: refactor
 (defvar jde-global-classpath)
 (defvar jde-sourcepath)
 (declare-function jde-expand-wildcards-and-normalize "jde" (path &optional symbol))
+(declare-function jde-normalize-path "jde" (path &optional symbol))
+(declare-function jde-cygpath "jde" (path &optional direction))
+(declare-function jde-get-jdk-dir "jde" ())
+(declare-function jde-build-classpath "jde" (paths &optional symbol quote-path-p))
+(declare-function jde-get-global-classpath "jde" ())
 
 (defgroup jde-javadoc nil
   "Javadoc template generator"
@@ -284,7 +292,7 @@ by the jde-javadoc-gen variables."
 	(setq args
 	      (append
 	       args
-	       (mapcan
+	       (cl-mapcan
 		(lambda (link)  (list "-link" link))
 		jde-javadoc-gen-link-URL))))
 
@@ -293,7 +301,7 @@ by the jde-javadoc-gen variables."
 	(setq args
 	      (append
 	       args
-	       (mapcan
+	       (cl-mapcan
 		(lambda (link)
 		  (list "-linkoffline" (car  link) (cdr link)))
 		jde-javadoc-gen-link-offline))))
@@ -303,7 +311,7 @@ by the jde-javadoc-gen variables."
 	(setq args
 	      (append
 	       args
-	       (mapcan
+	       (cl-mapcan
 		(lambda (group)
 		  (list "-group" (car group) (cdr group)))
 		jde-javadoc-gen-group))))
@@ -614,7 +622,7 @@ browser."
 (defun jde-javadoc-browse-tool-doc ()
   "Displays the documentation for the javadoc tool in a browser."
   (interactive)
-  (let* ((jdk-url (jde-help-get-jdk-doc-url))
+  (let* ((jdk-url (jde-jdhelper-jdk-url jde-jdhelper-singleton))
 	 (javadoc-url
 	  (concat
 	   (substring jdk-url 0 (string-match "index" jdk-url))

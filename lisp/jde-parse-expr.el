@@ -32,6 +32,10 @@
 
 (require 'thingatpt)
 
+;; FIXME: (require 'cc-cmds) doesn't work
+(declare-function c-beginning-of-statement "cc-cmds" (&optional count lim sentence-flag))
+(declare-function c-end-of-statement "cc-cmds" (&optional count lim sentence-flag))
+
 (defun jde-beginning-of-expression ()
   (c-beginning-of-statement))
 (put 'java-expression 'beginning-op 'jde-beginning-of-expression)
@@ -79,17 +83,17 @@ TO-PARSE is the string to parse."
     (let ((last-cap 0)
 	  toks)
       (setq to-parse (append (vconcat to-parse) nil))
-      (flet ((upperp
-	      (pos)
-	      (if (<= pos 0)
-		  t
-		(let ((char (elt to-parse pos)))
-		  (and (eq char (upcase char))))))
-	     (handle
-	      (pos)
-	      (prog1
-		  (apply 'string (subseq to-parse last-cap pos))
-		(setq last-cap pos))))
+      (cl-flet ((upperp
+		 (pos)
+		 (if (<= pos 0)
+		     t
+		   (let ((char (elt to-parse pos)))
+		     (and (eq char (upcase char))))))
+		(handle
+		 (pos)
+		 (prog1
+		     (apply 'string (cl-subseq to-parse last-cap pos))
+		   (setq last-cap pos))))
 	(do ((pos 0 (incf pos)))
 	    ((> pos (1- (length to-parse))))
 	  (if (and (upperp pos)

@@ -37,21 +37,23 @@
 
 ;;; Code:
 
-(require 'jde-dbo)
-(require 'jde-db)
+(require 'cl-lib)
 (require 'eieio)
-(require 'jde-widgets)
+(require 'jde-db)
+(require 'jde-dbo)
 (require 'tree-widget)
 
-
-;; quiet "reference to free variable" build-time warnings
+;; FIXME: refactor to eliminate these
 (defvar jde-bug-debug)
 (defvar jde-bug-debugger-command-timeout)
 (defvar jde-bug-debugger-host-address)
-
+(declare-function jde-bug-vm-includes-jpda-p "jde-bug" ())
+(declare-function jde-build-classpath "jde" (paths &optional symbol quote-path-p))
+(declare-function jde-normalize-path "jde" (path &optional symbol))
+(declare-function jde-get-tools-jar "jde" nil)
 
 ;; Need jde-run only to get the definition for
-;; save-w32-show-window macro.
+;; save-w32-show-window macro. FIXME: refactor
 (eval-when-compile
   (require 'jde-run))
 
@@ -113,7 +115,7 @@ debugger is starting and nil when it is quitting.")
 
 (defmethod jde-dbs-proc-set-remove ((this jde-dbs-proc-set) process)
   (oset this :proc-alist
-	(remove-if
+	(cl-remove-if
 	 (lambda (assoc-x)
 	   (let* ((xproc (cdr assoc-x))
 		  (xid (oref xproc id))
@@ -127,7 +129,7 @@ debugger is starting and nil when it is quitting.")
 (defmethod jde-dbs-proc-set-find ((this jde-dbs-proc-set) field value)
   "Finds the process in the set whose FIELD is equal to VALUE."
   (if (slot-boundp this :proc-alist)
-      (cdr (find-if
+      (cdr (cl-find-if
 	(lambda (assoc-x)
 	  (let ((process-x (cdr assoc-x)))
 	    (equal (eieio-oref process-x field) value)))
@@ -287,7 +289,7 @@ process-specific information about a breakpoint")
 
 (defun jde-dbs-proc-bpspecs-remove (bpspecs bpspec)
   "Removes BPSPEC from BPSPECS"
-  (remove-if (lambda (x)
+  (cl-remove-if (lambda (x)
 	       (equal (car x) (oref bpspec id) ))
 	     bpspecs))
 
@@ -627,7 +629,7 @@ for the breakpoint."
 	(if (and (object-p bp) (jde-db-breakpoint-p bp))
 	    (let* ((jde-id (oref bp id)))
 	      (cdr
-	       (find-if
+	       (cl-find-if
 		(lambda (assoc-x)
 		  (let ((spec (cdr assoc-x)))
 		    (equal (oref (oref spec breakpoint) id) jde-id)))
@@ -1843,7 +1845,7 @@ debugger output following the Lisp form."
   (let* ((bp-spec (oref this breakpoint))
 	 (file (oref bp-spec file))
 	 (line (jde-db-breakpoint-get-line bp-spec)))
-    (oset this msg  (format "Error: cannot set breakpoint at line %s in file %s.\n  Reason:"
+    (oset this msg  (format "Error: cannot set breakpoint at line %s in file %s.\n  Reason: %s"
 			    file line (oref this data)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -3132,7 +3134,7 @@ object.")
     (if command-succeeded-p
 	(let* ((canceled-request-id (oref (oref this trace-request) id))
 	       (requests
-		(remove-if
+		(cl-remove-if
 		 (lambda (r)
 		   (= (car r) canceled-request-id))
 		 (oref process trace-req))))
@@ -3290,7 +3292,7 @@ object.")
     (if command-succeeded-p
 	(let* ((canceled-request-id (oref (oref this watch-request) id))
 	       (requests
-		(remove-if
+		(cl-remove-if
 		 (lambda (r)
 		   (= (car r) canceled-request-id))
 		 (oref process watch-req))))

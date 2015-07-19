@@ -30,7 +30,8 @@
 
 ;;; Code:
 
-(require 'jde-project-file)
+(require 'cl-lib)
+(require 'cus-edit)
 
 (defun jde-custom-variable-set (widget)
   "Set the current value for the variable being edited by WIDGET."
@@ -140,21 +141,21 @@ Optional EVENT is the location for the menu."
 				(custom-unlispify-tag-name symbol))))
 
 
+(defun jde-custom-adjust-group (group)
+  (let ((symbol-specs (get group 'custom-group)))
+    (dolist (spec symbol-specs)
+      (let ((symbol (nth 0 spec))
+	    (symbol-type (nth 1 spec)))
+	(if (eq symbol-type 'custom-group)
+	    (jde-custom-adjust-group symbol)
+	  (setcdr spec (list 'jde-custom-variable)))))))
+
 (defun jde-custom-adjust-groups ()
   "Change the symbol type in the symbol spec lists for all
 JDEE groups from `custom-variable' to `jde-custom-variable'.
 This causes the save-to-project-file menu item to appear
 for JDEE variables in group customization buffers."
-  (flet ((adjust-group
-	  (group)
-	  (let ((symbol-specs (get group 'custom-group)))
-	    (dolist (spec symbol-specs)
-	      (let ((symbol (nth 0 spec))
-		    (symbol-type (nth 1 spec)))
-		(if (eq symbol-type 'custom-group)
-		    (adjust-group symbol)
-		  (setcdr spec (list 'jde-custom-variable))))))))
-    (adjust-group 'jde)))
+  (jde-custom-adjust-group 'jde))
 
 
 (provide 'jde-custom)

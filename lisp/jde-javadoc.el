@@ -34,15 +34,18 @@
 
 ;;; Code:
 
-(require 'tempo)
-(eval-when-compile
-  (require 'jde))
-(jde-semantic-require 'semantic-java)
+(require 'semantic/java)
+(require 'jde-javadoc-gen)
+(require 'jde-parse)
 (require 'regexp-opt)
+(require 'tempo)
 
-(eval-when-compile
-  (require 'jde)
-  (require 'jde-parse))
+;; FIXME: refactor
+(declare-function jde-jeval-r "jde-bsh" (java-statement))
+
+;; FIXME: can't find working-status-forms
+(defvar working-message);; for byte-compiler
+(declare-function working-status-forms "working")
 
 ;;;; Customization
 ;;;; -------------
@@ -1858,9 +1861,6 @@ Report the next tag with documentation errors."
 ;;
 (defalias 'jde-javadoc-generate-javadoc-template
   'jde-javadoc-autodoc-at-line)
-
-;; Load the javadoc builder
-(require 'jde-javadoc-gen)
 
 ;;;###autoload
 (defun jde-javadoc-remove (start end)

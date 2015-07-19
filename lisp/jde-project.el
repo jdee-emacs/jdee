@@ -29,6 +29,10 @@
 
 (require 'eieio)
 
+;; FIXME: refactor
+(defvar jde-sourcepath);; jde
+(defvar jde-global-classpath);; jde
+
 (defgroup jde-project nil
   "JDE Project Options"
   :group 'jde
@@ -164,12 +168,13 @@ the Application Project Creation dialog."
 	  (error "Cannot create project.")))
 
     ;; Make source directory
-    (setq dir (expand-file-name "src" (oref this dir)))
-    (if (not (file-exists-p dir)) (make-directory dir))
+    (let ((dir (expand-file-name "src" (oref this dir))))
+      (if (not (file-exists-p dir)) (make-directory dir)))
 
     ;; Make classes directory
-    (setq dir (expand-file-name "classes" (oref this dir)))
-    (if (not (file-exists-p dir)) (make-directory dir))
+    (let ((dir (expand-file-name "classes" (oref this dir))))
+      (when (not (file-exists-p dir))
+	(make-directory dir)))
 )
 
 

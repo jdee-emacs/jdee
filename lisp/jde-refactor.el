@@ -29,6 +29,7 @@
 
 ;;; Code:
 
+(require 'dired-aux)
 (require 'jde-parse)
 (require 'jde-util)
 

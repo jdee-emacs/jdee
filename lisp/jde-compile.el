@@ -61,14 +61,20 @@
 ;;; Code:
 
 (require 'eieio)
-(require 'cl)
+(require 'cl-lib)
 (require 'compile)
 
-
-;; quiet "reference to free variable" build-time warnings
-(defvar jde-complete-last-compiled-class)
+;; FIXME: refactor to eliminate these
+(declare-function jde-bsh-running-p "jde-bsh" ())
+(declare-function jde-build-classpath "jde" (paths &optional symbol quote-path-p))
+(declare-function jde-complete-flush-classes-in-cache "jde-complete" (class-list))
+(declare-function jde-create-prj-values-str "jde" nil)
+(declare-function jde-get-global-classpath "jde" ())
+(declare-function jde-get-jdk-prog "jde" (progname))
+(declare-function jde-java-version "jde" ())
+(declare-function jde-normalize-path "jde" (path &optional symbol))
 (defvar jde-classpath-separator)
-
+(defvar jde-complete-last-compiled-class)
 
 (defgroup jde-compile-options nil
   "JDE Compiler Options"
@@ -215,8 +221,9 @@ don't know which classes were recompiled."
 
 (defun jde-compile-finish-refresh-speedbar (buf msg)
   "Refresh speedbar at the end of a compilation."
-  (if (and (frame-live-p speedbar-frame)
-	    (frame-visible-p speedbar-frame))
+  (if (and (boundp 'speedbar-frame)
+	   (frame-live-p speedbar-frame)
+	   (frame-visible-p speedbar-frame))
        (speedbar-refresh)))
 
 
@@ -823,7 +830,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 (defmethod jde-compile-vm-args ((this jde-compile-compiler))
   "Get arguments to pass to the vm used to run this compiler."
     (if jde-compile-option-vm-args
-	(mapcan
+	(cl-mapcan
 	 (lambda (arg)
 	   (list (concat "-J" arg)))
 	 jde-compile-option-vm-args)))
@@ -1361,7 +1368,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 	 (jdk-major-version (nth 0 jdk-split-version))
 	 (jdk-minor-version (nth 1 jdk-split-version))
 	 (compiler
-	  (find-if
+	  (cl-find-if
 	   (lambda (compiler-x)
 	     (let* ((compiler-split-version (split-string (oref compiler-x :version) "[.]"))
 		    (compiler-major-version (nth 0 compiler-split-version))

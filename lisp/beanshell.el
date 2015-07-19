@@ -78,8 +78,13 @@
 
 (require 'eieio)
 (require 'comint)
+(require 'compile)
+(require 'cl-lib)
+
+;; FIXME: there is no cl-lexical-let
+;; Change file to lexical-binding t
 (eval-when-compile
-  (require 'cl))
+ (require 'cl)) ;; lexical-let
 
 (declare-function jde-find-jde-doc-directory "jde" nil)
 
@@ -319,7 +324,7 @@ buffer."
 			 (compilation-nomessage-regexp-alist
 			  ,nomessage-regexp-alist)))
 	    (if (boundp (car elt))
-		(set (make-local-variable (car elt)) (second elt)))))
+		(set (make-local-variable (car elt)) (cadr elt)))))
 
 	(setq default-directory thisdir)
 	(if (boundp 'compilation-directory-stack)
@@ -517,12 +522,12 @@ to the string form required by the vm."
 
 (defmethod bsh-launch ((this bsh) &optional display-buffer)
 
-  (assert
+  (cl-assert
    (or (file-exists-p (oref this vm))
        (executable-find (oref this vm)))
    nil "Specified vm does not exist: %s" (oref this vm))
 
-  (assert
+  (cl-assert
    (file-exists-p (oref this jar))
    nil
    "Specified BeanShell jar filed does not exist: %s" (oref this jar))
@@ -606,7 +611,7 @@ to the string form required by the vm."
 
 (defmethod bsh-eval-lisp-output ((this bsh))
   (if (not (string= (oref this lisp-output) ""))
-      (flet ((format-error-msg (error-symbols)
+      (cl-flet ((format-error-msg (error-symbols)
 	       (mapconcat (lambda (s) (symbol-name s)) error-symbols " ")))
 	(condition-case eval-error
 	    (eval (read (oref this lisp-output)))
@@ -635,7 +640,7 @@ to the string form required by the vm."
 
 (defmethod bsh-redirect-eval-output ((this bsh) process output)
   (let ((eval-buffer (oref this eval-buffer)))
-    (assert eval-buffer)
+    (cl-assert eval-buffer)
     (funcall (oref eval-buffer filter) process output)
     ;; Restore the Beanshell's standard output filter when
     ;; the Beanshell prompt reappears.
@@ -700,8 +705,8 @@ must be an instance of `bsh-buffer' class. A typical use for this
 method is to invoke a Java application whose output is compiler-like,
 e.g., javac, ant, or checkstyle. In this case, BUFFER would be
 an instance of a subclass of `bsh-compiler-buffer'."
-  (assert (typep expr 'string))
-  (assert (typep buffer 'bsh-buffer))
+  (cl-assert (cl-typep expr 'string))
+  (cl-assert (cl-typep buffer 'bsh-buffer))
   (unless (bsh-running-p this)
     (bsh-launch this))
   (let* ((comint-buffer (oref this buffer))
@@ -733,7 +738,7 @@ jar file on your system and that either `exec-path'
 or `bsh-vm' point to a Java vm on your system."
    (interactive)
 
-   (assert
+   (cl-assert
     (file-exists-p (expand-file-name bsh-jar))
     nil
     (concat
@@ -742,13 +747,13 @@ or `bsh-vm' point to a Java vm on your system."
      ". Type C-h bsh-jar for more info."))
 
    (if bsh-vm
-       (assert
+       (cl-assert
 	(or
 	 (executable-find bsh-vm)
 	 (file-exists-p bsh-vm))
 	nil
 	"The vm specified by bsh-vm does not exist: %s." bsh-vm)
-     (assert
+     (cl-assert
       (executable-find (if (eq system-type 'windows-nt) "javaw" "java"))
       nil
       "Cannot find a Java vm on exec-path."))
@@ -812,7 +817,7 @@ Emacs package.")
   "Constructor for the standard bsh BeanShell instance."
   (call-next-method)
 
-  (assert
+  (cl-assert
    (file-exists-p (expand-file-name bsh-jar))
    nil
    (concat
@@ -821,13 +826,13 @@ Emacs package.")
     ". Type C-h bsh-jar for more info."))
 
    (if bsh-vm
-       (assert
+       (cl-assert
 	(or
 	 (executable-find bsh-vm)
 	 (file-exists-p bsh-vm))
 	nil
 	"The vm specified by bsh-vm does not exist: %s." bsh-vm)
-     (assert
+     (cl-assert
       (executable-find (if (eq system-type 'windows-nt) "javaw" "java"))
       nil
       "Cannot find a Java vm on exec-path."))

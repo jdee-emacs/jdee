@@ -25,7 +25,16 @@
 
 ;;; Commentary:
 
+(require 'cl-lib)
 (require 'eieio)
+(require 'jde-open-source);; jde-find-class-source-file
+
+;; FIXME: refactor
+(defvar jde-global-classpath);; jde
+(declare-function jde-build-classpath "jde" (paths &optional symbol quote-path-p))
+(declare-function jde-normalize-path "jde" (path &optional symbol))
+(declare-function jde-java-version "jde" ())
+(declare-function jde-get-jdk-prog "jde" (progname))
 
 (defcustom jde-run-mode-hook nil
   "*List of hook functions run by `jde-run-mode' (see `run-hooks')."
@@ -1148,7 +1157,7 @@ to a debugger."
   "Gets the vm for the current JDK."
   (let* ((jdk-version (jde-java-version))
 	 (vm
-	  (find-if
+	  (cl-find-if
 	   (lambda (vm-x)
 	     (string-match
 	      (oref vm-x :version)
@@ -1420,13 +1429,13 @@ directory."
      ((file-exists-p (setq f (concat basename ".htm"))) ;; for poor winXX souls
       (list f))
      (t
-      (mapcan (lambda (file)
-		(if (or
-		     (string-match "[.]html$" file)
-		     (string-match "[.]htm$" file))
-		    (list file)))
-	      (directory-files
-	       (file-name-directory (buffer-file-name)) t))))))
+      (cl-mapcan (lambda (file)
+		   (if (or
+			(string-match "[.]html$" file)
+			(string-match "[.]htm$" file))
+		       (list file)))
+		 (directory-files
+		  (file-name-directory (buffer-file-name)) t))))))
 
 
 
@@ -1558,21 +1567,21 @@ Here goes all the error message parsing."
 (defun jde-run-etrace-goto (&optional next)
   "Display the current stack using `compilation-goto-locus'."
   (jde-run-etrace-current-marker next)
-  (if jde-emacs22p
-      (compilation-goto-locus (car jde-run-etrace-current-marker)
-			      (cdr jde-run-etrace-current-marker)
-			      nil)
-    (compilation-goto-locus jde-run-etrace-current-marker)))
+  (compilation-goto-locus (car jde-run-etrace-current-marker)
+			  (cdr jde-run-etrace-current-marker)
+			  nil))
 
 (defun jde-run-etrace-show-at-mouse (event)
   "Jump to the stack position at the mouse click.
 Click anywhere on the line with the stack reference."
   (interactive "e")
-  (if jde-xemacsp
-      (set-marker (car jde-run-etrace-current-marker)
-		  (event-point pos)
-		  (window-buffer (event-window pos)))
-    (let ((pos (event-start event)))
+  (let ((pos (event-start event)))
+    (if (and (fboundp 'event-point)
+	     (fboundp 'event-window))
+	      ;; xemacs
+	(set-marker (car jde-run-etrace-current-marker)
+		    (event-point pos)
+		    (window-buffer (event-window pos)))
       (set-marker (car jde-run-etrace-current-marker)
 		  (posn-point pos)
 		  (window-buffer (posn-window pos)))))

@@ -23,7 +23,12 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
+(require 'cl-lib)
 (require 'compile)
+
+;; FIXME: refactor
+(declare-function jde-root-dir-p "jde" (dir))
+(declare-function jde-normalize-path "jde" (path &optional symbol))
 
 (defgroup jde-make nil
   "JDE Make Interface"
@@ -90,8 +95,8 @@ list of arguments entered in the minibuffer."
 (defun jde-make-find-build-file (dir)
   "Find the next Makefile upwards in the directory tree from DIR.
 Returns nil if it cannot find a project file in DIR or an ascendmake directory."
-  (let ((file (find "Makefile"
-		    (directory-files dir) :test 'string=)))
+  (let ((file (cl-find "Makefile"
+		       (directory-files dir) :test 'string=)))
 
     (if file
 	(setq file (expand-file-name file dir))

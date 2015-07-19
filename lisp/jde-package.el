@@ -89,6 +89,14 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
+;; FIXME: refactor
+(defvar jde-resolve-relative-paths-p);; jde
+(defvar jde-sourcepath);; jde
+(declare-function jde-normalize-path "jde" (path &optional symbol))
+(declare-function jde-expand-wildcards-and-normalize "jde" (path &optional symbol))
+
 (defconst jde-package-unknown-package-name
   "*unknown*"
   "The string returned when a package name can't be generated.")
@@ -142,7 +150,7 @@ That is to say the first non-nil value found in the variables given by
 
 (defun jde-package-get-directories-in-classpath ()
   "Return the list of directories found in classpath."
-  (mapcan
+  (cl-mapcan
    (lambda (path)
        (if (or jde-resolve-relative-paths-p
 	      (not   (string= path "."))) ; "." is ignored in classpath
@@ -157,7 +165,7 @@ That is to say the first non-nil value found in the variables given by
   (let ((dir (jde-normalize-path default-directory))
 	;; case-insensitive for Windows
 	(case-fold-search (eq system-type 'windows-nt)))
-    (mapcan
+    (cl-mapcan
      (lambda (root)
 	 (let ((root (regexp-quote root)))
 	   (message "Seaching %S in %S..." root dir)

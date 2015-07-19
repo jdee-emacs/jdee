@@ -37,7 +37,12 @@
 ;;
 ;; There are also a few helper utilities here.
 
+(require 'cl-lib)
 (require 'jde-parse-class)
+
+;; FIXME: refactor
+(declare-function jde-normalize-path "jde" (path &optional symbol))
+(declare-function jde-get-jdk-prog "jde" (progname))
 
 (defcustom jde-built-class-path nil
   "Similar to `jde-global-classpath', except this path should only
@@ -58,16 +63,16 @@ argument in the SPEC is the package to restrict processing to.
 \(fn (VAR [RESULT] [PACKAGE]) BODY...)"
 
   (let ((class-var-sym (car spec))
-	(old-dir-sym (gensym "--with-all-class-files-old-dir"))
-	(normalized-path-sym (gensym "--with-all-class-files-npath"))
-	(dir-sym (gensym "--with-all-class-files-dir-sym"))
-	(dir2-sym (gensym "--with-all-class-files-dir2-sym"))
-	(path-sym (gensym "--with-all-class-files-path"))
-	(buf-sym (gensym "--with-all-class-files-buf"))
-	(rec-descend (gensym "--with-all-class-files-rec-descend"))
-	(process-files (gensym "--with-all-class-files-process-files"))
-	(process-class (gensym "--with-all-class-files-process-class"))
-	(child-path (gensym "--with-all-class-files-child-path"))
+	(old-dir-sym (cl-gensym "--with-all-class-files-old-dir"))
+	(normalized-path-sym (cl-gensym "--with-all-class-files-npath"))
+	(dir-sym (cl-gensym "--with-all-class-files-dir-sym"))
+	(dir2-sym (cl-gensym "--with-all-class-files-dir2-sym"))
+	(path-sym (cl-gensym "--with-all-class-files-path"))
+	(buf-sym (cl-gensym "--with-all-class-files-buf"))
+	(rec-descend (cl-gensym "--with-all-class-files-rec-descend"))
+	(process-files (cl-gensym "--with-all-class-files-process-files"))
+	(process-class (cl-gensym "--with-all-class-files-process-class"))
+	(child-path (cl-gensym "--with-all-class-files-child-path"))
 	(package (nth 2 spec)))
 	`(labels ((,process-class (,class-var-sym)
 				 (when (string-match "\.[Cc][Ll][Aa][Ss][Ss]$" ,class-var-sym)
@@ -131,20 +136,20 @@ as the return value (similar to `dotimes').  Otherwise `nil' will be
 returned.  The second optional parameter is the optional package
 parameter, to restrict processing to a particular package.
 Example:(with-all-class-infos-when (info) (lambda (x)
-(some-pred-p x)) (do-stuff info))"
+ (some-pred-p x)) (do-stuff info))"
 
-(let ((parsed-class-sym (gensym "--with-all-class-infos-pclasses"))
-      (class-file-sym (gensym "--with-all-class-infos-cfile"))
-      (var-sym (car spec)))
-  `(let ((,parsed-class-sym '()))
-     (with-all-class-files (,class-file-sym ,@(cdr spec))
-			   (when (and (not (jde-class-path-in-classes-p ,class-file-sym ,parsed-class-sym))
-				      (funcall ,pred ,class-file-sym))
-			     (let ((,var-sym (jde-parse-class ,class-file-sym)))
-			       ,@body
-			       (add-to-list (quote ,parsed-class-sym)
-					    (jde-parse-class-extract-classname info)))))
-     ,(cadr spec))))
+  (let ((parsed-class-sym (cl-gensym "--with-all-class-infos-pclasses"))
+	(class-file-sym (cl-gensym "--with-all-class-infos-cfile"))
+	(var-sym (car spec)))
+    `(let ((,parsed-class-sym '()))
+       (with-all-class-files (,class-file-sym ,@(cdr spec))
+			     (when (and (not (jde-class-path-in-classes-p ,class-file-sym ,parsed-class-sym))
+					(funcall ,pred ,class-file-sym))
+			       (let ((,var-sym (jde-parse-class ,class-file-sym)))
+				 ,@body
+				 (add-to-list (quote ,parsed-class-sym)
+					      (jde-parse-class-extract-classname info)))))
+       ,(cadr spec))))
 
 (defmacro with-all-corresponding-class-infos (spec &rest body)
   "Do BODY with all the class files that correspond to the given
@@ -168,7 +173,7 @@ info, the package name of the source file, the source name of the source file, a
 (defun jde-class-partial-match-member (str list)
   "Like `member' but works with strings and will return true if any of
 the strings in LIST exist at the end of STR"
-  (member-if (lambda (item) (string-match (concat (regexp-quote item) "$")
+  (cl-member-if (lambda (item) (string-match (concat (regexp-quote item) "$")
 					  str)) list))
 
 (defun jde-remove-all-from-directory (dir)

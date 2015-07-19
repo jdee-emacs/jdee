@@ -61,13 +61,11 @@
 ;; for XEmacs compatibilty
 (unless (fboundp 'char-int)
   (defalias 'char-int 'identity))
-(when jde-xemacsp
-    (require 'jde-xemacs))
 
 (defmacro do-and-advance-chars (num &rest body)
   "Execute BODY, and then advance the point NUM bytes, called like
       (do-and-advance-chars 2 ...)"
-  (let ((result-sym (gensym)))
+  (let ((result-sym (cl-gensym)))
   `(let ((,result-sym (progn ,@body)))
      (goto-char (+ (point) ,num))
      ,result-sym)))
@@ -158,20 +156,22 @@ keys: version, this-class, interfaces, fields, and methods."
 calls.  Each method in the list is a list of the calling method or
 line number if available, the Class, method, and return value, and
 arguments.  INFO is the result of `jde-parse-class'"
-  (mapcan (lambda (method) (mapcar (lambda (attr)
-				     (list
-				      `(,(cdr (nth 2 info))
-					 ,(cdr (assoc 'name method))
-					 ,@(cdr (assoc 'descriptor method))
-					 ,(car attr)) (cdr attr)))
-				   (cdr (assoc
-					 'calls
-					 (cdr
-					  (assoc 'code
-						 (cdr
-						  (assoc 'attributes
-							 method))))))))
-	  (cdr (assoc 'methods info))))
+  (cl-mapcan
+   (lambda (method)
+     (mapcar (lambda (attr)
+	       (list
+		`(,(cdr (nth 2 info))
+		  ,(cdr (assoc 'name method))
+		  ,@(cdr (assoc 'descriptor method))
+		  ,(car attr)) (cdr attr)))
+	     (cdr (assoc
+		   'calls
+		   (cdr
+		    (assoc 'code
+			   (cdr
+			    (assoc 'attributes
+				   method))))))))
+   (cdr (assoc 'methods info))))
 
 (defun jde-parse-class-extract-interfaces (info)
   "Returns a list of fully qualified interface names that the class

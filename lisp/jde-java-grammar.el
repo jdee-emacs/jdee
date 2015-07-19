@@ -23,25 +23,15 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
-(require 'jde-parse)
-(jde-semantic-require 'semantic-java)
-(eval-when-compile
-  (jde-semantic-require 'senator)
-  (require 'jde-which-method))
+(require 'semantic/java)
+(require 'semantic/senator)
+(require 'jde-which-method)
 
-
-;; quiet "reference to free variable" build-time warnings
-(defvar jde-enable-senator)
-
-
+;; FIXME: move to jde-parse?
 (defun jde-parse-semantic-default-setup ()
   "Setup the semantic bovinator for the JDE.
 Should be run when Semantic is ready to parse, that is, via
 `semantic-init-hook'."
-
-  (unless jde-emacs-cedet-p
-    ;; Remove me from `semantic-init-hook'
-    (remove-hook 'semantic-init-hook 'jde-parse-semantic-default-setup))
 
   (when jde-auto-parse-enable
     ;; JDE delegates auto-parse to Semantic if possible.  Since
@@ -56,29 +46,25 @@ Should be run when Semantic is ready to parse, that is, via
 	  (semantic-idle-scheduler-mode 1)))
      (t
       ;; Default to JDE's auto-parse
-      (when jde-xemacsp
+      (when (fboundp 'make-local-hook)
+	;; xemacs
 	(make-local-hook 'semantic-change-hooks))
       (add-hook 'semantic-change-hooks
 		'jde-parse-buffer-changed-hook t t))))
 
   ;; Track full reparses
-  (when jde-xemacsp
+  (when (fboundp 'make-local-hook)
+    ;; xemacs
     (make-local-hook 'semantic-after-toplevel-cache-change-hook))
   (add-hook 'semantic-after-toplevel-cache-change-hook
 	    'jde-parse-update-after-parse nil t)
 
   ;; Track partial reparses
-  (when jde-xemacsp
+  (when (fboundp 'make-local-hook)
+    ;; xemacs
     (make-local-hook 'semantic-after-partial-cache-change-hook))
   (add-hook 'semantic-after-partial-cache-change-hook
 	    'jde-parse-update-after-partial-parse nil t)
-
-  (when jde-enable-senator
-    ;; Enable `senator-minor-mode' in this buffer, unless it is
-    ;; already enabled globally (since Semantic 1.4beta12).
-    (or (and (boundp 'global-senator-minor-mode)
-	     global-senator-minor-mode)
-	(senator-minor-mode 1)))
 
   ;; imenu & speedbar setup
   (jde-imenu-setup)

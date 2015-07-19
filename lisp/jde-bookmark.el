@@ -30,8 +30,6 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'jde))
 (require 'jde-parse)
 (require 'jde-util)
 
@@ -56,7 +54,7 @@ Function `jde-find-class-source' is used to visit these Java source files (see
 
 (defun jde-bookmark-prompt (&optional prompt)
   (let ((default (car jde-bookmark-history)))
-    (setq prompt (or prompt 
+    (setq prompt (or prompt
 		     (format "Class%s"
 			     (if default
 				 (format " (default %s): " default)

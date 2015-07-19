@@ -31,8 +31,10 @@
 
 ;;; Code:
 
-(require 'jde-parse)
+(require 'cl-lib)
 (require 'eieio)
+(require 'jde-open-source)
+(require 'jde-parse)
 (require 'jde-util)
 (require 'widget)
 
@@ -40,14 +42,20 @@
   (require 'wid-edit))
 
 (unless (fboundp 'make-overlay)
+  ;; FIXME; xemacs?
   (require 'overlay))
 
-
-;; quiet "reference to free variable" build-time warnings
+;; FIXME: refactor
+(declare-function jde-build-classpath "jde" (paths &optional symbol quote-path-p))
+(declare-function jde-dbs-debugger-running-p "jde-dbs" ())
+(declare-function jde-dbs-get-target-process "jde-dbs" ())
+(declare-function jde-expand-wildcards-and-normalize "jde" (path &optional symbol))
+(declare-function jde-jdb-get-jdb "jde-jdb" ())
+(declare-function jde-normalize-path "jde" (path &optional symbol))
+(defvar jde-dbs-the-debugger)
+(defvar jde-debugger);; jde
 (defvar jde-global-classpath)
 (defvar jde-sourcepath)
-(defvar jde-debugger)
-(declare-function jde-expand-wildcards-and-normalize "jde" (path &optional symbol))
 
 ;; ======================================================================
 ;; jde-db variables
@@ -339,22 +347,24 @@ current debuggee process."
 	 (oref status running-p))))
 
 
-;;;###autoload
-(defun jde-db-set-debugger (name is-executable)
-  "Specify the pathname of the debugger, if an executable, or the
-debugger's fully qualified class name, if a class."
-  (interactive
-   "sEnter name of Java interpreter: \nsIs %s executable? (yes): ")
-  (let ((db name)
-	(type
-	 (if (stringp is-executable)
-	     (if (or
-		  (string= is-executable "")
-		  (eq (aref is-executable 0) ?y))
-		 "Executable"
-	       "Class")
-	   "Executable")))
-    (setq jde-db-debugger (cons "Other" (cons db type)))))
+;; FIXME: the variable 'jdb-db-debugger' is not used anywhere else, so
+;; this function is pointless.
+;; ;;;###autoload
+;; (defun jde-db-set-debugger (name is-executable)
+;;   "Specify the pathname of the debugger, if an executable, or the
+;; debugger's fully qualified class name, if a class."
+;;   (interactive
+;;    "sEnter name of Java interpreter: \nsIs %s executable? (yes): ")
+;;   (let ((db name)
+;; 	(type
+;; 	 (if (stringp is-executable)
+;; 	     (if (or
+;; 		  (string= is-executable "")
+;; 		  (eq (aref is-executable 0) ?y))
+;; 		 "Executable"
+;; 	       "Class")
+;; 	   "Executable")))
+;;     (setq jde-db-debugger (cons "Other" (cons db type)))))
 
 ;;;###autoload
 (defun jde-db-set-args (args)
@@ -590,7 +600,7 @@ and sets the status of all breakpoints to `specified'."
 	;; bp will be in the list so don't run the risk of using a
 	;; deleted extent.
 	(let ((bpline (jde-db-breakpoint-get-line bp)))
-	  (remove-if
+	  (cl-remove-if
 	   (lambda (assoc-x)
 	     (let* ((xbp (cdr assoc-x))
 		    (xfile (oref xbp file))
@@ -721,7 +731,7 @@ particular breakpoint and to select breakpoints to be clear."
 
 (defun jde-db-find-breakpoint-by-id (id)
   "Finds the breakpoint object with ID"
-  (cdr (find-if
+  (cdr (cl-find-if
 	(lambda (assoc-x)
 	  (let ((bp (cdr assoc-x)))
 	    (= (oref bp id) id)))
@@ -729,7 +739,7 @@ particular breakpoint and to select breakpoints to be clear."
 
 (defun jde-db-find-breakpoint (file line)
   "Finds the breakpoint object for the breakpoint at FILE and LINE."
-  (cdr (find-if
+  (cdr (cl-find-if
 	(lambda (assoc-x)
 	  (let ((bp (cdr assoc-x)))
 	       (and (string= (oref bp file) file)
@@ -1236,14 +1246,14 @@ ready to accept the next command."
   "Adds LISTENER to the list of listeners listening for response
 from the debugger. LISTENER must be an object of type
 `jde-db-listener'."
-  (assert (typep listener jde-db-listener))
+  (assert (cl-typep listener jde-db-listener))
   (oset this listeners (cons listener (oref this listeners))))
 
 (defmethod jde-db-remove-listener ((this jde-db-debugger) listener)
   "Removes LISTENER from the list of listeners listening for a
 response from the debugger.  LISTENER must be an object of type
 `jde-db-listener'."
-  (assert (typep listener jde-db-listener))
+  (assert (cl-typep listener jde-db-listener))
   (oset this listeners (remove listener (oref this listeners))))
 
 (defmethod jde-db-set-process-filter ((this jde-db-debugger))
@@ -1332,7 +1342,7 @@ command list."
 
 (defmethod jde-db-exec-cmd ((this jde-db-debugger) cmd)
   "Executes CMD."
-  (assert (and cmd (typep cmd 'jde-db-cmd)))
+  (assert (and cmd (cl-typep cmd 'jde-db-cmd)))
   (jde-db-exec-cmds this (list cmd)))
 
 (defmethod jde-db-classpath-arg ((this jde-db-debugger))
@@ -1999,7 +2009,7 @@ name, e.g. A$B if point is in inner class B of A."
 matches FILE."
   (let* ((directory-sep-char ?/)
 		 (filename (jde-normalize-path file)))
-    (find-if
+    (cl-find-if
      (lambda (dir-x)
        (string-match
 		(concat "^" dir-x)

@@ -106,9 +106,10 @@
 ;;(eval-when-compile
 ;;  (require 'jde-loader))
 
+(require 'flymake)
 (require 'jde)
 (require 'jde-compile)
-(require 'flymake)
+(require 'jde-bsh)
 
 ;; pattern for matching eclipse compiler error/warning output
 (defconst jde-ecj-compiler-error-regexps

@@ -31,22 +31,28 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+(require 'compile)
 (require 'eieio)
-(eval-when-compile
-  (require 'beanshell))
+(require 'beanshell)
 (require 'jde-parse-expr)
+(require 'jde-plugins);; jde-pi-get-bsh-classpath
+(require 'jde-util)
 
-(declare-function jde-build-classpath "jde" (path &optional sym quote-path-p))
-(declare-function jde-get-tools-jar "jde" nil)
-(declare-function jde-get-project "jde-project-file" (sym proj))
-(declare-function jde-run-get-vm "jde-run" nil)
-(declare-function jde-pi-get-bsh-classpath "jde-plugins" nil)
-(declare-function jde-expand-classpath "jde" (classpath &optional sym))
-(declare-function jde-get-global-classpath "jde" nil)
-(declare-function jde-create-prj-values-str "jde" nil)
-(defvar jde-current-project)
-(defvar jde-devel-debug)
+;; FIXME: there is no cl-lexical-let
+;; Change file to lexical-binding t
+(require 'cl)
 
+;; FIXME: refactor to eliminate these
+(defvar jde-devel-debug);; jde.el
+(defvar jde-current-project);; jde-project-file.el
+(declare-function jde-get-project "jde-project-file" (symbol project));;
+(declare-function jde-run-get-vm "jde-run" ())
+(declare-function jde-build-classpath "jde" (paths &optional symbol quote-path-p))
+(declare-function jde-get-tools-jar "jde" ())
+(declare-function jde-expand-classpath "jde" (classpath &optional symbol))
+(declare-function jde-get-global-classpath "jde" ())
+(declare-function jde-create-prj-values-str "jde" ())
 
 (defcustom jde-bsh-separate-buffer nil
   "*Whether or not to use a separate buffer for errors."
@@ -201,15 +207,15 @@ command yeilding the output.  This is going to need to be true
 for most things since unless `show()' was invoked and output
 prints out, Emacs has nothing to evaluate or report."
   (interactive (list (jde-bsh-read-java-expression)))
-  (flet ((log
-	  (msg logtype)
-	  (when jde-jeval-debug
-	    (with-current-buffer (get-buffer-create "*Bsh Debug Log*")
-	      (goto-char (point-max))
-	      (insert (format "%S<" logtype))
-	      (insert (if (stringp msg) msg (prin1-to-string msg)))
-	      (insert ">")
-	      (newline)))))
+  (cl-flet ((log
+	     (msg logtype)
+	     (when jde-jeval-debug
+	       (with-current-buffer (get-buffer-create "*Bsh Debug Log*")
+		 (goto-char (point-max))
+		 (insert (format "%S<" logtype))
+		 (insert (if (stringp msg) msg (prin1-to-string msg)))
+		 (insert ">")
+		 (newline)))))
     (let ((the-bsh (oref-default 'jde-bsh the-bsh)))
       (when (not (bsh-running-p the-bsh))
 	(bsh-launch the-bsh)

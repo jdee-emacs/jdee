@@ -31,7 +31,15 @@
 ;;; Code:
 
 (require 'jde-db)
+(require 'semantic/util-modes);; semantic-add-minor-mode
 
+;; FIXME: refactor
+(defvar jde-debugger);; jde
+(declare-function jde-java-major-version "jde" ())
+(declare-function jde-java-minor-version "jde" ())
+(declare-function jde-get-jdk-prog "jde" (progname))
+(declare-function jde-find-jde-doc-directory "jde" ())
+(declare-function jde-convert-cygwin-path "jde" (path &optional separator))
 
 ;; Thanks to "David J. Biesack" <sasdjb@unx.sas.com> for this function
 ;; and its use in jde-db-marker-filter.

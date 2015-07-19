@@ -25,9 +25,17 @@
 ;; Boston, MA 02111-1307, USA.
 
 (require 'beanshell)
-(require 'jde-widgets)
+(require 'cl-lib)
 (require 'eieio)
+(require 'jde-widgets)
 (require 'jde-util)
+
+;; FIXME: refactor
+(defvar jde-jdk)
+(defvar jde-complete-function)
+(declare-function jde-complete-get-classinfo "jde-complete" (name &optional access-level))
+(declare-function jde-complete-find-all-completions "jde-complete" (pair lst &optional exact-match))
+(declare-function jde-cursor-posn-as-event "jde-complete" ())
 
 (defgroup jde-help nil
   "Java Development Environment"
@@ -85,10 +93,11 @@ JDK Version: The version of the JDK (i.e. 1.5)."
    :group 'jde-help
    :type 'boolean)
 
-(defcustom jde-help-remote-file-exists-function (list "wget")
+;; FIXME: this default avoids errors from jde-jdhelper-singleton initialization at byte-compile time.
+(defcustom jde-help-remote-file-exists-function (list "url-http-file-exists-p")
   "Specifies the function the JDEE uses to retrieve remote documents.
 wget is a Unix utility available on Windows as part of the Cygwin
-package. `url-file-exists' is part of the url Emacs Lisp library,
+package. `url-http-file-exists-p' is part of the url Emacs Lisp library,
 which is included in the Emacs w3 package."
   :group 'jde-help
   :type '(list
@@ -96,13 +105,13 @@ which is included in the Emacs w3 package."
 	   :format "%t \n%v"
 	   :tag "Function:"
 	   (const "wget")
-	   (const "url-file-exists")
+	   (const "url-http-file-exists-p")
 	   (const "beanshell")))
   :set '(lambda (sym val)
 	  (if (and
-	       (string= (car val) "url-file-exists")
-	       (locate-library "url"))
-	       (autoload 'url-file-exists "url" nil nil nil))
+	       (string= (car val) "url-http-file-exists-p")
+	       (locate-library "url-http"))
+	       (autoload 'url-http-file-exists-p "url-http" nil nil nil))
 	  (set-default sym val)
 	  (if (boundp 'jde-jdhelper-singleton)
 	      (jde-jdhelper-reload-resolvers jde-jdhelper-singleton))))
@@ -247,7 +256,7 @@ This defaults to false."
   (let ((file (jde-url-parse this 'file)))
     (concat file
 	    (if (string-equal "/" (substring file -1)) "" "/")
-	    (concat (substitute ?/ ?. (oref this :class)) ".html"))))
+	    (concat (cl-substitute ?/ ?. (oref this :class)) ".html"))))
 
 (defmethod jde-url-docset-url-name ((this jde-jdurl))
   (object-name-string this))
@@ -263,7 +272,7 @@ This defaults to false."
 (defmethod jde-url-class-url-name ((this jde-jdurl))
   (jde-url-append-file-name
    this
-   (concat (substitute ?/ ?. (oref this :class)) ".html")))
+   (concat (cl-substitute ?/ ?. (oref this :class)) ".html")))
 
 (defmethod jde-url-member-url-name ((this jde-jdurl))
   (if (oref this :member)
@@ -271,7 +280,6 @@ This defaults to false."
 	      (jde-url-class-url-name this)
 	      (oref this :member))
     (jde-url-class-url-name this)))
-  
 
 (defclass jde-jdurl-resolver () ()
   :abstract true)
@@ -289,19 +297,21 @@ This defaults to false."
 			 urls)))))
 
 
-(defclass jde-jdurl-fs-resolver (jde-jdurl-resolver) ())  
+(defclass jde-jdurl-fs-resolver (jde-jdurl-resolver) ())
 
 (defmethod jde-jdurl-resolver-url-exists ((this jde-jdurl-fs-resolver) url)
   (and (equal "file" (jde-url-protocol url))
        (file-exists-p (jde-url-file url))))
 
 
-(defclass jde-jdurl-w3-resolver (jde-jdurl-resolver) ())  
+(defclass jde-jdurl-w3-resolver (jde-jdurl-resolver) ())
+;; 'w3' is an old name for a library that provided url functions
 
 (defmethod jde-jdurl-resolver-url-exists ((this jde-jdurl-w3-resolver) url)
-  (if (fboundp 'url-file-exists)
-      (url-file-exists url)
-    (error "Cannot find url-file-exists function")))
+  (require 'url-http)
+  (if (fboundp 'url-http-file-exists-p)
+      (url-http-file-exists-p url)
+    (error "Cannot find url-http-file-exists-p function")))
 
 
 (defclass jde-jdurl-wget-resolver (jde-jdurl-resolver)
@@ -413,7 +423,7 @@ try {
   (let* ((func (intern (car jde-help-remote-file-exists-function)))
 	 (resolver (case func
 		     (wget 'jde-jdurl-wget-resolver)
-		     (w3 'jde-jdurl-w3-resolver)
+		     (url-http-file-exists-p 'jde-jdurl-w3-resolver)
 		     (beanshell 'jde-jdurl-beanshell-resolver)
 		     (t (error "No such remote function: %S" func)))))
     (oset this :resolver
@@ -438,18 +448,20 @@ try {
 		jde-help-docsets)))
 
 (defmethod jde-jdhelper-urls-for-class ((this jde-jdhelper) class)
-  (with-slots (docsets resolver) this  
-    (mapcan #'(lambda (docset)
-		(let ((ver (oref docset :version)))
-		  (if (or (not ver) (equal ver (car jde-jdk)))
-		      (jde-jdurl-resolver-urls resolver class docset))))
-	    docsets)))
+  (with-slots (docsets resolver) this
+    (cl-mapcan #'(lambda (docset)
+		   (let ((ver (oref docset :version)))
+		     (if (or (not ver) (equal ver (car jde-jdk)))
+			 (jde-jdurl-resolver-urls resolver class docset))))
+	       docsets)))
 
 (defmethod jde-jdhelper-jdk-url ((this jde-jdhelper))
-  (with-slots (docsets resolver) this  
+  (with-slots (docsets resolver) this
     (dolist (docset docsets)
       (if (equal (oref docset :version) (car jde-jdk))
 	  (return (oref docset :url))))))
+
+(defvar jde-help-read-url-history nil)
 
 (defmethod jde-jdhelper-read-url ((this jde-jdhelper) class)
   (let ((urls (jde-jdhelper-urls-for-class this class)))
@@ -563,6 +575,16 @@ try {
       (goto-char (point-min))
       (pop-to-buffer (current-buffer)))))
 
+;; FIXME: this throws an error at byte-compile time and for new
+;; users if the default for jde-help-remote-file-exists-function is
+;; not found.
+;;
+;; Change jde-jdhelper-reload-resolvers to use more than just the
+;; first value in jde-help-remote-file-exists-function, and change
+;; default value to '("wget" "beanshell" "url-http-file-exists-p").
+;;
+;; Or just delete the jde-jdurl-resolver-url-exists method, and always
+;; use url-http-file-exists-p
 (defvar jde-jdhelper-singleton (jde-jdhelper nil)
   "The JDHelper singleton instance.")
 
@@ -570,8 +592,6 @@ try {
 ;; interactive
 
 
-
-(defvar jde-help-read-url-history nil)
 
 (defun jde-help-describe-docsets ()
   (interactive)
@@ -605,24 +625,24 @@ displays the javadoc for the class of the object of which the field or
 method is a member at the point where the method of field is
 documented."
   (interactive)
-  (flet ((show-symbol
-	  (class method-name)
-	  (let ((urls (jde-jdhelper-urls-for-class jde-jdhelper-singleton class)))
-	    (if (null urls)
-		(message "Error: cannot find documentation for class %s " class)
-	      (let ((classinfo (jde-complete-get-classinfo class))
-		    method-signature member pos)
-		(if (and method-name classinfo)
-		    (setq method-signature (jde-complete-find-all-completions
-					    (list class method-name)
-					    classinfo)))
-		(if method-signature
-		    (progn
-		      (setq member (caar method-signature))
-		      (setq pos (string-match " : " member))
-		      (if pos
-			  (setq member (substring member 0 pos)))))
-		(jde-jdhelper-show-class jde-jdhelper-singleton class member))))))
+  (cl-flet ((show-symbol
+	     (class method-name)
+	     (let ((urls (jde-jdhelper-urls-for-class jde-jdhelper-singleton class)))
+	       (if (null urls)
+		   (message "Error: cannot find documentation for class %s " class)
+		 (let ((classinfo (jde-complete-get-classinfo class))
+		       method-signature member pos)
+		   (if (and method-name classinfo)
+		       (setq method-signature (jde-complete-find-all-completions
+					       (list class method-name)
+					       classinfo)))
+		   (if method-signature
+		       (progn
+			 (setq member (caar method-signature))
+			 (setq pos (string-match " : " member))
+			 (if pos
+			     (setq member (substring member 0 pos)))))
+		   (jde-jdhelper-show-class jde-jdhelper-singleton class member))))))
     (condition-case err
 	(let* ((parse-result (jde-help-parse-symbol-at-point))
 	       (unqualified-name (thing-at-point 'symbol))

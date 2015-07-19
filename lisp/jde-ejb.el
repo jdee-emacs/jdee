@@ -32,9 +32,9 @@
 ;; I will simply provide a wizard to create all three elements and
 ;; leave referential integrity alone.
 
-(require 'jde-wiz)
+;; FIXME: this gives a byte-compile warning "Error: Selecting deleted buffer"
 (require 'jde-gen)
-
+(require 'tempo)
 
 (defgroup jde-ejb nil
   "JDE EJB Electric Class Builder"
@@ -115,145 +115,177 @@ name portion of the filename string."
     (format "%s/%s" thisdir  (format fmt name))))
 
 ;; (makunbound 'jde-ejb-remote-buffer-template)
-(defcustom jde-ejb-remote-buffer-template
-  (list
-   "(funcall jde-gen-boilerplate-function)"
-   "jde-ejb-package '>'n"
-   "'>'n"
-   "\"public interface \""
-   "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
-   "\" extends javax.ejb.EJBObject \""
+(eval-and-compile
+  (defcustom jde-ejb-remote-buffer-template
+    (list
+     "(funcall jde-gen-boilerplate-function)"
+     "jde-ejb-package '>'n"
+     "'>'n"
+     "\"public interface \""
+     "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+     "\" extends javax.ejb.EJBObject \""
 
-   "(if jde-gen-k&r "
-   " ()"
-   " '>'n)"
-   "\"{\"'>'n"
+     "(if jde-gen-k&r "
+     " ()"
+     " '>'n)"
+     "\"{\"'>'n"
 
 ;;;Add standard interface components for Remote Interface
-   "'>'n"
-   "\"}\">"
-   "\" // \""
-   "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
-   "'>'n")
-  "*Template for new EJB Remote interface.
+     "'>'n"
+     "\"}\">"
+     "\" // \""
+     "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+     "'>'n")
+    "*Template for new EJB Remote interface.
 This is the interface that contains all user methods.
 Setting this variable defines a template instantiation
 command `jde-ejb-remote', as a side-effect."
-  :group 'jde-ejb
-  :type '(repeat string)
-  :set '(lambda (sym val)
-	  (defalias 'jde-ejb-remote
-	    (tempo-define-template "java-ejb-remote-buffer-template"
-				   (jde-gen-read-template val)
-				   nil
-				   "Insert a generic Java class buffer skeleton."))
-	  (set-default sym val)))
+    :group 'jde-ejb
+    :type '(repeat string)
+    :set '(lambda (sym val)
+	    (defalias 'jde-ejb-remote
+	      (tempo-define-template "java-ejb-remote-buffer-template"
+				     (jde-gen-read-template val)
+				     nil
+				     "Insert a generic Java class buffer skeleton."))
+	    (set-default sym val)))
+
+  (defalias 'jde-ejb-remote
+    (tempo-define-template "java-ejb-remote-buffer-template"
+			   (jde-gen-read-template jde-ejb-remote-buffer-template)
+			   nil
+			   "Insert a generic Java class buffer skeleton."))
+  )
 
 ;; (makunbound 'jde-ejb-home-buffer-template)
-(defcustom jde-ejb-home-buffer-template
-  (list
-   "(funcall jde-gen-boilerplate-function)"
-   "jde-ejb-package '>'n"
-   "'>'n"
-   "\"public interface \""
-   "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
-   "\" extends javax.ejb.EJBHome \""
+(eval-and-compile
+  (defcustom jde-ejb-home-buffer-template
+    (list
+     "(funcall jde-gen-boilerplate-function)"
+     "jde-ejb-package '>'n"
+     "'>'n"
+     "\"public interface \""
+     "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+     "\" extends javax.ejb.EJBHome \""
 
-   "(if jde-gen-k&r "
-   " ()"
-   " '>'n)"
-   "\"{\"'>'n"
+     "(if jde-gen-k&r "
+     " ()"
+     " '>'n)"
+     "\"{\"'>'n"
 
 ;;;Add standard interface components for Home Interface
-   "'>'n"
-   "\"}\">"
-   "\" // \""
-   "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
-   "'>'n")
-  "*Template for new EJB Home interface.
+     "'>'n"
+     "\"}\">"
+     "\" // \""
+     "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+     "'>'n")
+    "*Template for new EJB Home interface.
 This interface defines the create/find (for entity beans)/remove
 methods. Setting this variable defines a template instantiation
 command `jde-ejb-home', as a side-effect."
-  :group 'jde-ejb
-  :type '(repeat string)
-  :set '(lambda (sym val)
-	  (defalias 'jde-ejb-home
-	    (tempo-define-template "java-ejb-home-buffer-template"
-				   (jde-gen-read-template val)
-				   nil
-				   "Insert a generic Java class buffer skeleton."))
-	  (set-default sym val)))
+    :group 'jde-ejb
+    :type '(repeat string)
+    :set '(lambda (sym val)
+	    (defalias 'jde-ejb-home
+	      (tempo-define-template "java-ejb-home-buffer-template"
+				     (jde-gen-read-template val)
+				     nil
+				     "Insert a generic Java class buffer skeleton."))
+	    (set-default sym val)))
+
+  (defalias 'jde-ejb-home
+    (tempo-define-template "java-ejb-home-buffer-template"
+			   (jde-gen-read-template jde-ejb-home-buffer-template)
+			   nil
+			   "Insert a generic Java class buffer skeleton."))
+  )
 
 ;;;;;;; start - by yoonforh 2003-01-15 17:09:14
 ;; (makunbound 'jde-ejb-local-buffer-template)
-(defcustom jde-ejb-local-buffer-template
-  (list
-   "(funcall jde-gen-boilerplate-function)"
-   "jde-ejb-package '>'n"
-   "'>'n"
-   "\"public interface \""
-   "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
-   "\" extends javax.ejb.EJBLocalObject \""
+(eval-and-compile
+  (defcustom jde-ejb-local-buffer-template
+    (list
+     "(funcall jde-gen-boilerplate-function)"
+     "jde-ejb-package '>'n"
+     "'>'n"
+     "\"public interface \""
+     "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+     "\" extends javax.ejb.EJBLocalObject \""
 
-   "(if jde-gen-k&r "
-   " ()"
-   " '>'n)"
-   "\"{\"'>'n"
+     "(if jde-gen-k&r "
+     " ()"
+     " '>'n)"
+     "\"{\"'>'n"
 
 ;;;Add standard interface components for Remote Interface
-   "'>'n"
-   "\"}\">"
-   "\" // \""
-   "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
-   "'>'n")
-  "*Template for new EJB Local interface.
+     "'>'n"
+     "\"}\">"
+     "\" // \""
+     "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+     "'>'n")
+    "*Template for new EJB Local interface.
 This is the interface that contains all user methods.
 Setting this variable defines a template instantiation
 command `jde-ejb-local', as a side-effect."
-  :group 'jde-ejb
-  :type '(repeat string)
-  :set '(lambda (sym val)
-	  (defalias 'jde-ejb-local
-	    (tempo-define-template "java-ejb-local-buffer-template"
-				   (jde-gen-read-template val)
-				   nil
-				   "Insert a generic Java class buffer skeleton."))
-	  (set-default sym val)))
+    :group 'jde-ejb
+    :type '(repeat string)
+    :set '(lambda (sym val)
+	    (defalias 'jde-ejb-local
+	      (tempo-define-template "java-ejb-local-buffer-template"
+				     (jde-gen-read-template val)
+				     nil
+				     "Insert a generic Java class buffer skeleton."))
+	    (set-default sym val)))
+
+  (defalias 'jde-ejb-local
+    (tempo-define-template "java-ejb-local-buffer-template"
+			   (jde-gen-read-template jde-ejb-local-buffer-template)
+			   nil
+			   "Insert a generic Java class buffer skeleton."))
+  )
 
 ;; (makunbound 'jde-ejb-local-home-buffer-template)
-(defcustom jde-ejb-local-home-buffer-template
-  (list
-   "(funcall jde-gen-boilerplate-function)"
-   "jde-ejb-package '>'n"
-   "'>'n"
-   "\"public interface \""
-   "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
-   "\" extends javax.ejb.EJBLocalHome \""
+(eval-and-compile
+  (defcustom jde-ejb-local-home-buffer-template
+    (list
+     "(funcall jde-gen-boilerplate-function)"
+     "jde-ejb-package '>'n"
+     "'>'n"
+     "\"public interface \""
+     "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+     "\" extends javax.ejb.EJBLocalHome \""
 
-   "(if jde-gen-k&r "
-   " ()"
-   " '>'n)"
-   "\"{\"'>'n"
+     "(if jde-gen-k&r "
+     " ()"
+     " '>'n)"
+     "\"{\"'>'n"
 
 ;;;Add standard interface components for LocalHome Interface
-   "'>'n"
-   "\"}\">"
-   "\" // \""
-   "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
-   "'>'n")
-  "*Template for new EJB LocalHome interface.
+     "'>'n"
+     "\"}\">"
+     "\" // \""
+     "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
+     "'>'n")
+    "*Template for new EJB LocalHome interface.
 This interface defines the create/find (for entity beans)/remove
 methods. Setting this variable defines a template instantiation
 command `jde-ejb-local-home', as a side-effect."
-  :group 'jde-ejb
-  :type '(repeat string)
-  :set '(lambda (sym val)
-	  (defalias 'jde-ejb-local-home
-	    (tempo-define-template "java-ejb-local-home-buffer-template"
-				   (jde-gen-read-template val)
-				   nil
-				   "Insert a generic Java class buffer skeleton."))
-	  (set-default sym val)))
+    :group 'jde-ejb
+    :type '(repeat string)
+    :set '(lambda (sym val)
+	    (defalias 'jde-ejb-local-home
+	      (tempo-define-template "java-ejb-local-home-buffer-template"
+				     (jde-gen-read-template val)
+				     nil
+				     "Insert a generic Java class buffer skeleton."))
+	    (set-default sym val)))
+
+  (defalias 'jde-ejb-local-home
+    (tempo-define-template "java-ejb-local-home-buffer-template"
+			   (jde-gen-read-template jde-ejb-local-home-buffer-template)
+			   nil
+			   "Insert a generic Java class buffer skeleton."))
+  )
 
 
 ;;;;;;;;;;; end - by yoonforh 2003-01-15 17:09:19
@@ -736,6 +768,7 @@ Bean-specific interactive function"
   (goto-char (point-min))
   (search-forward "{")
   (backward-char 1)
+  (require 'cc-cmds)
   (c-indent-exp)
   (tempo-forward-mark)))
 

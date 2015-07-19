@@ -44,6 +44,10 @@
 
 (require 'efc)
 
+;; FIXME: refactor
+(defvar jde-buffer-project-file);; jde-project-file.el
+(declare-function jde-find-class-source-file "jde-open-source" (class))
+
 (if (featurep 'xemacs)
      (load "arc-mode")
   (require 'arc-mode))
@@ -143,9 +147,12 @@ in the same directory that contains the JDE lisp directory."
 "Get the location used by the host system to store temporary files."
   (or (if (boundp 'temporary-file-directory) temporary-file-directory)
       (if (fboundp 'temp-directory) (temp-directory)
-	(if (member system-type '(cygwin32 cygwin))
-	    (jde-cygwin-path-converter-cygpath (temp-directory))
-	  (temp-directory)))))
+	(error "no temp-directory function found"))))
+
+	;; FIXME: this checks that temp-directory is unbound, then calls it anyway!?
+	;; (if (member system-type '(cygwin32 cygwin))
+	;;     (jde-cygwin-path-converter-cygpath (temp-directory))
+	;;   (temp-directory)))))
 
 (defun jde-get-java-source-buffers ()
   "Return a list of Java source buffers open in the current session."
@@ -232,13 +239,16 @@ directory."
   "Write the current code region as an HTML document.
 Line numbers are added as well.
 
+Requires ELPA package `htmlize'.
+
 See `jde-htmlize-code-destinations'."
   (interactive
    (append (if mark-active
 	       (list (region-beginning) (region-end))
 	     (list (point-min) (point-max)))
 	   (list (not current-prefix-arg))))
-  (require 'htmlize)
+  (unless (require 'htmlize nil t)
+    (error "Requires ELPA package `htmlize'."))
   (save-restriction
     (narrow-to-region start end)
     (let ((code-buf (current-buffer))
@@ -254,7 +264,8 @@ See `jde-htmlize-code-destinations'."
 	      (insert (format (format "%%.%dd " line-width) (incf ln)))
 	      (forward-line)))
 	(rename-buffer (concat (buffer-name code-buf) ".html"))
-	(let ((buf (htmlize-buffer))
+	(let ((buf (when (fboundp 'htmlize-buffer)
+		     (htmlize-buffer)))
 	      (bname (buffer-name)))
 	  (unwind-protect
 	      (with-current-buffer buf

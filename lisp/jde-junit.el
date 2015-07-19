@@ -37,6 +37,11 @@
 
 
 (require 'jde)
+(require 'jde-run);; jde-run-get-vm jde-run-vm-launch
+(require 'jde-db);; jde-db-get-package
+
+;; FIXME: (require 'cc-cmds) doesn't work
+(declare-function c-indent-exp "cc-cmds" (&optional shutup-p))
 
 (defgroup jde-junit nil
   "JDE JUnit"
@@ -203,6 +208,13 @@ command `jde-junit-test-class', as a side-effect."
 	     "Insert a generic JUnit test class buffer skeleton."))
 	  (set-default sym val)))
 
+(defalias 'jde-junit-test-class-internal
+  (tempo-define-template
+   "java-junit-test-class-buffer-template"
+   (jde-gen-read-template jde-junit-test-class-template)
+   nil
+   "Insert a generic JUnit test class buffer skeleton."))
+
 (defcustom jde-junit4-test-class-template
   (list
    "(funcall jde-gen-boilerplate-function)"
@@ -296,6 +308,13 @@ command `jde-junit4-test-class', as a side-effect."
 	     "Insert a generic JUnit 4 test class buffer skeleton."))
 	  (set-default sym val)))
 
+(defalias 'jde-junit4-test-class-internal
+  (tempo-define-template
+   "java-junit4-test-class-buffer-template"
+   (jde-gen-read-template jde-junit4-test-class-template)
+   nil
+   "Insert a generic JUnit 4 test class buffer skeleton."))
+
 ;;;###autoload
 (defun jde-junit-test-class ()
   "Instantiate a test class template."
@@ -386,6 +405,12 @@ framework. For more information, see http://www.junit.org."
 	     "Insert JUnit test to suite."))
 	  (set-default sym val)))
 
+(defalias 'jde-junit-add-test-to-suite-internal
+  (tempo-define-template
+   "Adding JUnit test to suit"
+   (jde-gen-read-template jde-junit-add-test-to-suite-template)
+   nil
+   "Insert JUnit test to suite."))
 
 ;;;###autoload
 (defun jde-junit-add-test-to-suite ()

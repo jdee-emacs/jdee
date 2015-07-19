@@ -37,10 +37,16 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'efc)
-(jde-semantic-require 'semantic-fw)
-(jde-semantic-require 'semantic-find)
-(jde-semantic-require 'semantic-util)
+(require 'jde-parse)
+(require 'semantic/fw)
+(require 'semantic/find)
+(require 'semantic/util)
+
+;; FIXME: refactor
+(declare-function jde-choose-class "jde-open-source" (classes &optional prompt uq-name confirm-fq-p))
+(declare-function jde-jeval-r "jde-bsh" (java-statement))
 
 ;;;;
 ;;;; Customization
@@ -221,11 +227,12 @@ the second empty line; otherwise, if the buffer
 contains a class definition, return the beginning
 of the line before the class definition; otherwise,
 return the beginning of the buffer."
-  (flet ((insertion-point-after (tag-end)
-	  (goto-char tag-end)
-	  (if (eolp) (forward-char 1)(forward-line 1)) ;skip comment
-	  (point)
-	  ))
+  (cl-flet ((insertion-point-after
+	     (tag-end)
+	     (goto-char tag-end)
+	     (if (eolp) (forward-char 1)(forward-line 1)) ;skip comment
+	     (point)
+	     ))
     (let* ((tags (semantic-fetch-tags)) ;(xx (message "tags = %s" tags))
 	   (import-tag (car
 			(last (semantic-brute-find-tag-by-class
@@ -320,13 +327,13 @@ any directories or jars that you want the command to search in your
 classpath, except jars implicitly included by the jvm, e.g.,
 rt.jar. The NO-ERRORS is used to avoid showing erros to the user."
   (interactive
-   (flet ((vfn
-	   (class)
-	   (let ((existing-import (jde-import-get-import (third class))))
-	     (if (null existing-import)
-		 class
-	       (message "Skipping: already imported %s" existing-import)
-	       'pass))))
+   (cl-flet ((vfn
+	      (class)
+	      (let ((existing-import (jde-import-get-import (third class))))
+		(if (null existing-import)
+		    class
+		  (message "Skipping: already imported %s" existing-import)
+		  'pass))))
      (list (jde-read-class nil nil nil nil nil 'vfn) nil current-prefix-arg t)))
   (if qualifiedp
       (unless (eq class 'pass)
@@ -337,7 +344,7 @@ rt.jar. The NO-ERRORS is used to avoid showing erros to the user."
       (if (not (null existing-import))
 	  (message "Skipping: already imported %s" existing-import)
 	(let ((imports (jde-import-get-qualified-names class)))
-	  (setq imports (remove-duplicates imports :test 'equal))
+	  (setq imports (cl-remove-duplicates imports :test 'equal))
 	  (if imports
 	      (jde-import-insert-import imports (not no-exclude))
 	    (if (not no-errors)
@@ -422,7 +429,7 @@ inserts the selected import in the buffer."
 
 (defun jde-import-already-imports-class (class-name existing-imports)
   "Determine if a class is already being imported."
-  (find
+  (cl-find
    class-name
    existing-imports
    :test (lambda (new existing)
@@ -443,8 +450,8 @@ inserts the selected import in the buffer."
    (mapcar
     (lambda (new-import)
       (unless  (jde-import-already-imports-class new-import existing-imports)
-	new-import)
-      new-imports))))
+	new-import))
+    new-imports)))
 
 (defun jde-import-choose-import (new-imports)
   "Prompts the user to select a class to import from a list of similarly
@@ -890,6 +897,15 @@ is used by `jde-import-all'. This function is roughly the opposite of
 ;;                                                                                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun jde-import-find-declared-classes (class-tag declared-classes)
+  (let ((members (semantic-tag-get-attribute class-tag :members)))
+    (dolist (member members)
+      (if (eq (semantic-tag-class member) 'type)
+	  (progn
+	    (setq declared-classes
+		  (append declared-classes (list (semantic-tag-name member))))
+	    (jde-import-find-declared-classes member))))))
+
 (defun jde-import-all-find-classes-to-import ()
   "Returns a list of unqualified class names to import into this
 buffer. This function returns all the identifiers in the current
@@ -911,18 +927,9 @@ are not the names of inner or outer classes declared in this buffer."
 
     ;; Get the names of classes declared in this buffer.
     (let ((buffer-class-tags (semantic-brute-find-tag-by-class 'type (current-buffer))))
-      (flet ((find-declared-classes
-	      (class-tag)
-	      (let ((members (semantic-tag-get-attribute class-tag :members)))
-		(dolist (member members)
-		  (if (eq (semantic-tag-class member) 'type)
-		      (progn
-			(setq declared-classes
-			      (append declared-classes (list (semantic-tag-name member))))
-			(find-declared-classes member)))))))
       (dolist (class-tag buffer-class-tags)
-	 (setq declared-classes (append declared-classes  (list (semantic-tag-name class-tag))))
-	 (find-declared-classes class-tag))))
+	(setq declared-classes (append declared-classes  (list (semantic-tag-name class-tag))))
+	(jde-import-find-declared-classes class-tag declared-classes)))
 
     ;; Sort through the Java tokens in this buffer, looking
     ;; for identifiers that start with an uppercase character and
@@ -945,20 +952,20 @@ are not the names of inner or outer classes declared in this buffer."
 
 (defun jde-import-is-included0 (name import0)
   "check single qualified name against a single qualified class name."
-  (and import0 
+  (and import0
        (let* ((len0 (length import0))
 	      (dotstar (eq t (compare-strings import0 (- len0 2) len0 ".*" nil nil nil)))
 	      (import (if dotstar (substring import0 0 (- len0 2)) import0))
 	      (len (length import)))
 	 (or
 	  (string-equal import name)	; name.equals(import)
-	  (and 
+	  (and
 	   (eq t (compare-strings name 0 len import nil nil nil))  ; name.startsWith(import)
 	   (eq t (compare-strings name len (1+ len) "." nil nil )) ; name[len] == "."
 	   ))
 	 )))
 
-(defun jde-import-is-included1 (name classes) 
+(defun jde-import-is-included1 (name classes)
   "check single qualified name against list of qualified classes"
   (and name
        (do* ((imports classes (cdr imports))
@@ -967,9 +974,9 @@ are not the names of inner or outer classes declared in this buffer."
 	   ((or (null import) incl) incl)
 	 )))
 
-(defun jde-import-is-included (names classes) 
+(defun jde-import-is-included (names classes)
   "check single or list of qualified names against qualified classes"
-  (if (listp names) 
+  (if (listp names)
       (do* ((nlist names (cdr nlist))
 	    (name (car nlist) (car nlist))
 	    (incl (jde-import-is-included1 name classes) (jde-import-is-included1 name classes))
@@ -978,13 +985,13 @@ are not the names of inner or outer classes declared in this buffer."
     (jde-import-is-included1 names classes)
     ))
 
-(defun jde-import-filter-inner-imports (qualified-names) 
-  "remove names that are imported by outer classes or some.package.*" 
+(defun jde-import-filter-inner-imports (qualified-names)
+  "remove names that are imported by outer classes or some.package.*"
   (let* ((import-tags (semantic-brute-find-tag-by-class 'include (current-buffer)))
 	 (imported-classes (mapcar (lambda (import-tag) (semantic-tag-name import-tag)) import-tags))
 	 (imports nil))
     (dolist (qnames qualified-names imports)
-      (if (not (jde-import-is-included qnames imported-classes)) 
+      (if (not (jde-import-is-included qnames imported-classes))
 	  (setq imports (cons qnames imports))))
     ))
 

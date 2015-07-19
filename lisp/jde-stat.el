@@ -27,15 +27,17 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
 ;;;###autoload
 (defun jde-stat-loc-report (&optional count &optional total-files)
   "Generates a report showing the number of code, comment,
 javadoc, and blank lines in the current Java source buffer. Optionally
-a total count could be passed to be displayes, as well as the number of
+a total count could be passed to be displayed, as well as the number of
 processed files."
   (interactive)
-  (flet ((perc2x2 (a b)
-		  (format "%.1f" (* 100(/ (float a) (float b))))))
+  (cl-flet ((perc2x2 (a b)
+		     (format "%.1f" (* 100(/ (float a) (float b))))))
     (let* ((fname (buffer-file-name))
 	   (result (if count count (jde-stat-count-loc)))
 	   (total (nth 0 result))

@@ -23,13 +23,21 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
-(jde-semantic-require 'semantic-util)
-(jde-semantic-require 'semantic-idle)
 (require 'beanshell)
-(require 'jde-complete)
+(require 'cc-cmds)
+(require 'cl-lib)
 (require 'efc)
-(require 'jde-parse)
+(require 'jde-complete)
 (require 'jde-gen)
+(require 'jde-import)
+(require 'jde-parse)
+(require 'semantic/idle)
+(require 'semantic/util)
+
+;; FIXME: refactor
+(declare-function jde-jeval-r "jde-bsh" (java-statement))
+(declare-function jde-bsh-running-p "jde-bsh" nil)
+(declare-function jde-create-prj-values-str "jde" nil)
 
 (defgroup jde-wiz nil
   "JDE Wizards"
@@ -136,9 +144,9 @@ if that fails (as it will when INTERFACE-NAME is an inner-class name),
 then try after replacing INTERFACE-NAME with (jde-dollar-name INTERFACE-NAME).
 
 If EVAL-RETURN is t, then return (jde-jeval ... t), else return (read (jde-jeval ...))"
-  (flet ((jeval (name) (if eval-return
-			   (jde-jeval (format fmt name) t)
-			 (read (jde-jeval (format fmt name))))))
+  (cl-flet ((jeval (name) (if eval-return
+			      (jde-jeval (format fmt name) t)
+			    (read (jde-jeval (format fmt name))))))
     (let ((code (jeval interface-name)) dollar-name)
       (if (and code (eq (car code) 'error)
 	       (setq dollar-name (jde-dollar-name interface-name))
@@ -969,7 +977,7 @@ protected modifiers"
       (setq tokens (cdr tokens)))
     filtered-tokens))
 
-(defun jde-wiz-get-name(variable)
+(defun jde-wiz-get-name (variable)
   "Gets the name of variable to be used in generation the get set
 method templates. For Example if the variable is \"_Name\" and the variable
 `jde-wiz-get-set-variable-convention' is set to prefix _ this method will

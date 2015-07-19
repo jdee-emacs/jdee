@@ -3,7 +3,7 @@
 <project name="jdee" default="bindist">
   <!--
      For compilation and installation instructions, see doc/install.html
-     -->
+  -->
 
   <!-- add in the contribs (add ant-contrib-VERSION.jar) to CLASSPATH -->
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
@@ -33,6 +33,7 @@
     <property file="${config.devel.build.file}"/>
     <property file="${config.dir}/project.properties"/>
     <property file="${config.build.file}"/>
+
     <path id="compile.classpath">
 	<fileset dir="${lib.java.dir}"/>
     </path>
@@ -198,9 +199,12 @@
   <target name="build-java" depends="init"
 	  description="compile the JDEE Java source code">
     <mkdir dir="${build.java.dir}"/>
-    <javac srcdir="${src.java.dir}" destdir="${build.java.dir}"
+    <javac srcdir="${src.java.dir}"
+           destdir="${build.java.dir}"
 	   source="1.4" target="1.4"
-	   debug="true" classpathref="compile.classpath"/>
+	   debug="true"
+           classpathref="compile.classpath"
+           includeantruntime="false"/>
   </target>
 
 

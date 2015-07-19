@@ -27,6 +27,13 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
+;; FIXME: refactor
+(declare-function jde-wiz-set-bsh-project "jde-wiz" ())
+(declare-function jde-root-dir-p "jde" (dir))
+(declare-function jde-log-msg "jde" (msg &rest args))
+
 (defconst jde-project-file-version "1.0"
   "*The current JDE project file version number.")
 
@@ -88,8 +95,8 @@ being loaded.")
 from DIR. Returns nil if it cannot find a project file in DIR
 or an ascendant directory."
   (let* ((directory-sep-char ?/) ;; Override NT/XEmacs setting
-	 (file (find jde-project-file-name
-		     (directory-files dir) :test 'string=)))
+	 (file (cl-find jde-project-file-name
+			(directory-files dir) :test 'string=)))
     (if file
 	(expand-file-name file dir)
       (if (not (jde-root-dir-p dir))

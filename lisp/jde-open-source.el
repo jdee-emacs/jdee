@@ -22,10 +22,18 @@
 
 ;; This package allows to open the class at point.
 
+(require 'cl-lib)
+(require 'etags);; find-tag-marker-ring
+(require 'jde-complete);; jde-complete-private
+(require 'jde-import);; jde-import-get-import
 (require 'jde-parse)
 (require 'jde-util)
-(require 'jde-bsh)
-(jde-semantic-require 'senator)
+(require 'semantic/senator)
+
+;; FIXME: refactor
+(declare-function jde-expand-wildcards-and-normalize "jde" (path &optional symbol))
+(declare-function jde-jeval-r "jde-bsh" (java-statement))
+(defvar jde-sourcepath)
 
 (defcustom jde-open-class-at-point-find-file-function 'find-file-other-window
   "Define the function for opening the class at point. See
@@ -106,7 +114,7 @@ checks if it is a member of the base class(\"super\")."
     (setq tags (jde-get-parents))
     (setq super-class (car tags))
     (message "Superclass of %s is %s" class-name super-class)
-    ;; Now let´s jump to the thing-of-interest. If this is a
+    ;; Now letÂ´s jump to the thing-of-interest. If this is a
     ;; variable-name then we will not find this with senator in
     ;; the opened java-file so we search for the definiton of
     ;; the class itself. This feature is only available if we
@@ -114,7 +122,6 @@ checks if it is a member of the base class(\"super\")."
     (when (and (fboundp 'senator-search-forward) (not (string= parsed-symbol "")))
       (goto-char (point-min))
       (semantic-fetch-tags)
-      (senator-parse)
       (setq parsed-symbol (concat "\\b" parsed-symbol "\\b"))
       (while (not (senator-re-search-forward parsed-symbol nil t))
 	(message "Could not find %s in %s" parsed-symbol (buffer-name))
@@ -126,7 +133,6 @@ checks if it is a member of the base class(\"super\")."
           (let ((jde-open-cap-ff-function-temp-override 'find-file))
             (jde-show-superclass-source-2 tags))
           (goto-char (point-min))
-          (senator-parse)
           (search-forward-regexp "^[^\\*]*?{" nil t)
           (setq tags (jde-get-parents))
           ;;if it is the first time try in the class definition
@@ -201,7 +207,7 @@ $CLASSPATH, then in the current directory."
 		(let ((source
 		       (jde-find-class-source-file class-to-open)))
 		  (if source
-		      ;; we have found the source file. So let´s open it and
+		      ;; we have found the source file. So letÂ´s open it and
 		      ;; then jump to the thing-of-interest
 		      (progn
 			(if (typep source 'buffer)
@@ -360,6 +366,9 @@ find the source for the class, it returns nil."
   :group 'jde-project
   :type '(repeat string))
 
+(defvar jde-read-class-fq-items nil
+  "History for `jde-choose-class'.")
+
 (defun jde-choose-class (classes &optional prompt uq-name confirm-fq-p)
   "Choose a class from user input.
 
@@ -375,15 +384,15 @@ CONFIRM-FQ-P, if non-nil, confirm the class name even when there
 is only one unique fully qualified class found for the simple
 class name \(that is the class without the package part in the
 name)."
-  (flet ((sort-helper
-	  (a b)
-	  (dolist (pkg jde-preferred-packages)
-	    (let ((len (length pkg)))
-	      (cond ((eq t (compare-strings pkg 0 len a 0 len))
-		     (return t))
-		    ((eq t (compare-strings pkg 0 len b 0 len))
-		     (return nil))
-		    (t (string< a b)))))))
+  (cl-flet ((sort-helper
+	     (a b)
+	     (dolist (pkg jde-preferred-packages)
+	       (let ((len (length pkg)))
+		 (cond ((eq t (compare-strings pkg 0 len a 0 len))
+			(return t))
+		       ((eq t (compare-strings pkg 0 len b 0 len))
+			(return nil))
+		       (t (string< a b)))))))
     (setq classes (sort classes 'sort-helper))
     (setq prompt (or prompt "Class"))
     (let ((default (if uq-name
@@ -504,7 +513,6 @@ If it finds the source file, it opens the file in a buffer."
 		    (let ((inner-class (substring class (+ 1 inner-class-pos))))
 		      (when inner-class
 			(goto-char (point-min))
-			(senator-parse)
 			(senator-re-search-forward
 			 (concat "\\b" inner-class "\\b") nil t)))))))
       (message "JDE error: Could not find source for \"%s\" in this

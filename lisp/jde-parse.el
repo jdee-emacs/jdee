@@ -23,14 +23,26 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
-(jde-semantic-require 'semantic-ctxt)
-(jde-semantic-require 'semantic-sb)
 (require 'avl-tree)
-(require 'thingatpt)
-(require 'eieio)
-(require 'jde-imenu)                    ; All the imenu stuff is here now!
+(require 'cl-lib)
 (require 'efc)
+(require 'eieio)
+(require 'etags)
+(require 'jde-imenu)
 (require 'rx)
+(require 'semantic/ctxt)
+(require 'semantic/sb)
+(require 'thingatpt)
+
+;; FIXME: refactor
+(defvar jde-complete-private)
+(defvar jde-complete-current-list)
+(declare-function jde-jeval-r "jde-bsh" (java-statement))
+(declare-function jde-complete-find-completion-for-pair "jde-complete" (pair &optional exact-completion access-level))
+(declare-function jde-import-find-and-import "jde-import" (class &optional no-errors no-exclude qualifiedp))
+
+;; FIXME: (require 'cc-engine) doesn't work in Emacs 24.3
+(declare-function c-parse-state "cc-engine" ())
 
 (defcustom jde-auto-parse-enable t
   "Enables automatic reparsing of a Java source buffer.
@@ -289,7 +301,7 @@ MODIFIERS creteria as an exact match or subset.  This defaults to `subset'."
 	  (cond ((or (null compare-method)
 		     (eq 'subset compare-method))
 		 #'(lambda (modifiers var-modifiers)
-		     (subsetp modifiers var-modifiers :test 'equal)
+		     (cl-subsetp modifiers var-modifiers :test 'equal)
 		     ))
 		((eq 'equal compare-method)
 		 #'(lambda (modifiers var-modifiers)
@@ -432,7 +444,7 @@ current buffer resides."
   "Gets the package portion of a qualified class name."
   (substring
    class-name 0
-   (let ((pos  (position ?. class-name :from-end t)))
+   (let ((pos  (cl-position ?. class-name :from-end t)))
      (if pos
 	 pos
        0))))
@@ -524,35 +536,33 @@ or interface keyword or the first character
 of the new keyword in case of anonymous classes.
 Returns nil, if point is not in a class."
 
-;; commented out for now until current build upgraded to new semantci (emacs
-;; major version 23?)
-;;  (semantic-refresh-tags-safe)
-(let ((left-paren-pos (c-parse-state)))
-  (if left-paren-pos
-      (save-excursion
-	(catch 'class-found
-	  (let ((left-paren-index 0)
-		(left-paren-count (length left-paren-pos)))
-	    (while (< left-paren-index left-paren-count)
-	      (let ((paren-pos (nth left-paren-index left-paren-pos)))
-		(unless (consp paren-pos)
-		  (goto-char paren-pos)
-		  (when (looking-at "{")
-		    (let* ((search-end-pos
-			    (if (< left-paren-index (1- left-paren-count))
-				(let ((pos (nth (1+ left-paren-index) left-paren-pos)))
-				  (if (consp pos)
-				      (cdr pos)
-				    pos))
-			      (point-min)))
-			   (case-fold-search nil)
-			   (class-pos (re-search-backward jde-parse-class-decl-re search-end-pos t)))
-		      (if class-pos
-			(throw
-			 'class-found
-			 (cons (match-string-no-properties 2)
-			       (match-beginning 1))))))))
-	      (setq left-paren-index (1+ left-paren-index)))))))))
+  (semantic-refresh-tags-safe)
+  (let ((left-paren-pos (c-parse-state)))
+    (if left-paren-pos
+	(save-excursion
+	  (catch 'class-found
+	    (let ((left-paren-index 0)
+		  (left-paren-count (length left-paren-pos)))
+	      (while (< left-paren-index left-paren-count)
+		(let ((paren-pos (nth left-paren-index left-paren-pos)))
+		  (unless (consp paren-pos)
+		    (goto-char paren-pos)
+		    (when (looking-at "{")
+		      (let* ((search-end-pos
+			      (if (< left-paren-index (1- left-paren-count))
+				  (let ((pos (nth (1+ left-paren-index) left-paren-pos)))
+				    (if (consp pos)
+					(cdr pos)
+				      pos))
+				(point-min)))
+			     (case-fold-search nil)
+			     (class-pos (re-search-backward jde-parse-class-decl-re search-end-pos t)))
+			(if class-pos
+			    (throw
+			     'class-found
+			     (cons (match-string-no-properties 2)
+				   (match-beginning 1))))))))
+		(setq left-paren-index (1+ left-paren-index)))))))))
 
 (defun jde-parse-get-class-at-point ()
   (let ((class-info (jde-parse-get-innermost-class-at-point))
@@ -777,8 +787,8 @@ could be found."
       (while (and
 	      (< try-count max-try-count)
 	      (not
-	       (= (count ?< (buffer-substring (point) lastpos))
-		  (count ?> (buffer-substring (point) lastpos)))))
+	       (= (cl-count ?< (buffer-substring (point) lastpos))
+		  (cl-count ?> (buffer-substring (point) lastpos)))))
 	(setq try-count (1+ try-count))
 	(backward-word 1)))
 
@@ -814,8 +824,8 @@ could be found."
 	(while (and
 		(< try-count max-try-count)
 		(not
-		 (= (count ?< (buffer-substring (point) lastpos))
-		    (count ?> (buffer-substring (point) lastpos)))))
+		 (= (cl-count ?< (buffer-substring (point) lastpos))
+		    (cl-count ?> (buffer-substring (point) lastpos)))))
 	  (setq try-count (1+ try-count))
 	  (backward-word 1)))
 
@@ -871,39 +881,38 @@ otherwise nil."
 	    (nth 4 state))
 	t)))
 
+(defun jde-parse--search-class (class pos)
+  ;; Define an internal function that recursively searches a class
+  ;; and its subclasses for a method containing point.
+  (let* ((class-name       (semantic-tag-name class))
+	 (class-parts      (semantic-tag-type-members class))
+	 (class-subclasses (semantic-brute-find-tag-by-class 'type class-parts))
+	 (class-methods    (semantic-brute-find-tag-by-class 'function class-parts)))
+
+    ;; Is point in a method of a subclass of this class?
+    (loop for subclass in class-subclasses do
+	  (jde-parse--search-class subclass pos))
+
+    ;; Is point in any of the methods of this class?
+    (loop for method in class-methods do
+	  (let* ((method-name  (semantic-tag-name method))
+		 (method-start (semantic-tag-start method))
+		 (method-end   (semantic-tag-end method)))
+	    (when (and (>= pos method-start)
+		       (<= pos method-end))
+	      (throw 'found (cons (cons class-name method-name)
+				  (cons method-start method-end))))))))
+
 (defun jde-parse-get-method-at-point (&optional position)
   "Gets the method at POSITION, if specified, otherwise at point.
 Returns (CLASS_NAME . METHOD_NAME) if the specified position is
 in a method; otherwise, nil."
-  ;; Define an internal function that recursively searches a class
-  ;; and its subclasses for a method containing point.
-  (flet ((search-class
-	  (class pos)
-	  (let* ((class-name       (semantic-tag-name class))
-		 (class-parts      (semantic-tag-type-members class))
-		 (class-subclasses (semantic-brute-find-tag-by-class 'type class-parts))
-		 (class-methods    (semantic-brute-find-tag-by-class 'function class-parts)))
-
-	    ;; Is point in a method of a subclass of this class?
-	    (loop for subclass in class-subclasses do
-		  (search-class subclass pos))
-
-	    ;; Is point in any of the methods of this class?
-	    (loop for method in class-methods do
-		  (let* ((method-name  (semantic-tag-name method))
-			 (method-start (semantic-tag-start method))
-			 (method-end   (semantic-tag-end method)))
-		    (when (and (>= pos method-start)
-			       (<= pos method-end))
-		      (throw 'found (cons (cons class-name method-name)
-					  (cons method-start method-end)))))))))
-
-    (let* ((pos (if position position (point)))
-	   (tokens (semantic-fetch-tags))
-	   (classes (semantic-brute-find-tag-by-class 'type tokens)))
-      (catch 'found
-	(loop for class in classes
-	      do (search-class class pos))))))
+  (let* ((pos (if position position (point)))
+	 (tokens (semantic-fetch-tags))
+	 (classes (semantic-brute-find-tag-by-class 'type tokens)))
+    (catch 'found
+      (loop for class in classes
+	    do (jde-parse--search-class class pos)))))
 
 (defclass jde-avl-tree ()
   ((tree        :initarg tree
@@ -981,6 +990,27 @@ in a method; otherwise, nil."
    (< (car (cdr m1)) (car (cdr m2)))
    (< (cdr (cdr m1)) (car (cdr m2)))))
 
+(defun jde-parse--add-methods (method-map class)
+  (let* ((class-name       (semantic-tag-name class))
+	 (class-parts      (semantic-tag-type-members class))
+	 (class-subclasses (semantic-brute-find-tag-by-class 'type class-parts))
+	 (class-methods    (semantic-brute-find-tag-by-class 'function class-parts)))
+
+    ;; Add methods of subclasses
+    (loop for subclass in class-subclasses do
+	  (jde-parse--add-methods method-map subclass))
+
+    ;; Add methods of this class?
+    (loop for method in class-methods do
+	  (let* ((method-name  (semantic-tag-name method))
+		 (method-start (semantic-tag-start method))
+		 (method-end   (semantic-tag-end method)))
+	    (jde-avl-tree-add
+	     method-map
+	     (cons
+	      (cons class-name method-name)
+	      (cons method-start method-end)))))))
+
 (defmethod initialize-instance ((this jde-parse-method-map) &rest fields)
   "Constructor for method map."
 
@@ -989,32 +1019,10 @@ in a method; otherwise, nil."
   ;; Call parent initializer.
   (call-next-method)
 
-  (flet ((add-methods
-	  (class)
-	  (let* ((class-name       (semantic-tag-name class))
-		 (class-parts      (semantic-tag-type-members class))
-		 (class-subclasses (semantic-brute-find-tag-by-class 'type class-parts))
-		 (class-methods    (semantic-brute-find-tag-by-class 'function class-parts)))
-
-	    ;; Add methods of subclasses
-	    (loop for subclass in class-subclasses do
-		  (add-methods subclass))
-
-	    ;; Add methods of this class?
-	    (loop for method in class-methods do
-		  (let* ((method-name  (semantic-tag-name method))
-			 (method-start (semantic-tag-start method))
-			 (method-end   (semantic-tag-end method)))
-		    (jde-avl-tree-add
-		     this
-		     (cons
-		      (cons class-name method-name)
-		      (cons method-start method-end))))))))
-
-    (let* ((tokens (semantic-fetch-tags))
-	   (classes (semantic-brute-find-tag-by-class 'type tokens)))
-      (loop for class in classes do
-	    (add-methods class)))))
+  (let* ((tokens (semantic-fetch-tags))
+	 (classes (semantic-brute-find-tag-by-class 'type tokens)))
+    (loop for class in classes do
+	  (jde-parse--add-methods this class))))
 
 (defmethod jde-parse-method-map-get-method-at ((this jde-parse-method-map) &optional pos)
   "Get the method at POS, if specified, otherwise, at point."
@@ -1703,36 +1711,36 @@ or `nil' if the passed class name doesn't look like a class (by the Sun Java
 codeing standard).
 
 The first two elements of the list are `nil' if CLASSNAME isn't fully qualifed."
-  (flet ((is-first-cap
-	  (str)
-	  (unless (= 0 (length str))
-	    (let ((char (substring str 0 1)))
-	      (string= char (upcase char)))))
-	 (is-all-cap
-	  (str)
-	  (string= str (upcase str)))
-	 (parse-at-point
-	  (classname)
-	  (let ((nopkgclass classname)
-		end-pos fq pkg)
-	    (when (> (length classname) 0)
-	      (setq end-pos (position ?. classname :from-end t))
-	      (if end-pos
-		  (setq fq classname
-			pkg (substring fq 0 end-pos)
-			classname (substring fq (1+ end-pos))))
-	      (when (and (> (length nopkgclass) 0)
-			 (is-first-cap classname))
-		;; either a class can be all caps with a package behind it
-		;; (i.e. com.google.gwt.core.client.GWT) or it can be class
-		;; with a constant in front of it (i.e. Color.WHITE), currently
-		;; support the latter instead of kludging this now
-		;; --PL 2010-06-30
- 		(if (and (> (length classname) 1)
- 			 (is-all-cap classname))
-		    ;; looks like <class>.<sym> (i.e. Color.WHITE)
-		    nil
-		  (list fq pkg classname)))))))
+  (cl-flet* ((is-first-cap
+	      (str)
+	      (unless (= 0 (length str))
+		(let ((char (substring str 0 1)))
+		  (string= char (upcase char)))))
+	     (is-all-cap
+	      (str)
+	      (string= str (upcase str)))
+	     (parse-at-point
+	      (classname)
+	      (let ((nopkgclass classname)
+		    end-pos fq pkg)
+		(when (> (length classname) 0)
+		  (setq end-pos (cl-position ?. classname :from-end t))
+		  (if end-pos
+		      (setq fq classname
+			    pkg (substring fq 0 end-pos)
+			    classname (substring fq (1+ end-pos))))
+		  (when (and (> (length nopkgclass) 0)
+			     (is-first-cap classname))
+		    ;; either a class can be all caps with a package behind it
+		    ;; (i.e. com.google.gwt.core.client.GWT) or it can be class
+		    ;; with a constant in front of it (i.e. Color.WHITE), currently
+		    ;; support the latter instead of kludging this now
+		    ;; --PL 2010-06-30
+		    (if (and (> (length classname) 1)
+			     (is-all-cap classname))
+			;; looks like <class>.<sym> (i.e. Color.WHITE)
+			nil
+		      (list fq pkg classname)))))))
     (if (eq classname 'point)
 	;; TODO: a fully qualified class name looks like a file name
 	;; (i.e. [a-zA-Z.])  but this need to be refined to use the Sun Java

@@ -26,10 +26,19 @@
 
 (require 'tempo)
 
+;; FIXME: (require 'cc-cmds) doesn't work
+(declare-function c-indent-line "cc-cmds" (&optional syntax quiet ignore-point-pos))
+(declare-function c-indent-exp "cc-cmds" (&optional shutup-p))
+(declare-function c-indent-command "cc-cmds" (&optional arg))
 
-;; quiet "reference to free variable" build-time warnings
+;; FIXME: refactor
+(declare-function jde-import-find-and-import "jde-import" (class &optional no-errors no-exclude qualifiedp))
+(declare-function jde-package-convert-directory-to-package "jde-package" (dir))
+(declare-function jde-package-get-package-directory "jde-package" ())
+(declare-function jde-wiz-get-name "jde-wiz" (variable))
+(declare-function jde-wiz-implement-interface-internal "jde-wiz" (interface-name))
+(defvar jde-jdk-registry)
 (defvar jde-package-unknown-package-name)
-
 
 ;; Allow tempo to understand ~ as destination of point
 ;; http://www.emacswiki.org/emacs/TempoMode#toc3
@@ -481,34 +490,34 @@ This function takes care of `jde-gen-final-methods' and
 `jde-gen-final-arguments'. final modifiers will be added
 according to those flags.
 
-If a parameter to this function is empty or nil, then it is omitted
-(as well as the corresponding padding, whitespace and/or Java keywords)."
+If a parameter to this function is empty or nil, then it is omitted,
+as well as the corresponding padding, whitespace and/or Java keywords."
 
-(if (> (length type) 0) ; ordinary method?
-    (setq access (jde-gen-final-method-modifier access)))
-(let ((sig
-       (concat
-	(if (> (length access) 0)
-	    (concat access " ")
-	  ());; if no access (e.g. "public static"), then nothing
-	(if (> (length type) 0)
-	    (concat type " ")
-	  ());; if no type (e.g. "boolean" or "void"), then nothing
-	name
-	jde-gen-method-signature-padding-1
-	"("
-	(if (> (length arglist) 0)
-	    (concat jde-gen-method-signature-padding-2 (jde-gen-final-argument-modifier arglist)
-		    jde-gen-method-signature-padding-2 )
-	  ())
-	")"
-	(if (> (length throwslist) 0)
-	    (concat " throws " throwslist)
-	  ())
-	(if jde-gen-k&r
-	    jde-gen-method-signature-padding-3
-	  ()))))
-  sig))
+  (if (> (length type) 0) ; ordinary method?
+      (setq access (jde-gen-final-method-modifier access)))
+  (let ((sig
+	 (concat
+	  (if (> (length access) 0)
+	      (concat access " ")
+	    ());; if no access (e.g. "public static"), then nothing
+	  (if (> (length type) 0)
+	      (concat type " ")
+	    ());; if no type (e.g. "boolean" or "void"), then nothing
+	  name
+	  jde-gen-method-signature-padding-1
+	  "("
+	  (if (> (length arglist) 0)
+	      (concat jde-gen-method-signature-padding-2 (jde-gen-final-argument-modifier arglist)
+		      jde-gen-method-signature-padding-2 )
+	    ())
+	  ")"
+	  (if (> (length throwslist) 0)
+	      (concat " throws " throwslist)
+	    ())
+	  (if jde-gen-k&r
+	      jde-gen-method-signature-padding-3
+	    ()))))
+    sig))
 
 (defcustom jde-gen-class-create-constructor t
   "*If non-nil, generate constructor for `jde-gen-class-buffer'."

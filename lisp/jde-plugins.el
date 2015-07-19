@@ -25,8 +25,11 @@
 
 ;;; Commentary:
 
+(require 'cl-lib)
 (require 'eieio)
 (require 'executable)
+(require 'jde-util);; jde-root
+(require 'semantic/util-modes);; semantic-add-minor-mode
 
 (defcustom jde-plugins-directory (expand-file-name "plugins" (jde-root))
   "Location of the JDEE's plugins directory."
@@ -152,7 +155,7 @@ jar program is on the system path."
        (list "JDEpi")
        (delq
 	nil
-	(mapcan
+	(cl-mapcan
 	 (lambda (plugin)
 	   (oref plugin menu-spec))
 	 (oref-default 'jde-plugin plugins))))))
