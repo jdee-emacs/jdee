@@ -3178,9 +3178,7 @@ of the current class from semantic via `semantic-current-tag'."
 	 (super (car (semantic-tag-type-superclasses class-tag)))
 	 (extends (and super (not (string= "Object" super))))
 	 (first t)
-	 (str-bld-type (if (< 1.4 (string-to-number (caar jde-jdk-registry)))
-			   "StringBuilder"
-			 "StringBuffer")))
+	 (str-bld-type "StringBuilder"))
     (list 'l '>
 	  (format "return new %s(" str-bld-type)
 	  (cons 'l (mapcar
