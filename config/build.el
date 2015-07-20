@@ -47,10 +47,4 @@ AUTOLOAD-LIBNAME the name of the generated autoload file."
 (require 'autoload)
 (jde-make-autoloads-and-compile (expand-file-name "@{build.lisp.dir}")
 				"@{src.lisp.dir}"
-				'("common"
-				  "eieio"
-				  "semantic"
-				  "semantic/bovine"
-				  "speedbar"
-				  )
 				"@{build.lisp.autoload.libname}")

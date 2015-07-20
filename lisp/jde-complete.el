@@ -912,7 +912,7 @@ string -  show completions in-line, cycling thru them."
 (defun jde-complete-pair (pair completion-type)
   "PAIR is (PREFIX PARTIAL). COMPLETION-TYPE is as for `jde-complete-generic'."
   (let ((completion-list
-	 (jde-complete-find-completion-for-pair pair nil (jde-complete-get-access pair)))
+	 (jde-complete-find-completion-for-pair pair nil (jde-complete-get-access pair))))
 
     (if (null completion-list)
 	;; Check if PREFIX is in the current class
