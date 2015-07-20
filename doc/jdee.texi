@@ -361,13 +361,6 @@ Java Development Kit (@abbr{JDK}) or compatible set of Java development tools
 Web browser for viewing documentation
 
 @item
-Latest versions of Eric Ludlam's Speedbar, Semantic, and EIEIO
-packages available for download from the CEDET home page
-
-@item
-The elib package available from the JDEE web site
-
-@item
 Bash or another Unix-style shell highly recommended for Windows
 environments. The cygwin Unix emulation package for Windows from Red
 Hat includes Bash

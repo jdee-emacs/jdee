@@ -54,7 +54,7 @@
 
 	    div.component li {
 	    margin-bottom: 0pt;
-	    }            
+	    }
 	</style>
 	<title>Installing JDEE</title>
   </head>
@@ -88,7 +88,7 @@
       To use JDEE you need
     </p>
     <ul>
-      <li>GNU Emacs 23.4 or later</li>
+      <li>GNU Emacs 24.3 or later</li>
 
       <li>A Java Development Kit (JDK). Oracle's Java platforms
       (including releases from Sun Microsystems) are known to work,
@@ -178,6 +178,7 @@ $ tar jxf ~/Downloads/jdee-bin-2.4.1.bz2
     <h2>Building From Source</h2>
 
     <h3>Getting the latest source</h3>
+    <!-- FIXME: change to github -->
     <p>
       The <a href="https://jdee.svn.sourceforge.net/svnroot/jdee">JDEE
       source code repository</a> is maintained with <a
@@ -253,7 +254,7 @@ $ ln -s /usr/share/java/ant-contrib.jar ~/.ant/lib
     </p>
     <div class="code">
       <pre>
-$ tar zxf ~/Downloads/ant-contrib-1.0b2-bin.tar.gz 
+$ tar zxf ~/Downloads/ant-contrib-1.0b2-bin.tar.gz
 $ mkdir -p ~/.ant/lib
 $ cp ant-contrib/lib/ant-contrib.jar ~/.ant/lib
 </pre>
@@ -292,8 +293,6 @@ $ cp ant-contrib/lib/ant-contrib.jar ~/.ant/lib
 #Sun, 07 Oct 2012 16:43:21 -0700
 
 config.time=2012/10/07 16\:43
-cedet.dir=
-elib.dir=
 prefix.dir=/usr/local/jdee
 build.bin.emacs=emacs
 </pre>

@@ -240,17 +240,6 @@ The Java Development Environment (JDE) is an Emacs Lisp
 	  </fo:block>
                   </fo:list-item-body>
                </fo:list-item>
-               <fo:list-item id="c41b2b1b3b2b4" space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em">
-                  <fo:list-item-label>
-                     <fo:block>•</fo:block>
-                  </fo:list-item-label>
-                  <fo:list-item-body>
-                     <fo:block>
-	    The elib package available from the 
-	    <fo:simple-link external-destination="http://jdee.sourceforge.net/">JDE web site</fo:simple-link> [http://jdee.sourceforge.net/]
-	  </fo:block>
-                  </fo:list-item-body>
-               </fo:list-item>
                <fo:list-item id="c41b2b1b3b2b5" space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em">
                   <fo:list-item-label>
                      <fo:block>•</fo:block>
