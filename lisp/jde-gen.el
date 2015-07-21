@@ -37,7 +37,7 @@
 (declare-function jde-package-get-package-directory "jde-package" ())
 (declare-function jde-wiz-get-name "jde-wiz" (variable))
 (declare-function jde-wiz-implement-interface-internal "jde-wiz" (interface-name))
-(defvar jde-jdk-registry)
+
 (defvar jde-package-unknown-package-name)
 
 ;; Allow tempo to understand ~ as destination of point
