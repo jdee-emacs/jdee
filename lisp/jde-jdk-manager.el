@@ -4,7 +4,7 @@
 
 ;;; Code:
 
-(defun jde-set-jdk-dir-type (sym val)
+(defun jde--jdk-set-dir-type (sym val)
   (if val
       (let ((type
 	     (list
@@ -31,7 +31,7 @@
       (customize-set-value 'jde-jdk nil)))
   (set-default sym val))
 
-(defun jde-default-jdk-registry ()
+(defun jde-jdk-build-default-registry ()
   "Attempts to build a default value for jde-jdk-registry.
 This function uses platform specific rules and/or heuristics to
 pick a sensible default for jde-jdk-registry."
@@ -73,7 +73,7 @@ pick a sensible default for jde-jdk-registry."
 
 
 ;; (makunbound 'jde-jdk-registry)
-(defcustom jde-jdk-registry (jde-default-jdk-registry)
+(defcustom jde-jdk-registry (jde-jdk-build-default-registry)
   "Specifies the versions and locations of the JDKs installed on your
 system.  For each JDK to be registered, enter the version number
 \(e.g., 1.4.0) of the JDK in the Version field. Enter the path of the
@@ -87,7 +87,7 @@ first."
 	   :tag "JDK"
 	   (string :tag "Version")
 	   (string :tag "Path")))
-  :set 'jde-set-jdk-dir-type)
+  :set 'jde--jdk-set-dir-type)
 
 (provide 'jde-jdk-manager)
 ;;; jde-jdk-manager ends here
