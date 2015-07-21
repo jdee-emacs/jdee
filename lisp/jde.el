@@ -307,14 +307,7 @@ registered JDK.  Select the button of the JDK that you want to use for
 the current project."
   :group 'jde-project
   :type 'symbol
-
-  (if (or (featurep 'xemacs) (< emacs-major-version 21))
-      :set
-    :set-after)
-
-  (if (or (featurep 'xemacs) (< emacs-major-version 21))
-      'custom-set-default
-    '(jde-jdk-registry)))
+  :set-after '(jde-jdk-registry))
 
 ;;;###autoload
 (defun jde-version ()
