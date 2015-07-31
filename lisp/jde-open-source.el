@@ -384,16 +384,16 @@ CONFIRM-FQ-P, if non-nil, confirm the class name even when there
 is only one unique fully qualified class found for the simple
 class name \(that is the class without the package part in the
 name)."
-  (cl-flet ((sort-helper
-	     (a b)
-	     (dolist (pkg jde-preferred-packages)
-	       (let ((len (length pkg)))
-		 (cond ((eq t (compare-strings pkg 0 len a 0 len))
-			(return t))
-		       ((eq t (compare-strings pkg 0 len b 0 len))
-			(return nil))
-		       (t (string< a b)))))))
-    (setq classes (sort classes 'sort-helper))
+  (let ((sort-helper
+	 (lambda (a b)
+	   (dolist (pkg jde-preferred-packages)
+	     (let ((len (length pkg)))
+	       (cond ((eq t (compare-strings pkg 0 len a 0 len))
+		      (return t))
+		     ((eq t (compare-strings pkg 0 len b 0 len))
+		      (return nil))
+		     (t (string< a b))))))))
+    (setq classes (sort classes sort-helper))
     (setq prompt (or prompt "Class"))
     (let ((default (if uq-name
 		       (jde-import-get-import uq-name))))
