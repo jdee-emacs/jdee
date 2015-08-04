@@ -55,34 +55,47 @@
    ((string-match "-\\([45678]\\)-" dir)
     (concat "1." (match-string 1 dir)))))
 
+(defun jde--jdk-find-darwin-jdk ()
+  "Return a (VERSION DIR) pair or nil when not found.
+Mac OS X default."
+  (let (version dir)
+    (when (file-executable-p "/usr/libexec/java_home")
+      (setq dir (substring (shell-command-to-string "/usr/libexec/java_home")
+			   0 -1))
+      (if (string-match "\\(1\\.[45678]\\)\\.[0-9]" dir)
+	  (setq version (match-string 1 dir))))
+    (and version dir (list (cons version dir)))))
+
+(defun jde--jdk-find-linux-jdk ()
+  "Return a (VERSION DIR) pair or nil when not found."
+  ;; On Linux use the default javac if it is installed.
+  (let (version dir)
+    (when (file-executable-p "/usr/bin/javac")
+      (let ((javac "/usr/bin/javac"))
+	(while (file-symlink-p javac)
+	  (setq javac (file-symlink-p javac)))
+	(setq dir (expand-file-name ".." (file-name-directory javac)))
+	(setq version (jde--jdk-get-version dir))))
+    (and version dir (list (cons version dir)))))
+
+(defun jde--jdk-find-other-os-jdk ()
+  "Return a (VERSION DIR) pair or nil when not found."
+  ;; On other systems the user needs to customize this to get a
+  ;; fully functional install (patches welcome!)
+  nil)
+
 (defun jde-jdk-build-default-registry ()
   "Attempts to build a default value for jde-jdk-registry.
 This function uses platform specific rules and/or heuristics to
 pick a sensible default for jde-jdk-registry."
-  (let (version dir)
-    ;; Set version and dir for the current system
-    (cond
-     ;; Mac OS X: find default
-     ((eq system-type 'darwin)
-      (when (file-executable-p "/usr/libexec/java_home")
-	(setq dir (substring (shell-command-to-string "/usr/libexec/java_home")
-			     0 -1))
-	(if (string-match "\\(1\\.[45678]\\)\\.[0-9]" dir)
-	    (setq version (match-string 1 dir)))))
-
-     ;; On Linux use the default javac if it is installed
-     ((eq system-type 'gnu/linux)
-      (when (file-executable-p "/usr/bin/javac")
-	(let ((javac "/usr/bin/javac"))
-	  (while (file-symlink-p javac)
-	    (setq javac (file-symlink-p javac)))
-	  (setq dir (expand-file-name ".." (file-name-directory javac)))
-	  (setq version (jde--jdk-get-version dir)))))
-     ;; On other systems the user needs to customize this to get a
-     ;; fully functional install (patches welcome!)
-     (t
-      nil))
-    (and version dir (list (cons version dir)))))
+  ;; Set version and dir for the current system
+  (cond
+   ((eq system-type 'darwin)
+    (jde--jdk-find-darwin-jdk))
+   ((eq system-type 'gnu/linux)
+    (jde--jdk-find-linux-jdk))
+   (t
+    (jde--jdk-find-other-os-jdk))))
 
 
 ;; (makunbound 'jde-jdk-registry)
