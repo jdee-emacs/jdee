@@ -21,6 +21,28 @@
     (let ((system-type st))
       (should (null (jde-jdk-build-default-registry))))))
 
+(ert-deftest jde-jdk-build-default-registry-darwin-test ()
+  "Should return default registry for Darwin."
+  ;; No JDK found:
+  (cl-letf ((system-type 'darwin)
+            ((symbol-function 'file-executable-p)
+             (lambda (filename)
+               (should (string= "/usr/libexec/java_home" filename))
+               nil)))
+    (should (null (jde-jdk-build-default-registry))))
+
+  ;; JDK in default path:
+  (cl-letf ((system-type 'darwin)
+            ((symbol-function 'file-executable-p)
+             (lambda (filename)
+               (should (string= "/usr/libexec/java_home" filename))))
+            ((symbol-function 'shell-command-to-string)
+             (lambda (command)
+               (should (string= "/usr/libexec/java_home" command))
+               "/usr/lib64/jvm/jdk1.7.0_21/")))
+    (should (equal '(("1.7" . "/usr/lib64/jvm/jdk1.7.0_21"))
+                   (jde-jdk-build-default-registry)))))
+
 (ert-deftest jde--jdk-get-version-test ()
   "Should return version for given directory."
 
