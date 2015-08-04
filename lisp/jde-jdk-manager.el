@@ -1,8 +1,15 @@
 ;;; package --- Finds and manages access to JDKs
 
 ;;; Commentary:
+;; This code is responsible for finding installed JDKs and defining
+;; default `jde-jdk-registry', which is a set of pairs (version dir).
+;;
+;; It tries to find JDKs in default paths for each system. For example
+;; for GNU/Linux usually it is "/usr/lib/jvm".
 
 ;;; Code:
+
+(require 'cl-macs)
 
 (defun jde--jdk-set-dir-type (sym val)
   (if val
@@ -31,6 +38,23 @@
       (customize-set-value 'jde-jdk nil)))
   (set-default sym val))
 
+(defun jde--jdk-get-version (dir)
+  "Return version of JDK in given DIR."
+  (cond
+   ((null dir) nil)
+
+   ;; java-1.6.0-openjdk-amd64 or jdk1.7.0_21 etc.
+   ((string-match "\\(1\\.[4567]\\)\\.[0-9]" dir)
+    (match-string 1 dir))
+
+   ;; j2sdk1.6-oracle etc
+   ((string-match "[^0-9]\\(1\\.[4567]\\)\\-" dir)
+    (match-string 1 dir))
+
+   ;; java-7-openjdk-amd64 etc
+   ((string-match "-\\([45678]\\)-" dir)
+    (concat "1." (match-string 1 dir)))))
+
 (defun jde-jdk-build-default-registry ()
   "Attempts to build a default value for jde-jdk-registry.
 This function uses platform specific rules and/or heuristics to
@@ -53,18 +77,7 @@ pick a sensible default for jde-jdk-registry."
 	  (while (file-symlink-p javac)
 	    (setq javac (file-symlink-p javac)))
 	  (setq dir (expand-file-name ".." (file-name-directory javac)))
-	  (cond
-	   ;; java-1.6.0-openjdk-amd64 or jdk1.7.0_21 etc.
-	   ((string-match "\\(1\\.[4567]\\)\\.[0-9]" dir)
-	    (setq version (match-string 1 dir)))
-
-	   ;; j2sdk1.6-oracle etc
-	   ((string-match "[^0-9]\\(1\\.[4567]\\)\\-" dir)
-	    (setq version (match-string 1 dir)))
-
-	   ;; java-7-openjdk-amd64 etc
-	   ((string-match "-\\([45678]\\)-" dir)
-	    (setq version (concat "1." (match-string 1 dir))))))))
+	  (setq version (jde--jdk-get-version dir)))))
      ;; On other systems the user needs to customize this to get a
      ;; fully functional install (patches welcome!)
      (t
