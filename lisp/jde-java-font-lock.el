@@ -412,16 +412,7 @@ expression in the returned regexp.  ALIASES are other names for TAG."
 				   ""))
 		    (cons tag aliases)
 		    "\\|"))
-	   (hit-re (if (or (and (featurep 'xemacs)
-				(or (< emacs-major-version 21)
-				    (and (= emacs-major-version 21)
-					 (< emacs-minor-version 4))))
-			   (< emacs-major-version 21))
-		       ".*"
-		     ;; In GNU Emacs 21 use the "non-greedy" variant of
-		     ;; the operator `*' to match the smallest possible
-		     ;; substring.
-		     "\\(.\\|[\r\n]\\)*?")))
+	   (hit-re "\\(.\\|[\r\n]\\)*?"))
       (format "<\\(%s\\)>\\(%s\\)</\\(%s\\)>" tag-re hit-re tag-re)
       )))
 
@@ -758,9 +749,8 @@ match all the names."
 There is a different cache file for each major version of (X)Emacs
 because of incompatible regular expressions returned by `regexp-opt'."
   (and jde-java-font-lock-api-file
-       (format "%s.%semacs-%d.apicache"
+       (format "%s.emacs-%d.apicache"
 	       jde-java-font-lock-api-file
-	       (if (featurep 'xemacs) "x" "")
 	       emacs-major-version)))
 
 (defconst jde-java-font-lock-api-cache-file-header
@@ -1105,35 +1095,32 @@ When `jde-use-font-lock' is non-nil syntax coloring is always turned
 on and uses `java-font-lock-keywords-4' extra level of fontification.
 If `jde-use-font-lock' is nil syntax coloring rules are those of
 standard `java-mode'."
-  (when (or (featurep 'xemacs)          ; XEmacs and Emacs 21 support
-	    (> emacs-major-version 20)  ; colors on ordinary terminal.
-	    window-system)              ; Others only on `window-system'.
-    ;; If `jde-use-font-lock' is non-nil setup
-    ;; `java-font-lock-keywords-4' extra level of fontification.
-    (when jde-use-font-lock
-      ;; Setup `font-lock-defaults'
-      (set (make-local-variable 'font-lock-defaults)
-	   jde-java-font-lock-defaults)
-      ;; Use the maximum decoration available
-      (set (make-local-variable 'font-lock-maximum-decoration) t)
-      ;; Handle multiline
-      (set (make-local-variable 'font-lock-multiline) t)
-      )
-    ;; Turn on Font Lock Mode as needed (based on parent `java-mode'
-    ;; if `jde-use-font-lock' is nil).
-    (let ((major-mode (if jde-use-font-lock major-mode 'java-mode)))
-      (if (featurep 'xemacs)
-	  ;; The following is intended to avoid a byte-compilation warning
-	  ;; when compiling this file under Emacs. The Emacs version of
-	  ;; font-lock-set-defaults accepts no arguments.
-	  (apply 'font-lock-set-defaults (list t))
-	(if global-font-lock-mode
-	    (if (fboundp 'turn-on-font-lock-if-enabled)
-		(turn-on-font-lock-if-enabled)
-	      (turn-on-font-lock-if-desired)))))  ;; Newer emacs renamed -if-enabled to -if-desired
-    ;; Always turn on font locking if `jde-use-font-lock' is non-nil.
-    (if jde-use-font-lock
-	(turn-on-font-lock))))
+  ;; If `jde-use-font-lock' is non-nil setup
+  ;; `java-font-lock-keywords-4' extra level of fontification.
+  (when jde-use-font-lock
+    ;; Setup `font-lock-defaults'
+    (set (make-local-variable 'font-lock-defaults)
+	 jde-java-font-lock-defaults)
+    ;; Use the maximum decoration available
+    (set (make-local-variable 'font-lock-maximum-decoration) t)
+    ;; Handle multiline
+    (set (make-local-variable 'font-lock-multiline) t)
+    )
+  ;; Turn on Font Lock Mode as needed (based on parent `java-mode'
+  ;; if `jde-use-font-lock' is nil).
+  (let ((major-mode (if jde-use-font-lock major-mode 'java-mode)))
+    (if (featurep 'xemacs)
+	;; The following is intended to avoid a byte-compilation warning
+	;; when compiling this file under Emacs. The Emacs version of
+	;; font-lock-set-defaults accepts no arguments.
+	(apply 'font-lock-set-defaults (list t))
+      (if global-font-lock-mode
+	  (if (fboundp 'turn-on-font-lock-if-enabled)
+	      (turn-on-font-lock-if-enabled)
+	    (turn-on-font-lock-if-desired)))))  ;; Newer emacs renamed -if-enabled to -if-desired
+  ;; Always turn on font locking if `jde-use-font-lock' is non-nil.
+  (if jde-use-font-lock
+      (turn-on-font-lock)))
 
 ;; Java has a different font for comments than Emacs Lisp, but by default,
 ;; `jde-java-font-lock-javadoc-face' inherits from `font-lock-doc-face', which
