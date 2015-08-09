@@ -43,7 +43,7 @@
   "Return full paths to dirs in given `PATHS'."
   (let (dirs)
     (dolist (path paths dirs)
-      (let ((all-files (directory-files path t)))
+      (let ((all-files (ignore-errors (directory-files path t))))
 	(setq all-files (delete (concat path "/" ".") all-files))
 	(setq all-files (delete (concat path "/" "..") all-files))
 	(dolist (f all-files dirs)
