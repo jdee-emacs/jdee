@@ -43,6 +43,67 @@
     (should (equal '(("1.7" . "/usr/lib64/jvm/jdk1.7.0_21"))
                    (jde-jdk-build-default-registry)))))
 
+(ert-deftest jde--jdk-find-dirs-test ()
+  "Should return list of directories in given path."
+  (cl-letf ((expected-dirs '("/usr/lib/jvm/java-8-oracle"
+                             "/usr/lib64/jvm/java-7-openjdk-amd64"))
+            ((symbol-function 'directory-files)
+             (lambda (path full-match)
+               (should full-match)
+               (if (string= "/usr/lib/jvm" path)
+                   '("/usr/lib/jvm/."
+                     "/usr/lib/jvm/.."
+                     "/usr/lib/jvm/.java-8-oracle.jinfo"
+                     "/usr/lib/jvm/default-java"
+                     "/usr/lib/jvm/java-8-oracle")
+                 '("/usr/lib64/jvm/."
+                   "/usr/lib64/jvm/.."
+                   "/usr/lib64/jvm/.java-1.7.0-openjdk-amd64.jinfo"
+                   "/usr/lib64/jvm/java-1.7.0-openjdk-amd64"
+                   "/usr/lib64/jvm/java-7-openjdk-amd64"))))
+            ((symbol-function 'file-directory-p)
+             (lambda (filename)
+               (member filename expected-dirs)))
+            ((symbol-function 'file-symlink-p)
+             (lambda (filename)
+               (not (file-directory-p filename)))))
+    (should (equal (sort (jde--jdk-find-dirs '("/usr/lib/jvm" "/usr/lib64/jvm")) #'string<)
+                   expected-dirs))))
+
+(ert-deftest jde-jdk-build-default-registry-linux-test ()
+  "Should return default registry for GNU/Linux."
+  ;; 'gnu/linux JDK paths:
+  ;; /usr/lib/jvm for Debian based and RedHat
+  ;; /usr/lib64/jvm for Open Suse
+
+  (let ((default-jvm-paths '("/usr/lib/jvm" "/usr/lib64/jvm")))
+    ;; No JDK found in default paths:
+    (cl-letf ((system-type 'gnu/linux)
+              ((symbol-function 'file-executable-p)
+               (lambda (filename)
+                 (should (string= "/usr/bin/javac" filename))
+                 nil))
+              ((symbol-function 'jde--jdk-find-dirs)
+               (lambda (paths)
+                 (should (equal paths default-jvm-paths))
+                 nil)))
+      (should (null (jde-jdk-build-default-registry))))
+
+    ;; JDKs in default paths:
+    (cl-letf ((system-type 'gnu/linux)
+              ((symbol-function 'file-executable-p)
+               (lambda (filename)
+                 (should (string= "/usr/bin/javac" filename))
+                 nil))
+              ((symbol-function 'jde--jdk-find-dirs)
+               (lambda (paths)
+                 (should (equal paths default-jvm-paths))
+                 '("/usr/lib/jvm/java-6-oracle"
+                   "/usr/lib/jvm/java-8-oracle"
+                   "/usr/lib/jvm/java-7-oracle"))))
+      (should (equal '("1.8" . "/usr/lib/jvm/java-8-oracle")
+                     (jde-jdk-build-default-registry))))))
+
 (ert-deftest jde--jdk-get-version-test ()
   "Should return version for given directory."
 
