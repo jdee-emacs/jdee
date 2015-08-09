@@ -87,7 +87,7 @@
                (lambda (paths)
                  (should (equal paths default-jvm-paths))
                  nil)))
-      (should (equal '(nil) (jde-jdk-build-default-registry))))
+      (should (null (jde-jdk-build-default-registry))))
 
     ;; JDKs in default paths:
     (cl-letf ((system-type 'gnu/linux)
@@ -101,7 +101,9 @@
                  '("/usr/lib/jvm/java-6-oracle"
                    "/usr/lib/jvm/java-8-oracle"
                    "/usr/lib/jvm/java-7-oracle"))))
-      (should (equal '(("1.8" . "/usr/lib/jvm/java-8-oracle"))
+      (should (equal '(("1.8" . "/usr/lib/jvm/java-8-oracle")
+                       ("1.7" . "/usr/lib/jvm/java-7-oracle")
+                       ("1.6" . "/usr/lib/jvm/java-6-oracle"))
                      (jde-jdk-build-default-registry))))))
 
 (ert-deftest jde--jdk-get-version-test ()
