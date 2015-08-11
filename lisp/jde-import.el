@@ -334,7 +334,7 @@ rt.jar. The NO-ERRORS is used to avoid showing erros to the user."
 		    class
 		  (message "Skipping: already imported %s" existing-import)
 		  'pass))))
-     (list (jde-read-class nil nil nil nil nil 'vfn) nil current-prefix-arg t)))
+     (list (jde-read-class nil nil nil nil nil #'vfn) nil current-prefix-arg t)))
   (if qualifiedp
       (unless (eq class 'pass)
 	(jde-parse-class-exists "java.util.List")
