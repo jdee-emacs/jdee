@@ -52,7 +52,7 @@
 	    (setq dirs (cons f dirs))))))))
 
 (defun jde--jdk-p (path)
-  "Return t if given PATH is path to Java Development Kit."
+  "Return t if given `PATH' is path to JDK (has Java compiler)."
   (file-executable-p (concat path "/bin/javac")))
 
 (defun jde--jdk-get-version (dir)
@@ -98,7 +98,7 @@ Mac OS X default."
 
     (dolist (dir (jde--jdk-find-dirs '("/usr/lib/jvm" "/usr/lib64/jvm")))
       (let ((version (jde--jdk-get-version dir)))
-	(when version
+	(when (and version (jde--jdk-p dir))
 	  (setq jdks (cons (cons version dir) jdks)))))
 
     ;; On Linux use the default javac if it is installed.

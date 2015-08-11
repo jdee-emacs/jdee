@@ -70,8 +70,8 @@
     (should (equal (sort (jde--jdk-find-dirs '("/usr/lib/jvm" "/usr/lib64/jvm")) #'string<)
                    expected-dirs))))
 
-(ert-deftest jde-jdk-build-default-registry-linux-test ()
-  "Should return default registry for GNU/Linux."
+(ert-deftest jde-jdk-build-default-registry-linux-no-jdks-test ()
+  "Should return empty when there are no JDKs in default paths for GNU/Linux."
   ;; 'gnu/linux JDK paths:
   ;; /usr/lib/jvm for Debian based and RedHat
   ;; /usr/lib64/jvm for Open Suse
@@ -87,20 +87,23 @@
                (lambda (paths)
                  (should (equal paths default-jvm-paths))
                  nil)))
-      (should (null (jde-jdk-build-default-registry))))
+      (should (null (jde-jdk-build-default-registry))))))
 
-    ;; JDKs in default paths:
+(ert-deftest jde-jdk-build-default-registry-linux-default-test ()
+  "Should return registry with JDKs loaded from default dirs for GNU/Linux."
+  ;; JDKs in default paths:
+  (let ((default-jvm-paths '("/usr/lib/jvm" "/usr/lib64/jvm")))
     (cl-letf ((system-type 'gnu/linux)
-              ((symbol-function 'file-executable-p)
-               (lambda (filename)
-                 (should (string= "/usr/bin/javac" filename))
-                 nil))
+              ((symbol-function 'jdk--jdk-p)
+               (lambda (path)
+                 (string-match "oracle" path)))
               ((symbol-function 'jde--jdk-find-dirs)
                (lambda (paths)
                  (should (equal paths default-jvm-paths))
                  '("/usr/lib/jvm/java-6-oracle"
                    "/usr/lib/jvm/java-8-oracle"
-                   "/usr/lib/jvm/java-7-oracle"))))
+                   "/usr/lib/jvm/java-7-oracle"
+                   "/usr/lib/jvm/java-7-openjdk-amd64"))))
       (should (equal '(("1.8" . "/usr/lib/jvm/java-8-oracle")
                        ("1.7" . "/usr/lib/jvm/java-7-oracle")
                        ("1.6" . "/usr/lib/jvm/java-6-oracle"))
