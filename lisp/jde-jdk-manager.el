@@ -83,8 +83,8 @@ Mac OS X default."
 	  (setq version (match-string 1 dir))))
     (and version dir (list (cons version dir)))))
 
-(defun jde--jdk-select-newest (jdks)
-  "Return the newest of `JDKS' or nil if empty."
+(defun jde--jdk-newest-first (jdks)
+  "Sort `JDKS' ordering from newest to oldest or nil when empty."
   (sort jdks
 	(lambda (c1 c2) ; Compare only versions:
 	  (string< (first c2) (first c1)))))
@@ -115,7 +115,7 @@ Mac OS X default."
     ;; Path scan and /usr/bin/javac may resolve to the same values:
     (delete-dups jdks)
 
-    (jde--jdk-select-newest jdks)))
+    (jde--jdk-newest-first jdks)))
 
 (defun jde--jdk-find-other-os-jdk ()
   "Return a (VERSION DIR) pair or nil when not found."
