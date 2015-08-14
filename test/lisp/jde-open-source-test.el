@@ -4,7 +4,6 @@
 
 (require 'ert)
 
-(require 'jde-autoload)
 (require 'beanshell)
 (require 'jde-open-source)
 

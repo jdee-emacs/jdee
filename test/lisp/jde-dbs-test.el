@@ -3,7 +3,6 @@
 ;;; Code:
 
 (require 'ert)
-(require 'jde-autoload)
 (require 'jde-dbs)
 
 (ert-deftest test-jde-dbs-proc ()
