@@ -94,7 +94,7 @@
   ;; JDKs in default paths:
   (let ((default-jvm-paths '("/usr/lib/jvm" "/usr/lib64/jvm")))
     (cl-letf ((system-type 'gnu/linux)
-              ((symbol-function 'jdk--jdk-p)
+              ((symbol-function 'jde--jdk-p)
                (lambda (path)
                  (string-match "oracle" path)))
               ((symbol-function 'jde--jdk-find-dirs)
