@@ -61,15 +61,15 @@
    ((null dir) nil)
 
    ;; java-1.6.0-openjdk-amd64 or jdk1.7.0_21 etc.
-   ((string-match "\\(1\\.[4567]\\)\\.[0-9]" dir)
+   ((string-match "\\(1\\.[456789]\\)\\.[0-9]" dir)
     (match-string 1 dir))
 
    ;; j2sdk1.6-oracle etc
-   ((string-match "[^0-9]\\(1\\.[4567]\\)\\-" dir)
+   ((string-match "[^0-9]\\(1\\.[456789]\\)\\-" dir)
     (match-string 1 dir))
 
    ;; java-7-openjdk-amd64 etc
-   ((string-match "-\\([45678]\\)-" dir)
+   ((string-match "-\\([456789]\\)-" dir)
     (concat "1." (match-string 1 dir)))))
 
 (defun jde--jdk-find-darwin-jdk ()
