@@ -122,7 +122,17 @@
   (should (string= "1.6" (jde--jdk-get-version "/usr/lib64/jvm/java-1.6.0-openjdk-amd64")))
   (should (string= "1.7" (jde--jdk-get-version "/usr/lib64/jvm/jdk1.7.0_21")))
   (should (string= "1.7" (jde--jdk-get-version "/usr/lib/jvm/java-7-openjdk-amd64")))
-  (should (string= "1.8" (jde--jdk-get-version "/usr/lib/jvm/java-8-oracle"))))
+  (should (string= "1.8" (jde--jdk-get-version "/usr/lib/jvm/java-8-oracle")))
+  (should
+   (string=
+    "1.8"
+    (jde--jdk-get-version
+     "/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.51-4.b16.fc22.x86_64")))
+    (should
+   (string=
+    "1.9"
+    (jde--jdk-get-version
+     "/usr/lib/jvm/java-1.9.0-openjdk-1.9.0.12-4.b16.fc22.x86_64"))))
 
 (provide 'jde-jdk-manager-test)
 ;;; jde-jdk-manager-test.el ends here
