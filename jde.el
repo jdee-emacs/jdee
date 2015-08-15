@@ -29,9 +29,8 @@
 
 ;;; Code:
 
-;; Autoloads and most of jde are required here to allow user to do
-;; just `(require 'jde)'
-(require 'jde-autoload)
+(defconst jde-xemacsp (string-match "XEmacs" (emacs-version))
+  "Non-nil if we are running in the XEmacs environment.")
 
 (require 'beanshell)
 (require 'browse-url)
@@ -81,9 +80,6 @@
   "Cedet minimum version")
 (defconst jde-cedet-max-version "2.0"
   "Cedet maximum version")
-
-(defconst jde-xemacsp (string-match "XEmacs" (emacs-version))
-  "Non-nil if we are running in the XEmacs environment.")
 
 (unless (fboundp 'custom-set-default)
   ;; FIXME: for xemacs?
