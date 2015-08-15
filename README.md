@@ -28,14 +28,12 @@ For more information, see ```doc/install.html```
 
 ## Build from source options
 
-1. Available Ant targets: ```ant -p```
-2. (_Always_) Run unit tests: ```ant test```
-3. Run JUnit tests: ```ant test-java```
-4. Build project: ```ant bindist```
+1. Run tests: ```cask exec ert-runner -L .```
+2. Compile: ```cask build```
 
 To use this built distribution without installation, in your .emacs add:
 ```emacs-lisp
-  (add-to-list 'load-path "/path/to/jdee/dist/jdee-2.4.2/lisp")
+  (add-to-list 'load-path "/path/to/jdee/dist/jdee-2.4.2")
   (load "jde-autoload")
 ```
 
@@ -43,7 +41,7 @@ If hacking on jde lisp, it is better to build in the git-controlled
 source directory, by adding:
 
 ```
-build.lisp.dir=${project.dir}/lisp
+build.lisp.dir=${project.dir}
 ```
 
 to ```~/.jdee-config.properties``` (```%USERDATA%/.jdee-config.properties``` on Windows)
