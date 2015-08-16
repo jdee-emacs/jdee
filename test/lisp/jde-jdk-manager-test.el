@@ -103,7 +103,9 @@
                  '("/usr/lib/jvm/java-6-oracle"
                    "/usr/lib/jvm/java-8-oracle"
                    "/usr/lib/jvm/java-7-oracle"
-                   "/usr/lib/jvm/java-7-openjdk-amd64"))))
+                   "/usr/lib/jvm/java-7-openjdk-amd64")))
+              ((symbol-function 'file-executable-p)
+               (lambda (path) nil)))
       (should (equal '(("1.8" . "/usr/lib/jvm/java-8-oracle")
                        ("1.7" . "/usr/lib/jvm/java-7-oracle")
                        ("1.6" . "/usr/lib/jvm/java-6-oracle"))
