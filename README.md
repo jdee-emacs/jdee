@@ -1,3 +1,7 @@
+[![MELPA](http://melpa.org/packages/jdee-badge.svg)](http://melpa.org/#/jdee)
+[![MELPA Stable](http://stable.melpa.org/packages/jdee-badge.svg)](http://stable.melpa.org/#/jdee)
+[![Build Status](https://travis-ci.org/jdee-emacs/jdee.png?branch=cask)](https://travis-ci.org/jdee-emacs/jdee)
+
 # JDEE
 
 The JDEE is an add-on software package that turns Emacs into a
