@@ -59,6 +59,11 @@
   :group 'jde
   :type 'boolean)
 
+(defcustom jde-server-dir ""
+  "Path to JDEE Java Backend JARs."
+  :group 'jde
+  :type 'directory)
+
 (defclass jde-bsh-buffer (bsh-comint-buffer) ()
   "JDEE's beanshell buffer")
 
@@ -71,16 +76,6 @@
 		     :type string
 		     :documentation
 		     "Path of the BeanShell commmand directory.")
-
-   (checkstyle-jar  :initarg :checkstyle-jar
-		    :type string
-		    :documentation
-		    "Path of the Checkstyle jar.")
-
-   (regexp-jar      :initarg :regexp-jar
-		    :type string
-		    :documentation
-		    "Path of the Jakarta regexp jar.")
 
    (jde-jar         :initarg :jde-jar
 		    :type string
@@ -101,17 +96,12 @@
 (defmethod initialize-instance ((this jde-bsh) &rest fields)
   "Constructor for the JDEE BeanShell instance."
   (call-next-method)
-  (let* ((jde-java-directory
-	  (concat
-	   (jde-find-jde-data-directory)
-	   "java/")))
 
+  (let* ((jde-java-directory jde-server-dir))
     (oset this bsh-cmd-dir (expand-file-name "bsh-commands" jde-java-directory))
-    (oset this checkstyle-jar  (expand-file-name "lib/checkstyle-all.jar" jde-java-directory))
-    (oset this regexp-jar (expand-file-name "lib/jakarta-regexp.jar" jde-java-directory))
     (oset this jde-classes-dir (expand-file-name "classes" jde-java-directory))
-    (oset this jde-jar (expand-file-name "lib/jde.jar" jde-java-directory))
-    (oset this jar  (expand-file-name "lib/bsh.jar" jde-java-directory))
+    (oset this jde-jar (expand-file-name "jde.jar" jde-java-directory))
+    (oset this jar  (expand-file-name "bsh.jar" jde-java-directory))
     (oset this separate-error-buffer jde-bsh-separate-buffer)
     (oset-default 'jde-bsh the-bsh this)))
 
@@ -143,21 +133,7 @@ the PRIMARY launch method is invoked."
 	 )
 
     (oset this vm (oref (jde-run-get-vm) :path))
-    (oset  this  cp (delq
-		     nil
-		     (append
-		      (list
-		       (oref this jar)
-		       (oref this bsh-cmd-dir)
-		       (oref this checkstyle-jar)
-		       (oref this regexp-jar)
-		       (if jde-devel-debug
-			   (oref this jde-classes-dir))
-		       (oref this jde-jar)
-		       (jde-get-tools-jar)
-		       (if ant-home (expand-file-name "lib" ant-home)))
-		      (jde-pi-get-bsh-classpath)
-		      (jde-expand-classpath (jde-get-global-classpath)))))))
+    (oset this cp (directory-files jde-server-dir t ".*\\.jar"))))
 
 ;; Create the BeanShell wrapper object.
 (jde-bsh "JDEE BeanShell")
