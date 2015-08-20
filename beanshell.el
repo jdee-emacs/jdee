@@ -528,6 +528,10 @@ to the string form required by the vm."
    nil "Specified vm does not exist: %s" (oref this vm))
 
   (cl-assert
+   (not (string= "" jde-server-dir))
+   nil "Point `jde-server-dir' to dir with JDEE jars.")
+
+  (cl-assert
    (file-exists-p (oref this jar))
    nil
    "Specified BeanShell jar filed does not exist: %s" (oref this jar))
@@ -535,42 +539,42 @@ to the string form required by the vm."
 
   (if (not (bsh-running-p this))
       (let*  ((dir
-		 (cond
-		  ((not (string= (oref this startup-dir) ""))
-		   (expand-file-name (oref this startup-dir)))
-		  ((buffer-file-name)
-		   (file-name-directory (buffer-file-name)))
-		  (t
-		   default-directory)))
-		(vm-args (list "-classpath" (bsh-build-classpath-argument this)))
-		(buffer
-		 (let ((buf (oref this buffer)))
-		   (if (bsh-buffer-live-p buf)
-		       buf
-		     (bsh-create-buffer this))))
-		(native-buff (oref buffer buffer)))
+               (cond
+                ((not (string= (oref this startup-dir) ""))
+                 (expand-file-name (oref this startup-dir)))
+                ((buffer-file-name)
+                 (file-name-directory (buffer-file-name)))
+                (t
+                 default-directory)))
+              (vm-args (list "-classpath" (bsh-build-classpath-argument this)))
+              (buffer
+               (let ((buf (oref this buffer)))
+                 (if (bsh-buffer-live-p buf)
+                     buf
+                   (bsh-create-buffer this))))
+              (native-buff (oref buffer buffer)))
 
 
-	  (setq vm-args (append vm-args (oref this vm-args)))
-	  (setq vm-args (append vm-args bsh-vm-args))
-	  (setq vm-args (append vm-args (list (oref this class-name))))
+        (setq vm-args (append vm-args (oref this vm-args)))
+        (setq vm-args (append vm-args bsh-vm-args))
+        (setq vm-args (append vm-args (list (oref this class-name))))
 
-	  (with-current-buffer native-buff
-	    (erase-buffer)
+        (with-current-buffer native-buff
+          (erase-buffer)
 
-	    (cd dir)
-	    (insert (concat "cd " dir "\n"))
-	    (insert
-	     (concat (oref this vm) " "
-		     (mapconcat (lambda (x) x) vm-args " ") "\n\n"))
+          (cd dir)
+          (insert (concat "cd " dir "\n"))
+          (insert
+           (concat (oref this vm) " "
+                   (mapconcat (lambda (x) x) vm-args " ") "\n\n"))
 
-	    (setq bsh-the-bsh this))
+          (setq bsh-the-bsh this))
 
-	  (message "%s" "Starting the BeanShell. Please wait...")
-	  (bsh-comint-buffer-exec buffer (oref this vm) vm-args)
+        (message "%s" "Starting the BeanShell. Please wait...")
+        (bsh-comint-buffer-exec buffer (oref this vm) vm-args)
 
-	  (if display-buffer
-	      (bsh-buffer-display buffer)))
+        (if display-buffer
+            (bsh-buffer-display buffer)))
     (when display-buffer
       (message "The BeanShell is already running.")
       (bsh-buffer-display (oref this buffer)))))
