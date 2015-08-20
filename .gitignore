@@ -3,6 +3,5 @@
 
 # Packaging
 .cask
-build.properties
-build
 dist
+elpa
