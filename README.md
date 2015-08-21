@@ -18,7 +18,7 @@ Additional information can be found at http://jdee.sourceforge.net/rootpage.html
 
 Emacs 24.3 is the oldest version that JDEE can be expected to run in.
 
-JDEE requires http://github.com/jdee-emacs/jdee-server for some operations.
+JDEE requires [JDEE Server](http://github.com/jdee-emacs/jdee-server) for some operations.
 
 ## Install from distribution
 
