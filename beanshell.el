@@ -501,7 +501,7 @@ to the string form required by the vm."
    'identity
    (append
     (and (slot-boundp this 'cp) (oref this cp))
-    (list (oref this jar)))
+    (directory-files jde-server-dir t ".*\.jar"))
    path-separator))
 
 (defmethod bsh-running-p ((this bsh))
@@ -520,8 +520,7 @@ to the string form required by the vm."
   (if (bsh-running-p this)
       (oref (oref this buffer) process)))
 
-(defmethod bsh-launch ((this bsh) &optional display-buffer)
-
+(defun bsh--check-launch-preconditions (this)
   (cl-assert
    (or (file-exists-p (oref this vm))
        (executable-find (oref this vm)))
@@ -532,27 +531,29 @@ to the string form required by the vm."
    nil "Point `jde-server-dir' to dir with JDEE jars.")
 
   (cl-assert
-   (file-exists-p (oref this jar))
+   (directory-files jde-server-dir t ".*\.jar")
    nil
-   "Specified BeanShell jar filed does not exist: %s" (oref this jar))
+   "Found no JARs in specified `jde-server-dir': %s" jde-server-dir))
 
+(defmethod bsh-launch ((this bsh) &optional display-buffer)
+  (bsh--check-launch-preconditions this)
 
   (if (not (bsh-running-p this))
-      (let*  ((dir
-               (cond
-                ((not (string= (oref this startup-dir) ""))
-                 (expand-file-name (oref this startup-dir)))
-                ((buffer-file-name)
-                 (file-name-directory (buffer-file-name)))
-                (t
-                 default-directory)))
-              (vm-args (list "-classpath" (bsh-build-classpath-argument this)))
-              (buffer
-               (let ((buf (oref this buffer)))
-                 (if (bsh-buffer-live-p buf)
-                     buf
-                   (bsh-create-buffer this))))
-              (native-buff (oref buffer buffer)))
+      (let* ((dir
+              (cond
+               ((not (string= (oref this startup-dir) ""))
+                (expand-file-name (oref this startup-dir)))
+               ((buffer-file-name)
+                (file-name-directory (buffer-file-name)))
+               (t
+                default-directory)))
+             (vm-args (list "-classpath" (bsh-build-classpath-argument this)))
+             (buffer
+              (let ((buf (oref this buffer)))
+                (if (bsh-buffer-live-p buf)
+                    buf
+                  (bsh-create-buffer this))))
+             (native-buff (oref buffer buffer)))
 
 
         (setq vm-args (append vm-args (oref this vm-args)))
