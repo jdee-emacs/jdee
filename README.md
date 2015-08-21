@@ -18,12 +18,7 @@ Additional information can be found at http://jdee.sourceforge.net/rootpage.html
 
 Emacs 24.3 is the oldest version that JDEE can be expected to run in.
 
-Building JDEE requires [Apache Ant](https://ant.apache.org/bindownload.cgi) and
-the [Ant Contrib](http://ant-contrib.sourceforge.net/) tasks.
-
-JDEE can use Beanshell for some operations - available from
-```http://www.beanshell.org/```. Copy bsh-2.0b4.jar to
-```$JAVA_HOME/jre/lib/ext```, or put it in CLASSPATH.
+JDEE requires http://github.com/jdee-emacs/jdee-server for some operations.
 
 ## Install from distribution
 
@@ -33,23 +28,13 @@ For more information, see ```doc/install.html```
 
 ## Build from source options
 
-1. Run tests: ```cask exec ert-runner -L .```
-2. Compile: ```cask build```
+1. Run tests: ```make test```
 
 To use this built distribution without installation, in your .emacs add:
 ```emacs-lisp
-  (add-to-list 'load-path "/path/to/jdee/dist/jdee-2.4.2")
-  (load "jde-autoload")
+  (add-to-list 'load-path "/path/to/jdee")
+  (require 'jde)
 ```
-
-If hacking on jde lisp, it is better to build in the git-controlled
-source directory, by adding:
-
-```
-build.lisp.dir=${project.dir}
-```
-
-to ```~/.jdee-config.properties``` (```%USERDATA%/.jdee-config.properties``` on Windows)
 
 ## Features
 
