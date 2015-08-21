@@ -1,4 +1,4 @@
-;;; jdecompletion.el -- Smart completion for the JDE
+;;; jdecompletion.el -- Smart completion for the JDEE
 ;; $Id$
 
 ;; Author: Rodrigo Reyes <reyes@chez.com>
@@ -17,11 +17,11 @@
 ;;; Commentary:
 
 ;; This is one of a set of packages that make up the
-;; Java Development Environment (JDE) for Emacs. See the
-;; JDE User's Guide for more information.
+;; Java Development Environment (JDEE) for Emacs. See the
+;; JDEE User's Guide for more information.
 
 ;;
-;; This package adds smart completion to the JDE. How it works is
+;; This package adds smart completion to the JDEE. How it works is
 ;; simple : put the cursor at the end of a statement "under
 ;; construction", eg. "myVariable.rem<CURSOR HERE> and call the
 ;; prf2-complete-at-point emacs-lisp function (this is by default
@@ -161,11 +161,11 @@ car."
   (let ((guessed (prf2-guess-type-of name)) result)
     (if (stringp guessed)
 	(setq result (bsh-eval
-		      (oref-default 'jde-bsh the-bsh)
+		      (oref-default 'jdee-bsh the-bsh)
 		      (concat "jde.util.Completion.getClassInfo(\"" guessed "\");")))
       (if (not (null name))
 	  (setq result (bsh-eval
-			(oref-default 'jde-bsh the-bsh)
+			(oref-default 'jdee-bsh the-bsh)
 			(prf2-get-classinfo-javacode name guessed)))))
     (if (not (null result))
 	(eval (read result))
@@ -317,4 +317,4 @@ jde.util.Completion.getClassInfo function."
 
 (provide 'jcomplete)
 
-;; end of jdecompletion.el
+;;; jcomplete.el ends here

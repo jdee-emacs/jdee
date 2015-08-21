@@ -226,9 +226,9 @@ Searching Source Code
 
 Finding Expressions
 
-* Using the Minibuffer-Based Find (jde-find) Command::
+* Using the Minibuffer-Based Find (jdee-find) Command::
 * Customizing the Minibuffer-Based Find Command::
-* Using the Dialog-Based Find (jde-find-dlg) Command::
+* Using the Dialog-Based Find (jdee-find-dlg) Command::
 
 Cross-Referencing Classes
 
@@ -240,7 +240,7 @@ Cross-Referencing Classes
 Customizing the JDEE
 
 * JDEE Customization Variables::
-* Customizing jde-mode::
+* Customizing jdee-mode::
 
 JDEE Customization Variables
 
@@ -248,7 +248,7 @@ JDEE Customization Variables
 * Specifying Paths::
 * JDEE Customization Groups::
 
-Customizing jde-mode
+Customizing jdee-mode
 
 * Customizing Key Bindings::
 
@@ -417,9 +417,9 @@ To register a version of the JDK with the JDEE:
 
 @enumerate
 @item
-Type M-x customize-variable RET jde-jdk-registry RET.
+Type M-x customize-variable RET jdee-jdk-registry RET.
 
-The jde-jdk-registry customization buffer appears.
+The jdee-jdk-registry customization buffer appears.
 
 @item
 Click the INS button.
@@ -433,7 +433,7 @@ paths of all versions of the JDK that you wish to use with the JDEE.
 
 @item
 Click the @samp{Save for Future Sessions} from the State menu.
-This saves the setting of jde-jdk-registry in your init file.
+This saves the setting of jdee-jdk-registry in your init file.
 
 @end enumerate
 
@@ -444,9 +444,9 @@ To select a JDK:
 @enumerate
 
 @item
-Type M-x customize-variable RET jde-jdk RET.
+Type M-x customize-variable RET jdee-jdk RET.
 
-The jde-jdk customization buffer appears.
+The jdee-jdk customization buffer appears.
 
 @item
 The buffer lists the JDKs that you have previously registered
@@ -457,7 +457,7 @@ Click the radio button next to the version of the JDK you want to use.
 
 @item
 Click the @samp{Save for Future Sessions} from the State menu.
-This saves the setting of jde-jdk-registry in your init file.
+This saves the setting of jdee-jdk-registry in your init file.
 
 Note: This procedure saves your JDK selection in your init file so
 that it applies to all projects. You can configure the JDEE to use different
@@ -471,13 +471,13 @@ file. (see Using Project Files) for more information.
 
 To edit an existing Java source file, load it into an Emacs buffer by
 executing @kbd{C-x C-f}. Loading a Java source file into a buffer
-causes the buffer to enter into jde-mode, a variant of java-mode,
+causes the buffer to enter into jdee-mode, a variant of java-mode,
 which is in turn a variant of the standard Emacs cc-mode for editing
-source files written in C and related languages. jde-mode offers all
+source files written in C and related languages. jdee-mode offers all
 the specialized source file editing commands of cc-mode plus functions
 for creating, compiling, building, running, and debugging Java source
 files. You can invoke the commands by selecting them from the JDEE menu
-that jde-mode displays on the Emacs menu bar or by typing the commands
+that jdee-mode displays on the Emacs menu bar or by typing the commands
 in the Emacs minibuffer.
 
 @node Documenting Code, Abbreviations, Editing Java Source Files, User's Guide
@@ -498,10 +498,10 @@ See also Displaying Java Documentation.
 
 To insert a skeleton javadoc comment for a class or method, position
 point in the first line of the method or class and select
-JDE->Document from the Emacs menubar or type @kbd{C-c C-v j}.
+JDEE->Document from the Emacs menubar or type @kbd{C-c C-v j}.
 
 To customize the javadoc skeletons, select
-JDE->Options->Project->Javadoc from the Emacs menubar.
+JDEE->Options->Project->Javadoc from the Emacs menubar.
 
 Thanks to David Ponce for developing the JDEE's javadoc comment
 generation facility.
@@ -511,20 +511,20 @@ generation facility.
 
 To generate documentation for the current project, open any source
 file in the project and select Make Doc from the JDEE menu or enter M-x
-jde-javadoc-make.
+jdee-javadoc-make.
 
-The jde-javadoc-make command runs the JDK's javadoc program to
+The jdee-javadoc-make command runs the JDK's javadoc program to
 generate the documentation. The javadoc command must be on your
 system's command path.
 
-The jde-javadoc-make command uses jde-global-classpath as the
--classpath and jde-sourcepath as the -sourcepath option for generating
+The jdee-javadoc-make command uses jdee-global-classpath as the
+-classpath and jdee-sourcepath as the -sourcepath option for generating
 the doc. You can specify all other javadoc options via JDEE
 customization variables. To specify the options, select
 Project->Options->Javadoc from the JDEE menu. Use
-jde-javadoc-gen-packages to specify the packages, classes, or source
+jdee-javadoc-gen-packages to specify the packages, classes, or source
 files for which you want to generate javadoc. If this variable is nil,
-the jde-javadoc-make generates javadoc for the Java source file in the
+the jdee-javadoc-make generates javadoc for the Java source file in the
 current buffer.
 
 Thanks to Sergey A Klibanov for developing the JDEE's javadoc
@@ -552,14 +552,14 @@ keyword. For example, when the abbreviation mode is enabled, you need
 only type fa followed by a space to enter the Java keyword false.
 
 To enable or disable abbreviation mode by default for a project,
-select JDE->Project->Options ->General and toggle the boolean variable
-jde-enable-abbrev-mode.
+select JDEE->Project->Options ->General and toggle the boolean variable
+jdee-enable-abbrev-mode.
 
 To toggle abbreviation mode on or off during a session, select
-JDE->Code Generation->Modes->Abbrev.
+JDEE->Code Generation->Modes->Abbrev.
 
 To change, remove, or add an abbreviation, edit the variable
-jde-mode-abbreviations in the project customization buffer.
+jdee-mode-abbreviations in the project customization buffer.
 
 @indentedblock
 Note: The JDEE's Java keyword expansion facility is based on the Emacs
@@ -632,7 +632,7 @@ brace placement: placement on the first line of the template
 (Kerningham & Ritchie Style, the default) and placement on a separate
 line.
 
-Type M-x customize-variable jde-gen-k&r to specify the style you prefer.
+Type M-x customize-variable jdee-gen-k&r to specify the style you prefer.
 
 @node Customizing the Control Flow Templates, Adding Your Own Control Flow Templates, Left Brace Placement, Control Flow Abbreviations
 @subsubsection Customizing the Control Flow Templates
@@ -642,16 +642,16 @@ JDEE menu.
 
 @node Adding Your Own Control Flow Templates, Enabling Variable Content, Customizing the Control Flow Templates, Control Flow Abbreviations
 @subsubsection Adding Your Own Control Flow Templates
-Use the jde-gen-define-abbrev-template function to define your own
+Use the jdee-gen-define-abbrev-template function to define your own
 control flow abbreviation in your .emacs file. For example, the
 following code defines an abbreviation for an else clause.
 
 @example
-(jde-gen-define-abbrev-template "melse" '('> "else @{" '> 'n
+(jdee-gen-define-abbrev-template "melse" '('> "else @{" '> 'n
 '> 'r 'n "@}"))
 @end example
 
-The jde-gen-define-abbrev-template function takes two arguments. The
+The jdee-gen-define-abbrev-template function takes two arguments. The
 first argument is a string that specifies the abbreviation. The
 section argument is a list defining the text that replaces the
 abbreviation. The list can contain any of the following elements.
@@ -735,7 +735,7 @@ non-nil value in your .emacs file.
 @node Disabling the Control Flow Abbreviations,  , Enabling Variable Content, Control Flow Abbreviations
 @subsubsection Disabling the Control Flow Abbreviations
 To disable the control flow abbreviations, set the variable
-jde-gen-cflow-enable off.
+jdee-gen-cflow-enable off.
 
 @node Completing Expressions, Dynamic Keyword Completion, Abbreviations, User's Guide
 @section Completing Expressions
@@ -744,7 +744,7 @@ Both Emacs and the JDEE provide commands for completing incomplete
 expressions. Emacs provides commands that work for any expression but
 only if the completions exist in an open buffer. The JDEE provides
 completion commands that work for any Java method or field name that
-exists on jde-global-classpath. The following sections explain how to
+exists on jdee-global-classpath. The following sections explain how to
 use completion facilities supplied by the JDEE and by Emacs itself.
 
 @menu
@@ -765,33 +765,33 @@ they present the completions to you for selection. The commands
 include:
 
 @table @code
-@item jde-complete-in-line
+@item jdee-complete-in-line
 This command uses the first completion that it finds to complete the
 method or field name at point. If multiple completions exist, it
 allows you to cycle through the completions, each completion replacing
 the previous in the source buffer. See Using In-Line Completion for
 more information.
 
-@item jde-complete-menu
+@item jdee-complete-menu
 This command displays a menu of possible completions for the
 incomplete method or field name at point. It enters the completion
 that you select in the source buffer. See Using Menu-Based Completion
 for more information.
 
-@item jde-complete-minibuf
+@item jdee-complete-minibuf
 This command uses the minibuffer to display possible completions for
 the incomplete method or field name at point. The comamnd enters the
 completion that you select in the source buffer. See Using
 Minibuffer-Based Completion for more information.
 
-@item jde-complete
+@item jdee-complete
 This is the JDEE's user-definable "standard" completion command. It
 delegates completion to one of the JDEE's other completion commands
-(jde-complete-menu by default) or to a custom completion function that
+(jdee-complete-menu by default) or to a custom completion function that
 you specify (@ref{Selecting a Completion Method} for more
-information.) The @code{jde-complete command} is bound by default to
+information.) The @code{jdee-complete command} is bound by default to
 the key combination @kbd{C-c C-v C-.}. If you prefer another binding,
-use the customization variable @code{jde-key-bindings} to change the
+use the customization variable @code{jdee-key-bindings} to change the
 binding.
 @end table
 
@@ -809,11 +809,11 @@ dramatically speed up field and method completion.
 @end indentedblock
 
 Completion works only for compiled classes that reside in the
-classpath defined by @code{jde-global-classpath}, if set, otherwise by
+classpath defined by @code{jdee-global-classpath}, if set, otherwise by
 the @env{CLASSPATH} environment variable when the Beanshell
 starts. Thus, if the JDEE is unable to complete a method or field,
 make sure that the class that defines the field or method is compiled
-and exists on the classpath defined by @code{jde-global-classpath}, if
+and exists on the classpath defined by @code{jdee-global-classpath}, if
 set, otherwise by the @env{CLASSPATH} environment variable.
 
 The JDEE completion commands work for all of the following cases:
@@ -868,17 +868,17 @@ void setColor(String color) @{ color.get ^ @}
 @node Selecting a Completion Method, Using Menu-Based Completion, Completing Method and Field Names, Completing Expressions
 @subsection Selecting a Completion Method
 
-The JDEE's generic completion command, @code{jde-complete} delegates
+The JDEE's generic completion command, @code{jdee-complete} delegates
 completion to one of several specific completion commands supplied by
 the JDEE or to a custom completion method that you supply. This allows
-you to customize jde-complete to use the completion method that you
+you to customize jdee-complete to use the completion method that you
 prefer.
 
 To specify your preferred completion method:
 
 @enumerate
 @item
-Type M-x jde-complete-function RET
+Type M-x jdee-complete-function RET
 
 @item
 Select the completion command that implements the completion method
@@ -896,10 +896,10 @@ Save your selection in your .emacs or project file.
 @node Using Menu-Based Completion, Using In-Line Completion, Selecting a Completion Method, Completing Expressions
 @subsection Using Menu-Based Completion
 
-The jde-complete-menu displays a popup menu of completions for the
+The jdee-complete-menu displays a popup menu of completions for the
 method or field name at point. Selecting a completion from the menu
 causes the command to use it to complete the method or field at
-point. This section assumes that you have selected jde-complete-menu
+point. This section assumes that you have selected jdee-complete-menu
 as your standard completion command.
 
 To select completions from a menu:
@@ -922,7 +922,7 @@ The JDEE inserts the completion at point in the buffer.
 @node Using In-Line Completion, Speeding Up Completion, Using Menu-Based Completion, Completing Expressions
 @subsection Using In-Line Completion
 
-The jde-complete-in-line command allows you to select completions at
+The jdee-complete-in-line command allows you to select completions at
 the point of insertion in the source buffer. The command finds all the
 fields and methods that complete the name at point. It then inserts
 the first potential completion in the buffer at point. Repeatedly
@@ -931,7 +931,7 @@ potential completions. If the completion is a method name, the command
 completes the method name and displays the method signature in the
 minibuffer.
 
-The @code{jde-complete-in-line} command is bound to @kbd{C-c C-v
+The @code{jdee-complete-in-line} command is bound to @kbd{C-c C-v
 .}. You can use this combination to invoke the command or @kbd{C-c C-v
 C-.}, if you have selected this command as your preferred completion
 method. The following examples use the @kbd{C-c C-v .} combination.
@@ -981,7 +981,7 @@ Import by class, not by package, in your Java files.
 
 Every package import, e.g., @code{java.util.*}, requires invoking the
 BeanShell to determine the fully qualified name of the class at point
-(see jde-parse-get-qualified-name). A Beanshell invocation is by far
+(see jdee-parse-get-qualified-name). A Beanshell invocation is by far
 the most time-consuming operation required for completion. Thus
 eliminating the use of package-level imports can significantly speed
 up completion.
@@ -1031,9 +1031,9 @@ information.
 
 In electric return mode, pressing the @kbd{Enter} key causes the JDEE
 to close open braces at the end of a line. To enable or disable this
-mode by default, customize jde-electric-return-p.
+mode by default, customize jdee-electric-return-p.
 
-To turn the mode on or off during a session, select JDE->Code
+To turn the mode on or off during a session, select JDEE->Code
 Generation->Modes->Electric Return.
 
 @node Generating Code, Checking Coding Style, Dynamic Keyword Completion, User's Guide
@@ -1068,7 +1068,7 @@ tasks:
 @node Importing Classes, Importing All Classes, Generating Import Statements, Generating Import Statements
 @subsubsection Importing Classes
 
-The JDE->Import->Class  (jde-import-find-and-import, C-c C-v C-z)
+The JDEE->Import->Class  (jdee-import-find-and-import, C-c C-v C-z)
 command generates an import statement for the class at point in the
 current buffer. It inserts the import statement at the head of the
 buffer.
@@ -1080,14 +1080,14 @@ class name may be unqualified.
 @indentedblock
 Note: The classpath that the import wizard searches for import
 candidates is the classpath specified by the value of
-jde-global-classpath for the current project.
+jdee-global-classpath for the current project.
 @end indentedblock
 
 If the command finds more than one class of the same unqualified name
 on the current classpath, it prompts you to select one of the classes
 to import.
 
-The customization variable jde-import-excluded-classes allows you to
+The customization variable jdee-import-excluded-classes allows you to
 specify rules for excluding classes from consideration for import into
 the current source file. If the import command finds any classes on
 the classpath that belong to the list of prohibited classes, it
@@ -1101,15 +1101,15 @@ consideration for import. This is useful for preventing the JDEE from
 importing alternate implementations of standard Java classes that do
 not need to be imported.
 
-For example, the default setting for jde-import-excluded-classes
+For example, the default setting for jdee-import-excluded-classes
 includes a rule to exclude all classes belonging to the java.lang
 package because every Java class implicitly imports this package. The
-default setting for jde-import-excluded-classes also excludes all
+default setting for jdee-import-excluded-classes also excludes all
 unqualified synonyms of classes belonging to the java.lang
 package. This prevents importation of alternate implementations of
 these classes, e.g., alternate implementations of java.lang.String,
 included in some commonly used class libraries and intended for
-internal use. See the docstring for jde-import-excluded-classes for
+internal use. See the docstring for jdee-import-excluded-classes for
 more information.
 
 Thanks to Len Trigg for contributing the initial implementation of the
@@ -1119,7 +1119,7 @@ the import wizard.
 @node Importing All Classes, Expanding Package Imports, Importing Classes, Generating Import Statements
 @subsubsection Importing All Classes
 
-The JDE->Code Generation->Import->All (jde-import-all, C-c C-v z)
+The JDEE->Code Generation->Import->All (jdee-import-all, C-c C-v z)
 imports all the classes that need to be imported into the current
 buffer.
 
@@ -1136,7 +1136,7 @@ letter.
 The class is not already imported into the buffer.
 
 @item
-The class is not in jde-import-excluded-classes.
+The class is not in jdee-import-excluded-classes.
 
 @item
 The class exists on the current classpath.
@@ -1147,8 +1147,8 @@ the classpath, the JDEE displays a dialog that allows you to select
 one of the candidates.
 
 @indentedblock
-Note: You can use the JDE->Code Generation->Import->Import All Unique
-(jde-import-all-unique ) command to avoid the dialog box. This command
+Note: You can use the JDEE->Code Generation->Import->Import All Unique
+(jdee-import-all-unique ) command to avoid the dialog box. This command
 imports all classes whose unqualified names appear only once on the
 classpath.
 @end indentedblock
@@ -1159,9 +1159,9 @@ the Import All Wizard.
 @node Expanding Package Imports, Collapsing Class Imports, Importing All Classes, Generating Import Statements
 @subsubsection Expanding Package Imports
 
-To expand a package import statement, select JDE->Code
+To expand a package import statement, select JDEE->Code
 Generation->Import->Expand Package Imports
-(jde-import-expand-imports). This command replaces a package import
+(jdee-import-expand-imports). This command replaces a package import
 statement, e.g.:
 
 @example
@@ -1181,10 +1181,10 @@ import java.io.IOException;
 @subsubsection Collapsing Class Imports
 
 To collapse class import statements in the current buffer into package
-imports, select JDE->Code Generation->Import->Collapse Class Imports
-(jde-import-collapse-imports). This command collapses imports for any
+imports, select JDEE->Code Generation->Import->Collapse Class Imports
+(jdee-import-collapse-imports). This command collapses imports for any
 package that contains as many as or more than the number of imports
-specified by jde-import-collapse-imports-threshhold. The default value
+specified by jdee-import-collapse-imports-threshhold. The default value
 of this variable is 2. This causes this command to collapse imports
 for any package from which the current buffer imports two or more
 classes. For example, this command, by default, collapses:
@@ -1205,8 +1205,8 @@ import java.io.*;
 @subsubsection Grouping Imports
 
 To organize import statements into groups of related imports, select
-JDE->Code Generation->Import->Organize Imports
-(jde-import-organize). By default this command groups import
+JDEE->Code Generation->Import->Organize Imports
+(jdee-import-organize). By default this command groups import
 statements into two groups separated by a blank line. The first group
 contains all imports from the java and javax packages. The other group
 contains imports from all other packages. The imports are sorted
@@ -1226,32 +1226,32 @@ The following variables allow you to customize the organization of
 imports into groups:
 
 @table @code
-@item jde-import-group-function
+@item jdee-import-group-function
 This variable allows you to specify a function that assigns imports to
-groups. The default group function is jde-import-group-of, which uses
+groups. The default group function is jdee-import-group-of, which uses
 rules specified by the following variable to assign imports to
 groups.
 
-@item jde-import-group-rules
+@item jdee-import-group-rules
 This variable specifies a list of rules for assigning import
 statements to group, e.g., '(("^javax\\." . "Swing")), Each rule
 consists of two parts: a regular expression and an optional group name
-specifier. The jde-import-group-of function assigns an import
+specifier. The jdee-import-group-of function assigns an import
 statement to the group if it matches the regular expression. The group
 name specifier is either a string that specifies the name or an index
 to a component of the regular expression to be used as the group
 name.
 
-@item jde-import-insert-group-names
+@item jdee-import-insert-group-names
 Specifies whether to insert an import group's name in the buffer.
 
-@item jde-import-default-group-name
+@item jdee-import-default-group-name
 Specifies the default name for an import group.
 
-@item jde-import-blank-line-between-groups
+@item jdee-import-blank-line-between-groups
 Specifies whether to insert a blank line between import groups.
 
-@item jde-import-sorted-groups
+@item jdee-import-sorted-groups
 Specifies whether and how to sort groups of packages. Options include
 no sorting, in the order specified by grouping rules, or in ascending
 or descending alphabetical order.
@@ -1261,8 +1261,8 @@ or descending alphabetical order.
 @subsubsection Deleting Unneeded Imports
 
 To delete superfluous import statements from the current buffer,
-select JDE->Code Generation->Import->Delete Unneeded
-(jde-import-kill-extra-imports). This command deletes all import
+select JDEE->Code Generation->Import->Delete Unneeded
+(jdee-import-kill-extra-imports). This command deletes all import
 statements for classes that are not actually referenced by the class
 in the current buffer.
 
@@ -1317,14 +1317,14 @@ The point must be within the class that is overriding the method.
 
 @item
 Select Wizards->Override Method from the JDEE menu or enter M-x
-jde-wiz-overrided-method.
+jdee-wiz-overrided-method.
 
 The JDEE prompts you to enter the name of the method to be overridden
 in the minibuffer.
 
 The name must be the name of a method defined by an ancestor of the
 class in which the Emacs point is located. The compiled class of the
-ancestor must be on the classpath specified by jde-global-classpath.
+ancestor must be on the classpath specified by jdee-global-classpath.
 
 @item
 Enter the name of the method to be overridden.
@@ -1370,7 +1370,7 @@ a method.
 @subsubsection Interface Wizard
 
 This wizard creates a skeleton implementation of any interface defined
-on the classpath specified by jde-global-classpath.
+on the classpath specified by jdee-global-classpath.
 
 To create an implementation of an interface:
 @enumerate
@@ -1383,8 +1383,8 @@ Position the Emacs point at the point in the class where you want the
 implementation of the interface's methods to appear.
 
 @item
-Select JDE->Wizards->Implement Interface or enter M-x
-jde-wiz-implement-interface.
+Select JDEE->Wizards->Implement Interface or enter M-x
+jdee-wiz-implement-interface.
 
 The JDEE prompts you to enter the name of the interface to be
 implemented.
@@ -1431,8 +1431,8 @@ This wizard generates get and set methods for the private fields of
 the class at point, but only if the fields do not already have get or
 set methods. To generate the methods, move point to the point in the
 class where you want the get and set methods to appear. Then select
-JDE->Code Generation->Wizards->Generate Get/Set Methods... or enter
-M-x jde-wiz-get-set-methods
+JDEE->Code Generation->Wizards->Generate Get/Set Methods... or enter
+M-x jdee-wiz-get-set-methods
 
 Thanks to Javier Lopez and Sandip Chitale for contributing this
 wizard.
@@ -1485,12 +1485,12 @@ You can specify boilerplate text (for example, a copyright notice) to
 be inserted at the head of class source files created by the JDE. The
 JDEE provides two ways to specify the boilerplate text. The simplest
 way is to enter the lines of boilerplate text as the value of the
-customization variable jde-gen-buffer-boilerplate. Another way to
+customization variable jdee-gen-buffer-boilerplate. Another way to
 specify the text is to set the value of the customization variable
-jde-gen-boilerplate-functionto a function that generates the
+jdee-gen-boilerplate-functionto a function that generates the
 boilerplate text. (The default value of this variable is
-jde-gen-create-buffer-boilerplate, which returns the value of the
-boilerplate variable, jde-gen-buffer-boilerplate). The functional
+jdee-gen-create-buffer-boilerplate, which returns the value of the
+boilerplate variable, jdee-gen-buffer-boilerplate). The functional
 approach allows you to generate boilerplate text dynamically by
 evaluating the appropriate Lisp code. By saving the values of
 boilerplate variables in project files, you can specify different
@@ -1504,13 +1504,13 @@ autocoded Java source buffers:
 
 @multitable @columnfractions .45 .15 .40
 @headitem Variable @tab Group @tab Usage
-@item jde-gen-class-buffer-template @tab Autocode @tab Template for a generic public class buffer.
-@item jde-gen-console-buffer-template @tab Autocode @tab Template for a console application buffer.
-@item jde-gen-jfc-app-buffer-template @tab Autocode @tab Template for a JFC (Swing) application.
-@item jde-gen-junit-test-class-buffer-template @tab Autocode @tab Template for a JUnit test case class. This template requires the JUnit test framework.
-@item jde-gen-buffer-templates @tab Autocode @tab Specifies templates available to create Java buffers.
-@item jde-gen-buffer-boilerplate @tab Autocode @tab Specifies lines of text to be inserted at the head of class files.
-@item jde-gen-boilerplate-function @tab Autocode @tab Specifies a function that returns a string of boilerplate text. The default value is jde-gen-create-buffer-boilerplate, which returns the value of jde-gen-buffer-boilerplate.
+@item jdee-gen-class-buffer-template @tab Autocode @tab Template for a generic public class buffer.
+@item jdee-gen-console-buffer-template @tab Autocode @tab Template for a console application buffer.
+@item jdee-gen-jfc-app-buffer-template @tab Autocode @tab Template for a JFC (Swing) application.
+@item jdee-gen-junit-test-class-buffer-template @tab Autocode @tab Template for a JUnit test case class. This template requires the JUnit test framework.
+@item jdee-gen-buffer-templates @tab Autocode @tab Specifies templates available to create Java buffers.
+@item jdee-gen-buffer-boilerplate @tab Autocode @tab Specifies lines of text to be inserted at the head of class files.
+@item jdee-gen-boilerplate-function @tab Autocode @tab Specifies a function that returns a string of boilerplate text. The default value is jdee-gen-create-buffer-boilerplate, which returns the value of jdee-gen-buffer-boilerplate.
 @end multitable
 
 See Customizing Templates for information on how to customize the
@@ -1523,23 +1523,23 @@ The following commands insert templates at the current point in the
 buffer:
 
 @table @asis
-@item JDE->Generate->Get/Set Pair
+@item JDEE->Generate->Get/Set Pair
 generates an instance variable and a get and set method for that
 variable
 
-@item JDE->Generate->Println
+@item JDEE->Generate->Println
 generates a @code{System.out.println(...);} statement.
 
-@item JDE->Generate->Action
+@item JDEE->Generate->Action
 generates and registers an action listener for a specified component.
 
-@item JDE->Generate->Listener->Window
+@item JDEE->Generate->Listener->Window
 generates and registers a window listener for a specified window.
 
-@item JDE->Generate->Listener->Mouse
+@item JDEE->Generate->Listener->Mouse
 generates and registers a mouse listener for a specified component.
 
-@item JDE->Generate->Other
+@item JDEE->Generate->Other
 allows you to select any of the above templates or a custom
 (user-defined) template.
 @end table
@@ -1548,12 +1548,12 @@ The following variables control generation of code at point:
 
 @multitable @columnfractions .45 .15 .40
 @headitem Variable @tab Group @tab Usage
-@item jde-gen-get-set-var-template @tab Autocode @tab Defines a get/set method pair template.
-@item jde-gen-listener-action-template @tab Autocode @tab Defines an action listener template.
-@item jde-gen-listener-window-template @tab Autocode @tab Defines a window listener template.
-@item jde-gen-listener-mouse-template @tab Autocode @tab Defines a mouse listener template.
-@item jde-gen-inner-class-template @tab Autocode @tab Defines a template for creating a class inside another class or inside an existing source buffer.
-@item jde-gen-code-templates @tab Autocode @tab Specifies available code templates.
+@item jdee-gen-get-set-var-template @tab Autocode @tab Defines a get/set method pair template.
+@item jdee-gen-listener-action-template @tab Autocode @tab Defines an action listener template.
+@item jdee-gen-listener-window-template @tab Autocode @tab Defines a window listener template.
+@item jdee-gen-listener-mouse-template @tab Autocode @tab Defines a mouse listener template.
+@item jdee-gen-inner-class-template @tab Autocode @tab Defines a template for creating a class inside another class or inside an existing source buffer.
+@item jdee-gen-code-templates @tab Autocode @tab Specifies available code templates.
 @end multitable
 
 See @ref{Customizing Templates} for information on how to customize
@@ -1571,7 +1571,7 @@ customization feature.
 To customize an autocode template:
 @enumerate
 @item
-Select JDE->Options->Autocode
+Select JDEE->Options->Autocode
 
 The JDEE displays a customization buffer containing the autocode
 templates.
@@ -1600,7 +1600,7 @@ Save your changes.
 Select Save for Future Sessions if you want your changes to apply to
 all projects. If you want your changes to apply only to the current
 projects, select Set for Current Session. Then select
-JDE->Options->Save Project to save your changes in the current
+JDEE->Options->Save Project to save your changes in the current
 project's project file.
 
 @node Creating Templates, Defining a Template and Template Insertion Function, Customizing Templates, Code Templates
@@ -1613,13 +1613,13 @@ create your own, add-on templates (see below and the doc for the
 tempo-define-template for more information) or create templates from
 scratch. In either case, once you have created a template, you can add
 it to the JDE's lists of available code and/or buffer templates, using
-the JDEE's jde-gen-code-templates and/or jde-gen-buffer-templates
+the JDEE's jdee-gen-code-templates and/or jdee-gen-buffer-templates
 variables, respectively. Adding a template to these lists enables you
 to invoke the templates from the JDEE menus. When adding a template,
 you need to specify a unique title for the template. These titles
 enable you to specify the templates when invoking them, using the
 JDE's custom code template commands (Files->JDE New->Custom and
-JDE->Generate->Custom). You can use auto completion to enter a
+JDEE->Generate->Custom). You can use auto completion to enter a
 template title when invoking a custom code generation command. Note
 that you can specify different sets of templates for different
 projects, by setting and saving the template list variables in project
@@ -1719,11 +1719,11 @@ tempo-define-template) for more information on creating templates.
 You can register templates that you create with the JDEE. When you
 register a template with the JDEE, it appears among the list of
 templates that you can select when you select
-JDE->Generate->Other.....
+JDEE->Generate->Other.....
 
 You register a template by customizing the JDEE variable
-jde-gen-code-templates. The value of this variable is a list of the
-template functions that the JDEE command JDE->Generate->Other.... can
+jdee-gen-code-templates. The value of this variable is a list of the
+template functions that the JDEE command JDEE->Generate->Other.... can
 invoke.
 
 To register a custom template, add its name to the list.
@@ -1732,7 +1732,7 @@ To insert a template that you have registered:
 
 @enumerate
 @item
-Select JDE->Generate->Other....
+Select JDEE->Generate->Other....
 
 The JDEE displays the prompt @code{Enter template:} in the
 minibuffer.
@@ -1752,7 +1752,7 @@ You can assign templates to keyboard keys to speed use of frequently
 used templates. For example, insert this form:
 
 @example
-(global-set-key [f9] 'jde-gen-to-string-method)
+(global-set-key [f9] 'jdee-gen-to-string-method)
 @end example
 
 in your .emacs file to assign the @kbd{F9} function key to the JDEE
@@ -1761,9 +1761,9 @@ template that generates a skeleton toString method.
 @node Checking Coding Style, Compiling Java Programs, Generating Code, User's Guide
 @section Checking Coding Style
 
-The JDE->Check Style command (M-x jde-checkstyle) command checks the
+The JDEE->Check Style command (M-x jdee-checkstyle) command checks the
 current buffer for conformity to a Java coding standard. The default
-standard is that specified by Oracle. Execute jde-checkstyle-customize
+standard is that specified by Oracle. Execute jdee-checkstyle-customize
 to customize the command to support your own coding standard.
 
 The command displays a list of stylistic faults in a popup
@@ -1773,8 +1773,8 @@ standard.
 @node Compiling Java Programs, Building Java Applications, Checking Coding Style, User's Guide
 @section Compiling Java Programs
 
-To compile the source file in the current buffer, select JDE->Compile,
-type @kbd{C-c-C-v-C-c}, or execute @kbd{M-x jde-compile}. The compiler
+To compile the source file in the current buffer, select JDEE->Compile,
+type @kbd{C-c-C-v-C-c}, or execute @kbd{M-x jdee-compile}. The compiler
 uses the version of javac included in the currently selected JDK or on
 your system command path by default. However, you can configure the
 JDEE to use another compiler for the current project or all projects
@@ -1836,9 +1836,9 @@ Type M-x customize-variable RET
 Emacs prompts you to enter the name of a variable to customize.
 
 @item
-Enter jde-compiler and press Enter.
+Enter jdee-compiler and press Enter.
 
-The jde-compiler customization buffer appears.
+The jdee-compiler customization buffer appears.
 
 @item
 Select the compiler that you want to use for the current project or
@@ -1872,10 +1872,10 @@ Project->Project File->Save from the JDEE menu.
 The JDEE allows you to specify compilation options by setting
 compilation variables. You must use the Emacs customization
 feature. To use the customization feature, select
-JDE->Options->Compile. (See Configuring the JDEE for more information
+JDEE->Options->Compile. (See Configuring the JDEE for more information
 on using the customization feature). To save the compilation settings
 in the project file (see Using Project Files) for the current source
-buffer, select JDE->Options->Update Project.
+buffer, select JDEE->Options->Update Project.
 
 @menu
 * Setting Compile Options Interactively::
@@ -1885,7 +1885,7 @@ buffer, select JDE->Options->Update Project.
 @node Setting Compile Options Interactively, Compiler Customization Variables, Compilation Options, Compilation Options
 @subsubsection Setting Compile Options Interactively
 
-If you set the customization variable jde-read-compile-args to a
+If you set the customization variable jdee-read-compile-args to a
 non-nil value, the JDEE compile command prompts you to enter
 compilation options in the minibuffer. It appends the options that you
 enter to the options specified via customization variables. The JDEE
@@ -1897,11 +1897,11 @@ arrows on your keyboard.
 Note: The JDEE uses the values of the JDEE customization variables to
 set the compiler's command-line option switches. The JDEE assumes that
 the compiler you are using (specified by the customization variable
-jde-compiler) has the same set of command-line switches as the version
+jdee-compiler) has the same set of command-line switches as the version
 of javac or jikes that you have selected. If the command-line switch
 for a particular option supported by the compiler your are using is
 not the same as that specified by javac or jikes, you must use the
-variable jde-compile-option-command-line-args to select the option.
+variable jdee-compile-option-command-line-args to select the option.
 @end indentedblock
 
 @node Compiler Customization Variables,  , Setting Compile Options Interactively, Compilation Options
@@ -1912,33 +1912,33 @@ functions used to set them.
 
 @multitable @columnfractions .50 .10 .40
 @headitem Name @tab Group @tab Usage
-@item jde-compiler @tab Project @tab Specifies the compiler (javac server, by default) to use to compile the code in the current source buffer.
-@item jde-compile-option-command-line-args @tab Compile @tab Specifies a string of command-line arguments to be passed to the compiler.
-@item jde-global-classpath @tab Project @tab Specify class paths for compile, run, and debug commands.
-@item jde-read-compile-args @tab Project @tab Specify whether to read compile options from the minibuffer.
-@item jde-compile-option-classpath @tab Compile @tab Specifies the classpath for compile command. If set, this variable overrides jde-global-classpath.
-@item jde-compile-option-sourcepath @tab Compile @tab Specifies the path of source files for classes required to compile the current class.
-@item jde-quote-classpath @tab Project @tab Quote the classpath argument.
-@item jde-compile-option-directory @tab Compile @tab Specifies the directory into which to place the compiled class.
-@item jde-compile-option-deprecation @tab Compile @tab Warn of use or override of a deprecated member or class
-@item jde-compile-option-debug @tab Compile @tab Generate information about local variables for debug tools.
-@item jde-compile-option-optimize @tab Compile @tab Directs the compiler to try to generate faster varname.
-@item jde-compile-option-depend @tab Compile @tab Analyze dependencies.
-@item jde-compile-option-depend-switch @tab Compile @tab Command line switch that causes the compiler to analyze dependencies.
-@item jde-compile-option-vm-args @tab Compile @tab Specify command-line arguments for Java interpreter used to run the compiler.
-@item jde-compile-option-verbose-path @tab Compile @tab Print verbose messages.
-@item jde-compile-option-verbose @tab Compile @tab List directories searched to compile current class.
-@item jde-compile-option-nowarn @tab Compile @tab Turn off warnings.
-@item jde-compile-option-encoding @tab Compile @tab Specify the source file encoding name, such as EUCJIS\SJIS.
-@item jde-compile-option-target @tab Compile @tab Generate code compatible with a specified vm version.
-@item jde-compile-option-bootclasspath @tab Compile @tab Specify classpath of standard libraries for target vm.
-@item jde-compile-option-bootclasspath @tab Compile @tab Specify path of directories containing extensions for target vm.
+@item jdee-compiler @tab Project @tab Specifies the compiler (javac server, by default) to use to compile the code in the current source buffer.
+@item jdee-compile-option-command-line-args @tab Compile @tab Specifies a string of command-line arguments to be passed to the compiler.
+@item jdee-global-classpath @tab Project @tab Specify class paths for compile, run, and debug commands.
+@item jdee-read-compile-args @tab Project @tab Specify whether to read compile options from the minibuffer.
+@item jdee-compile-option-classpath @tab Compile @tab Specifies the classpath for compile command. If set, this variable overrides jdee-global-classpath.
+@item jdee-compile-option-sourcepath @tab Compile @tab Specifies the path of source files for classes required to compile the current class.
+@item jdee-quote-classpath @tab Project @tab Quote the classpath argument.
+@item jdee-compile-option-directory @tab Compile @tab Specifies the directory into which to place the compiled class.
+@item jdee-compile-option-deprecation @tab Compile @tab Warn of use or override of a deprecated member or class
+@item jdee-compile-option-debug @tab Compile @tab Generate information about local variables for debug tools.
+@item jdee-compile-option-optimize @tab Compile @tab Directs the compiler to try to generate faster varname.
+@item jdee-compile-option-depend @tab Compile @tab Analyze dependencies.
+@item jdee-compile-option-depend-switch @tab Compile @tab Command line switch that causes the compiler to analyze dependencies.
+@item jdee-compile-option-vm-args @tab Compile @tab Specify command-line arguments for Java interpreter used to run the compiler.
+@item jdee-compile-option-verbose-path @tab Compile @tab Print verbose messages.
+@item jdee-compile-option-verbose @tab Compile @tab List directories searched to compile current class.
+@item jdee-compile-option-nowarn @tab Compile @tab Turn off warnings.
+@item jdee-compile-option-encoding @tab Compile @tab Specify the source file encoding name, such as EUCJIS\SJIS.
+@item jdee-compile-option-target @tab Compile @tab Generate code compatible with a specified vm version.
+@item jdee-compile-option-bootclasspath @tab Compile @tab Specify classpath of standard libraries for target vm.
+@item jdee-compile-option-bootclasspath @tab Compile @tab Specify path of directories containing extensions for target vm.
 @end multitable
 
 @node Building Java Applications, Running Java Applications, Compiling Java Programs, User's Guide
 @section Building Java Applications
 
-The JDE->Build command builds an application. By default this command
+The JDEE->Build command builds an application. By default this command
 invokes the Unix-style make utility to build the application. You can
 configure the build command to invoke the Ant build system or a custom
 build function.
@@ -1955,9 +1955,9 @@ build function.
 To select a build method:
 @enumerate
 @item
-Type M-x customize-variable RET jde-build-function RET
+Type M-x customize-variable RET jdee-build-function RET
 
-The jde-build-function customization buffer appears.
+The jdee-build-function customization buffer appears.
 
 @item
 Select the build function that you want to use.
@@ -1978,7 +1978,7 @@ Project->Project File->Save from the JDEE menu.
 @node Building with Make, Building with Ant, Selecting a Build Method, Building Java Applications
 @subsection Building with Make
 
-The jde-make command uses a make utility, such as GNU make, to rebuild
+The jdee-make command uses a make utility, such as GNU make, to rebuild
 a project. You must supply the makefiles used to build your
 projects. See Sample Makefile for an example of a makefile for
 building a Java project. David Ponce's JMaker package generates
@@ -1997,14 +1997,14 @@ other makefiles to build the entire project.
 @subsubsection Make Options
 
 The following customization variables allow you to specify various
-jde-make options in Project group:
+jdee-make options in Project group:
 
 @multitable @columnfractions .50 .10 .40
 @headitem Name @tab Default @tab Usage
-@item jde-make-program @tab make @tab Specifies the pathname on your system of the make utility that the jde-make uses to build your project.
-@item jde-make-args @tab @tab Specifies a string of command-line arguments (for example, "-f mymakefile all") to be passed to the make utility.
-@item jde-read-make-args @tab nil @tab If non-nil, this variable causes the jde-make command to prompt you to enter command-line arguments in the minibuffer. jde-make passes these arguments along with the arguments specified by jde-make-args to the make utility.
-@item jde-make-working-directory @tab @tab Specifies the directory from which jde-make runs the make utility.
+@item jdee-make-program @tab make @tab Specifies the pathname on your system of the make utility that the jdee-make uses to build your project.
+@item jdee-make-args @tab @tab Specifies a string of command-line arguments (for example, "-f mymakefile all") to be passed to the make utility.
+@item jdee-read-make-args @tab nil @tab If non-nil, this variable causes the jdee-make command to prompt you to enter command-line arguments in the minibuffer. jdee-make passes these arguments along with the arguments specified by jdee-make-args to the make utility.
+@item jdee-make-working-directory @tab @tab Specifies the directory from which jdee-make runs the make utility.
 @end multitable
 
 @node Sample Makefile,  , Make Options, Building with Make
@@ -2041,28 +2041,28 @@ clean: rm *.class
 @node Building with Ant,  , Building with Make, Building Java Applications
 @subsection Building with Ant
 
-The jde-ant-build command uses the Apache Ant build tool to build a
+The jdee-ant-build command uses the Apache Ant build tool to build a
 Java project.
 
 The following variables allow you to control the build process.
 
 @multitable @columnfractions .40 .20 .40
 @headitem Name @tab Default @tab Usage
-@item jde-ant-invocation-method @tab script @tab Specifies how to invoke ant. Ant can be invoked in one of three ways. The first is via the ant script/program that comes with ant. The second is via java and the third is via the Ant Server.
-@item jde-ant-home @tab @tab Directory where ant is installed.
-@item jde-ant-user-jar-files @tab nil @tab Specifies jar files that hold user-defined tasks.
-@item jde-ant-program @tab ant @tab Specifies name of ant program/script.
-@item jde-ant-args @tab -emacs @tab Specifies arguments to be passed to the Ant program.
-@item jde-ant-buildfile @tab build.xml @tab Specifies the default buildfile to use.
-@item jde-ant-read-buildfile @tab off @tab Specify whether to prompt for a buildfile. If non-nil, the jde-ant-build command prompts you for an ant buildfile. Note that jde-ant-read-buildfile and jde-ant-enable-find are incompatible and that jde-ant-read-buildfile will override the former.
-@item jde-ant-read-target @tab off @tab Specify whether to prompt for a build target. If non-nil, the jde-ant-build command prompts you for an ant target.
-@item jde-ant-interactive-buildfile @tab off @tab Default buildfile to use when prompting interactively.
-@item jde-ant-read-args @tab off @tab Specify whether to prompt for additional arguments to pass to Ant. If non-nil, the jde-ant-build command prompts you for the additional arguments.
-@item jde-ant-enable-find @tab off @tab Specify whether jde-ant find the build.xml file based on your current directory. If non-nil, we will search up the directory hierarchy from the current directory for the build definition file. Also note that, if non-nil, this will relax the requirement for an explicit jde project file. In order for this to work jde-ant-read-buildfile must be nil.
-@item jde-ant-complete-target @tab off @tab Specify whether to enable completion of build target names in the minibuffer. If non-nil, the jde-ant-build command allows you to use tab completion in the minibuffer to specify the build target name. This list of valid build targets is determined by parsing the Ant build file. This option has no effect if jde-ant-read-target is nil.
-@item jde-ant-use-global-classpath @tab off @tab Specify whether to enable use of jde-global-classpath when running jde-ant.
-@item jde-ant-target-regexp @tab <\s-*target\s-[^...]*?name\s-*=\s-*\"\s-*\([^\"]+\) @tab Regular expression used to match target names in Ant build files.
-@item jde-ant-build-hook @tab nil @tab List of hook functions run by jde-ant-build (see run-hooks in the Emacs documentation for more information).
+@item jdee-ant-invocation-method @tab script @tab Specifies how to invoke ant. Ant can be invoked in one of three ways. The first is via the ant script/program that comes with ant. The second is via java and the third is via the Ant Server.
+@item jdee-ant-home @tab @tab Directory where ant is installed.
+@item jdee-ant-user-jar-files @tab nil @tab Specifies jar files that hold user-defined tasks.
+@item jdee-ant-program @tab ant @tab Specifies name of ant program/script.
+@item jdee-ant-args @tab -emacs @tab Specifies arguments to be passed to the Ant program.
+@item jdee-ant-buildfile @tab build.xml @tab Specifies the default buildfile to use.
+@item jdee-ant-read-buildfile @tab off @tab Specify whether to prompt for a buildfile. If non-nil, the jdee-ant-build command prompts you for an ant buildfile. Note that jdee-ant-read-buildfile and jdee-ant-enable-find are incompatible and that jdee-ant-read-buildfile will override the former.
+@item jdee-ant-read-target @tab off @tab Specify whether to prompt for a build target. If non-nil, the jdee-ant-build command prompts you for an ant target.
+@item jdee-ant-interactive-buildfile @tab off @tab Default buildfile to use when prompting interactively.
+@item jdee-ant-read-args @tab off @tab Specify whether to prompt for additional arguments to pass to Ant. If non-nil, the jdee-ant-build command prompts you for the additional arguments.
+@item jdee-ant-enable-find @tab off @tab Specify whether jdee-ant find the build.xml file based on your current directory. If non-nil, we will search up the directory hierarchy from the current directory for the build definition file. Also note that, if non-nil, this will relax the requirement for an explicit jde project file. In order for this to work jdee-ant-read-buildfile must be nil.
+@item jdee-ant-complete-target @tab off @tab Specify whether to enable completion of build target names in the minibuffer. If non-nil, the jdee-ant-build command allows you to use tab completion in the minibuffer to specify the build target name. This list of valid build targets is determined by parsing the Ant build file. This option has no effect if jdee-ant-read-target is nil.
+@item jdee-ant-use-global-classpath @tab off @tab Specify whether to enable use of jdee-global-classpath when running jdee-ant.
+@item jdee-ant-target-regexp @tab <\s-*target\s-[^...]*?name\s-*=\s-*\"\s-*\([^\"]+\) @tab Regular expression used to match target names in Ant build files.
+@item jdee-ant-build-hook @tab nil @tab List of hook functions run by jdee-ant-build (see run-hooks in the Emacs documentation for more information).
 @end multitable
 
 @node Running Java Applications, Working with Applets, Building Java Applications, User's Guide
@@ -2077,7 +2077,7 @@ command line input via the comint buffer. When interacting with an
 application, you can use any of comint-mode's extensive set of
 command-line history commands to speed interaction.
 
-To run an application, enter @kbd{M-x jde-run} or select Java->Run App
+To run an application, enter @kbd{M-x jdee-run} or select Java->Run App
 from the Emacs menubar or type @kbd{C-c C-v C-r}.
 
 @menu
@@ -2098,11 +2098,11 @@ default that the class in the current buffer is the application's main
 class. This can be inconvenient if you have an application that has
 multiple classes. You may want to be able to run the application from
 any buffer containing one of the application's classes. To do this,
-set the variable jde-run-application-class to the fully qualified name
+set the variable jdee-run-application-class to the fully qualified name
 of the application's main class.
 
-You can temporarily override the setting of jde-run-application-class
-by typing C-u - before executing the jde-run command, for example, by
+You can temporarily override the setting of jdee-run-application-class
+by typing C-u - before executing the jdee-run command, for example, by
 typing C-u - C-c C-r. This causes the JDEE to prompt you to enter the
 fully qualified name of the application's main class (as well
 application arguments if any).
@@ -2116,7 +2116,7 @@ directory of the current source buffer. The default directory of the
 current source buffer is the directory containing the source file
 displayed in the buffer. You can specify another directory as the
 startup directory by setting the JDEE customization variable
-jde-run-working-directory.
+jdee-run-working-directory.
 
 To set this variable,
 @enumerate
@@ -2124,9 +2124,9 @@ To set this variable,
 Display its customization panel.
 
 You can do this by typing @kbd{M-x customize-variable
-jde-run-working-directory} or selecting JDE->Options->Project to
+jdee-run-working-directory} or selecting JDEE->Options->Project to
 display the project customization panel and searching this panel for
-jde-run-working-directory.
+jdee-run-working-directory.
 
 @item
 Enter the working directory in the variable's edit field.
@@ -2140,14 +2140,14 @@ current project or Save for future sessions if you want the settings
 to apply to all projects. In either case, you should save the new
 settings in you project file if your project has a project file. To
 save the new settings in your project file, switch to a source buffer
-and choose JDE->Options->Save Project.
+and choose JDEE->Options->Save Project.
 
 @end enumerate
 
 @node Setting VM Command-Line Arguments, Setting Command-Line Application Arguments, Specifying a Startup Directory, Running Java Applications
 @subsection Setting VM Command-Line Arguments
 
-If you set the customization variable jde-run-read-vm-args to a
+If you set the customization variable jdee-run-read-vm-args to a
 non-nil value, the JDEE compile command prompts you to enter virtual
 machine options in the minibuffer. It appends the options that you
 enter to the options specified via customization variables. The JDEE
@@ -2158,15 +2158,15 @@ arrows on your keyboard.
 @node Setting Command-Line Application Arguments, Navigating Exception Traces, Setting VM Command-Line Arguments, Running Java Applications
 @subsection Setting Command-Line Application Arguments
 
-Specifying a prefix argument before the jde-run, e.g., C-u C-c C-v C-r
+Specifying a prefix argument before the jdee-run, e.g., C-u C-c C-v C-r
 causes the command to prompt you to enter arguments to be passed to
 the application's main method. The command appends the options that
 you enter to the arguments specified via the customization variable
-jde-run-option-application-args. The JDEE saves the arguments that you
+jdee-run-option-application-args. The JDEE saves the arguments that you
 enter in a minibuffer history list. You can recall previously entered
 options by pressing the up or down arrows on your keyboard.
 
-If you set the customization variable jde-run-read-app-args to a
+If you set the customization variable jdee-run-read-app-args to a
 non-nil value, the JDEE run command prompts you to enter command-line
 application arguments by default, i.e., you do not have to specify a
 prefix argument each time you execute the command.
@@ -2189,10 +2189,10 @@ combinations @kbd{C-c C-v C-[} or @kbd{C-c C-v C-]}.
 The JDEE allows you to specify run-time options by setting run
 variables. You can use the Emacs customization feature to set run-time
 variables interactively. To use the customization feature, select
-JDE->Project->Options->Run. (See Configuring the JDEE for more
+JDEE->Project->Options->Run. (See Configuring the JDEE for more
 information on using the customization feature). To save the
 compilation settings in the project file (see Using Project Files) for
-the current source buffer, select JDE-> Project->Project File->Save
+the current source buffer, select JDEE-> Project->Project File->Save
 Project.
 
 The following table lists the JDEE run variables and the functions
@@ -2200,25 +2200,25 @@ used to set them.
 
 @multitable @columnfractions .50 .10 .40
 @headitem Variable @tab Group @tab Usage
-@item jde-run-mode-hook @tab Project @tab List of hook functions run by jde-run-mode
-@item jde-run-working-directory @tab Project @tab Startup directory for running or debugging Java applications.
-@item jde-run-application-class @tab Project @tab Name of the Java class to run. The command jde-run-set-app sets the buffer-local value of this variable.
-@item jde-run-java-vm @tab Project @tab Specify Java interpreter for non-Windows platforms. The command jde-run-set-vm sets the buffer-local value of this variable.
-@item jde-run-java-vm-w @tab Project @tab Specify Java interpreter for Windows platforms. The command jde-run-set-vm-w sets the buffer-local value of this variable.
-@item jde-global-classpath @tab Project @tab Specify class paths for compile, run, and debug commands. The command jde-set-global-classpath sets the buffer-local value of this variable.
-@item jde-run-classic-mode-vm @tab Project @tab Specifies that the JDEE should run the JDK's classic version of the Java virtual machine (as opposed to the HotSpot version). This option applies only to versions of the JDK that include both a classic and a HotSpot vm.
-@item jde-run-read-vm-args @tab Project @tab Specifies whether to read vm arguments from the  minibuffer.
-@item jde-run-option-classpath @tab Run @tab Specifies the classpath for  the Java interpreter. This option overrides the jde-global-classpath option.
-@item jde-run-option-verbose @tab Run @tab Print messages about the running process.
-@item jde-run-option-properties @tab Run @tab Specify property values.
-@item jde-run-option-heap-size @tab Run @tab Specify the initial and maximum size of the interpreter heap.
-@item jde-run-option-stack-size @tab Run @tab Specify size of the C and Java stacks.
-@item jde-run-option-garbage-collection @tab Run @tab Specify garbage collection options.
-@item jde-run-option-java-profile @tab Run @tab Enable Java profiling.
-@item jde-run-option-heap-profile @tab Run @tab Output heap profiling data.
-@item jde-run-option-verify @tab Run @tab Verify classes.
-@item jde-run-option-vm-args @tab Run @tab Specify command-line arguments to be passed to the Java vm. The command jde-run-set-args sets the buffer-local value of this variable.
-@item jde-run-option-application-args @tab Run @tab Specify command-line arguments to pass to the application. The command jde-run-set-app-args sets the buffer-local value of this variable.
+@item jdee-run-mode-hook @tab Project @tab List of hook functions run by jdee-run-mode
+@item jdee-run-working-directory @tab Project @tab Startup directory for running or debugging Java applications.
+@item jdee-run-application-class @tab Project @tab Name of the Java class to run. The command jdee-run-set-app sets the buffer-local value of this variable.
+@item jdee-run-java-vm @tab Project @tab Specify Java interpreter for non-Windows platforms. The command jdee-run-set-vm sets the buffer-local value of this variable.
+@item jdee-run-java-vm-w @tab Project @tab Specify Java interpreter for Windows platforms. The command jdee-run-set-vm-w sets the buffer-local value of this variable.
+@item jdee-global-classpath @tab Project @tab Specify class paths for compile, run, and debug commands. The command jdee-set-global-classpath sets the buffer-local value of this variable.
+@item jdee-run-classic-mode-vm @tab Project @tab Specifies that the JDEE should run the JDK's classic version of the Java virtual machine (as opposed to the HotSpot version). This option applies only to versions of the JDK that include both a classic and a HotSpot vm.
+@item jdee-run-read-vm-args @tab Project @tab Specifies whether to read vm arguments from the  minibuffer.
+@item jdee-run-option-classpath @tab Run @tab Specifies the classpath for  the Java interpreter. This option overrides the jdee-global-classpath option.
+@item jdee-run-option-verbose @tab Run @tab Print messages about the running process.
+@item jdee-run-option-properties @tab Run @tab Specify property values.
+@item jdee-run-option-heap-size @tab Run @tab Specify the initial and maximum size of the interpreter heap.
+@item jdee-run-option-stack-size @tab Run @tab Specify size of the C and Java stacks.
+@item jdee-run-option-garbage-collection @tab Run @tab Specify garbage collection options.
+@item jdee-run-option-java-profile @tab Run @tab Enable Java profiling.
+@item jdee-run-option-heap-profile @tab Run @tab Output heap profiling data.
+@item jdee-run-option-verify @tab Run @tab Verify classes.
+@item jdee-run-option-vm-args @tab Run @tab Specify command-line arguments to be passed to the Java vm. The command jdee-run-set-args sets the buffer-local value of this variable.
+@item jdee-run-option-application-args @tab Run @tab Specify command-line arguments to pass to the application. The command jdee-run-set-app-args sets the buffer-local value of this variable.
 @end multitable
 
 @node Working with Applets, Debugging Applications, Running Java Applications, User's Guide
@@ -2242,7 +2242,7 @@ To run an applet:
 Open the applet's source file in a buffer.
 
 @item
-Choose JDE->Run Applet.
+Choose JDEE->Run Applet.
 
 The JDEE searches for an html file in the directory containing the
 applet source file and displays the first file it finds, using your
@@ -2250,24 +2250,24 @@ system's default browser. If the JDEE cannot find an html page in the
 applet's source file directory, it signals an error by default.
 @end enumerate
 
-The JDE->Run Applet command assumes by default that the directory
+The JDEE->Run Applet command assumes by default that the directory
 containing the applet's source also contains an html page for testing
 that applet. If this is not true in your case, you have two
 options. You can either specify the path of the applet file via the
-JDEE customization variable jde-run-applet-doc or you can use the
-jde-run-applet command to run your applet. If the jde-run-applet-doc
-variable is not a null string, JDE->Run Applet displays the document
+JDEE customization variable jdee-run-applet-doc or you can use the
+jdee-run-applet command to run your applet. If the jdee-run-applet-doc
+variable is not a null string, JDEE->Run Applet displays the document
 that the variable specifies instead of searching the source file
-directory for a document to display. The jde-run-applet command
+directory for a document to display. The jdee-run-applet command
 prompts you to enter in the minibuffer the path of an html file to
 display. If you enter nothing, the command defaults to the behavior of
-JDE->Run Applet.
+JDEE->Run Applet.
 
 The run commands chooses the viewer as follows. If
-jde-run-applet-viewer is a null string (the default) or browse-url,
+jdee-run-applet-viewer is a null string (the default) or browse-url,
 the JDEE uses browse-url to launch the applet doc in your system's
 default browser. Otherwise, the menu command uses comint to launch the
-viewer (e.g., appletviewer) specified by jde-run-applet-viewer.
+viewer (e.g., appletviewer) specified by jdee-run-applet-viewer.
 
 @node Debugging Applets, Applet Customization Variables, Running Applets, Working with Applets
 @subsection Debugging Applets
@@ -2278,7 +2278,7 @@ To debug an applet:
 Open the applet's source file in a buffer.
 
 @item
-Choose JDE->Debug Applet.
+Choose JDEE->Debug Applet.
 
 The JDEE searches for an html file in the directory containing the
 applet source file. If the JDEE cannot find an html page in the
@@ -2296,8 +2296,8 @@ breakpoints, single-step, or continue running the applet. See
 Debugging Applications for more information.
 
 If you want to specify the document to be used to test the applet,
-customize the variable jde-run-applet-doc or execute M-x
-jde-db-applet. This command prompts you to enter the test document's
+customize the variable jdee-run-applet-doc or execute M-x
+jdee-db-applet. This command prompts you to enter the test document's
 name.
 
 @node Applet Customization Variables,  , Debugging Applets, Working with Applets
@@ -2306,20 +2306,20 @@ name.
 The JDEE allows you to specify run-time options for applets by setting
 JDEE configuration variables.You must use the Emacs customization
 feature to set applet run-time variables . To use the customization
-feature, select JDE->Options->Run. (See Configuring the JDEE for more
+feature, select JDEE->Options->Run. (See Configuring the JDEE for more
 information on using the customization feature). In some cases, the
 JDEE also provides functions for setting the buffer-local values of
 the compilation variables. To save the compilation settings in the
 project file (see Using Project Files) for the current source buffer,
-select JDE->Options->Update Project.
+select JDEE->Options->Update Project.
 
 The following table lists the JDEE applet run-time variables and the
 functions used to set them (all are in Project group):
 
 @multitable @columnfractions .30 .70
 @headitem Variable @tab Usage
-@item jde-run-applet-viewer @tab Specify name of viewer to use to display page containing the applet. The command jde-run-set-applet-viewer sets the buffer-local value of this variable.
-@item jde-run-applet-doc @tab Specify name of document containing applet to be viewed. The command jde-run-set-applet-doc sets the buffer-local value of this variable.
+@item jdee-run-applet-viewer @tab Specify name of viewer to use to display page containing the applet. The command jdee-run-set-applet-viewer sets the buffer-local value of this variable.
+@item jdee-run-applet-doc @tab Specify name of document containing applet to be viewed. The command jdee-run-set-applet-doc sets the buffer-local value of this variable.
 @end multitable
 
 @node Debugging Applications, Specifying Classpaths, Working with Applets, User's Guide
@@ -2350,19 +2350,19 @@ commands. The following table lists these variables.
 
 @multitable @columnfractions .40 .60
 @headitem Variable @tab Applies to
-@item jde-global-classpath @tab All JDEE commands that use a classpath.
-@item jde-compile-option-classpath @tab Compile command
-@item jde-run-option-classpath @tab Run App command
-@item jde-db-option-classpath @tab Debug App command
+@item jdee-global-classpath @tab All JDEE commands that use a classpath.
+@item jdee-compile-option-classpath @tab Compile command
+@item jdee-run-option-classpath @tab Run App command
+@item jdee-db-option-classpath @tab Debug App command
 @end multitable
 
-The jde-global-classpath variable is so named because it specifies a
+The jdee-global-classpath variable is so named because it specifies a
 classpath that is used by all JDEE commands unless overridden by a
 classpath variable specific to a particular command. For example, the
-JDE's Compile command uses jde-global-classpath unless the value of
-jde-compile-option-classpath is set. Typically you want to use the
+JDE's Compile command uses jdee-global-classpath unless the value of
+jdee-compile-option-classpath is set. Typically you want to use the
 same classpath to compile, run, and debug an application. So typically
-jde-global-classpath is the only variable you need to set.
+jdee-global-classpath is the only variable you need to set.
 
 @menu
 * Setting a Classpath Variable::
@@ -2386,8 +2386,8 @@ show the right and wrong way to specify a classpath.
 Example 1. Wrong Way to Specify a Classpath
 
 @example
-jde-global-classpath: [Hide]
-[INS] [DEL] Path: c:/jde-dev/jmath/classes;c:/jde-dev/jmath/src
+jdee-global-classpath: [Hide]
+[INS] [DEL] Path: c:/jdee-dev/jmath/classes;c:/jdee-dev/jmath/src
 [INS]
   [State]: this option has been set and saved.
 @end example
@@ -2395,9 +2395,9 @@ jde-global-classpath: [Hide]
 Example 2. Right Way to Specify a Classpath
 
 @example
-jde-global-classpath: [Hide]
-[INS] [DEL] Path: c:/jde-dev/jmath/classes
-[INS] [DEL] Path: c:/jde-dev/jmath/src
+jdee-global-classpath: [Hide]
+[INS] [DEL] Path: c:/jdee-dev/jmath/classes
+[INS] [DEL] Path: c:/jdee-dev/jmath/src
 [INS]
   [State]: this option has been set and saved.
 @end example
@@ -2422,23 +2422,23 @@ where the src directory contains all of your source files, the lib
 directory all of your jar and zip files, and the classes directory all
 of the classes compiled from the src directory. Further, suppose you
 store your project file (see Using Project Files) at the root of your
-project directory. Then, you can specify jde-global-classpath simply
+project directory. Then, you can specify jdee-global-classpath simply
 as follows.
 
 @example
-jde-global-classpath:
+jdee-global-classpath:
           [Hide] [INS] [DEL] Path: ./classes [INS] [DEL] Path: ./src
           [INS] [DEL] Path: ./lib [INS] [State]: this option has been
           set and saved.
 @end example
 
 If you do not want the JDEE to expand library directories, set the
-variable jde-expand-classpath-p off. The JDEE expands directories
+variable jdee-expand-classpath-p off. The JDEE expands directories
 whose names match the regular expressions specified by
-jde-lib-directory-names. The default values of this variable are ^lib
+jdee-lib-directory-names. The default values of this variable are ^lib
 and ^jar. So by default, the JDEE expands names that begin with the
 string lib or lib, e.g., lib, libraries, etc. However, you can
-customize jde-lib-directory-names to reflect any library naming scheme
+customize jdee-lib-directory-names to reflect any library naming scheme
 you prefer.
 
 @node Using Project Files, Displaying Java Documentation, Specifying Classpaths, User's Guide
@@ -2450,7 +2450,7 @@ project. The JDEE has commands that save the current settings of JDEE
 project variables in the project file for the current project. Project
 files thus allow you to save and restore project-specific settings of
 JDEE customization variables. For example, you can use a project file
-to set the value of the jde-global-classpath variable to a
+to set the value of the jdee-global-classpath variable to a
 project-specific classpath automatically whenever you load a file
 belonging to that project.
 
@@ -2471,7 +2471,7 @@ assumptions. First, it assumes that all Java source files relating to
 a particular project live in a single directory tree. Second, it
 assumes that all project files have the same file name. The name
 assumed by default is prj.el. You can use the JDEE configuration
-variable jde-project-file-name to specify another name.
+variable jdee-project-file-name to specify another name.
 
 When you open a Java source file, the JDEE looks for project files in
 the directory tree containing the source file. If the JDEE finds one
@@ -2498,15 +2498,15 @@ A project file can contain any Lisp code that can be evaluated
 correctly as the last step in creating a Java source buffer. For
 example, a project file can contain code that sets the value of JDEE
 configuration variables. In general, a project file can contain any
-code that could be implemented as a jde-mode hook function. In fact,
-you can think of a project file as a project-specific jde-mode hook
+code that could be implemented as a jdee-mode hook function. In fact,
+you can think of a project file as a project-specific jdee-mode hook
 function.
 
 @node Creating a Project File, Creating Portable Projects, Project File Contents, Using Project Files
 @subsection Creating a Project File
 
 The easiest way to create a project file is to use the
-jde-create-new-project command (JDE->Project->Project File->Create
+jdee-create-new-project command (JDEE->Project->Project File->Create
 New). This command creates a new project file and saves the current
 values of all customized JDEE configuration variables in the project
 file for the selected Java buffer. (To be precise, the command inserts
@@ -2528,7 +2528,7 @@ See Configuring the JDEE for information on how to set the values of
 the JDEE configuration variables.
 
 @item
-Select JDE->Project->Project File->Save Project.
+Select JDEE->Project->Project File->Save Project.
 
 @item
 The JDEE prompts you to enter the path to a directory in which to
@@ -2541,7 +2541,7 @@ Enter to store the project file in the current directory.
 
 Once you have created the project file, you can insert additional
 configuration code into the file if desired. Note that the
-jde-save-project command edits rather than replaces existing project
+jdee-save-project command edits rather than replaces existing project
 files. Thus, you can use the command to update configuration variable
 settings without disturbing any other configuration code that you have
 inserted manually into the project file.
@@ -2566,7 +2566,7 @@ myprj
 
 Further suppose that your project uses beans from a shared library
 specified by the environment variable BEANS. With this setup, you can
-specify jde-global-classpath as:
+specify jdee-global-classpath as:
 
 @example
 ./src
@@ -2574,7 +2574,7 @@ specify jde-global-classpath as:
 $BEANS/lib/dials.jar
 @end example
 
-and jde-compile-option-directory as
+and jdee-compile-option-directory as
 
 @example
 ./classes
@@ -2597,21 +2597,21 @@ code from different projects. Accordingly, the JDEE provides ways for
 you to disable context-switching either permanently or temporarily.
 
 To disable context-switching permanently, toggle the customizat
-variable jde-project-context-switching-enabled-p off. Be sure to use
+variable jdee-project-context-switching-enabled-p off. Be sure to use
 customize to do this and save the customization in your .emacs or
 prj.el file. Note that you can use the JDE's project file loading
-command, JDE->Project->Project File->Load, to switch contexts
+command, JDEE->Project->Project File->Load, to switch contexts
 manually.
 
 To disable context-switching temporarily during a session, select
-JDE->Project->Auto Switch or enter M-x
-jde-toggle-project-context-switching. To reenable context-switching,
+JDEE->Project->Auto Switch or enter M-x
+jdee-toggle-project-context-switching. To reenable context-switching,
 execute the same command again.
 
 @node Project Hook Functions,  , Disabling Context Switching, Using Project Files
 @subsection Project Hook Functions
 
-The variable jde-project-hooks lists functions that execute after the
+The variable jdee-project-hooks lists functions that execute after the
 JDEE loads a project file. By writing hook functions and adding them
 to this list, you can specify actions to be taken every time the JDEE
 switches from one project to another.
@@ -2631,24 +2631,24 @@ and context-sensitive help for classes.
 @node Browsing JDK Documentation, Context-Sensitive Class Help, Displaying Java Documentation, Displaying Java Documentation
 @subsection Browsing JDK Documentation
 
-The jde-browse-jdk-doc command (JDE->Help->JDK, C-c  C-v C-n) opens
+The jdee-browse-jdk-doc command (JDEE->Help->JDK, C-c  C-v C-n) opens
 the JDK documentation in a browser. By default, this command displays
 the JDK documentation page at JavaSoft's web site. To display a
-different copy, set the variable jde-jdk-doc-url to the url of the
+different copy, set the variable jdee-jdk-doc-url to the url of the
 index page of the copy you want to be displayed.
 
 @node Context-Sensitive Class Help, Specifying a Browser, Browsing JDK Documentation, Displaying Java Documentation
 @subsection Context-Sensitive Class Help
 
 The JDK provides context-sensitive help for Java classes. To use this
-facility, you must first customize the variable jde-help-docsets to
+facility, you must first customize the variable jdee-help-docsets to
 specify the location of class documentation on your system. The JDEE
 class help facility supports javadoc documentation by default but it
 works with other types of documentation as well.
 
 Once you have specified the location of class documentation on your
 system, you can get help for the class at point in the current buffer
-by selecting JDE->Help->Symbol at Point.
+by selecting JDEE->Help->Symbol at Point.
 
 @node Specifying a Browser,  , Context-Sensitive Class Help, Displaying Java Documentation
 @subsection Specifying a Browser
@@ -2677,7 +2677,7 @@ of links.
 
 One you have installed emacs-w3m/w3m, you can configure Emacs (and
 hence the JDEE) to use it to display Javadoc pages by customizing
-jde-help-browser-function to specify w3m-browse-url.
+jdee-help-browser-function to specify w3m-browse-url.
 
 The w3m-browse-url function displays its output by default in the
 current window, replacing the Java file in the buffer. To cause the
@@ -2737,7 +2737,7 @@ should rebuild the menu whenever you edit the buffer.
 
 Selecting this item takes you to the start of the definition of the
 class on whose submenu it appears. Turn the variable
-jde-imenu-include-classdef off to suppress inclusion of these items in
+jdee-imenu-include-classdef off to suppress inclusion of these items in
 the menu.
 @end itemize
 
@@ -2745,7 +2745,7 @@ the menu.
 @subsubsection Alphabetizing the Classes Menu
 
 By default the Classes menu lists methods and fields in the order in
-which the active buffer defines them. Use the variable jde-imenu-sort
+which the active buffer defines them. Use the variable jdee-imenu-sort
 to customize the menu to list methods and fields alphabetically in
 either ascending or descending order.
 
@@ -2756,13 +2756,13 @@ By default the Classes menu displays the signatures of methods and the
 types of fields displayed in the active buffer. The method signatures
 enable you to distinguish overloaded method names. The menu can also
 display the names of methods and fields without signatures and
-types. Use the variable jde-imenu-include-signature to turn signature
+types. Use the variable jdee-imenu-include-signature to turn signature
 and type display off or on.
 
 @node Disabling the Classes Menu, Using the Keyboard to Navigate the Classes Menu, Suppressing Method Signatures and Field Types, Classes Index Menu
 @subsubsection Disabling the Classes Menu
 
-Set the variable jde-imenu-enable off to disable the Classes
+Set the variable jdee-imenu-enable off to disable the Classes
 menu. When disabled, the menu does not appear in the Emacs menubar.
 
 @node Using the Keyboard to Navigate the Classes Menu,  , Disabling the Classes Menu, Classes Index Menu
@@ -2780,7 +2780,7 @@ scrolls the buffer to the indexed point in the buffer.
 @node Using the Speedbar, Tags, Classes Index Menu, Browsing Source Code
 @subsection Using the Speedbar
 
-To display the speedbar, select JDE-> Speedbar. The speedbar opens in
+To display the speedbar, select JDEE-> Speedbar. The speedbar opens in
 a separate frame.
 
 The speedbar displays a list of the files and subdirectories in the
@@ -2924,7 +2924,7 @@ Java source and other types of text files:
 
 @itemize
 @item
-JDE->Find->Expression (jde-find)
+JDEE->Find->Expression (jdee-find)
 
 This command uses the minibuffer to prompt you for the search
 expression and the paths to be searched. You can use customization
@@ -2935,7 +2935,7 @@ project. See Using the Minibuffer-Based Find Command for more
 information.
 
 @item
-JDE->Find->Expression... (jde-find-dlg)
+JDEE->Find->Expression... (jdee-find-dlg)
 
 This command uses a text dialog buffer to prompt you for search
 arguments. The dialog buffer allows you to specify all search options
@@ -2965,20 +2965,20 @@ find-program variable to specify the Unix-style command's location.
 @end indentedblock
 
 @menu
-* Using the Minibuffer-Based Find (jde-find) Command::
+* Using the Minibuffer-Based Find (jdee-find) Command::
 * Customizing the Minibuffer-Based Find Command::
-* Using the Dialog-Based Find (jde-find-dlg) Command::
+* Using the Dialog-Based Find (jdee-find-dlg) Command::
 @end menu
 
-@node Using the Minibuffer-Based Find (jde-find) Command, Customizing the Minibuffer-Based Find Command, Finding Expressions, Finding Expressions
-@subsubsection Using the Minibuffer-Based Find (jde-find) Command
+@node Using the Minibuffer-Based Find (jdee-find) Command, Customizing the Minibuffer-Based Find Command, Finding Expressions, Finding Expressions
+@subsubsection Using the Minibuffer-Based Find (jdee-find) Command
 
 To find an expression with the minibuffer-based find command:
 
 @enumerate
 @item
 Select Find->Expression (C-c-C-v-C-f) from the JDEE menu or execute
-the jde-find command.
+the jdee-find command.
 
 The JDEE prompts you to enter a regular expression.
 
@@ -2992,10 +2992,10 @@ The prompt may list a default search path. The JDEE determines the
 default path by testing each of the following variables in the order
 listed.
 @itemize
-@item jde-sourcepath
-@item jde-compile-option-sourcepath
-@item jde-compile-option-classpath
-@item jde-global-classpath
+@item jdee-sourcepath
+@item jdee-compile-option-sourcepath
+@item jdee-compile-option-classpath
+@item jdee-global-classpath
 @end itemize
 
 The JDEE uses the directories specified by the first path variable
@@ -3019,7 +3019,7 @@ To visit the file containing the match, click the match message in the
 grep buffer with the middle mouse button or move point to the message
 and press Enter.
 
-@node Customizing the Minibuffer-Based Find Command, Using the Dialog-Based Find (jde-find-dlg) Command, Using the Minibuffer-Based Find (jde-find) Command, Finding Expressions
+@node Customizing the Minibuffer-Based Find Command, Using the Dialog-Based Find (jdee-find-dlg) Command, Using the Minibuffer-Based Find (jdee-find) Command, Finding Expressions
 @subsubsection Customizing the Minibuffer-Based Find Command
 
 The following variables allow you to customize the minibuffer-based
@@ -3027,19 +3027,19 @@ search command:
 
 @multitable @columnfractions .35 .12 .53
 @headitem Variable @tab Default @tab Description
-@item jde-find-case-sensitive @tab nil @tab Specifies whether the jde-find command performs a case-sensitive search. If non-nil, the search is case-sensitive; otherwise the search ignores case.
-@item jde-find-granularity @tab Character @tab Specifies the granularity of the expression search conducted by jde-find: Character (expression starting on any character), Word (match words only), Line (match lines only).
-@item jde-find-file-regexp @tab *.java @tab Specifies the regular expression that the jde-find command uses to select files to be searched. You can use any regular expression supported by the -name option of the GNU find command.
+@item jdee-find-case-sensitive @tab nil @tab Specifies whether the jdee-find command performs a case-sensitive search. If non-nil, the search is case-sensitive; otherwise the search ignores case.
+@item jdee-find-granularity @tab Character @tab Specifies the granularity of the expression search conducted by jdee-find: Character (expression starting on any character), Word (match words only), Line (match lines only).
+@item jdee-find-file-regexp @tab *.java @tab Specifies the regular expression that the jdee-find command uses to select files to be searched. You can use any regular expression supported by the -name option of the GNU find command.
 @end multitable
 
-@node Using the Dialog-Based Find (jde-find-dlg) Command,  , Customizing the Minibuffer-Based Find Command, Finding Expressions
-@subsubsection Using the Dialog-Based Find (jde-find-dlg) Command
+@node Using the Dialog-Based Find (jdee-find-dlg) Command,  , Customizing the Minibuffer-Based Find Command, Finding Expressions
+@subsubsection Using the Dialog-Based Find (jdee-find-dlg) Command
 
 To find an expression with the dialog-based find command:
 
 @enumerate
 @item
-Select Find->Expression... from the JDEE menu or execute the jde-find
+Select Find->Expression... from the JDEE menu or execute the jdee-find
 command.
 
 The Find Expression Options buffer appears.
@@ -3048,13 +3048,13 @@ The Find Expression Options buffer appears.
 Edit the buffer to reflect the search options that you desire.
 
 Note: The options you select will appear the next time you execute the
-jde-find-dlg command.
+jdee-find-dlg command.
 
 @item
 Select the Ok button.
 @end enumerate
 
-The jde-find-dlg invokes the find and grep commands with the options
+The jdee-find-dlg invokes the find and grep commands with the options
 you specified and displays the results in a buffer.
 
 @node Finding Symbol Definitions, Finding Classes, Finding Expressions, Searching Source Code
@@ -3062,14 +3062,14 @@ you specified and displays the results in a buffer.
 
 To find the source code that defines the class, interface, method, or
 field at point, select Find->Symbol Definition (C-c  C-v  C-y) from
-the JDEE menu or execute M-x jde-open-class-at-point. The JDEE
+the JDEE menu or execute M-x jdee-open-class-at-point. The JDEE
 displays a buffer containing the source code that defines the symbol
 at point in the original buffer.
 
 @indentedblock
 Note: This command requires that the symbol definition be located on
-jde-sourcepath and that the class referenced at point be located on
-jde-global-classpath. The command uses the beanshell to determine the
+jdee-sourcepath and that the class referenced at point be located on
+jdee-global-classpath. The command uses the beanshell to determine the
 fully qualified name of the class referenced at point. If the
 beanshell is not running, it launches the beanshell.
 @end indentedblock
@@ -3077,21 +3077,21 @@ beanshell is not running, it launches the beanshell.
 @node Finding Classes, Cross-Referencing Classes, Finding Symbol Definitions, Searching Source Code
 @subsection Finding Classes
 
-The jde-open-class-source command finds and opens the Java source file
+The jdee-open-class-source command finds and opens the Java source file
 for the class whose qualified or unqualified name appears at point.
 
 @indentedblock
 Note: The JDEE uses Java reflection to determine the fully qualified
 name of the class at point. Therefore, the class must be on
-jde-global-classpath.
+jdee-global-classpath.
 @end indentedblock
 
 If more than one class with the same name exists on
-jde-global-classpath, this command prompts you to select one of the
+jdee-global-classpath, this command prompts you to select one of the
 classes. The following conditions must be true for this command to
 work. First, a class file for this class must exist on the classpath
-specified by jde-global-classpath. Secondly, the source for the class
-must exist on one of the paths specified by jde-sourcepath. This
+specified by jdee-global-classpath. Secondly, the source for the class
+must exist on one of the paths specified by jdee-sourcepath. This
 command uses the Beanshell to determine the fully qualified name of
 the class to be found. It starts the Beanshell if necessary. Thus, the
 command may respond somewhat slowly the first time you it in a
@@ -3129,23 +3129,23 @@ for a particular project. To this end, JDEE needs to know where the
 built class files for a project live. This is usually a subset of the
 classpath.
 
-Then select JDE->Options->Project->General, and go to the "Jde Built
+Then select JDEE->Options->Project->General, and go to the "Jde Built
 Class Path" option. Insert one path for each place where built classes
 wind up. You can add both directories and zip files (jar/bar/etc). Any
 file entered will be assumed to be a zip file.
 
 Now that you have the built class path defined, you can configure the
-cross-referencer that uses it. Type M-x jde-xref-customize. The
+cross-referencer that uses it. Type M-x jdee-xref-customize. The
 following are a list the variables that can be set, and what they do:
 
 @table @code
-@item jde-xref-db-base-directory
+@item jdee-xref-db-base-directory
 The cross-referencer creates a database to store the cross-reference
 information. This variable defines a directory where that information
 resides. It might, for example, be at the base of your project tree,
 in a directory called xrefdb.
 
-@item jde-xref-store-prefixes
+@item jdee-xref-store-prefixes
 To reduce database size, it's useful to ignore all information that
 doesn't refer to code you care about. For example, most people don't
 need to know who calls java.lang.System.out.println. To not store this
@@ -3154,7 +3154,7 @@ interested in. Typically, this may be just one string, for example
 "com.mycompany", to store only code that references com.mycompany
 classes.
 
-@item jde-xref-cache-size
+@item jdee-xref-cache-size
 The caller database can be quite large. However, it is useful for
 efficiency reasons to keep part of it in memory. This variable
 deterines how many packages to keep in memory simulatenously. The
@@ -3170,7 +3170,7 @@ is to build the cross-reference database. The project must be fully
 built for this to work, since it takes cross-reference information
 directly from the built classes.
 
-To build the database, type @kbd{M-x jde-xref-make-xref-db}.
+To build the database, type @kbd{M-x jdee-xref-make-xref-db}.
 
 If all the settings are properly configured, JDEE will go off and
 create the cross-reference database. This can take from a few seconds
@@ -3179,7 +3179,7 @@ files may take long to parse, so if it seems to be "stuck", please
 give it time.
 
 When it is done, it will save the database in the base directory
-specified in the jde-xref customization group.
+specified in the jdee-xref customization group.
 
 @node Using the Cross-Reference Database, Updating the Cross-Reference Database, Building the Cross-Reference Database, Cross-Referencing Classes
 @subsubsection Using the Cross-Reference Database
@@ -3189,26 +3189,26 @@ database:
 
 @table @asis
 
-@item M-x jde-xref-first-caller (C-c C-v a)
+@item M-x jdee-xref-first-caller (C-c C-v a)
 If your cursor is in the body of a function, then this will go to the
 first in a sequence of callers to this function. If there are no
 callers, there will be a message saying so.
 
-@item M-x jde-xref-next-caller (C-c C-v n)
-After calling jde-xref-first-caller, you can go to each of the callers
+@item M-x jdee-xref-next-caller (C-c C-v n)
+After calling jdee-xref-first-caller, you can go to each of the callers
 in sequence with this function. The first caller function creates a
 list of callers and goes to the first one. This navigates to the next
 caller on the list. You can keep calling this until there are no more
 callers, in which case there will be a message saying so.
 
-@item M-x jde-xref-display-call-tree
+@item M-x jdee-xref-display-call-tree
 This displays an interactive tree view of the function you are in, and
 it's callers. Each level down will show you who calls the parent
 function. In this way you can quickly get an overview of the context
 in which the current function is used in. Each item in the tree will
 take you to it's definition if it is clicked on.
 
-@item M-x jde-xref-list-uncalled-functions
+@item M-x jdee-xref-list-uncalled-functions
 Called from a java file, this lists all the functions in the file that
 have no apparent callers. It's important to remember that because of
 Java reflection, there is no guarantee that the functions are truly
@@ -3227,16 +3227,16 @@ Bar.doSomething(), then Bar.doSomething() is treated as a caller in
 non-strict mode. In strict mode, however, the caller must specify the
 function directly for it to be considered a hit. To run these
 functions with strict mode, type C-u M-x and then the
-function-name. So C-u M-x jde-xref-list-uncalled-functions will list
+function-name. So C-u M-x jdee-xref-list-uncalled-functions will list
 only functions that are uncalled directly.
 
 @node Updating the Cross-Reference Database,  , Using the Cross-Reference Database, Cross-Referencing Classes
 @subsubsection Updating the Cross-Reference Database
 
 As the code changes, the cross-referencer must be kept up to date, or
-else the jde-xref functions will start taking you to incorrect places
+else the jdee-xref functions will start taking you to incorrect places
 in files, and the callers list itself will become incorrect. As you
-change the code, you can call M-x jde-xref-update after a recompile,
+change the code, you can call M-x jdee-xref-update after a recompile,
 and it will go through and recompute just the part of the database you
 have changed.
 
@@ -3244,7 +3244,7 @@ Another, easier way to update, for those of us who leave their emacs
 running all the time, is to add a line such as this in their .emacs
 
 @example
-(run-at-time "11:00pm" 86400 'jde-xref-make-xref-db)
+(run-at-time "11:00pm" 86400 'jdee-xref-make-xref-db)
 @end example
 
 @node Customizing the JDEE, Installing a Plugin, Searching Source Code, User's Guide
@@ -3254,10 +3254,10 @@ This section describes various ways you can customize the JDEE.
 
 @menu
 * JDEE Customization Variables::
-* Customizing jde-mode::
+* Customizing jdee-mode::
 @end menu
 
-@node JDEE Customization Variables, Customizing jde-mode, Customizing the JDEE, Customizing the JDEE
+@node JDEE Customization Variables, Customizing jdee-mode, Customizing the JDEE, Customizing the JDEE
 @subsection JDEE Customization Variables
 
 JDEE customization variables allow you to specify compile, run, debug,
@@ -3295,8 +3295,8 @@ Determine the name of the variable you want to customize.
 
 Refer to the section of this guide that documents the feature you want
 to customize for the name of the corresponding variable. Or type C-h
-v followed by the JDEE group prefix (jde-) or subgroup prefix (e.g.,
-jde-compile-option-, see JDEE Customization Groups). Emacs displays
+v followed by the JDEE group prefix (jdee-) or subgroup prefix (e.g.,
+jdee-compile-option-, see JDEE Customization Groups). Emacs displays
 all variables belonging to the JDEE group or subgroup. You can then
 browse this list, using Emacs search, completion, and documentation
 display command, to find the applicable variable.
@@ -3307,9 +3307,9 @@ Display a customization buffer for the variable.
 If you know the name of the variable, the easiest way to display a
 customization buffer for the variable is to select
 Help->Customize->Specific Option... from the Emacs menubar or type M-x
-jde-customize-variable.
+jdee-customize-variable.
 
-Note: jde-customize-variable is a special version of the standard
+Note: jdee-customize-variable is a special version of the standard
 Emacs customize-variable command that provides a customization buffer
 menu item for saving a customization in a JDEE project file (see
 below). You should use this version of the command if you intend to
@@ -3340,7 +3340,7 @@ If you want the setting to apply only to the current project, select
 Save in JDEE Project File from the State menu for the variable.
 
 Note: The Save in JDEE Project File menu item appears only if you used
-the jde-customize-variable command to create the customization buffer.
+the jdee-customize-variable command to create the customization buffer.
 
 If a project file does not exist for the project, the JDEE prompts you
 to enter a name for the project. It then creates a project file for
@@ -3376,14 +3376,14 @@ home directory.
 @emph{Relative Paths}
 
 A relative path is a path that begins with a period, for example,
-./src. If jde-resolve-relative-paths is set to a non-nil value (the
+./src. If jdee-resolve-relative-paths is set to a non-nil value (the
 default), the JDEE converts a relative path to an absolute path by
 appending the relative path to the path of the project file that set
 the path variable, or if no such file exists, to the path of the
 current Java source buffer.
 
 You can use your .emacs file to specify default relative paths for
-projects. For example, setting jde-global-classpath to ./classes in
+projects. For example, setting jdee-global-classpath to ./classes in
 your .emacs file specifies that the default location of class files is
 in a subdirectory of the project file directory named classes.
 
@@ -3393,23 +3393,23 @@ You can use cygwin style paths in JDEE classpath variables on
 Windows. The JDEE converts such paths to DOS paths before using them,
 using a conversion function that you can specify.
 
-The jde-cgywin-path-converter variable allows you to choose the path
+The jdee-cgywin-path-converter variable allows you to choose the path
 conversion function used by the JDEE.
 
 @table @asis
-@item jde-cygwin-path-converter-internal
+@item jdee-cygwin-path-converter-internal
 This is the default path conversion function used by the JDE. It
 converts any paths of the form //[a-z]/ or //cygdrive/[a-z]/ to the
 corresponding DOS form. For example it converts /c/jde/java/classes to
 c:/jde/java/classes.
 
-@item jde-cygwin-path-converter-cygpath
+@item jdee-cygwin-path-converter-cygpath
 This function invokes the cygwin cygpath utility to perform the path
 conversion. The advantage is that the cygwin path utility can
 recognize and convert Unix style paths that represent mount points in
 the cygwin mount table. For example, suppose that you have mounted
 d:/javadev as /javadev in the cygwin mount table. Then choosing
-jde-cygwin-path-converter-cygpath allows you to use paths beginning
+jdee-cygwin-path-converter-cygpath allows you to use paths beginning
 with /javadev in JDEE classpaths. The drawback is that the conversion
 is slow as it requires running the cygwin utility for each Unix-style
 path to be converted.
@@ -3433,9 +3433,9 @@ construct a list of command-line arguments that it passes to the Java
 compiler that the JDEE uses to compile Java source programs. The
 compiler is itself an option that you can specify (see the Project
 Option Group). You can specify command-line arguments directly by
-setting the value of the jde-compile-option-command-line-args
+setting the value of the jdee-compile-option-command-line-args
 variable. You can display the customization buffer for the Compile
-Option Group by selecting JDE-> Project->Options->Compile from the
+Option Group by selecting JDEE-> Project->Options->Compile from the
 Emacs™ menubar.
 
 @emph{Run Option Group}
@@ -3451,7 +3451,7 @@ different set of arguments than java does) and for specifying
 arguments to be passed to the application (as opposed to the virtual
 machine interpreting the application.) You can display the
 customization buffer for the Run Option Group by selecting
-JDE->Project->Options->Run from the Emacs menubar.
+JDEE->Project->Options->Run from the Emacs menubar.
 
 @emph{Debug Option Group}
 
@@ -3465,7 +3465,7 @@ normally. When you execute the JDEE Debug command, the JDEE uses the
 settings of this group to construct a list of command-line arguments
 that it passes to the Java debugger used by the JDEE to run
 applications in debug mode. You can display the customization buffer
-for the Debug Option Group by selecting JDE->Project->Options->Debug
+for the Debug Option Group by selecting JDEE->Project->Options->Debug
 from the Emacs™ menubar.
 
 @emph{Autocode Group}
@@ -3476,33 +3476,33 @@ Specifies templates used to generate code automatically.
 
 Specify all other JDEE options. You can display the customization
 buffer for the General Option Group by selecting
-JDE->Project->Options->General from the Emacs menubar.
+JDEE->Project->Options->General from the Emacs menubar.
 
-@node Customizing jde-mode,  , JDEE Customization Variables, Customizing the JDEE
-@subsection Customizing jde-mode
+@node Customizing jdee-mode,  , JDEE Customization Variables, Customizing the JDEE
+@subsection Customizing jdee-mode
 
-The JDEE defines a major mode, named jde-mode, for editing Java source
+The JDEE defines a major mode, named jdee-mode, for editing Java source
 files. This mode derives from the standard Emacs Java source editing
 mode java-mode. In particular, it inherits all the functions and
 customization variables defined by java-mode and adds its own
 customization variables. When you load a Java source file, Emacs runs
-a JDEE mode initialization function called jde-mode. The jde-mode
+a JDEE mode initialization function called jdee-mode. The jdee-mode
 function in turn calls the Java mode intialization function,
-java-mode. The last thing that jde-mode does before returning is to
+java-mode. The last thing that jdee-mode does before returning is to
 call a JDEE mode function, if it exists. You can customize the JDEE by
 defining a JDEE mode hook function in your .emacs file. The following
 is an example of how to do this:
 
 @example
-(defun my-jde-mode-hook ()
-  (message "my-jde-mode-hook function executed"))
-    (add-hook 'jde-mode-hook 'my-jde-mode-hook)
+(defun my-jdee-mode-hook ()
+  (message "my-jdee-mode-hook function executed"))
+    (add-hook 'jdee-mode-hook 'my-jdee-mode-hook)
 @end example
 
 The preceding example defines a JDEE mode hook function named
-my-jde-mode-hook and adds it to the list of JDEE mode hook functions,
+my-jdee-mode-hook and adds it to the list of JDEE mode hook functions,
 using the Emacs Lisp function add-hook. Now, whenever you open a Java
-source file, jde-mode invokes the function my-jde-mode-hook. Of
+source file, jdee-mode invokes the function my-jdee-mode-hook. Of
 course, the hook function defined in this example is trivial. A
 real-world example might do something more useful, such as setting a
 custom indentation style.
@@ -3511,14 +3511,14 @@ custom indentation style.
 * Customizing Key Bindings::
 @end menu
 
-@node Customizing Key Bindings,  , Customizing jde-mode, Customizing jde-mode
+@node Customizing Key Bindings,  , Customizing jdee-mode, Customizing jdee-mode
 @subsubsection Customizing Key Bindings
 
 A key binding establishes an equivalence between a keystroke or a
 sequence of keystrokes and an interactive Lisp function. The keystroke
 or keystroke combination causes Emacs to execute the function to which
 the keystroke (combination) is bound. For example, the JDEE by default
-binds the keystroke C-c C-v C-c to the function jde-compile. You can
+binds the keystroke C-c C-v C-c to the function jdee-compile. You can
 use the JDEE customization facility to change the standard JDEE
 bindings or create bindings for functions that do not have default
 bindings.
@@ -3528,11 +3528,11 @@ To customize key bindings:
 
 @enumerate
 @item
-Open a buffer on the JDEE customization variable jde-key-bindings.
+Open a buffer on the JDEE customization variable jdee-key-bindings.
 
-You can do this by typing M-x customize-variable  jde-key-bindings or
-by selecting JDE->Options->Project and searching the resulting JDEE
-project customization buffer for jde-key-bindings.
+You can do this by typing M-x customize-variable  jdee-key-bindings or
+by selecting JDEE->Options->Project and searching the resulting JDEE
+project customization buffer for jdee-key-bindings.
 
 @item
 Edit the buffer to specify altered or new bindings.
@@ -3550,7 +3550,7 @@ current project or Save for future sessionsif you want the settings to
 apply to all projects. In either case, you should save the new
 settings in you project file if your project has a project file. To
 save the new settings in your project file, switch to a source buffer
-and choose JDE-> Options->Save Project from the Emacs menubar.
+and choose JDEE-> Options->Save Project from the Emacs menubar.
 @end enumerate
 
 @node Installing a Plugin,  , Customizing the JDEE, User's Guide
@@ -3565,11 +3565,11 @@ plugins directory.
 
 Note: By default the JDEE plugin directory is a subdirectory of the
 JDEE directory named plugins. If you want to keep your plugins in
-another directory, set jde-plugins-directory to the path of that
+another directory, set jdee-plugins-directory to the path of that
 directory.
 
 @item
-Execute M-h jde-pi-install-plugins.
+Execute M-h jdee-pi-install-plugins.
 
 This command installs any plugins at the top level of the plugins
 directory in the plugins directory.
@@ -3597,16 +3597,16 @@ The JDEE distribution includes the following files:
 @itemize
 
 @item
-@file{jde.el} Defines jde-mode, a major Emacs mode for developing Java code.
+@file{jde.el} Defines jdee-mode, a major Emacs mode for developing Java code.
 
 @item
-@file{jde-run.el} Runs Java applications and applets
+@file{jdee-run.el} Runs Java applications and applets
 
 @item
-@file{jde-db.el} Interfaces Emacs to jdb, the command-line debugger that comes with the JDK.
+@file{jdee-db.el} Interfaces Emacs to jdb, the command-line debugger that comes with the JDK.
 
 @item
-@file{jde-gen.el} Contains code generation templates.
+@file{jdee-gen.el} Contains code generation templates.
 
 @item
 @file{bsh.jar} Compiled files for the BeanShell, a Java source code interpreter developed by Pat Neimeyer.
@@ -3615,25 +3615,25 @@ The JDEE distribution includes the following files:
 @file{beanshell.el} Provides an Emacs interface to the BeanShell interpreter.
 
 @item
-@file{jde-wiz.el} Provides "wizards" that generate skeleton implementations of interfaces and skeleton overrides of methods declared by superclasses.
+@file{jdee-wiz.el} Provides "wizards" that generate skeleton implementations of interfaces and skeleton overrides of methods declared by superclasses.
 
 @item
-@file{jde-complete.el} Automatic field and method completion package.
+@file{jdee-complete.el} Automatic field and method completion package.
 
 @item
-@file{jde-parse.el} Java parser package.
+@file{jdee-parse.el} Java parser package.
 
 @item
 @file{java.bnf} Java grammar used to generate the JDEE's lisp-based Java parser.
 
 @item
-@file{jde-bug.el} JDEbug user interface package.
+@file{jdee-bug.el} JDEbug user interface package.
 
 @item
-@file{jde-dbs.el} JDEbug low-level command interface package.
+@file{jdee-dbs.el} JDEbug low-level command interface package.
 
 @item
-@file{jde-dbo.el} JDEbug output processing functions.
+@file{jdee-dbo.el} JDEbug output processing functions.
 
 @item
 source code, jar files, and documentation for the Java components of the JDEE.
@@ -3702,7 +3702,7 @@ plugin
 @emph{Bootstrap File}
 
 The plugin's lisp directory must contain a Lisp file named
-jde-PLUGIN.el where PLUGIN is the same as the plugin's top-level
+jdee-PLUGIN.el where PLUGIN is the same as the plugin's top-level
 directory name. This file is called a bootstrap file because it is the
 only file directly loaded by the JDEE. It is responsible for
 registering the plugin with the JDEE and loading any other Lisp files
@@ -3713,8 +3713,8 @@ required by the plugin.
 
 A plugin's bootstrap file must register the plugin with the JDEE when
 it is loaded. The bootstrap file should do this by invoking the JDEE's
-jde-pi-register function. This function takes a single argument: an
-instance of jde-plugin class that optionally specifies the plugin's
+jdee-pi-register function. This function takes a single argument: an
+instance of jdee-plugin class that optionally specifies the plugin's
 menu and its contribution to the classpath of the instance of the
 BeanShell run by the JDEE.
 
@@ -3726,18 +3726,18 @@ methods and display their output in an Emacs buffer. The JDEE provides
 the following functions for this purpose:
 
 @table @code
-@item jde-jeval
+@item jdee-jeval
 Evaluate a Java statement in the JDEE's BeanShell instance and return
 the resulting BeanShell output.
 
-@item jde-jeval-r
+@item jdee-jeval-r
 Evaluate a Java statement in the JDEE's BeanShell instance, use the
 Emacs Lisp interpreter to evaluate the resulting BeanShell output, and
 return the result. This function assumes that the Java statement emits
 Emacs Lisp code, i.e., that the Java code was developed specifically
 to cause Emacs to do something.
 
-@item jde-jeval-cm
+@item jdee-jeval-cm
 Evaluate a Java statement in the JDEE's BeanShell instance and display
 the resulting BeanShell output in an Emacs compilation buffer. This
 function is intended to run Java applications, such as style checkers,
@@ -3753,20 +3753,20 @@ The following is an example of the bootstrap file for a plugin named
 @samp{pi1}.
 
 @example
-;; jde-pi1.el
-(defun jde-pi1-cmd ()
+;; jdee-pi1.el
+(defun jdee-pi1-cmd ()
   (interactive)
   (message "plugin 1"))
 
-(jde-pi-register
-  (jde-plugin
+(jdee-pi-register
+  (jdee-plugin
    "pi1"
    :bsh-cp (list
-             (expand-file-name "lib/lib1.jar" (jde-pi-get-plugin-dir "pi1"))
-             (expand-file-name "lib/lib2.jar" (jde-pi-get-plugin-dir "pi1")))
-   :menu-spec (list (list "Pi1" ["cmd" jde-pi1-cmd :active t]))))
+             (expand-file-name "lib/lib1.jar" (jdee-pi-get-plugin-dir "pi1"))
+             (expand-file-name "lib/lib2.jar" (jdee-pi-get-plugin-dir "pi1")))
+   :menu-spec (list (list "Pi1" ["cmd" jdee-pi1-cmd :active t]))))
 
-(provide 'jde-pi1)
+(provide 'jdee-pi1)
 @end example
 
 @c JDEE Developer's Guide ends here
