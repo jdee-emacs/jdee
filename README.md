@@ -33,7 +33,7 @@ For more information, see ```doc/install.html```
 To use this built distribution without installation, in your .emacs add:
 ```emacs-lisp
   (add-to-list 'load-path "/path/to/jdee")
-  (require 'jde)
+  (require 'jdee)
 ```
 
 ## Features
@@ -42,17 +42,17 @@ Some of the features of JDEE include:
 
 - source code editing with syntax highlighting, auto indentation using the
   native GNU Emacs Java mode
-- Symbol completion (jde-complete-in-line)
+- Symbol completion (jdee-complete-in-line)
 - Code generation: templates, import insertion/deletion/ordering
   etc.
-- browse JDK doc, using the browser of your choice (jde-help-symbol and
-  jde-help-docsets)
-- browse your source code (jde-find-class* and semantic integration)
+- browse JDK doc, using the browser of your choice (jdee-help-symbol and
+  jdee-help-docsets)
+- browse your source code (jdee-find-class* and semantic integration)
 - compilation with automatic jump from error messages to responsible line in the
-  source code using ant (jde-ant-build).
+  source code using ant (jdee-ant-build).
 - run Java application in an interactive (comint) Emacs buffer
 - integrated debugging with interactive debug command buffer and automatic
-  display of current source file/line when stepping through code (jde-debug)
+  display of current source file/line when stepping through code (jdee-debug)
 - supports Oracle/OpenJDK Java 7
 - runs on any platform supported by GNU Emacs 24.3 and later
 - easily and infinitely customizable
