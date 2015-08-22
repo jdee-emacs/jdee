@@ -1,10 +1,11 @@
-;;; jdee.el -- Java Development Environment for Emacs
-;; $Id$
+;;; jdee.el --- Java Development Environment for Emacs
 
 ;; Author: Paul Kinnucan <pkinnucan@attbi.com>
 ;; Maintainer: Paul Landes
 ;; Keywords: java, tools
 ;; URL: http://github.com/jdee-emacs/jdee
+;; Version: 2.4.2
+;; Package-Requires: ((emacs "24.3"))
 
 ;; Copyright (C) 1997-2008 Paul Kinnucan.
 ;; Copyright (C) 2009 by Paul Landes
@@ -2332,4 +2333,4 @@ buffer, otherwise, return whether or not it is a legitimate buffer."
 
 (provide 'jdee)
 
-;; End of jde.el
+;;; jdee.el ends here
