@@ -1,4 +1,5 @@
 language: emacs-lisp
+sudo: required
 env:
   - EMACS=emacs24
 #  - EMACS=emacs-snapshot
