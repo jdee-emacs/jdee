@@ -42,7 +42,7 @@ If nil then the default efc custom-based dialogs will be used."
 		 (const :tag "Mini-Buffer" efc-query-options-function-minibuf)
 		 (function :tag "Specify Function"
 			   efc-query-options-function-dialog))
-  :group 'jde)
+  :group 'jdee)
 
 (defun efc-query-options-function-dialog (options prompt title history default)
   (let ((dialog

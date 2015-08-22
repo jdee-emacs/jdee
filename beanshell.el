@@ -86,7 +86,7 @@
 (eval-when-compile
  (require 'cl)) ;; lexical-let
 
-(declare-function jde-find-jde-doc-directory "jde" nil)
+(declare-function jdee-find-jdee-doc-directory "jdee" nil)
 
 (defgroup bsh nil
   "Customizations for the Emacs inteface to Pat Neimeyer's Java
@@ -501,7 +501,7 @@ to the string form required by the vm."
    'identity
    (append
     (and (slot-boundp this 'cp) (oref this cp))
-    (directory-files jde-server-dir t ".*\.jar"))
+    (directory-files jdee-server-dir t ".*\.jar"))
    path-separator))
 
 (defmethod bsh-running-p ((this bsh))
@@ -527,13 +527,13 @@ to the string form required by the vm."
    nil "Specified vm does not exist: %s" (oref this vm))
 
   (cl-assert
-   (not (string= "" jde-server-dir))
-   nil "Point `jde-server-dir' to dir with JDEE jars.")
+   (not (string= "" jdee-server-dir))
+   nil "Point `jdee-server-dir' to dir with JDEE jars.")
 
   (cl-assert
-   (directory-files jde-server-dir t ".*\.jar")
+   (directory-files jdee-server-dir t ".*\.jar")
    nil
-   "Found no JARs in specified `jde-server-dir': %s" jde-server-dir))
+   "Found no JARs in specified `jdee-server-dir': %s" jdee-server-dir))
 
 (defmethod bsh-launch ((this bsh) &optional display-buffer)
   (bsh--check-launch-preconditions this)
@@ -904,10 +904,10 @@ by Pat Niemeyer."
 (defun bsh-script-help ()
   "Display BeanShell User's Guide."
   (interactive)
-  (let* ((jde-dir (jde-find-jde-doc-directory))
+  (let* ((jdee-dir (jdee-find-jdee-doc-directory))
 	 (bsh-help
-	  (if jde-dir
-	      (expand-file-name "doc/html/bsh-ug/bsh-ug.html" jde-dir))))
+	  (if jdee-dir
+	      (expand-file-name "doc/html/bsh-ug/bsh-ug.html" jdee-dir))))
     (if (and
 	 bsh-help
 	 (file-exists-p bsh-help))

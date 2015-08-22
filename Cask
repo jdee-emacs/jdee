@@ -1,10 +1,10 @@
 ;; -*- emacs-lisp -*-
-(package "jdee" "2.4.2" "Java Development Environment for Emacs.")
-
 (source gnu)
 (source melpa)
 
-(files "*.el" (:exclude ".dir-locals.el") "doc/jdee.texi")
+(package-file "jdee.el")
+
+(files "*.el" "doc/jdee.texi" (:exclude ".dir-locals.el"))
 
 (development
  (depends-on "ert-runner")
