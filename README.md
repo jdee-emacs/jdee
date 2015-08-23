@@ -22,7 +22,7 @@ JDEE requires [JDEE Server](http://github.com/jdee-emacs/jdee-server) for some o
 
 ## Install from distribution
 
-FIXME: need ELPA package
+The project is available in MELPA.
 
 For more information, see ```doc/install.html```
 
