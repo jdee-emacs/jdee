@@ -26,7 +26,7 @@
 
 ;;; Code:
 
-(defvar windows-suffixes
+(defvar which-windows-suffixes
   (if (memq system-type (list 'ms-dos 'windows-nt))
       (list ".exe" ".EXE" ".cmd" ".CMD" ".bat" ".BAT" "")
     (list ""))
@@ -57,7 +57,7 @@ This command searches the directories in `exec-path'."
                 (and (file-executable-p try)
                      (null (file-directory-p try))
                      (throw 'answer try))))
-          windows-suffixes))
+          which-windows-suffixes))
      directory-list)
     nil))
 
@@ -73,7 +73,7 @@ This command searches the directories in `exec-path'."
                      (null (file-directory-p try))
                      (setq answers (cons try answers))
                      )))
-          windows-suffixes))
+          which-windows-suffixes))
      directory-list)
     answers
     ))
