@@ -5,3 +5,5 @@
 .cask
 dist
 elpa
+build.properties
+build
