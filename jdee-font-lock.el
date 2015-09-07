@@ -91,10 +91,6 @@
 ;; locking don't work correctly for some complex matchers like those
 ;; used to highlight imported package name :-)
 
-;;; History:
-;;
-;; See at end of this file.
-
 ;;; Code:
 (require 'font-lock)
 (require 'regexp-opt)
