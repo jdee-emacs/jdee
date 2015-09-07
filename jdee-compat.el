@@ -105,7 +105,7 @@
 ;; Avoid undefined function error when compiling jdee-help.
 (defun url-file-exists (&args))
 
-;; Required to compile jdee-java-font-lock.el in versions
+;; Required to compile jdee-font-lock.el in versions
 ;; of Emacs that lack the cc-fonts package.
 (eval-when-compile
   (if (not (fboundp 'c-make-font-lock-search-function))

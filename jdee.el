@@ -57,7 +57,7 @@
 (require 'jdee-gen)
 (require 'jdee-help)
 (require 'jdee-import)
-(require 'jdee-java-font-lock)
+(require 'jdee-font-lock)
 (require 'jdee-java-grammar)
 (require 'jdee-jdb)
 (require 'jdee-jdk-manager)
