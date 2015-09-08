@@ -112,10 +112,71 @@ buffer."
     (should (eq (jdee-test-face-at 8) 'font-lock-keyword-face))
     ;; package name:
     (should (eq (jdee-test-face-at 15) 'jdee-font-lock-package-face))
-    ;; static field/method:
+    ;; *:
     (should (eq (jdee-test-face-at 33) nil))
     ;; semicolon:
     (should (eq (jdee-test-face-at 34) nil))))
+
+(ert-deftest jdee-font-lock/fontify-class-declaration ()
+  :tags '(fontification)
+  :expected-result :failed
+  (jdee-test-with-temp-buffer
+      "public class Sample { Sample() {} }"
+    ;; public modifier:
+    (should (eq (jdee-test-face-at 1) 'jdee-font-lock-public-face))
+    ;; class keyword:
+    (should (eq (jdee-test-face-at 8) 'font-lock-keyword-face))
+    ;; class name:
+    (should (eq (jdee-test-face-at 14) 'font-lock-type-face))
+    ;; class opening brace:
+    (should (eq (jdee-test-face-at 21) nil))
+    ;; Sample() {}:
+    (should (eq (jdee-test-face-at 23) 'jdee-font-lock-constructor-face))
+    (should (eq (jdee-test-face-at 29) nil))
+    (should (eq (jdee-test-face-at 30) nil))
+    (should (eq (jdee-test-face-at 32) nil))
+    (should (eq (jdee-test-face-at 33) nil))
+    ;; class closing brace:
+    (should (eq (jdee-test-face-at 35) nil))))
+
+(ert-deftest jdee-font-lock/fontify-public-modifier ()
+  :tags '(fontification)
+  (jdee-test-with-temp-buffer
+      "public class Sample { public int field; }"
+    ;; public before class:
+    (should (eq (jdee-test-face-at 1) 'jdee-font-lock-public-face))
+    ;; class keyword:
+    (should (eq (jdee-test-face-at 8) 'font-lock-keyword-face))
+    ;; class name:
+    (should (eq (jdee-test-face-at 14) 'font-lock-type-face))
+    ;; public before field:
+    (should (eq (jdee-test-face-at 23) 'jdee-font-lock-public-face))))
+
+(ert-deftest jdee-font-lock/fontify-protected-modifier ()
+  :tags '(fontification)
+  (jdee-test-with-temp-buffer
+      "protected class Sample { protected int field; }"
+    ;; protected before class:
+    (should (eq (jdee-test-face-at 1) 'jdee-font-lock-protected-face))
+    ;; class keyword:
+    (should (eq (jdee-test-face-at 11) 'font-lock-keyword-face))
+    ;; class name:
+    (should (eq (jdee-test-face-at 17) 'font-lock-type-face))
+    ;; protected before field:
+    (should (eq (jdee-test-face-at 26) 'jdee-font-lock-protected-face))))
+
+(ert-deftest jdee-font-lock/fontify-private-modifier ()
+  :tags '(fontification)
+  (jdee-test-with-temp-buffer
+      "private class Sample { private int field; }"
+    ;; private before class:
+    (should (eq (jdee-test-face-at 1) 'jdee-font-lock-private-face))
+    ;; class keyword:
+    (should (eq (jdee-test-face-at 9) 'font-lock-keyword-face))
+    ;; class name:
+    (should (eq (jdee-test-face-at 15) 'font-lock-type-face))
+    ;; private before field:
+    (should (eq (jdee-test-face-at 24) 'jdee-font-lock-private-face))))
 
 (provide 'jdee-font-lock-test)
 ;;; jdee-font-lock-test.el ends here
