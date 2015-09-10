@@ -1,5 +1,4 @@
 ;;; jdee-javadoc.el --- JDE javadoc autodoc
-;; $Id$
 
 ;; Author: David Ponce <david@dponce.com>
 ;; Maintainer: David Ponce
@@ -653,7 +652,7 @@ Local to checker report buffer.")
 Local to checker report buffer.")
 
 (condition-case nil
-    (require 'jdee-java-font-lock)
+    (require 'jdee-font-lock)
   (error nil))
 
 (defvar jdee-javadoc-checker-report-font-lock-keywords
@@ -663,8 +662,8 @@ Local to checker report buffer.")
 	 1 'font-lock-warning-face)
    ;; Javadoc tags
    (list "\\(@[^ \n\r\t]+\\)"
-	 1 (cond ((boundp 'jdee-java-font-lock-doc-tag-face)
-		  'jdee-java-font-lock-doc-tag-face)
+	 1 (cond ((boundp 'jdee-font-lock-doc-tag-face)
+		  'jdee-font-lock-doc-tag-face)
 		 ((featurep 'xemacs)
 		  'font-lock-keyword-face)
 		 (t

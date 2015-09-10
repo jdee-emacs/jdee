@@ -133,7 +133,17 @@ the PRIMARY launch method is invoked."
 	 )
 
     (oset this vm (oref (jdee-run-get-vm) :path))
-    (oset this cp (directory-files jdee-server-dir t ".*\\.jar"))))
+    (oset this cp (delq
+                   nil
+                   (append
+                    (list
+                     (if jdee-devel-debug
+                         (oref this jdee-classes-dir))
+                     (jdee-get-tools-jar)
+                     (if ant-home (expand-file-name "lib" ant-home)))
+                    (directory-files jdee-server-dir t ".*\\.jar")
+                    (jdee-pi-get-bsh-classpath)
+                    (jdee-expand-classpath (jdee-get-global-classpath)))))))
 
 ;; Create the BeanShell wrapper object.
 (jdee-bsh "JDEE BeanShell")
