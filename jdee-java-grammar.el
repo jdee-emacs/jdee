@@ -1,5 +1,4 @@
 ;;; jdee-java-grammar.el
-;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -45,24 +44,15 @@ Should be run when Semantic is ready to parse, that is, via
       (or global-semantic-idle-scheduler-mode
 	  (semantic-idle-scheduler-mode 1)))
      (t
-      ;; Default to JDE's auto-parse
-      (when (fboundp 'make-local-hook)
-	;; xemacs
-	(make-local-hook 'semantic-change-hooks))
+      ;; Default to JDEE's auto-parse
       (add-hook 'semantic-change-hooks
 		'jdee-parse-buffer-changed-hook t t))))
 
   ;; Track full reparses
-  (when (fboundp 'make-local-hook)
-    ;; xemacs
-    (make-local-hook 'semantic-after-toplevel-cache-change-hook))
   (add-hook 'semantic-after-toplevel-cache-change-hook
 	    'jdee-parse-update-after-parse nil t)
 
   ;; Track partial reparses
-  (when (fboundp 'make-local-hook)
-    ;; xemacs
-    (make-local-hook 'semantic-after-partial-cache-change-hook))
   (add-hook 'semantic-after-partial-cache-change-hook
 	    'jdee-parse-update-after-partial-parse nil t)
 
@@ -79,4 +69,4 @@ Should be run when Semantic is ready to parse, that is, via
 
 (provide 'jdee-java-grammar)
 
-;; End of jdee-java-grammar.el
+;;; jdee-java-grammar.el ends here

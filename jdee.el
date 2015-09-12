@@ -31,9 +31,6 @@
 
 ;;; Code:
 
-(defconst jdee-xemacsp (string-match "XEmacs" (emacs-version))
-  "Non-nil if we are running in the XEmacs environment.")
-
 (require 'beanshell)
 (require 'browse-url)
 (require 'cc-defs)
@@ -657,7 +654,7 @@ comment."
        (define-abbrev
 	 local-abbrev-table
 	 abbrev
-	 (if (featurep 'xemacs) abbrev t)
+	 t
 	 (lambda ()
 	   (unless (jdee-parse-comment-or-quoted-p)
 	     (delete-char (- (length abbrev))) ; remove abbreviation and
@@ -694,7 +691,7 @@ See `jdee-mode-abbreviations' for more information."
 	    (mapcar
 	     (lambda(x) (cons (cdr x) (car x)))
 	     jdee-mode-abbreviations))
-	   (expansion (car (imenu--mouse-menu expansions (if jdee-xemacsp nil t) "Abbreviations"))))
+	   (expansion (car (imenu--mouse-menu expansions t "Abbreviations"))))
       (insert expansion))))
 
 
@@ -807,9 +804,6 @@ idle moments.")
 	;; This feature loads the appropriate project settings whenever
 	;; a user switches from a Java buffer belonging to one project
 	;; to a buffer belonging to another.
-	(when (fboundp 'make-local-hook)
-	  ;; xemacs
-	  (make-local-hook 'post-command-hook))
 	(add-hook 'post-command-hook
 		  'jdee-detect-java-buffer-activation
 		  nil
@@ -824,11 +818,7 @@ idle moments.")
 	(unless (member 'jdee-clean-up-after-jde kill-buffer-hook)
 	  (add-hook 'kill-buffer-hook 'jdee-clean-up-after-jde))
 
-	(when jdee-xemacsp
-	  (require 'jdee-xemacs)
-	  (jdee-insert-menu-in-xemacs-menubar))
-
-	;; Define underscore as a word constituent. This is needed
+        ;; Define underscore as a word constituent. This is needed
 	;; to support coding styles the begin fields with an underscore.
 	(modify-syntax-entry ?_ "w")
 
@@ -873,8 +863,8 @@ idle moments.")
 
 	(when (boundp 'jdee-mode-map)
 	  (let ((key (car (read-from-string "[return]"))))
-	   (if jdee-electric-return-mode
-	     (define-key (current-local-map) key 'jdee-electric-return))))
+            (if jdee-electric-return-mode
+                (define-key (current-local-map) key 'jdee-electric-return))))
 
 	;; Set up indentation of Java annotations.
 	(jdee-annotations-setup)
@@ -998,28 +988,28 @@ Does nothing but return nil if `jdee-log-max' is nil."
 	["Build"             jdee-build t]
 	(list "Find"
 	      ["Expression"    jdee-find
-				  (and
-				   (executable-find
-				    (if (eq system-type 'windows-nt) "find.exe" "find"))
-				   (executable-find
-				    (if (eq system-type 'windows-nt) "grep.exe" "grep")))]
+               (and
+                (executable-find
+                 (if (eq system-type 'windows-nt) "find.exe" "find"))
+                (executable-find
+                 (if (eq system-type 'windows-nt) "grep.exe" "grep")))]
 	      ["Expression..."  jdee-find-dlg
-				  (and
-				   (executable-find
-				    (if (eq system-type 'windows-nt) "find.exe" "find"))
-				   (executable-find
-				    (if (eq system-type 'windows-nt) "grep.exe" "grep")))]
-	       ["Symbol Definition" jdee-open-class-at-point t]
-	       ["Class"  jdee-show-class-source t]
-	       ["Super Class"  jdee-show-superclass-source t]
-	       ["Interface"  jdee-show-interface-source t]
+               (and
+                (executable-find
+                 (if (eq system-type 'windows-nt) "find.exe" "find"))
+                (executable-find
+                 (if (eq system-type 'windows-nt) "grep.exe" "grep")))]
+              ["Symbol Definition" jdee-open-class-at-point t]
+              ["Class"  jdee-show-class-source t]
+              ["Super Class"  jdee-show-superclass-source t]
+              ["Interface"  jdee-show-interface-source t]
 	      )
 	(list "Interpreter"
 	      ["Start"         jdee-bsh-run t]
 	      ["Exit"          jdee-bsh-exit t]
 	      "-"
 	      ["Help"          jdee-help-beanshell t]
-	 )
+              )
 	(list "Documentation"
 	      ["Add"             jdee-javadoc-autodoc-at-line (jdee-javadoc-enable-menu-p)]
 	      ["Remove"          jdee-javadoc-remdoc-at-line (jdee-javadoc-enable-menu-p)]
@@ -1031,7 +1021,7 @@ Does nothing but return nil if `jdee-log-max' is nil."
 	      ["Javadoc Reference"     jdee-javadoc-browse-tool-doc t]
 	      "-"
 	      [ "Create HTML"    jdee-htmlize-code t]
-	)
+              )
 	"-"
 	(list "Code Generation"
 	      (list "Templates"
@@ -1071,24 +1061,24 @@ Does nothing but return nil if `jdee-log-max' is nil."
 	      (list "Modes"
 		    (vector "Abbrev"
 			    'jdee-abbrev-mode
-			    (if (featurep 'xemacs) :active :enable) t
+			    :enable t
 			    :style 'toggle
 			    :selected 'jdee-enable-abbrev-mode)
 		    (vector "Electric Return"
 			    'jdee-electric-return-mode
-			    (if (featurep 'xemacs) :active :enable) t
+			    :enable t
 			    :style 'toggle
 			    :selected 'jdee-electric-return-mode)
-	      ))
+                    ))
 	(list "Browse"
 	      ["Source Files"          jdee-show-speedbar t]
 	      ["Class at Point"        jdee-browse-class-at-point t]
-	     )
+              )
 	["Check Style"  jdee-checkstyle]
 	(list "Project"
 	      (vector "Auto Switch"
 		      'jdee-toggle-project-switching
-		      (if jdee-xemacsp :active :enable) t
+		      :enable t
 		      :style 'toggle
 		      :selected 'jdee-project-context-switching-enabled-p)
 	      (list "Options"
@@ -1136,29 +1126,12 @@ Does nothing but return nil if `jdee-log-max' is nil."
   :type 'sexp
   :set '(lambda (sym val)
 	  (set-default sym val)
-	  ; Define JDEE menu for FSF Emacs.
-	  (if (or (not jdee-xemacsp) (featurep 'infodock))
+          ;; Define JDEE menu for FSF Emacs.
+	  (if (featurep 'infodock)
 	      (easy-menu-define jdee-menu
-				jdee-mode-map
-				"Menu for JDE."
-				val))
-	  (if (and jdee-xemacsp
-		   (eq major-mode 'jdee-mode))
-	      (jdee-insert-menu-in-xemacs-menubar))))
-
-
-(defun jdee-insert-menu-in-xemacs-menubar ()
-  "Insert JDEE menu in the XEmacs menu bar."
-  (if (and
-       (not (featurep 'infodock))
-       (not (memq 'infodock c-emacs-features))
-       (boundp 'current-menubar)
-       current-menubar)
-      (if (fboundp 'add-submenu)
-	  (add-submenu nil jdee-menu-definition)
-	(when (fboundp 'add-menu)
-	  (add-menu nil "JDE" (cdr jdee-menu-definition))))))
-
+                jdee-mode-map
+                "Menu for JDE."
+                val))))
 
 (defcustom jdee-new-buffer-menu
   (list
@@ -1183,17 +1156,13 @@ Does nothing but return nil if `jdee-log-max' is nil."
   :type 'sexp
   :set '(lambda (sym val)
 	  (set-default sym val)
-	  (if jdee-xemacsp
-	      (unless (featurep 'infodock)
-		(when (fboundp 'add-submenu)
-		  (add-submenu '("File") val "Insert File...")))
-	    (let* ((menu (if (fboundp 'easy-menu-create-menu)
-			     (easy-menu-create-menu
-			      (car val) (cdr val))))
-		   (menu-name (car val)))
-	      (define-key-after menu-bar-file-menu [jdee-new]
-		(cons menu-name menu)
-		  'open-file)))))
+	  (let* ((menu (if (fboundp 'easy-menu-create-menu)
+                           (easy-menu-create-menu
+                            (car val) (cdr val))))
+                 (menu-name (car val)))
+            (define-key-after menu-bar-file-menu [jdee-new]
+              (cons menu-name menu)
+              'open-file))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                            ;;
@@ -1725,8 +1694,7 @@ for insertion of the .emacs file"
     (goto-char (point-max))
     (let* ((debug-buffer (get-buffer "*JDEbug*"))
 	   (messages-buffer
-	    (get-buffer
-	     (if jdee-xemacsp " *Message-Log*" "*Messages*")))
+	    (get-buffer "*Messages*"))
 	   (backtrace-buffer (get-buffer "*Backtrace*"))
 	   (jdee-log-buffer (get-buffer "*jdee-log*"))
 	   (process
@@ -1797,7 +1765,7 @@ for insertion of the .emacs file"
       (insert "\n\n\nProcess environment: \n\n")
       (insert (mapconcat (lambda (var) var) process-environment "\n")))
 
-    (let* ((init-file-name (if (featurep 'xemacs) "init.el" ".emacs"))
+    (let* ((init-file-name ".emacs")
 	   (buf (get-buffer-create
 		 (format "*Insert %s*" init-file-name)))
 	   (mail-buf (current-buffer)))
@@ -1806,11 +1774,11 @@ for insertion of the .emacs file"
 
       (widget-insert
        (format       "You should include the entire contents of your %s file.\n"
-	       init-file-name))
+                     init-file-name))
 
       (widget-insert
        (format       "This is because often parts of the %s file that appear\n"
-	       init-file-name))
+                     init-file-name))
 
       (widget-insert "not to be JDEE-related do in fact contain the cause of\n")
       (widget-insert "reported bugs.\n\n")
@@ -1840,9 +1808,7 @@ for insertion of the .emacs file"
 	     (format "\n\n\nThe contents of the %s file was\n\n\n"
 		     init-file-name))
 
-	    (if (featurep 'xemacs)
-		(insert-file-contents "~/.xemacs/init.el")
-	      (insert-file-contents "~/.emacs"))
+	    (insert-file-contents "~/.emacs")
 	    (goto-char (point-max))
 	    (insert
 	     (format "\n\n\n=====end inserted %s file"
@@ -1897,9 +1863,7 @@ This is done if FILE.el is newer than FILE.elc or if FILE.elc doesn't exist."
 	     (elc-file (concat root ".elc")))
 	(if (and
 	     (or (not (file-exists-p elc-file))
-		(file-newer-than-file-p file  elc-file))
-	     (or (not (string= root "jdee-xemacs"))
-		 (featurep 'xemacs)))
+                 (file-newer-than-file-p file  elc-file)))
 	    (progn
 	      (message (format "Byte-compiling %s..."
 			       (file-name-nondirectory file)))

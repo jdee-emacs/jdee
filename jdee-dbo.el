@@ -204,10 +204,10 @@ See also the hook `tree-widget-after-toggle-fucntions'."
 
 (defun jdee-dbo-update-locals-buf (process thread frame)
   (let* ((cmd (jdee-dbs-get-locals
-	      "get locals"
-	      :process process
-	      :thread-id thread
-	      :stack-frame-index frame))
+               "get locals"
+               :process process
+               :thread-id thread
+               :stack-frame-index frame))
 	 (locals (jdee-dbs-cmd-exec cmd))
 	 var)
 
@@ -216,20 +216,10 @@ See also the hook `tree-widget-after-toggle-fucntions'."
       (let ((inhibit-read-only t))
 	(erase-buffer))
 
-      (if (and (fboundp 'map-extents)
-	       (fboundp 'delete-extent))
-	  ;; xemacs
-	  (map-extents
-	   (lambda (extent ignore)
-	     (delete-extent extent)
-	     nil))
-	(let ((all (overlay-lists)))
-	  (mapc 'delete-overlay (car all))
-	  (mapc 'delete-overlay (cdr all))))
+      (let ((all (overlay-lists)))
+        (mapc 'delete-overlay (car all))
+        (mapc 'delete-overlay (cdr all)))
 
-      (when (fboundp 'make-local-hook)
-	;; xemacs
-	(make-local-hook 'tree-widget-after-toggle-functions))
       (add-hook 'tree-widget-after-toggle-functions
 		'jdee-dbo-locals-update-open-nodes nil t)
 
@@ -246,18 +236,18 @@ See also the hook `tree-widget-after-toggle-fucntions'."
 	    (progn
 	      (let* ((id (oref this-obj :id))
 		     (open (concat "this" (number-to-string id))))
-	      (widget-create 'jdee-widget-java-obj
-			     :tag "this"
-			     :node-name open
-			     :open (jdee-dbo-locals-open-p open)
-			     :process process
-			     :object-id (oref this-obj :id))))))
+                (widget-create 'jdee-widget-java-obj
+                               :tag "this"
+                               :node-name open
+                               :open (jdee-dbo-locals-open-p open)
+                               :process process
+                               :object-id (oref this-obj :id))))))
 
       ;; Insert the local variables for this stack frame.
       (dolist (local-var locals)
 	(jdee-dbo-view-var-in-buf (oref local-var value)
-				 (oref local-var name) process
-				 'jdee-dbo-locals-open-p (current-buffer))))))
+                                  (oref local-var name) process
+                                  'jdee-dbo-locals-open-p (current-buffer))))))
 
 (defun jdee-dbo-update-stack (process thread-id)
   (let* ((cmd  (jdee-dbs-get-thread "get_thread"

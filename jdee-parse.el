@@ -1,5 +1,4 @@
 ;;; jdee-parse.el
-;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -125,19 +124,10 @@ match `jdee-auto-parse-max-buffer-size' threshold."
 	(<= jdee-auto-parse-max-buffer-size 0)
 	(< (buffer-size) jdee-auto-parse-max-buffer-size))))
 
-;;; Compatibility
 (eval-when (compile)
-  (if (featurep 'xemacs)
-      ;; XEmacs
-      (defsubst jdee-auto-parse-delay ()
-	"Return the time in seconds before auto-parse triggering."
-	;; Wake up the timer driver so it updates timer value
-	(itimer-driver-wakeup)
-	(itimer-value jdee-auto-parse-buffer-timer))
-    ;; GNU Emacs
-    (defsubst jdee-auto-parse-delay ()
-      "Return the time in seconds before auto-parse triggering."
-      (- (timer-until jdee-auto-parse-buffer-timer (current-time))))))
+  (defsubst jdee-auto-parse-delay ()
+    "Return the time in seconds before auto-parse triggering."
+    (- (timer-until jdee-auto-parse-buffer-timer (current-time)))))
 
 (defun jdee-parse-buffer-changed-hook (begin end length)
   "Hook run when Semantic detects a change in the current buffer.
@@ -1753,4 +1743,4 @@ The first two elements of the list are `nil' if CLASSNAME isn't fully qualifed."
 
 (provide 'jdee-parse)
 
-;; End of jdee-parse.el
+;;; jdee-parse.el ends here

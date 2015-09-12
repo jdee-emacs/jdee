@@ -1,5 +1,4 @@
 ;;; jdee-plugins.el -- Support for JDEE plugins
-;; $Id$
 
 ;; Author: Paul Kinnucan <pkinnucan@attbi.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -171,19 +170,11 @@ jar program is on the system path."
 
 
 (define-minor-mode jdee-plugin-minor-mode nil
-  :keymap jdee-plugin-mode-map
-  (if (featurep 'xemacs)
-      (let ((menu-spec (jdee-plugin-make-menu-spec)))
-	(if menu-spec
-	    (if jdee-plugin-minor-mode
-		(easy-menu-add menu-spec jdee-plugin-mode-map)
-	      (easy-menu-remove menu-spec))))))
+                   :keymap jdee-plugin-mode-map)
 
 (semantic-add-minor-mode 'jdee-plugin-minor-mode " plugin")
 
 
 (provide 'jdee-plugins)
 
-;; Change History
-
-;; End of jdee-plugins.el
+;;; jdee-plugins.el ends here

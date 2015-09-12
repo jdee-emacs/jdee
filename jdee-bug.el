@@ -136,7 +136,7 @@ specifiy the options  -Xnoagent and -Djava.compiler=NONE."
 	  (string :tag "Name")))
 
 
-(defcustom jdee-bug-debugger-host-address (if jdee-xemacsp (system-name) system-name)
+(defcustom jdee-bug-debugger-host-address system-name
   "*Address of system on which JDEbug is running.
 The default value is the value of the standard Emacs variable `system-name'.
 The JDE uses the host address to connect to JDEBug during startup. On some Windows
@@ -357,8 +357,8 @@ consuming and slows down stepping through the code."
 	["Display Variable At Point"
 	 jdee-bug-display-variable
 	 (and
-	   (jdee-dbs-debugger-running-p)
-	   (jdee-dbs-get-target-process))]
+          (jdee-dbs-debugger-running-p)
+          (jdee-dbs-get-target-process))]
 
 	["Evaluate Expression"
 	 jdee-bug-evaluate-expression
@@ -370,7 +370,7 @@ consuming and slows down stepping through the code."
 	 "Stack"
 	 `["Enable"
 	   jdee-bug-toggle-stack-info
-	   ,(if jdee-xemacsp :active :enable) t
+	   :enable t
 	   :style radio
 	   :selected jdee-bug-stack-info]
 	 ["Up"
@@ -422,8 +422,8 @@ consuming and slows down stepping through the code."
 	   (jdee-dbs-debugger-running-p)
 	   (jdee-dbs-get-target-process))]
 
-				       ; ["Show Thread Info"
-			      ;   jdee-bug-thread-show-thread-info nil]
+                                        ; ["Show Thread Info"
+                                        ;   jdee-bug-thread-show-thread-info nil]
 	 )
 
 	(list
@@ -1598,19 +1598,13 @@ requests to cancel."
   (let* ((current-frame (selected-frame))
 	 (falist
 	  (cons
-	   (cons (if (fboundp 'frame-property)
-		     ;; xemacs
-		     (frame-property current-frame 'name)
-		   (frame-parameter current-frame 'name))
+	   (cons (frame-parameter current-frame 'name)
 		 current-frame) nil))
 	 (frame (next-frame nil t)))
     (while (not (eq frame current-frame))
       (progn
 	(setq falist (cons (cons
-			    (if (fboundp 'frame-property)
-				;; xemacs
-				(frame-property frame 'name)
-			      (frame-parameter frame 'name))
+			    (frame-parameter frame 'name)
 			    frame) falist))
 	(setq frame (next-frame frame t))))
     falist))
@@ -1620,19 +1614,19 @@ requests to cancel."
   (interactive)
   (let* ((existing-frame (cdr (assoc "JDebug" (jdee-make-frame-names-alist)))))
     (if existing-frame
-      (progn
-	(make-frame-visible existing-frame)
-	(raise-frame existing-frame)
-	(select-frame existing-frame))
+        (progn
+          (make-frame-visible existing-frame)
+          (raise-frame existing-frame)
+          (select-frame existing-frame))
       (let* ((process (jdee-dbs-get-target-process))
 	     (cli-buffer (when (slot-boundp process 'cli-buf)
-			(oref process cli-buf)))
+                           (oref process cli-buf)))
 	     (locals-buffer (when (slot-boundp process 'locals-buf)
-			   (oref process locals-buf)))
+                              (oref process locals-buf)))
 	     (threads-buffer (when (slot-boundp process 'threads-buf)
-			    (oref process threads-buf)))
+                               (oref process threads-buf)))
 	     (msg-buffer (when (slot-boundp process 'msg-buf)
-			(oref process msg-buf)))
+                           (oref process msg-buf)))
 	     (frame (make-frame '((name . "JDebug") (minibuffer . nil))))
 	     (height (/ (frame-height frame)
 			(cl-count-if 'identity
@@ -1653,9 +1647,7 @@ requests to cancel."
 	      (setq prev-window locals-win)
 	      (when (not jdee-bug-local-variables)
 		(jdee-bug-toggle-local-variables)
-		(if (featurep 'xemacs)
-		  (sleep-for 0.1)
-		  (sleep-for 0 100)))
+		(sleep-for 0 100))
 	      (set-window-buffer locals-win locals-buffer)))
 	  (when threads-buffer
 	    (let ((threads-win (split-window prev-window height)))
@@ -1755,7 +1747,7 @@ any variables in scope in the program being debugged."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun jdee-bug-show-threads ()
-"Shows all threads and thread-groups running in the target process.
+  "Shows all threads and thread-groups running in the target process.
 This command displays the threads as a tree structure. To expand
 a node of the tree, click the + sign next to the node, using mouse
 button 2."
@@ -1767,9 +1759,7 @@ button 2."
   (if (not jdee-bug-stack-info)
       (progn
 	(jdee-bug-toggle-stack-info)
-	(if (featurep 'xemacs)
-	    (sleep-for 0.1)
-	  (sleep-for 0 100))))
+	(sleep-for 0 100)))
 
   (let* ((process (jdee-dbs-get-target-process))
 	 (get-threads-command
@@ -1779,7 +1769,7 @@ button 2."
 	 (result
 	  (jdee-dbs-cmd-exec get-threads-command)))
     (if (not result)
-      (error "Could not get threads"))))
+        (error "Could not get threads"))))
 
 (defun jdee-bug-thread-show-thread-info ()
   (interactive)
@@ -2348,9 +2338,7 @@ This command splits the window and shows the locals buffer."
   (if (not jdee-bug-local-variables)
       (progn
 	(jdee-bug-toggle-local-variables)
-	(if (featurep 'xemacs)
-	    (sleep-for 0.1)
-	  (sleep-for 0 100))))
+	(sleep-for 0 100)))
 
   (let* ((process (jdee-dbs-get-target-process))
 	 (locals-buf (oref process locals-buf))

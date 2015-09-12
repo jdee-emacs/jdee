@@ -260,14 +260,13 @@ variable ANT_HOME."
 	 (delimiter (if (or
 			 (string= (car jdee-ant-invocation-method) "Java")
 			 (and (string= (car jdee-ant-invocation-method)
-				       "Script")
-			      (not (featurep 'xemacs))))
+				       "Script")))
 			"'"
 		      "\""))
 	 (classpath-delimiter  (if (and (or (eq system-type 'windows-nt)
-			 (eq system-type 'cygwin32))
-		     (string-match "sh$" shell-file-name))
-		delimiter))
+                                            (eq system-type 'cygwin32))
+                                        (string-match "sh$" shell-file-name))
+                                   delimiter))
 	 (buildfile-delimiter  (if (eq system-type 'windows-nt)
 				   "\"" delimiter))
 	 (ant-program (if (or (string-match "\\\\" jdee-ant-program)
@@ -292,10 +291,10 @@ variable ANT_HOME."
 		     (string-match "." ant-home));; contains a space
 		    (concat delimiter ant-home delimiter)  ;; or period.
 		  ant-home)))
-	  (if (string= (car jdee-ant-invocation-method) "Java")
-	      (concat
-	       " "
-	       "org.apache.tools.ant.Main")))))
+           (if (string= (car jdee-ant-invocation-method) "Java")
+               (concat
+                " "
+                "org.apache.tools.ant.Main")))))
 
     (if (not (string= buildfile ""))
 	(setq ant-command
@@ -460,8 +459,7 @@ classpath normalized with `jdee-build-classpath'."
       ;; menu, save-some-buffers tries to popup a menu
       ;; which seems not to be supported--at least on
       ;; the PC.
-      (if (and (eq system-type 'windows-nt)
-	       (not jdee-xemacsp))
+      (if (eq system-type 'windows-nt)
 	  (let ((temp last-nonmenu-event))
 	    ;; The next line makes emacs think that the command
 	    ;; was invoked from the minibuffer, even when it
@@ -482,7 +480,7 @@ classpath normalized with `jdee-build-classpath'."
 	      (setq compile-command (replace-match "" nil nil
 						   compile-command)))
 	    (jdee-ant-compile-internal compile-command
-				      "No more errors"))
+                                       "No more errors"))
 	(let ((default-directory (jdee-ant-get-default-directory)))
 	  (compilation-start compile-command))))))
 
@@ -518,75 +516,73 @@ and there are no more errors. "
       ;; In case the compilation buffer is current, make sure we get the global
       ;; values of compilation-error-regexp-alist, etc.
       (kill-all-local-variables))
-	(setq error-regexp-alist compilation-error-regexp-alist)
-	(setq enter-regexp-alist
-	      (if (boundp 'compilation-enter-directory-regexp-alist)
-		  compilation-enter-directory-regexp-alist))
-	(setq leave-regexp-alist
-	      (if (boundp 'compilation-leave-directory-regexp-alist)
-		  compilation-leave-directory-regexp-alist))
-	(setq file-regexp-alist
-	      (if (boundp 'compilation-file-regexp-alist)
-		  compilation-file-regexp-alist))
-	(setq nomessage-regexp-alist
-	      (if (boundp 'compilation-nomessage-regexp-alist)
-		  compilation-nomessage-regexp-alist))
+    (setq error-regexp-alist compilation-error-regexp-alist)
+    (setq enter-regexp-alist
+          (if (boundp 'compilation-enter-directory-regexp-alist)
+              compilation-enter-directory-regexp-alist))
+    (setq leave-regexp-alist
+          (if (boundp 'compilation-leave-directory-regexp-alist)
+              compilation-leave-directory-regexp-alist))
+    (setq file-regexp-alist
+          (if (boundp 'compilation-file-regexp-alist)
+              compilation-file-regexp-alist))
+    (setq nomessage-regexp-alist
+          (if (boundp 'compilation-nomessage-regexp-alist)
+              compilation-nomessage-regexp-alist))
 
-	(let* (proc (thisdir (jdee-ant-get-default-directory)) outwin)
-	  (save-excursion
-	    ;; Clear out the compilation buffer and make it writable.
-	    (if (not (jdee-bsh-running-p))
-		(progn
-		  (bsh-launch (oref-default 'jdee-bsh the-bsh))
-		  (bsh-eval (oref-default 'jdee-bsh the-bsh) (jdee-create-prj-values-str))))
-	    (setq proc (bsh-get-process (oref-default 'jdee-bsh the-bsh)))
-	    (set-buffer outbuf)
-	    (compilation-mode)
-	    (setq buffer-read-only nil)
-	    (buffer-disable-undo (current-buffer))
-	    (erase-buffer)
-	    (buffer-enable-undo (current-buffer))
-	    (display-buffer outbuf)
-	    (insert "AntServer output:\n")
-	    (insert command "\n")
-	    (set-buffer-modified-p nil)
-	    (setq jdee-ant-comint-filter (process-filter proc))
-	    (set-process-filter proc 'jdee-ant-filter)
-	    ;;resets the jdee-ant-passed-security-exception flag
-	    (setq jdee-ant-passed-security-exception nil)
-	    (process-send-string proc (concat "jde.util.AntServer.start(\""
-					      command "\");" "\n")))
-	  (setq outwin (display-buffer outbuf))
-	  (save-excursion
-	    ;; (setq buffer-read-only t)  ;;; Non-ergonomic.
-	    (if (boundp 'compilation-error-message)
-		(set (make-local-variable 'compilation-error-message)
-		     error-message))
-	    (set (make-local-variable 'compilation-error-regexp-alist)
-		 error-regexp-alist)
+    (let* (proc (thisdir (jdee-ant-get-default-directory)) outwin)
+      (save-excursion
+        ;; Clear out the compilation buffer and make it writable.
+        (if (not (jdee-bsh-running-p))
+            (progn
+              (bsh-launch (oref-default 'jdee-bsh the-bsh))
+              (bsh-eval (oref-default 'jdee-bsh the-bsh) (jdee-create-prj-values-str))))
+        (setq proc (bsh-get-process (oref-default 'jdee-bsh the-bsh)))
+        (set-buffer outbuf)
+        (compilation-mode)
+        (setq buffer-read-only nil)
+        (buffer-disable-undo (current-buffer))
+        (erase-buffer)
+        (buffer-enable-undo (current-buffer))
+        (display-buffer outbuf)
+        (insert "AntServer output:\n")
+        (insert command "\n")
+        (set-buffer-modified-p nil)
+        (setq jdee-ant-comint-filter (process-filter proc))
+        (set-process-filter proc 'jdee-ant-filter)
+        ;;resets the jdee-ant-passed-security-exception flag
+        (setq jdee-ant-passed-security-exception nil)
+        (process-send-string proc (concat "jde.util.AntServer.start(\""
+                                          command "\");" "\n")))
+      (setq outwin (display-buffer outbuf))
+      (save-excursion
+        ;; (setq buffer-read-only t)  ;;; Non-ergonomic.
+        (if (boundp 'compilation-error-message)
+            (set (make-local-variable 'compilation-error-message)
+                 error-message))
+        (set (make-local-variable 'compilation-error-regexp-alist)
+             error-regexp-alist)
 
-	    (when (not (featurep 'xemacs))
-	      (dolist (elt `((compilation-enter-directory-regexp-alist
-			      ,enter-regexp-alist)
-			     (compilation-leave-directory-regexp-alist
-			      ,leave-regexp-alist)
-			     (compilation-file-regexp-alist
-			      ,file-regexp-alist)
-			     (compilation-nomessage-regexp-alist
-			      ,nomessage-regexp-alist)))
-		(if (boundp (car elt))
-		    (set (make-local-variable (car elt)) (cadr elt)))))
+        (dolist (elt `((compilation-enter-directory-regexp-alist
+                        ,enter-regexp-alist)
+                       (compilation-leave-directory-regexp-alist
+                        ,leave-regexp-alist)
+                       (compilation-file-regexp-alist
+                        ,file-regexp-alist)
+                       (compilation-nomessage-regexp-alist
+                        ,nomessage-regexp-alist)))
+          (if (boundp (car elt))
+              (set (make-local-variable (car elt)) (cadr elt))))
 
-	    (if (boundp 'compilation-directory-stack)
-		(setq default-directory thisdir
-		      compilation-directory-stack (list default-directory)))
-	    (compilation-set-window-height outwin)
+        (if (boundp 'compilation-directory-stack)
+            (setq default-directory thisdir
+                  compilation-directory-stack (list default-directory)))
+        (compilation-set-window-height outwin)
 
-	    (if (not jdee-xemacsp)
-		(if compilation-process-setup-function
-		    (funcall compilation-process-setup-function)))))
-	;; Make it so the next C-x ` will use this buffer.
-	(setq compilation-last-buffer outbuf)))
+        (if compilation-process-setup-function
+            (funcall compilation-process-setup-function))))
+    ;; Make it so the next C-x ` will use this buffer.
+    (setq compilation-last-buffer outbuf)))
 
 (defun jdee-ant-filter (proc string)
   "This filter prints out the result of the process without buffering.
@@ -628,13 +624,12 @@ The result is inserted as it comes in the compilation buffer."
 	      (if (and (not end-of-result)
 		       (not jdee-ant-passed-security-exception))
 		  (insert string)))
-	    (if (not jdee-xemacsp)
-		(if compilation-scroll-output
-		    (save-selected-window
-		      (if win
-			  (progn
-			    (select-window win)
-			    (goto-char (point-max))))))))))))
+	    (if compilation-scroll-output
+                (save-selected-window
+                  (if win
+                      (progn
+                        (select-window win)
+                        (goto-char (point-max)))))))))))
 
 (defun jdee-ant-handle-exit ()
   "Handles the compilation exit"

@@ -74,10 +74,7 @@
   (cadr (jdee-parse-class-lookup-constant
 	 (jdee-parse-class-get-next-2-bytes) constants)))
 
-;; xemacs without mule can't do utf-8
-(setq jdee-parse-class-encoding
-      (if (member 'utf-8 (coding-system-list))
-	  'utf-8 'raw-text))
+(setq jdee-parse-class-encoding 'utf-8)
 
 (defun jdee-parse-class-slash-to-dot (string)
   (subst-char-in-string ?/ ?. string))
@@ -800,4 +797,4 @@ must be calculated at runtime.")
 
 (provide 'jdee-parse-class)
 
-;; End of jdee-parse-class.el
+;;; jdee-parse-class.el ends here

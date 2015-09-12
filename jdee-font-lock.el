@@ -133,9 +133,7 @@ you have a lot of user's defined names don't use a value less than 1!"
 (defgroup jdee-font-lock-faces nil
   "Specific JDE faces for highlighting Java sources."
   :prefix "jdee-font-lock-"
-  :group (if (featurep 'xemacs)
-	     'font-lock-faces
-	   'font-lock-highlighting-faces))
+  :group 'font-lock-highlighting-faces)
 
 (defface jdee-font-lock-number-face
   '((((class grayscale) (background light)) (:foreground "DimGray" :italic t))
@@ -894,7 +892,7 @@ expressions."
 	    '(2 font-lock-type-face t)))
 
 	;; modifier protections
-	 `(,(c-make-font-lock-search-function
+        `(,(c-make-font-lock-search-function
 	    "\\<\\(private\\)\\>"
 	    '(1 'jdee-font-lock-private-face t)))
 	`(,(c-make-font-lock-search-function
@@ -929,17 +927,6 @@ expressions."
      ;; Feature scoping: These must come first or the Special
      ;; constants, Modifiers and Packages from keywords-1 will catch
      ;; them.
-;;; Compatibility
-     (if (featurep 'xemacs)
-	 (list
-
-	  ;; Special keywords and constants
-	  '("\\<\\(this\\|super\\)\\>"
-	    (1 font-lock-keyword-face))
-	  '("\\<\\(false\\|null\\|true\\)\\>"
-	    (1 jdee-font-lock-constant-face))
-	  ))
-
      (list
       ;; Fontify default as keyword
       '("\\<\\(default\\)\\>" (1 font-lock-keyword-face))
@@ -977,35 +964,30 @@ expressions."
      ;; Fontify user's defined names
      (jdee-font-lock-api-keywords rebuild)
 
-;;; Compatibility
-     (if (featurep 'xemacs)
-	 java-font-lock-keywords-2
-       ;; Remove existing javadoc font lock keywords from GNU Emacs
-       ;; `java-font-lock-keywords-3'
-       (jdee-font-lock-remove-javadoc-keywords
-	java-font-lock-keywords-3))
+     ;; Remove existing javadoc font lock keywords from GNU Emacs
+     ;; `java-font-lock-keywords-3'
+     (jdee-font-lock-remove-javadoc-keywords
+      java-font-lock-keywords-3)
 
-;;; Compatibility
-     (unless (featurep 'xemacs)
-       ;; GNU Emacs don't fontify capitalized types so do it
-       (list
-	(list
-	 (concat "\\<\\([" jdee-font-lock-capital-letter "]\\sw*\\)\\>"
-		 "\\([ \t]*\\[[ \t]*\\]\\)*"
-		 "\\([ \t]*\\sw\\)")
-	 '(font-lock-match-c-style-declaration-item-and-skip-to-next
-	   (goto-char (match-beginning 3))
-	   (goto-char (match-beginning 3))
-	   (1 (if (match-beginning 2)
-		  font-lock-function-name-face
-		font-lock-variable-name-face))))
-	(cons
-	 (concat "\\<\\([" jdee-font-lock-capital-letter "]\\sw*\\)\\>"
-		 "\\([ \t]*\\[[ \t]*\\]\\)*"
-		 "\\([ \t]*\\sw\\)")
-	 '(1 font-lock-type-face))
-	'("\\<\\(new\\|instanceof\\)\\>[ \t]+\\(\\sw+\\)"
-	  2 font-lock-type-face)))
+     ;; GNU Emacs don't fontify capitalized types so do it
+     (list
+      (list
+       (concat "\\<\\([" jdee-font-lock-capital-letter "]\\sw*\\)\\>"
+               "\\([ \t]*\\[[ \t]*\\]\\)*"
+               "\\([ \t]*\\sw\\)")
+       '(font-lock-match-c-style-declaration-item-and-skip-to-next
+         (goto-char (match-beginning 3))
+         (goto-char (match-beginning 3))
+         (1 (if (match-beginning 2)
+                font-lock-function-name-face
+              font-lock-variable-name-face))))
+      (cons
+       (concat "\\<\\([" jdee-font-lock-capital-letter "]\\sw*\\)\\>"
+               "\\([ \t]*\\[[ \t]*\\]\\)*"
+               "\\([ \t]*\\sw\\)")
+       '(1 font-lock-type-face))
+      '("\\<\\(new\\|instanceof\\)\\>[ \t]+\\(\\sw+\\)"
+        2 font-lock-type-face))
 
      ;; Some extra fontification
      (list
@@ -1063,18 +1045,16 @@ expressions."
 ;; Define new defaults for Font Lock mode
 (defconst jdee-font-lock-defaults
   (let ((java-defaults
-	 (if (featurep 'xemacs)
-	     (get 'java-mode 'font-lock-defaults)
-	   ;;; To avoid compilation warning, replace obsolete variable,
-	   ;;; font-lock-defaults-alist, with its value for java-mode.
-	   ;;; (cdr (assq 'java-mode font-lock-defaults-alist)))))
-	   ;;; Paul Kinnucan.
-	   '((java-font-lock-keywords
-	      java-font-lock-keywords-1
-	      java-font-lock-keywords-2
-	      java-font-lock-keywords-3)
-	     nil nil ((?_ . "w") (?$ . "w")) nil
-	     (font-lock-mark-block-function . mark-defun)))))
+         ;;; To avoid compilation warning, replace obsolete variable,
+         ;;; font-lock-defaults-alist, with its value for java-mode.
+         ;;; (cdr (assq 'java-mode font-lock-defaults-alist)))))
+         ;;; Paul Kinnucan.
+         '((java-font-lock-keywords
+            java-font-lock-keywords-1
+            java-font-lock-keywords-2
+            java-font-lock-keywords-3)
+           nil nil ((?_ . "w") (?$ . "w")) nil
+           (font-lock-mark-block-function . mark-defun))))
     (cons (append (car java-defaults) '(java-font-lock-keywords-4))
 	  (cdr java-defaults)))
   "Defaults for coloring Java keywords in jdee-mode. The defaults
@@ -1104,15 +1084,10 @@ standard `java-mode'."
   ;; Turn on Font Lock Mode as needed (based on parent `java-mode'
   ;; if `jdee-use-font-lock' is nil).
   (let ((major-mode (if jdee-use-font-lock major-mode 'java-mode)))
-    (if (featurep 'xemacs)
-	;; The following is intended to avoid a byte-compilation warning
-	;; when compiling this file under Emacs. The Emacs version of
-	;; font-lock-set-defaults accepts no arguments.
-	(apply 'font-lock-set-defaults (list t))
-      (if global-font-lock-mode
-	  (if (fboundp 'turn-on-font-lock-if-enabled)
-	      (turn-on-font-lock-if-enabled)
-	    (turn-on-font-lock-if-desired)))))  ;; Newer emacs renamed -if-enabled to -if-desired
+    (if global-font-lock-mode
+        (if (fboundp 'turn-on-font-lock-if-enabled)
+            (turn-on-font-lock-if-enabled)
+          (turn-on-font-lock-if-desired))))
   ;; Always turn on font locking if `jdee-use-font-lock' is non-nil.
   (if jdee-use-font-lock
       (turn-on-font-lock)))

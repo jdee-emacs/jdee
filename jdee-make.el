@@ -116,11 +116,11 @@ enter to the make program along with the arguments specified by
   (interactive)
   (if jdee-read-make-args
       (setq jdee-interactive-make-args
-	      (read-from-minibuffer
-	       "Make args: "
-	       jdee-interactive-make-args
-	       nil nil
-	       '(jdee-interactive-make-arg-history . 1)))
+            (read-from-minibuffer
+             "Make args: "
+             jdee-interactive-make-args
+             nil nil
+             '(jdee-interactive-make-arg-history . 1)))
     (setq jdee-interactive-make-args ""))
 
   (let ((make-command
@@ -145,8 +145,7 @@ enter to the make program along with the arguments specified by
     ;; menu, save-some-buffers tries to popup a menu
     ;; which seems not to be supported--at least on
     ;; the PC.
-    (if (and (eq system-type 'windows-nt)
-	     (not jdee-xemacsp))
+    (if (eq system-type 'windows-nt)
 	(let ((temp last-nonmenu-event))
 	  ;; The next line makes emacs think that jdee-make
 	  ;; was invoked from the minibuffer, even when it
@@ -157,9 +156,9 @@ enter to the make program along with the arguments specified by
       (save-some-buffers (not compilation-ask-about-save) nil))
 
     (setq compilation-finish-functions
-      (lambda (buf msg)
-	(run-hook-with-args 'jdee-make-finish-hook buf msg)
-	(setq compilation-finish-functions nil)))
+          (lambda (buf msg)
+            (run-hook-with-args 'jdee-make-finish-hook buf msg)
+            (setq compilation-finish-functions nil)))
 
     (cd default-directory)
     (compilation-start make-command)

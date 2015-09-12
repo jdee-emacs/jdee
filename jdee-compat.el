@@ -1,5 +1,4 @@
 ;;; jdee-compat.el -- Integrated Development Environment for Java.
-;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -33,70 +32,34 @@
 ;;; Code:
 
 ;;;###autoload
-(defconst jdee-xemacsp (string-match "XEmacs" (emacs-version))
-  "Non-nil if we are running in the XEmacs environment.")
-
-(defconst jdee-xemacs20p (and jdee-xemacsp (>= emacs-major-version 20)))
-
 (defconst jdee-emacs21p (and (string-match "\\bEmacs\\b" (emacs-version))
-			    (>= emacs-major-version 21)))
+                             (>= emacs-major-version 21)))
 
-;; Define XEmacs- and Emacs-only variables
-;; and functions to avoid compiler warnings.
-  (if jdee-xemacsp
-      (progn
-	(defvar w32-start-process-show-window nil)
-	(defvar w32-quote-process-args nil)
-	(defvar last-nonmenu-event nil)
-	(defvar tags-table-format-hooks nil)
-	(defvar auto-insert nil)
-	(defvar message-log-max nil)
-	(defun easy-menu-create-menu (&rest args))
-	(defun define-key-after (&rest args))
-	(defun ange-ftp-ftp-name (&rest args))
-	(defun ange-ftp-get-file-entry (&rest args))
-	(defun make-overlay (beg end &optional buffer front-advance rear-advance))
-	(defun delete-overlay (overlay))
-	(defun overlay-start (overlay))
-	(defun overlay-end (overlay))
-	(defun overlay-lists ())
-	(defun event-start (ev))
-	(defun posn-point (p))
-	(defun posn-window (p))
-	(defalias 'frame-char-width 'frame-width)
-	(defalias 'frame-char-height 'frame-height))
-    (progn
-      ;; These are XEmacs-only functions
-      (defvar current-menubar nil)
-      (defvar tags-table-format-hooks nil)
-      (defvar windowed-process-io nil)
-      (unless (fboundp 'add-submenu)
-	(defun add-submenu (&rest args)))
-      (defun frame-property (&rest args))
-      (defun frame-highest-window (&rest args))
-      (defun mswindows-cygwin-to-win32-path (&rest args))
-      (defun ange-ftp-ftp-name (&rest args))
-      (defun ange-ftp-get-file-entry (&rest args))
-      (defun mswindows-cygwin-to-win32-path (&rest args))
-      (defun add-submenu (&rest args))
-      (defun add-menu (&rest args))
-      (defun easy-menu-create-keymaps (&rest args))
-      (defun locate-data-directory (&rest args))
-      (defun temp-directory (&rest args) temporary-file-directory)
-      (defun extent-at (&rest args))
-      (defun make-extent (&rest args))
-      (defun set-extent-face (&rest args))
-      (defun set-extent-priority (&rest args))
-      (defun extent-property (&rest args))
-      (defun delete-extent (&rest args))
-      (defun map-extents (&rest args))
-      (defun extent-start-position (&rest args))))
-
-
-;; Define XEmacs- and Emacs-only variables
-;; and functions to avoid compiler warnings.
-(if (not jdee-xemacsp)
-    (defun make-event (&rest args)))
+;; Define Emacs variables and functions to avoid compiler warnings.
+(defvar current-menubar nil)
+(defvar tags-table-format-hooks nil)
+(defvar windowed-process-io nil)
+(unless (fboundp 'add-submenu)
+  (defun add-submenu (&rest args)))
+(defun frame-property (&rest args))
+(defun frame-highest-window (&rest args))
+(defun ange-ftp-ftp-name (&rest args))
+(defun ange-ftp-get-file-entry (&rest args))
+(defun mswindows-cygwin-to-win32-path (&rest args))
+(defun add-submenu (&rest args))
+(defun add-menu (&rest args))
+(defun easy-menu-create-keymaps (&rest args))
+(defun locate-data-directory (&rest args))
+(defun temp-directory (&rest args) temporary-file-directory)
+(defun extent-at (&rest args))
+(defun make-extent (&rest args))
+(defun set-extent-face (&rest args))
+(defun set-extent-priority (&rest args))
+(defun extent-property (&rest args))
+(defun delete-extent (&rest args))
+(defun map-extents (&rest args))
+(defun extent-start-position (&rest args))
+(defun make-event (&rest args))
 
 (if jdee-emacs21p
     (progn
@@ -132,4 +95,4 @@
 
 (provide 'jdee-compat)
 
-;; End of jdee-compat.el
+;;; jdee-compat.el ends here

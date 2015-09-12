@@ -283,15 +283,11 @@ a file in the current directory:
 		  (setq compilation-finish-functions nil)))))
 
 
-    (if (not (featurep 'xemacs))
-	(if compilation-process-setup-function
-	  (funcall compilation-process-setup-function)))
+    (if compilation-process-setup-function
+        (funcall compilation-process-setup-function))
 
-
-    (if (not (featurep 'xemacs))
-	(if compilation-process-setup-function
-	  (funcall compilation-process-setup-function)))
-
+    (if compilation-process-setup-function
+        (funcall compilation-process-setup-function))
 
     (with-current-buffer native-buf
 
@@ -313,8 +309,8 @@ a file in the current directory:
        java-expr
        buffer-obj)
 
-    (set-buffer-modified-p nil)
-    (setq compilation-last-buffer native-buf))))
+      (set-buffer-modified-p nil)
+      (setq compilation-last-buffer native-buf))))
 
 ;;;###autoload
 (defun jdee-bsh-run()

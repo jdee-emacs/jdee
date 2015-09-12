@@ -1,5 +1,4 @@
 ;;; jdee-project-file.el -- Integrated Development Environment for Java.
-;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -274,17 +273,15 @@ if none. To test if SYMBOL has any value for PROJECT, use
 (defun jdee-save-close-buffer (project)
   "Saves and closes the buffer associated with PROJECT."
   (let* ((buffer
-	  (if jdee-xemacsp
-	      (get-file-buffer project)
-	    (find-buffer-visiting project)))
+	  (find-buffer-visiting project))
 	 (standard-output buffer))
     (if buffer
-      (progn
-	(princ ")\n")
-	(with-current-buffer buffer
-	  (save-buffer))
-	(jdee-log-msg "jdee-save-close-buffer: Closing buffer for %s" project)
-	(kill-buffer buffer))
+        (progn
+          (princ ")\n")
+          (with-current-buffer buffer
+            (save-buffer))
+          (jdee-log-msg "jdee-save-close-buffer: Closing buffer for %s" project)
+          (kill-buffer buffer))
       (jdee-log-msg "jdee-save-close-buffer: Unable to find buffer for %s" project))))
 
 (defun jdee-save-variable (symbol projects)
@@ -295,9 +292,7 @@ in PROJECTS."
      (if (and (not (string= (car project) "default"))
 	      (member (car project) projects))
 	 (let ((buffer
-		(if jdee-xemacsp
-		    (get-file-buffer (car project))
-		  (find-buffer-visiting (car project))))
+		(find-buffer-visiting (car project)))
 	       standard-output)
 	   (if (null buffer)
 	       (setq standard-output (setq buffer (jdee-save-open-buffer (car project))))
@@ -529,4 +524,4 @@ defined by the current project's project file."
 
 (provide 'jdee-project-file)
 
-;; End of jdee-project-file.el
+;;; jdee-project-file.el ends here
