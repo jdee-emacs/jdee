@@ -116,17 +116,15 @@ the root directory is the root directory that results
 from unpacking the distributable."
   (let ((directory-sep-char ?/))
     (expand-file-name
-     "../"
      (file-name-directory (locate-library "jdee")))))
 
 (defun jdee-find-jdee-data-directory ()
-  "Return the path of the JDE data directory.
-Returns the path of the directory containing the
-JDEE java and documentation directories;  nil if the
-directory cannot be found. If XEmacs, returns the location of
-the data directory in the XEmacs distribution hierarchy. On all other Emacs versions,
-the JDEE expects to find the documentation and Java class directories
-in the same directory that contains the JDEE lisp directory."
+  "Return the path of the JDEE data directory.
+Returns the path of the directory containing the JDEE java
+and documentation directories;  nil if the directory cannot
+be found. On all other Emacs versions, the JDEE expects
+to find the documentation in the doc subdirectory of directory
+that contains the JDEE lisp directory."
   (let ((directory-sep-char ?/))
     (jdee-root)))
 

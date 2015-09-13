@@ -1858,7 +1858,8 @@ keybindings."
 (defun jdee-compile-file-if-necessary (file)
   "Compile the JDEE file FILE if necessary.
 This is done if FILE.el is newer than FILE.elc or if FILE.elc doesn't exist."
-  (if (string= (file-name-extension file) "el")
+  (if (and (string= (file-name-extension file) "el")
+           (not (string= ".dir-locals.el" file)))
       (let* ((root (file-name-sans-extension file))
 	     (elc-file (concat root ".elc")))
 	(if (and
@@ -1878,9 +1879,8 @@ This is done if FILE.el is newer than FILE.elc or if FILE.elc doesn't exist."
   ;; a previous version of jde exists.
 
   (interactive)
-  (require 'jdee-compat)
   (let ((load-path (append '(".") load-path))
-	(jdee-lisp-directory (expand-file-name "lisp" (jdee-find-jdee-data-directory))))
+	(jdee-lisp-directory (jdee-find-jdee-data-directory)))
     (save-excursion
       (mapcar
        (function jdee-compile-file-if-necessary)
