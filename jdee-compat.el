@@ -31,10 +31,6 @@
 
 ;;; Code:
 
-;;;###autoload
-(defconst jdee-emacs21p (and (string-match "\\bEmacs\\b" (emacs-version))
-                             (>= emacs-major-version 21)))
-
 ;; Define Emacs variables and functions to avoid compiler warnings.
 (defvar current-menubar nil)
 (defvar tags-table-format-hooks nil)
@@ -60,10 +56,7 @@
 (defun map-extents (&rest args))
 (defun extent-start-position (&rest args))
 (defun make-event (&rest args))
-
-(if jdee-emacs21p
-    (progn
-      (defun hscroll-window-column (&rest args))))
+(defun hscroll-window-column (&rest args))
 
 ;; Avoid undefined function error when compiling jdee-help.
 (defun url-file-exists (&args))
