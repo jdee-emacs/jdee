@@ -1,4 +1,4 @@
-;;; jdee-project-file.el -- Integrated Development Environment for Java.
+;;; jdee-project-file.el -- Project files management
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -34,16 +34,16 @@
 (declare-function jdee-log-msg "jdee" (msg &rest args))
 
 (defconst jdee-project-file-version "1.0"
-  "*The current JDE project file version number.")
+  "*The current JDEE project file version number.")
 
 (defgroup jdee-project nil
-  "JDE Project Options"
+  "JDEE Project Options"
   :group 'jdee
   :prefix "jdee-")
 
 (defcustom jdee-project-context-switching-enabled-p t
   "*Enable project context switching.
-If non-nil, the JDE reloads a buffer's project file when you switch to the buffer from
+If non-nil, the JDEE reloads a buffer's project file when you switch to the buffer from
 another buffer belonging to another project. You can disable this feature if you prefer
 to load project files manually. The debugger uses this variable to disable context-switching
 temporarily when stepping through code."
@@ -62,18 +62,18 @@ temporarily when stepping through code."
   :type 'string)
 
 (defcustom jdee-project-file-name "prj.el"
-  "*Specify name of JDE project file.
-When it loads a Java source file, the JDE looks for a lisp file of
+  "*Specify name of JDEE project file.
+When it loads a Java source file, the JDEE looks for a lisp file of
 this name (the default is prj.el in the source file hierarchy. If it
 finds such a file, it loads the file. You can use this file to set the
-classpath, compile options, and other JDE options on a
+classpath, compile options, and other JDEE options on a
 project-by-project basis."
   :group 'jdee-project
   :type 'string)
 
 (defcustom jdee-project-hooks nil
   "Specifies a list of functions to be run when a project
-becomes active. The JDE runs the project hooks after
+becomes active. The JDEE runs the project hooks after
 the jdee-mode hooks."
   :group 'jdee-project
   :type '(repeat (function :tag "Function")))
@@ -133,7 +133,7 @@ buffer. Search for all the project file first in the directory
 tree containing the current source buffer. If any files are found,
 first reset all variables to their startup values. Then load
 the project files starting with the topmost in the tree.
-If no project files are found, set the JDE variables to their
+If no project files are found, set the JDEE variables to their
 Emacs startup values."
   (interactive)
   (setq jdee-loading-project t)
@@ -158,8 +158,8 @@ Emacs startup values."
 
 
 (defun jdee-load-all-project-files ()
+  "Load the project file associated with each Java source buffer."
   (interactive)
-  "Loads the project file associated with each Java source buffer."
   (mapc
    (lambda (java-buffer)
      (with-current-buffer java-buffer
@@ -170,13 +170,12 @@ Emacs startup values."
 
 ;;;###autoload
 (defun jdee-open-project-file ()
-  "Opens the project file for the Java source file in the
-current buffer."
+  "Open the project file for the Java source file in the current buffer."
   (interactive)
   (let ((prj-file (jdee-find-project-file default-directory)))
     (if prj-file
 	(find-file prj-file)
-      (message "%s" "Project file not found."))))
+      (message "Project file not found."))))
 
 
 (defun jdee-save-delete (symbol buffer)
@@ -200,7 +199,7 @@ Leave point at the location of the call, or after the last expression."
       (princ "\n"))))
 
 (defun jdee-symbol-p (symbol)
-  "Returns non-nil if SYMBOL is a JDE variable."
+  "Return non-nil if SYMBOL is a JDEE variable."
   (and (or
 	(get symbol 'custom-type)
 	(get symbol 'jdee-project))
@@ -230,7 +229,7 @@ packages loaded after startup of the JDEE."
   (setq jdee-project-name name))
 
 (defun jdee-put-project (symbol project value)
-  "Stores a new value for SYMBOL in PROJECT, or overwrites any
+  "Store a new VALUE for SYMBOL in PROJECT, or overwrites any
 existing value."
   (let ((proj-alist (get symbol 'jdee-project)))
     (if (null proj-alist)
@@ -240,8 +239,8 @@ existing value."
 	(put symbol 'jdee-project (pushnew (cons project (list value)) proj-alist))))))
 
 (defun jdee-get-project (symbol project)
-  "Gets the value for SYMBOL that is associated with PROJECT, or nil
-if none. To test if SYMBOL has any value for PROJECT, use
+  "Gets the value for SYMBOL that is associated with PROJECT, or nil if none.
+To test if SYMBOL has any value for PROJECT, use
 `jdee-project-present-p'."
   (car-safe (cdr-safe (assoc project (get symbol 'jdee-project)))))
 
@@ -250,7 +249,7 @@ if none. To test if SYMBOL has any value for PROJECT, use
   (assoc project (get symbol 'jdee-project)))
 
 (defun jdee-save-open-buffer (project)
-  "Creates a new buffer or opens an existing buffer for PROJECT."
+  "Create a new buffer or open an existing buffer for PROJECT."
   (let ((auto-insert nil)	; turn off auto-insert when
 	buffer standard-output)	; creating a new file
     (setq buffer (find-file-noselect project))
@@ -271,7 +270,7 @@ if none. To test if SYMBOL has any value for PROJECT, use
     buffer))
 
 (defun jdee-save-close-buffer (project)
-  "Saves and closes the buffer associated with PROJECT."
+  "Save and close the buffer associated with PROJECT."
   (let* ((buffer
 	  (find-buffer-visiting project))
 	 (standard-output buffer))
@@ -285,8 +284,7 @@ if none. To test if SYMBOL has any value for PROJECT, use
       (jdee-log-msg "jdee-save-close-buffer: Unable to find buffer for %s" project))))
 
 (defun jdee-save-variable (symbol projects)
-  "Saves all of the values of SYMBOL for each project file mentioned
-in PROJECTS."
+  "Save all of the values of SYMBOL for each project file in PROJECTS."
   (mapc
    (lambda (project)
      (if (and (not (string= (car project) "default"))
@@ -306,8 +304,7 @@ in PROJECTS."
    (get symbol 'jdee-project)))
 
 (defun jdee-save-needs-saving-p (symbol projects)
-  "Function used internally by the project saving mechanism to
-determine whether or not to save a symbol in a project file.  If there
+  "Determine whether or not to save a SYMBOL in a project file.  If there
 are settings to be saved, this function also resolves which project
 should receive the customized values."
   (unless (= (length projects) 0)
@@ -372,10 +369,10 @@ should receive the customized values."
 
 ;;;###autoload
 (defun jdee-save-project ()
-  "Saves source file buffer options in one or more project files.
+  "Save source file buffer options in one or more project files.
 This command provides an easy way to create and update a project file
-for a Java project. Simply open a source file, set the desired
-options, using the JDE Options menu, then save the settings in the
+for a Java project.  Simply open a source file, set the desired
+options, using the JDEE Options menu, then save the settings in the
 project file, using this command.  Now, whenever you open a source
 file from the same directory tree, the saved settings will be restored
 for that file."
@@ -392,7 +389,7 @@ for that file."
 
 ;;;###autoload
 (defun jdee-create-new-project (new-dir)
-  "Creates a new JDE project file in directory NEW-DIR, saving any
+  "Create a new JDEE project file in directory NEW-DIR, saving any
 current customized variables.  If a project file already exists in the
 given directory, the project is simply re-saved.  This functions the
 same as `jdee-save-project' when no project files can be found for the
@@ -423,9 +420,9 @@ hierarchical projects."
   "JDEE customization variables that have project-specific customizations.")
 
 (defun jdee-set-variables (&rest args)
-  "Initialize JDE customization variables.
+  "Initialize JDEE customization variables using ARGS.
 
-Takes a variable number of arguments. Each argument
+Takes a variable number of arguments.  Each argument
 should be of the form:
 
   (SYMBOL VALUE)
@@ -484,7 +481,7 @@ have been loaded)."
        'jdee-set-variable-init-value
        jdee-dirty-variables)))
 
-;; Code to update JDE customization variables when a user switches
+;; Code to update JDEE customization variables when a user switches
 ;; from a Java source buffer belonging to one project to a buffer
 ;; belonging to another.
 
