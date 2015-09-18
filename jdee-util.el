@@ -1,5 +1,4 @@
 ;;; jdee-util.el -- JDE utilities.
-;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -48,19 +47,13 @@
 (defvar jdee-buffer-project-file);; jdee-project-file.el
 (declare-function jdee-find-class-source-file "jdee-open-source" (class))
 
-(if (featurep 'xemacs)
-     (load "arc-mode")
-  (require 'arc-mode))
+(require 'arc-mode)
 
 (defsubst jdee-line-beginning-position (&optional n)
-  (if (featurep 'xemacs)
-      (save-excursion (beginning-of-line n) (point))
-    (line-beginning-position n)))
+  (line-beginning-position n))
 
 (defsubst jdee-line-end-position (&optional n)
-  (if (featurep 'xemacs)
-      (save-excursion (end-of-line n) (point))
-    (line-end-position)))
+  (line-end-position))
 
 ;;;###autoload
 (defun jdee-require (feature)
@@ -118,30 +111,22 @@ Unless optional argument INPLACE is non-nil, return a new string."
   "Return the path of the root directory of this JDEE
 installation. The root directory is the parent of the
 directory that contains the JDEE's Lisp files. On
-Emacs and on XEmacs installations that use the
-JDEE distributable, the root directory is the root
-directory that results from unpacking the distributable.
-On installations based on the version of the JDEE
-packaged with XEmacs, the root directory is
-xemacs-packages/lisp."
+Emacs and installations that use the JDEE distributable,
+the root directory is the root directory that results
+from unpacking the distributable."
   (let ((directory-sep-char ?/))
     (expand-file-name
-     "../"
      (file-name-directory (locate-library "jdee")))))
 
 (defun jdee-find-jdee-data-directory ()
-  "Return the path of the JDE data directory.
-Returns the path of the directory containing the
-JDE java and documentation directories;  nil if the
-directory cannot be found. If XEmacs, returns the location of
-the data directory in the XEmacs distribution hierarchy. On all other Emacs versions,
-the JDE expects to find the documentation and Java class directories
-in the same directory that contains the JDE lisp directory."
+  "Return the path of the JDEE data directory.
+Returns the path of the directory containing the JDEE java
+and documentation directories;  nil if the directory cannot
+be found. On all other Emacs versions, the JDEE expects
+to find the documentation in the doc subdirectory of directory
+that contains the JDEE lisp directory."
   (let ((directory-sep-char ?/))
-    (if (featurep 'xemacs)
-	(let ((dir (locate-data-directory "jdee")))
-	  (if dir dir (jdee-root)))
-      (jdee-root))))
+    (jdee-root)))
 
 (defun jdee-temp-directory ()
   "Get the location used by the host system to store temporary files."
@@ -288,4 +273,4 @@ See `jdee-htmlize-code-destinations'."
 
 (provide 'jdee-util)
 
-;; End of jdee-util.el
+;;; jdee-util.el ends here

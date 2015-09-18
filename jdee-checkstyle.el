@@ -1,5 +1,4 @@
 ;;; jdee-checkstyle.el --- Checkstyle interface for JDE
-;; $Id$
 
 ;; Copyright (C) 2001, 2002, 2003, 2004 Markus Mohnen and Paul Kinnucan
 ;; Copyright (C) 2009 by Paul Landes
@@ -249,7 +248,7 @@ string describing how the compilation finished."
 	(if check-proc
 	    (if (or (not (eq (process-status check-proc) 'run))
 		    (yes-or-no-p
-			 "A check style process is running; kill it?"))
+                     "A check style process is running; kill it?"))
 		(condition-case ()
 		    (progn
 		      (interrupt-process check-proc)
@@ -257,7 +256,7 @@ string describing how the compilation finished."
 		      (delete-process check-proc))
 		  (error nil))
 	      (error "Cannot have two processes in `%s' at once"
-			 (buffer-name)))))
+                     (buffer-name)))))
 
       ;; In case the checker buffer is current, make sure we get the global
       ;; values of compilation-error-regexp-alist, etc.
@@ -278,18 +277,17 @@ string describing how the compilation finished."
       (if (boundp 'compilation-error-message)
 	  (set (make-local-variable 'compilation-error-message) error-message))
       (set (make-local-variable 'compilation-error-regexp-alist)
-	     error-regexp-alist)
-      (when (not (featurep 'xemacs))
-	(dolist (elt `((compilation-enter-directory-regexp-alist
-			,enter-regexp-alist)
-		       (compilation-leave-directory-regexp-alist
-			,leave-regexp-alist)
-		       (compilation-file-regexp-alist
-			,file-regexp-alist)
-		       (compilation-nomessage-regexp-alist
-			,nomessage-regexp-alist)))
-	  (if (boundp (car elt))
-	      (set (make-local-variable (car elt)) (second elt)))))
+           error-regexp-alist)
+      (dolist (elt `((compilation-enter-directory-regexp-alist
+                      ,enter-regexp-alist)
+                     (compilation-leave-directory-regexp-alist
+                      ,leave-regexp-alist)
+                     (compilation-file-regexp-alist
+                      ,file-regexp-alist)
+                     (compilation-nomessage-regexp-alist
+                      ,nomessage-regexp-alist)))
+        (if (boundp (car elt))
+            (set (make-local-variable (car elt)) (second elt))))
 
       (if (boundp 'compilation-directory-stack)
 	  (setq default-directory thisdir
@@ -311,9 +309,8 @@ string describing how the compilation finished."
     (compilation-set-window-height outwin)
     (oset this :window outwin))
 
-  (if (not jdee-xemacsp)
-      (if compilation-process-setup-function
-	  (funcall compilation-process-setup-function)))
+  (if compilation-process-setup-function
+      (funcall compilation-process-setup-function))
 
   (let* ((outbuf (oref this :buffer))
 	 (vm-path (oref (jdee-run-get-vm) :path))
@@ -410,8 +407,7 @@ history enabled."
     ;; menu, save-some-buffers tries to popup a menu
     ;; which seems not to be supported--at least on
     ;; the PC.
-    (if (and (eq system-type 'windows-nt)
-	     (not jdee-xemacsp))
+    (if (eq system-type 'windows-nt)
 	(let ((temp last-nonmenu-event))
 	  ;; The next line makes emacs think that jdee-checkstyle
 	  ;; was invoked from the minibuffer, even when it
@@ -429,4 +425,4 @@ history enabled."
 
 (provide 'jdee-checkstyle)
 
-;; End of jdee-checkstyle.el
+;;; jdee-checkstyle.el ends here

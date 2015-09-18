@@ -1,5 +1,4 @@
 ;; jdee-import.el --- Organize Java imports
-;; $Id$
 
 ;; Copyright (C) 2000, 2001, 2002, 2003, 2004 by David Ponce
 ;; Copyright (C) 2004 by Philip Lord
@@ -410,9 +409,9 @@ inserts the selected import in the buffer."
   "Inserts imports into the correct place in the buffer."
   (save-excursion
     (goto-char (jdee-import-get-import-insertion-point))
-    (if (not jdee-xemacsp) (deactivate-mark))
+    (deactivate-mark)
     (if exclude
-      (setq new-imports (jdee-import-exclude-imports new-imports)))
+        (setq new-imports (jdee-import-exclude-imports new-imports)))
     (loop for new-import in new-imports do
 	  (when (> (length new-import) 0) ;; added to avoid insert empty import statements.
 	    (insert (concat "import " new-import ";\n"))
@@ -1113,4 +1112,4 @@ The fully qualified class is received from user input."
 
 (provide 'jdee-import)
 
-;; End of jdee-import.el
+;;; jdee-import.el ends here

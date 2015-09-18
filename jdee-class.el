@@ -1,5 +1,4 @@
-;; jdee-class.el --- Class usage commands for the JDEE.
-;; $Id$
+;;; jdee-class.el --- Class usage commands for the JDEE.
 
 ;; Copyright (C) 2003 Andrew Hyatt
 ;; Copyright (C) 2009 by Paul Landes
@@ -23,7 +22,7 @@
 ;; ) or from the Free Software
 ;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-;; Commentary:
+;;; Commentary:
 
 ;; This is a package that contains various utility classes that are
 ;; useful when dealing with class files.  There are several macros to
@@ -39,6 +38,7 @@
 
 (require 'cl-lib)
 (require 'jdee-parse-class)
+(require 'jdee-file-util)
 
 ;; FIXME: refactor
 (declare-function jdee-normalize-path "jdee" (path &optional symbol))
@@ -74,57 +74,57 @@ argument in the SPEC is the package to restrict processing to.
 	(process-class (cl-gensym "--with-all-class-files-process-class"))
 	(child-path (cl-gensym "--with-all-class-files-child-path"))
 	(package (nth 2 spec)))
-	`(labels ((,process-class (,class-var-sym)
-				 (when (string-match "\.[Cc][Ll][Aa][Ss][Ss]$" ,class-var-sym)
-				   ,@body))
-		  (,process-files (,dir2-sym)
-				  (when (file-exists-p ,dir2-sym)
-					(dolist (,class-var-sym (directory-files ,dir2-sym
-										 t "[^.]$"))
-					  (,process-class ,class-var-sym))))
-		  (,rec-descend (,dir2-sym)
-				(if (file-directory-p ,dir2-sym)
-				    (dolist (,child-path (directory-files ,dir2-sym
-									 t "[^.]$"))
-				      (,rec-descend ,child-path))
-				  (,process-class ,dir2-sym))))
-	   (let ((,old-dir-sym default-directory))
-	     (unwind-protect
-		 (save-excursion
-		   (dolist (,path-sym jdee-built-class-path)
-		     (let ((,normalized-path-sym (jdee-normalize-path ,path-sym)))
-		       (unless (file-exists-p ,normalized-path-sym)
-			 (error (concat "Could not find file or directory "
-					,normalized-path-sym)))
-		       (if (file-directory-p ,normalized-path-sym)
-			   (if ,package
-			       (,process-files
-				(concat ,normalized-path-sym "/" (subst-char-in-string ?. ?/ ,package)))
-			     (,rec-descend ,normalized-path-sym))
-			 ;; we're not a directory, assume we are a jar file
-			 (let ((,dir-sym (concat (jdee-temp-directory) "/"
-						 (make-temp-name "jdee-classes-temp"))))
-			   (make-directory ,dir-sym)
-			   (cd ,dir-sym)
-			   (let ((,buf-sym (get-buffer-create "*Jar output*")))
-			     (unless (eq (call-process (jdee-get-jdk-prog 'jar) nil
-						       ,buf-sym nil "-xf"
-						       (expand-file-name
-							,normalized-path-sym)) 0)
-			       (error
-				(concat "Could not unjar file "
-					(expand-file-name ,normalized-path-sym)
-					".  See *Jar output* buffer for details")))
-			     (kill-buffer ,buf-sym))
-			   (unwind-protect
-			       (if ,package
-				   (,process-files
-				    (concat ,dir-sym "/" (subst-char-in-string ?. ?/ ,package)))
-				 (,rec-descend ,dir-sym))
-			     (jdee-remove-all-from-directory ,dir-sym)))))))
-	       (cd ,old-dir-sym)))
-	   ;; return val
-	   ,(nth 1 spec))))
+    `(labels ((,process-class (,class-var-sym)
+                              (when (string-match "\.[Cc][Ll][Aa][Ss][Ss]$" ,class-var-sym)
+                                ,@body))
+              (,process-files (,dir2-sym)
+                              (when (file-exists-p ,dir2-sym)
+                                (dolist (,class-var-sym (directory-files ,dir2-sym
+                                                                         t "[^.]$"))
+                                  (,process-class ,class-var-sym))))
+              (,rec-descend (,dir2-sym)
+                            (if (file-directory-p ,dir2-sym)
+                                (dolist (,child-path (directory-files ,dir2-sym
+                                                                      t "[^.]$"))
+                                  (,rec-descend ,child-path))
+                              (,process-class ,dir2-sym))))
+       (let ((,old-dir-sym default-directory))
+         (unwind-protect
+             (save-excursion
+               (dolist (,path-sym jdee-built-class-path)
+                 (let ((,normalized-path-sym (jdee-normalize-path ,path-sym)))
+                   (unless (file-exists-p ,normalized-path-sym)
+                     (error (concat "Could not find file or directory "
+                                    ,normalized-path-sym)))
+                   (if (file-directory-p ,normalized-path-sym)
+                       (if ,package
+                           (,process-files
+                            (concat ,normalized-path-sym "/" (subst-char-in-string ?. ?/ ,package)))
+                         (,rec-descend ,normalized-path-sym))
+                     ;; we're not a directory, assume we are a jar file
+                     (let ((,dir-sym (concat (jdee-temp-directory) "/"
+                                             (make-temp-name "jdee-classes-temp"))))
+                       (make-directory ,dir-sym)
+                       (cd ,dir-sym)
+                       (let ((,buf-sym (get-buffer-create "*Jar output*")))
+                         (unless (eq (call-process (jdee-get-jdk-prog 'jar) nil
+                                                   ,buf-sym nil "-xf"
+                                                   (expand-file-name
+                                                    ,normalized-path-sym)) 0)
+                           (error
+                            (concat "Could not unjar file "
+                                    (expand-file-name ,normalized-path-sym)
+                                    ".  See *Jar output* buffer for details")))
+                         (kill-buffer ,buf-sym))
+                       (unwind-protect
+                           (if ,package
+                               (,process-files
+                                (concat ,dir-sym "/" (subst-char-in-string ?. ?/ ,package)))
+                             (,rec-descend ,dir-sym))
+                         (jdee-file-util-remove-all-matching ,dir-sym "[^\\.]$")))))))
+           (cd ,old-dir-sym)))
+       ;; return val
+       ,(nth 1 spec))))
 
 (defmacro with-all-class-infos-when (spec pred &rest body)
   "Call BODY with the parsed class information of each file found in
@@ -174,15 +174,7 @@ info, the package name of the source file, the source name of the source file, a
   "Like `member' but works with strings and will return true if any of
 the strings in LIST exist at the end of STR"
   (cl-member-if (lambda (item) (string-match (concat (regexp-quote item) "$")
-					  str)) list))
-
-(defun jdee-remove-all-from-directory (dir)
-  (if (file-directory-p dir)
-    (progn
-      (mapc 'jdee-remove-all-from-directory
-	      (directory-files dir t "[^\\.]$"))
-      (delete-directory dir))
-    (delete-file dir)))
+                                        str)) list))
 
 (defun append-to-list (var list &optional accept-nil)
   "Appends everything in LIST to the list in VAR.  Use similar to
@@ -225,4 +217,4 @@ will not be."
 
 (provide 'jdee-class)
 
-;; End of jdee-class.el
+;;; jdee-class.el ends here

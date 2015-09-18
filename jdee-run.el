@@ -1,5 +1,4 @@
 ;; jdee-run.el --- runs the Java app in the current buffer.
-;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -1576,15 +1575,9 @@ Here goes all the error message parsing."
 Click anywhere on the line with the stack reference."
   (interactive "e")
   (let ((pos (event-start event)))
-    (if (and (fboundp 'event-point)
-	     (fboundp 'event-window))
-	      ;; xemacs
-	(set-marker (car jdee-run-etrace-current-marker)
-		    (event-point pos)
-		    (window-buffer (event-window pos)))
-      (set-marker (car jdee-run-etrace-current-marker)
-		  (posn-point pos)
-		  (window-buffer (posn-window pos)))))
+    (set-marker (car jdee-run-etrace-current-marker)
+                (posn-point pos)
+                (window-buffer (posn-window pos))))
   (jdee-run-etrace-goto))
 
 
@@ -1608,7 +1601,7 @@ The point should be anywhere on the line with the stack reference."
   (jdee-run-etrace-goto -1))
 
 (defun jdee-run-etrace-setup-font-lock ()
-    ;;setup the correct font-lock stuff
+  ;;setup the correct font-lock stuff
 
 
   ;;font lock setup notes
@@ -1619,27 +1612,20 @@ The point should be anywhere on the line with the stack reference."
   ;; stack entry file -> font-lock-variable-name-face
   ;; stack entry line number -> font-lock-type-face
 
-  (if (featurep 'xemacs)
-      ;; For xemacs it seems to be sufficient to just define
-      ;; {mode-name}-font-lock-keywords, but if that doesn't work for
-      ;; you, then replace the nil with:
-      ;; (set (make-local-variable 'font-lock-keywords) jdee-run-font-lock-keywords)
-      nil
-    (progn
-      (font-lock-add-keywords
-       nil
-       '(("\\(^[_a-z.]+[_a-zA-Z0-9]+Exception\\)\\(: \\)?\\(.*\\)?"
-	  (1 'font-lock-keyword-face append)
-	  (3 'font-lock-string-face append))))
+  (font-lock-add-keywords
+   nil
+   '(("\\(^[_a-z.]+[_a-zA-Z0-9]+Exception\\)\\(: \\)?\\(.*\\)?"
+      (1 'font-lock-keyword-face append)
+      (3 'font-lock-string-face append))))
 
-      (font-lock-add-keywords
-       nil
-       '(("\\(at [_a-z.]+[_a-zA-Z0-9]+\\.[_a-zA-Z<>]*\\)(\\([_a-zA-Z0-9]+.java\\):\\([0-9]+\\))$"
-	  (1 'font-lock-constant-face append)
-	  (2 'font-lock-variable-name-face append)
-	  (3 'font-lock-type-face append))))
-      (font-lock-fontify-buffer))))
+  (font-lock-add-keywords
+   nil
+   '(("\\(at [_a-z.]+[_a-zA-Z0-9]+\\.[_a-zA-Z<>]*\\)(\\([_a-zA-Z0-9]+.java\\):\\([0-9]+\\))$"
+      (1 'font-lock-constant-face append)
+      (2 'font-lock-variable-name-face append)
+      (3 'font-lock-type-face append))))
+  (font-lock-fontify-buffer))
 
 (provide 'jdee-run)
 
-;; End of jdee-run.el
+;;; jdee-run.el ends here

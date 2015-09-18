@@ -1,5 +1,4 @@
 ;;; jdee-jdb.el -- Debugger mode for jdb.
-;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>x
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -1514,9 +1513,9 @@ the debuggee process at (e.g., jdbconn)."
   (list "Jdb"
 
 	["Step Over"
-	     jdee-debug-step-over
-	     :active (jdee-db-debuggee-stopped-p)
-	     :help "Step over the next method."]
+         jdee-debug-step-over
+         :active (jdee-db-debuggee-stopped-p)
+         :help "Step over the next method."]
 
 
 	["Step Into"
@@ -1601,10 +1600,10 @@ the debuggee process at (e.g., jdbconn)."
 	  :help "Display the variables in scope at the current line."]
 	 )
 
-	 ["Set Variable"
-	  jdee-jdb-set
-	  :active  (jdee-db-debuggee-stopped-p)
-	  :help "Change the value of an in-scope variable."]
+        ["Set Variable"
+         jdee-jdb-set
+         :active  (jdee-db-debuggee-stopped-p)
+         :help "Change the value of an in-scope variable."]
 
 	(list
 	 "Stack"
@@ -1669,155 +1668,15 @@ the debuggee process at (e.g., jdbconn)."
 	)
   "Defines the Jdb menu for Emacs.")
 
-(defvar jdee-jdb-xemacs-menu-spec
-  (list "Jdb"
-
-	["Step Over"
-	     jdee-debug-step-over
-	     :active (jdee-db-debuggee-stopped-p)]
-
-
-	["Step Into"
-	 jdee-debug-step-into
-	 :active (jdee-db-debuggee-stopped-p)
-	 ]
-
-	["Step Out"
-	 jdee-debug-step-out
-	 :active (jdee-db-debuggee-stopped-p)]
-
-	["Run"
-	 jdee-debug-run
-	 :active   (and
-		    (slot-boundp 'jdee-db-debugger 'the-debugger)
-		    (let* ((debugger (oref-default 'jdee-db-debugger the-debugger))
-			   (debuggee (oref debugger debuggee))
-			   (debuggee-status (oref debuggee status)))
-		      (and (oref debugger running-p)
-			   (not (oref debuggee-status running-p)))))
-
-	 :included (or
-		    (not (slot-boundp 'jdee-db-debugger 'the-debugger))
-		    (let* ((debugger (oref-default 'jdee-db-debugger the-debugger))
-			   (debuggee (oref debugger debuggee))
-			   (debuggee-status (oref debuggee status)))
-		      (or (not (oref debugger running-p))
-			  (not (oref debuggee-status running-p)))))]
-
-	["Continue"
-	 jdee-debug-cont
-	 :active   (or
-		    (jdee-db-debuggee-stopped-p)
-		    (jdee-db-debuggee-suspended-p))
-
-	 :included  (jdee-db-debuggee-running-p)]
-
-	["Quit"
-	 jdee-debug-quit
-	 :active  (jdee-db-debuggee-running-p)]
-
-	"-"
-
-	["Toggle Breakpoint"
-	 jdee-debug-toggle-breakpoint
-	 t]
-
-	["Clear Breakpoints"
-	 jdee-debug-clear-breakpoints
-	 jdee-db-breakpoints]
-
-	["List Breakpoints"
-	 jdee-debug-list-breakpoints
-	 jdee-db-breakpoints]
-	"-"
-
-	(list
-	 "Display"
-
-	 ["Expression"
-	  jdee-jdb-print
-	  :active  (jdee-db-debuggee-stopped-p)]
-
-	 ["Object"
-	  jdee-jdb-dump
-	  :active  (jdee-db-debuggee-stopped-p)]
-
-
-	 ["Locals"
-	  jdee-jdb-locals
-	  :active  (jdee-db-debuggee-stopped-p)]
-	 )
-
-	 ["Set Variable"
-	  jdee-jdb-set
-	  :active  (jdee-db-debuggee-stopped-p)]
-
-	(list
-	 "Stack"
-
-	 ["Up"
-	  jdee-debug-up
-	  :active  (jdee-db-debuggee-stopped-p)]
-
-	 ["Down"
-	  jdee-debug-down
-	  :active (and
-		   (jdee-db-debuggee-stopped-p)
-		   (let* ((debugger (oref-default 'jdee-db-debugger the-debugger))
-			  (debuggee (oref debugger debuggee)))
-		     (> (jdee-jdb-string-to-int
-			 (oref debuggee :stack-depth)) 1)))]
-
-	 ["Where"
-	  jdee-debug-where
-	  :active (jdee-db-debuggee-stopped-p)]
-
-	 )
-	"-"
-	(list
-	 "External Process"
-	 ["Attach Via Socket"
-	  jdee-jdb-attach-via-socket
-	  :active (not (jdee-db-debuggee-running-p))]
-	 ["Attach Via Shared Memory"
-	  jdee-jdb-attach-via-shared-memory
-	  :active (and
-		   (eq system-type 'windows-nt)
-		   (not (jdee-db-debuggee-running-p)))]
-	 ["Listen Via Socket"
-	  jdee-jdb-listen-via-socket
-	  :active (not (jdee-db-debuggee-running-p))]
-	 ["Listen Via Shared Memory"
-	  jdee-jdb-listen-via-shared-memory
-	  :active (and
-		   (eq system-type 'windows-nt)
-		   (not (jdee-db-debuggee-running-p)))]
-
-	 )
-	"-"
-	["Preferences"
-	 jdee-bug-show-preferences nil]
-	"-"
-	["Help"
-	 jdee-jdb-help t]
-	)
-  "Defines the JDE's menu of jdb commands.")
-
-
 (defvar jdee-jdb-mode-map
   (let ((km (make-sparse-keymap)))
     (easy-menu-define jdee-jdb-menu km "Jdb Minor Mode Menu"
-		      jdee-jdb-emacs-menu-spec)
+      jdee-jdb-emacs-menu-spec)
     km)
   "Keymap for Jdb minor mode.")
 
 (define-minor-mode jdee-jdb-minor-mode nil
-  :keymap jdee-jdb-mode-map
-  (if jdee-jdb-minor-mode
-      (if (featurep 'xemacs)
-	    (easy-menu-add jdee-jdb-xemacs-menu-spec jdee-jdb-mode-map))
-    (if (featurep 'xemacs)
-      (easy-menu-remove jdee-jdb-xemacs-menu-spec))))
+                   :keymap jdee-jdb-mode-map)
 
 (semantic-add-minor-mode 'jdee-jdb-minor-mode " jdb")
 
@@ -1883,4 +1742,4 @@ and converts the result to an integer."
 
 (provide 'jdee-jdb)
 
-;; End of jdee-jdb.el
+;;; jdee-jdb.el ends here

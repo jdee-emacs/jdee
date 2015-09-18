@@ -1,5 +1,4 @@
 ;;; jdee-compile.el -- Integrated Development Environment for Java.
-;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Author: Suraj Acharya <sacharya@cs.indiana.edu>
@@ -207,9 +206,7 @@ don't know which classes were recompiled."
   ;;Setting the last java buffer as the current buffer
   (condition-case nil
       (progn
-	(if jdee-xemacsp
-	    (set-buffer (cadr (buffer-list)))
-	  (set-buffer (car (buffer-list))))
+	(set-buffer (car (buffer-list)))
 	(if (eq major-mode 'jdee-mode)
 	    (progn
 	      (setq jdee-complete-last-compiled-class (jdee-parse-get-buffer-class))
@@ -1008,13 +1005,12 @@ If t (or other non-nil non-number) then kill in 2 secs."
 
   ;; Pop to compilation buffer.
   (let* ((outbuf (oref (oref this buffer) buffer))
-	  (outwin (display-buffer outbuf)))
+         (outwin (display-buffer outbuf)))
     (compilation-set-window-height outwin)
     (oset this :window outwin)
 
-    (if (not jdee-xemacsp)
-	(if compilation-process-setup-function
-	  (funcall compilation-process-setup-function)))
+    (if compilation-process-setup-function
+        (funcall compilation-process-setup-function))
 
     (jdee-compile-launch this)
 
@@ -1454,47 +1450,46 @@ uses the compiler executable specified by
 
   (if jdee-read-compile-args
       (setq jdee-interactive-compile-args
-	      (read-from-minibuffer
-	       "Compile args: "
-	       jdee-interactive-compile-args
-	       nil nil
-	       '(jdee-interactive-compile-arg-history . 1))))
+            (read-from-minibuffer
+             "Compile args: "
+             jdee-interactive-compile-args
+             nil nil
+             '(jdee-interactive-compile-arg-history . 1))))
 
-    ;; Force save-some-buffers to use the minibuffer
-    ;; to query user about whether to save modified buffers.
-    ;; Otherwise, when user invokes jdee-compile from
-    ;; menu, save-some-buffers tries to popup a menu
-    ;; which seems not to be supported--at least on
-    ;; the PC.
-    (if (and (eq system-type 'windows-nt)
-	     (not jdee-xemacsp))
-	(let ((temp last-nonmenu-event))
-	  ;; The next line makes emacs think that jdee-compile
-	  ;; was invoked from the minibuffer, even when it
-	  ;; is actually invoked from the menu-bar.
-	  (setq last-nonmenu-event t)
-	  (save-some-buffers (not compilation-ask-about-save) nil)
-	  (setq last-nonmenu-event temp))
-      (save-some-buffers (not compilation-ask-about-save) nil))
+  ;; Force save-some-buffers to use the minibuffer
+  ;; to query user about whether to save modified buffers.
+  ;; Otherwise, when user invokes jdee-compile from
+  ;; menu, save-some-buffers tries to popup a menu
+  ;; which seems not to be supported--at least on
+  ;; the PC.
+  (if (eq system-type 'windows-nt)
+      (let ((temp last-nonmenu-event))
+        ;; The next line makes emacs think that jdee-compile
+        ;; was invoked from the minibuffer, even when it
+        ;; is actually invoked from the menu-bar.
+        (setq last-nonmenu-event t)
+        (save-some-buffers (not compilation-ask-about-save) nil)
+        (setq last-nonmenu-event temp))
+    (save-some-buffers (not compilation-ask-about-save) nil))
 
-    (setq compilation-finish-functions
-      (lambda (buf msg)
-	(run-hook-with-args 'jdee-compile-finish-hook buf msg)
-	(setq compilation-finish-functions nil)))
+  (setq compilation-finish-functions
+        (lambda (buf msg)
+          (run-hook-with-args 'jdee-compile-finish-hook buf msg)
+          (setq compilation-finish-functions nil)))
 
-    (let ((compiler (jdee-compile-get-the-compiler)))
-      (if compiler
-	  (progn
-	    (oset compiler
-		  :interactive-args
-		  (if (and jdee-interactive-compile-args
-			   (not (string= jdee-interactive-compile-args "")))
-		      (split-string jdee-interactive-compile-args " ")))
-	    (jdee-compile-compile compiler))
-	(error "Unknown compiler. Aborting compilation."))))
+  (let ((compiler (jdee-compile-get-the-compiler)))
+    (if compiler
+        (progn
+          (oset compiler
+                :interactive-args
+                (if (and jdee-interactive-compile-args
+                         (not (string= jdee-interactive-compile-args "")))
+                    (split-string jdee-interactive-compile-args " ")))
+          (jdee-compile-compile compiler))
+      (error "Unknown compiler. Aborting compilation."))))
 
 
 
 (provide 'jdee-compile)
 
-;; End of jdee-compile.el
+;;; jdee-compile.el ends here

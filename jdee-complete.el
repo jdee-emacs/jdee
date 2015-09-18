@@ -1,5 +1,4 @@
 ;; jdee-complete.el -- Smart completion for the JDE
-;; $Id$
 
 ;; Author: Rodrigo Reyes <reyes@chez.com>
 ;; Maintainers: Rodrigo Reyes
@@ -845,25 +844,17 @@ before invoking the completion"
 (defun jdee-cursor-posn-as-event()
   "Returns the text cursor position as an EVENT on Emacs and the mouse
 cursor position on XEmacs."
-  (if jdee-xemacsp
-      (let* ((mouse-pos (mouse-pixel-position))
-	     (x (car (cdr mouse-pos)))
-	     (y (cdr (cdr mouse-pos))))
-	(if (fboundp 'make-event)
-	    (make-event 'button-press `(button 1 modifiers nil x ,x y ,y))))
-
-    ;; not xemacs
-    (let ((x (* (frame-char-width)
-		(if (and
-		     (boundp 'hscroll-mode)
-		     (fboundp 'hscroll-window-column))
-		    (hscroll-window-column)
-		  (mod (current-column) (window-width)))))
-	  (y  (* (frame-char-height)
-		 (- (count-lines (point-min) (point))
-		    (count-lines (point-min) (window-start)))))
-	  (window (get-buffer-window (current-buffer))))
-      (list (list x y) window))))
+  (let ((x (* (frame-char-width)
+              (if (and
+                   (boundp 'hscroll-mode)
+                   (fboundp 'hscroll-window-column))
+                  (hscroll-window-column)
+                (mod (current-column) (window-width)))))
+        (y  (* (frame-char-height)
+               (- (count-lines (point-min) (point))
+                  (count-lines (point-min) (window-start)))))
+        (window (get-buffer-window (current-buffer))))
+    (list (list x y) window)))
 
 (defun jdee-complete-menu ()
   "Completes the method or field name at point.  This command displays
@@ -1039,4 +1030,4 @@ all the other completions the cursor is place at the end."
 
 (provide 'jdee-complete)
 
-;; End of jdee-complete.el
+;;; jdee-complete.el ends here

@@ -1,5 +1,4 @@
 ;;; jdee-dbs.el -- JDEbug Session Interface Functions
-;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -2536,18 +2535,15 @@ the object.")
 	  (set-window-configuration (oref process win-cfg))
 	  (set-window-buffer
 	   (next-window
-	    (if (featurep 'xemacs)
-		(frame-highest-window)
-	      (frame-first-window)))
+	    (frame-first-window))
 	   buf)
 	  (set-buffer buf)
 	  (kill-all-local-variables)
 	  (let ((inhibit-read-only t))
 	    (erase-buffer))
-	  (if (not jdee-xemacsp)
-	      (let ((all (overlay-lists)))
-		(mapc 'delete-overlay (car all))
-		(mapc 'delete-overlay (cdr all))))
+	  (let ((all (overlay-lists)))
+            (mapc 'delete-overlay (car all))
+            (mapc 'delete-overlay (cdr all)))
 	  (apply 'widget-create (jdee-dbs-map-threads-to-tree thread-list))
 	  (use-local-map widget-keymap)
 	  (widget-setup))
@@ -3313,4 +3309,4 @@ object.")
 
 (provide 'jdee-dbs)
 
-;; End of jdee-dbs.el
+;;; jdee-dbs.el ends here

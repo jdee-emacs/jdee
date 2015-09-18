@@ -57,10 +57,7 @@
   "Specifies key bindings for JDE's project-related commands."
   :group 'jdee-project)
 
-(if (and
-     (or
-      (not jdee-xemacsp)
-      (featurep 'infodock)))
+(if (featurep 'infodock)
     (define-key-after (cdr (assq 'menu-bar global-map))
       [jdee-project]
       (cons (car jdee-project-menu-definition) jdee-project-menu) 'mule))

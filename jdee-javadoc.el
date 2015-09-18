@@ -664,8 +664,6 @@ Local to checker report buffer.")
    (list "\\(@[^ \n\r\t]+\\)"
 	 1 (cond ((boundp 'jdee-font-lock-doc-tag-face)
 		  'jdee-font-lock-doc-tag-face)
-		 ((featurep 'xemacs)
-		  'font-lock-keyword-face)
 		 (t
 		  'font-lock-constant-face)))
    ;; Misc.
@@ -1910,4 +1908,4 @@ definition."
 
 (provide 'jdee-javadoc)
 
-;; End of jdee-javadoc.el
+;;; jdee-javadoc.el ends here

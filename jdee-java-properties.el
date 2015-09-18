@@ -18,7 +18,7 @@
 ;; General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with Emacs; see the file COPYING.  If not, write to the 
+;; along with Emacs; see the file COPYING.  If not, write to the
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
@@ -120,9 +120,8 @@
   (set (make-local-variable 'comment-end) "")
   (set (make-local-variable 'comment-column) 32)
 
-  (if (not (featurep 'xemacs))
-      (set (make-local-variable 'font-lock-defaults)
-	   '(jdee-java-properties-font-lock-keywords t)))
+  (set (make-local-variable 'font-lock-defaults)
+       '(jdee-java-properties-font-lock-keywords t))
 
   (use-local-map jdee-java-properties-mode-map)
   (font-lock-mode t)
@@ -156,9 +155,6 @@
      jdee-java-properties-font-lock-comment-face t)
     )
   "Additional expressions to highlight in Java-Props mode.")
-(if (featurep 'xemacs)
-    (put 'jdee-java-properties-mode 'font-lock-defaults
-	 '(jdee-java-properties-font-lock-keywords t)))
 
 (defun jdee-java-properties-parse (&optional buffer)
   "Parse a file of Java properties and return them as an alist.

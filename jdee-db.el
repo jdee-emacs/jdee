@@ -1,5 +1,4 @@
 ;;; jdee-db.el -- Debugger mode for jdb.
-;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -40,10 +39,6 @@
 
 (eval-when-compile
   (require 'wid-edit))
-
-(unless (fboundp 'make-overlay)
-  ;; FIXME; xemacs?
-  (require 'overlay))
 
 ;; FIXME: refactor
 (declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
@@ -447,47 +442,30 @@ uses overlays as markers in Emacs and extents in XEmacs.")
   (call-next-method)
 
   (oset this marker
-	(if (featurep 'xemacs)
-	    (if (or (not (extent-at (jdee-line-beginning-position)))
-		    (not (jdee-db-breakpoint-marker-p
-			   (extent-at (jdee-line-beginning-position)))))
-		(make-extent
-		 (jdee-line-beginning-position)
-		 (1+ (jdee-line-end-position))))
-	  (make-overlay
-	   (jdee-line-beginning-position)
-	   (1+ (jdee-line-end-position))
-	   (current-buffer) nil t))))
-
+	(make-overlay
+         (jdee-line-beginning-position)
+         (1+ (jdee-line-end-position))
+         (current-buffer) nil t)))
 
 (defmethod jdee-db-breakpoint-marker-set-face ((this jdee-db-breakpoint-marker) face)
   "Apply FACE to OVERLAY."
   (let ((marker (oref this marker)))
-    (if (featurep 'xemacs)
-	(progn
-	  (set-extent-face marker face)
-	  (set-extent-priority marker 98))
-      (progn
-	(overlay-put marker  'face face)
-	(overlay-put marker 'priority 98)))))
+    (progn
+      (overlay-put marker  'face face)
+      (overlay-put marker 'priority 98))))
 
 (defun jdee-db-breakpoint-marker-p (marker)
   "Return t if overlay is a breakpoint marker overlay."
-    (let ((marker-face
-	   (if (featurep 'xemacs)
-	       (extent-property marker 'face nil)
-	     (overlay-get marker 'face))))
-      (or
-       (eq marker-face 'jdee-db-spec-breakpoint-face)
-       (eq marker-face 'jdee-db-requested-breakpoint-face)
-       (eq marker-face 'jdee-db-active-breakpoint-face))))
+  (let ((marker-face
+         (overlay-get marker 'face)))
+    (or
+     (eq marker-face 'jdee-db-spec-breakpoint-face)
+     (eq marker-face 'jdee-db-requested-breakpoint-face)
+     (eq marker-face 'jdee-db-active-breakpoint-face))))
 
 (defmethod jdee-db-breakpoint-marker-delete ((this jdee-db-breakpoint-marker))
   "Remove breakpoint overlay at LINE in FILE."
-  (if (featurep 'xemacs)
-      (delete-extent (oref this marker))
-    (delete-overlay (oref this marker))))
-
+  (delete-overlay (oref this marker)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -547,9 +525,7 @@ uses overlays as markers in Emacs and extents in XEmacs.")
   (with-current-buffer (find-file-noselect (oref this file))
     (if (oref this marker)
 	(let ((marker-start
-	       (if (featurep 'xemacs)
-		   (extent-start-position (oref (oref this marker) marker))
-		 (overlay-start (oref (oref this marker) marker)))))
+	       (overlay-start (oref (oref this marker) marker))))
 	  (jdee-get-line-at-point marker-start))
       (oref this line))))
 
@@ -2019,4 +1995,4 @@ matches FILE."
 
 (provide 'jdee-db)
 
-;;; End of jdee-db.el
+;;; jdee-db.el ends here

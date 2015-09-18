@@ -1,5 +1,4 @@
 ;;; efc.el -- Emacs Foundation Classes
-;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -342,10 +341,6 @@ and a string describing how the process finished."))
 				  compilation-leave-directory-regexp-alist))
 	  (file-regexp-alist (if (boundp 'compilation-file-regexp-alist)
 				 compilation-file-regexp-alist))
-	  (nomessage-regexp-alist
-	   (when (boundp 'compilation-nomessage-regexp-alist)
-	     ;; xemacs
-	       (compilation-nomessage-regexp-alist)))
 	  (error-message "No further errors")
 	  (thisdir default-directory))
 
@@ -359,7 +354,7 @@ and a string describing how the process finished."))
 	(if compiler-proc
 	    (if (or (not (eq (process-status compiler-proc) 'run))
 		    (yes-or-no-p
-			 (format "A %s process is running; kill it?" (oref this name))))
+                     (format "A %s process is running; kill it?" (oref this name))))
 		(condition-case ()
 		    (progn
 		      (interrupt-process compiler-proc)
@@ -367,7 +362,7 @@ and a string describing how the process finished."))
 		      (delete-process compiler-proc))
 		  (error nil))
 	      (error "Cannot have two processes in `%s' at once"
-			 (buffer-name)))))
+                     (buffer-name)))))
 
       ;; In case the compiler buffer is current, make sure we get the global
       ;; values of compilation-error-regexp-alist, etc.
@@ -386,20 +381,14 @@ and a string describing how the process finished."))
       (set (make-local-variable 'compilation-error-regexp-alist)
 	   error-regexp-alist)
 
-      (when (not (featurep 'xemacs))
-	(dolist (elt `((compilation-enter-directory-regexp-alist
-			,enter-regexp-alist)
-		       (compilation-leave-directory-regexp-alist
-			,leave-regexp-alist)
-		       (compilation-file-regexp-alist
-			,file-regexp-alist)
-		       (when (fboundp 'compilation-nomessage-regexp-alist)
-			 ;; xemacs
-			 ;; FIXME: for some reason, the byte compiler still complains here
-			 (compilation-nomessage-regexp-alist
-			  ,nomessage-regexp-alist))))
-	  (if (boundp (car elt))
-	      (set (make-local-variable (car elt)) (second elt)))))
+      (dolist (elt `((compilation-enter-directory-regexp-alist
+                      ,enter-regexp-alist)
+                     (compilation-leave-directory-regexp-alist
+                      ,leave-regexp-alist)
+                     (compilation-file-regexp-alist
+                      ,file-regexp-alist)))
+        (if (boundp (car elt))
+            (set (make-local-variable (car elt)) (second elt))))
 
       (if (slot-boundp this 'comp-finish-fcn)
 	  (set (make-local-variable 'compilation-finish-functions)
@@ -424,9 +413,8 @@ compiler process.")
     (compilation-set-window-height outwin)
     (oset this :window outwin))
 
-  (if (not (featurep 'xemacs))
-      (if compilation-process-setup-function
-	  (funcall compilation-process-setup-function)))
+  (if compilation-process-setup-function
+      (funcall compilation-process-setup-function))
 
   (let* ((outbuf (oref this :buffer))
 	 (executable-path (oref this exec-path))
@@ -702,4 +690,4 @@ of efc-visitor class."
 
 (provide 'efc)
 
-;; End of efc.el
+;;; efc.el ends here

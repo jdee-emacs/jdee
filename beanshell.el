@@ -1,5 +1,4 @@
 ;;; beanshell.el
-;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -314,17 +313,16 @@ buffer."
 	(set (make-local-variable 'compilation-error-regexp-alist)
 	     error-regexp-alist)
 
-	(when (not (featurep 'xemacs))
-	  (dolist (elt `((compilation-enter-directory-regexp-alist
-			  ,enter-regexp-alist)
-			 (compilation-leave-directory-regexp-alist
-			  ,leave-regexp-alist)
-			 (compilation-file-regexp-alist
-			  ,file-regexp-alist)
-			 (compilation-nomessage-regexp-alist
-			  ,nomessage-regexp-alist)))
-	    (if (boundp (car elt))
-		(set (make-local-variable (car elt)) (cadr elt)))))
+	(dolist (elt `((compilation-enter-directory-regexp-alist
+                        ,enter-regexp-alist)
+                       (compilation-leave-directory-regexp-alist
+                        ,leave-regexp-alist)
+                       (compilation-file-regexp-alist
+                        ,file-regexp-alist)
+                       (compilation-nomessage-regexp-alist
+                        ,nomessage-regexp-alist)))
+          (if (boundp (car elt))
+              (set (make-local-variable (car elt)) (cadr elt))))
 
 	(setq default-directory thisdir)
 	(if (boundp 'compilation-directory-stack)
@@ -365,16 +363,13 @@ The result is inserted as it comes in the compilation buffer."
 		 (format "exited abnormally with code %s\n"
 			 status))))
 	  (insert string)))
-      (if (not (featurep 'xemacs))
-	  (if compilation-scroll-output
-	      (save-selected-window
-		(if win
-		    (progn
-		      (select-window win)
-		      (goto-char (point-max))))
-		(sit-for 0)))))))
-
-
+      (if compilation-scroll-output
+          (save-selected-window
+            (if win
+                (progn
+                  (select-window win)
+                  (goto-char (point-max))))
+            (sit-for 0))))))
 
 (defclass bsh ()
   ((buffer        :initarg :buffer
@@ -456,7 +451,7 @@ The result is inserted as it comes in the compilation buffer."
 			  :type boolean
 			  :documentation
 			  "Whether or not to use a separate error buffer."))
-"Defines an instance of a BeanShell process.")
+  "Defines an instance of a BeanShell process.")
 
 (defmethod initialize-instance ((this bsh) &rest fields)
   "Constructor for BeanShell instance."
@@ -886,14 +881,12 @@ by Pat Niemeyer."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define-derived-mode
-  bsh-script-mode java-mode "bsh script"
+    bsh-script-mode java-mode "bsh script"
   "Major mode for developing Beanshell scripts.
   \\(bsh-script-mode-map)"
 
   (set (make-local-variable 'font-lock-defaults)
-       (if (featurep 'xemacs)
-	   (get 'java-mode 'font-lock-defaults)
-	 (cdr (assq 'java-mode font-lock-defaults))))
+       (cdr (assq 'java-mode font-lock-defaults)))
   (set (make-local-variable 'font-lock-maximum-decoration) t)
   (set (make-local-variable 'font-lock-multiline) t)
   (turn-on-font-lock))
@@ -914,21 +907,20 @@ by Pat Niemeyer."
 	(browse-url (concat "file://" bsh-help))
       (signal 'error '("Cannot find BeanShell help file.")))))
 
-(if (not (featurep 'xemacs))
-    (defcustom bsh-script-menu-definition
-      (list "Bsh"
-	    ["Help" bsh-script-help t])
-      "Definition of menu for BeanShell script buffers."
-      :group 'bsh
-      :type 'sexp
-      :set '(lambda (sym val)
-	      (set-default sym val)
-	      ; Define Bsh script menu for FSF Emacs.
-	      (easy-menu-define bsh-script-menu
-				bsh-script-mode-map
-				"Menu for BeanShell Script Buffer."
-				val))))
+(defcustom bsh-script-menu-definition
+  (list "Bsh"
+        ["Help" bsh-script-help t])
+  "Definition of menu for BeanShell script buffers."
+  :group 'bsh
+  :type 'sexp
+  :set '(lambda (sym val)
+          (set-default sym val)
+                                        ; Define Bsh script menu for FSF Emacs.
+          (easy-menu-define bsh-script-menu
+            bsh-script-mode-map
+            "Menu for BeanShell Script Buffer."
+            val)))
 
 (provide 'beanshell)
 
-;; End of beanshell.el
+;;; beanshell.el ends here

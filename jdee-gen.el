@@ -1,5 +1,4 @@
 ;;; jdee-gen.el -- Integrated Development Environment for Java.
-;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -3885,7 +3884,7 @@ Returns t, if the template has been inserted, otherwise nil."
 	  (define-abbrev
 	    local-abbrev-table
 	    abbrev
-	    (if (featurep 'xemacs) abbrev t) ;; Hack (see note below)
+	    t ;; Hack (see note below)
 	    'jdee-gen-abbrev-hook
 	    0))))
 
@@ -4134,4 +4133,4 @@ by rebinding the Return key to its original binding."
 
 (provide 'jdee-gen)
 
-;; End of jdee-gen.el
+;;; jdee-gen.el ends here
