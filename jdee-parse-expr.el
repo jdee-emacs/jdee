@@ -30,6 +30,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'thingatpt)
 
 ;; FIXME: (require 'cc-cmds) doesn't work
@@ -94,7 +95,7 @@ TO-PARSE is the string to parse."
 		 (prog1
 		     (apply 'string (cl-subseq to-parse last-cap pos))
 		   (setq last-cap pos))))
-	(do ((pos 0 (incf pos)))
+	(cl-do ((pos 0 (cl-incf pos)))
 	    ((> pos (1- (length to-parse))))
 	  (if (and (upperp pos)
 		   ;;(> (- pos last-cap) 2))

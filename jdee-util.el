@@ -41,6 +41,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'efc)
 
 ;; FIXME: refactor
@@ -246,7 +247,7 @@ See `jdee-htmlize-code-destinations'."
 	(if (not no-line-numbers-p)
 	    (while (not (eobp))
 	      (beginning-of-line)
-	      (insert (format (format "%%.%dd " line-width) (incf ln)))
+	      (insert (format (format "%%.%dd " line-width) (cl-incf ln)))
 	      (forward-line)))
 	(rename-buffer (concat (buffer-name code-buf) ".html"))
 	(let ((buf (when (fboundp 'htmlize-buffer)
@@ -258,7 +259,7 @@ See `jdee-htmlize-code-destinations'."
 		 (dolist (dir jdee-htmlize-code-destinations)
 		   (setq dir (expand-file-name dir))
 		   (if (file-exists-p dir)
-		       (return (expand-file-name bname dir)))))
+		       (cl-return (expand-file-name bname dir)))))
 		(save-buffer)
 		(if (featurep 'browse-url)
 		    (browse-url (buffer-file-name))))

@@ -388,7 +388,7 @@ and a string describing how the process finished."))
                      (compilation-file-regexp-alist
                       ,file-regexp-alist)))
         (if (boundp (car elt))
-            (set (make-local-variable (car elt)) (second elt))))
+            (set (make-local-variable (car elt)) (cl-second elt))))
 
       (if (slot-boundp this 'comp-finish-fcn)
 	  (set (make-local-variable 'compilation-finish-functions)
@@ -572,8 +572,8 @@ is an object of efc-visitor class."
 (defmethod initialize-instance ((this efc-list-iterator) &rest fields)
   "Iterator constructor."
   (call-next-method)
-  (assert (oref this list-obj))
-  (assert (cl-typep (oref this list-obj) efc-list))
+  (cl-assert (oref this list-obj))
+  (cl-assert (cl-typep (oref this list-obj) efc-list))
   (oset this list (oref (oref this list-obj) items)))
 
 (defmethod efc-iter-has-next ((this efc-list-iterator))
