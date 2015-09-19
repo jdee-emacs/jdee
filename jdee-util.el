@@ -238,7 +238,7 @@ See `jdee-htmlize-code-destinations'."
   (save-restriction
     (narrow-to-region start end)
     (let ((code-buf (current-buffer))
-	  (line-width (ceiling (log10 (count-lines (point-min) (point-max)))))
+	  (line-width (ceiling (log (count-lines (point-min) (point-max)) 10)))
 	  (ln 0))
       (with-temp-buffer
 	(insert-buffer-substring code-buf)
