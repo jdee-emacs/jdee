@@ -41,7 +41,8 @@
 
 ;; FIXME: there is no cl-lexical-let
 ;; Change file to lexical-binding t
-(require 'cl)
+(eval-when-compile
+  '(require 'cl))
 
 ;; FIXME: refactor to eliminate these
 (defvar jdee-devel-debug);; jde.el
