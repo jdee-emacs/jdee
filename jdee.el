@@ -1398,6 +1398,14 @@ SYMBOL is unnecessary."
    :group 'jdee-project
    :type 'boolean)
 
+(defmacro jdee-normalize-paths (pathlist &optional symbol)
+  "Normalize all paths of the list PATHLIST and return a list with the
+expanded paths.  SYMBOL is passed to `jdee-normalize-path' to expand
+relative paths."
+  `(mapcar (lambda (path)
+			 (jdee-normalize-path path ,symbol))
+		   ,pathlist))
+
 (defun jdee-expand-wildcards-and-normalize (path &optional symbol)
   "Expand any entries with wildcard patterns in path and interpolate them into the result"
   (if jdee-expand-wildcards-in-paths-p
@@ -1408,13 +1416,6 @@ SYMBOL is unnecessary."
        (jdee-normalize-paths path symbol))
     (jdee-normalize-paths path symbol)
     ))
-
-(defmacro jdee-normalize-paths (pathlist &optional symbol)
-  "Normalize all paths of the list PATHLIST and returns a list with the
-expanded paths."
-  `(mapcar (lambda (path)
-			 (jdee-normalize-path path ,symbol))
-		   ,pathlist))
 
 
 (defun jdee-directory-files-recurs (dir &optional include-regexp)
