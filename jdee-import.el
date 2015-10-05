@@ -900,10 +900,10 @@ is used by `jdee-import-all'. This function is roughly the opposite of
   (let ((members (semantic-tag-get-attribute class-tag :members)))
     (dolist (member members)
       (if (eq (semantic-tag-class member) 'type)
-	  (progn
-	    (setq declared-classes
-		  (append declared-classes (list (semantic-tag-name member))))
-	    (jdee-import-find-declared-classes member))))))
+          (progn
+            (setq declared-classes
+                  (append declared-classes (list (semantic-tag-name member))))
+            (jdee-import-find-declared-classes member declared-classes))))))
 
 (defun jdee-import-all-find-classes-to-import ()
   "Returns a list of unqualified class names to import into this
