@@ -79,17 +79,10 @@
 ;; All font-lock and jdee-font-lock faces are individually
 ;; customizable.  jdee-font-lock faces are in the customization
 ;; group `jdee-font-lock-faces' which is a sub group of
-;; `font-lock-highlighting-faces' (Emacs) or `font-lock-faces'
-;; (XEmacs).
+;; `font-lock-highlighting-faces' (Emacs).
 
-;; This code has been tested with GNU Emacs 20.7, 21.0 and XEmacs
-;; 21.1.  Any comments, suggestions, bug reports or upgrade requests
+;; Any comments, suggestions, bug reports or upgrade requests
 ;; are welcome.  Please send them to the maintainers.
-
-;; WARNING: It seems there is byte-code compatibility issues between
-;; Emacs and XEmacs.  When using Emacs byte-code on XEmacs font
-;; locking don't work correctly for some complex matchers like those
-;; used to highlight imported package name :-)
 
 ;;; Code:
 (require 'font-lock)
@@ -119,10 +112,7 @@ Set to nil to disable the use of font-locking."
   "*Maximum number of user defined names that one regexp can match.
 No limit if less than 1.  For speed, the default value of 100 seems to
 be a good compromize between the number of font lock keyword regexps
-to match and the complexity of each regexp.
-
-WARNING: It seems XEmacs search fails with a very long regexp.  So if
-you have a lot of user's defined names don't use a value less than 1!"
+to match and the complexity of each regexp."
   :group 'jdee-project
   :type 'integer)
 
