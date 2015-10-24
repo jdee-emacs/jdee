@@ -1,39 +1,24 @@
-EMACS ?= emacs
-EMACSFLAGS = -L .
-CASK ?= cask
-#VERSION = $(shell git describe --tags --abbrev=0 | sed 's/^v//')
-VERSION = 2.4.2
-PACKAGE_NAME = jdee-$(VERSION)
+all: jdee-nrepl jdee-maven-nrepl jdee-live jdee-sample
 
-ELS = $(wildcard *.el)
-OBJECTS = $(ELS:.el=.elc)
+nrepl:
+	$(MAKE) -C jdee-sample nrepl
 
-elpa:
-	$(CASK) install
-	$(CASK) update
-	touch $@
+nrepl-client:
+	lein repl :connect 12345
 
-.PHONY: build
-build : elpa $(OBJECTS)
+nrepl-client-exit:
+	echo "(System/exit 0)" | lein repl :connect 12345
 
-.PHONY: test
-test : clean
-	$(CASK) exec ert-runner -L .
+jdee-sample:
+	$(MAKE) -C jdee-sample compile
 
-.PHONY: clean
-clean :
-	rm -f $(OBJECTS)
+jdee-maven-nrepl:
+	$(MAKE) -C jdee-maven-nrepl install
 
-.PHONY: elpaclean
-elpaclean : clean
-	rm -f elpa
-	rm -rf .cask # Clean packages installed for development
+jdee-nrepl:
+	$(MAKE) -C jdee-nrepl install
 
-%.elc : %.el
-	$(CASK) build
+jdee-live:
+	$(MAKE) -C jdee-live package
 
-.PHONY: run-jdee run-jde
-run-jdee: elpa
-	cask exec emacs -Q -L . --eval "(require 'jdee)"
-
-run-jde: run-jdee
+.PHONY: jdee-nrepl jdee-maven-nrepl jdee-live jdee-sample
