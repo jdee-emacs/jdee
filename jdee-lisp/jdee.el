@@ -67,6 +67,7 @@
 (require 'jdee-wiz)
 (require 'semantic)
 (require 'thingatpt)
+(require 'jdee-live)
 
 ;;;###autoload
 (defconst jdee-version "2.4.2"

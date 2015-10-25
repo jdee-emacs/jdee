@@ -1,0 +1,6 @@
+(source gnu)
+
+(package-file "jdee-live.el")
+
+
+(files "*.el" "clj")

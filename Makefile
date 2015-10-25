@@ -1,4 +1,4 @@
-all: jdee-nrepl jdee-maven-nrepl jdee-live jdee-sample
+all: jdee-nrepl jdee-maven-nrepl jdee-live jdee-sample jdee-lisp
 
 nrepl:
 	$(MAKE) -C jdee-sample nrepl
@@ -19,6 +19,10 @@ jdee-nrepl:
 	$(MAKE) -C jdee-nrepl install
 
 jdee-live:
-	$(MAKE) -C jdee-live package
+# Nothing to make here currently.
+#	$(MAKE) -C jdee-live package
 
-.PHONY: jdee-nrepl jdee-maven-nrepl jdee-live jdee-sample
+jdee-lisp:
+	$(MAKE) -C jdee-lisp build
+
+.PHONY: jdee-nrepl jdee-maven-nrepl jdee-live jdee-sample jdee-lisp

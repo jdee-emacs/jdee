@@ -34,6 +34,6 @@ elpaclean : clean
 
 .PHONY: run-jdee run-jde
 run-jdee: elpa
-	cask exec emacs -Q -L . --eval "(require 'jdee)"
+	$(CASK) exec emacs -Q -L . --eval "(require 'jdee)"
 
 run-jde: run-jdee

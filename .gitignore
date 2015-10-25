@@ -7,3 +7,9 @@ dist
 elpa
 build.properties
 build
+
+# Backup files
+*~
+
+# Vagrant
+.vagrant

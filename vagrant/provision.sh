@@ -23,6 +23,9 @@ apt_update
 apt emacs24 emacs24-el emacs24-common-non-dfsg \
     emacs-snapshot emacs-snapshot-el
 
+# Install leinigen
+apt leiningen
+
 # Install Cask for Emacs dependency management
 CASK_VERSION=0.7.2
 CASK_DIR=/opt/cask-$CASK_VERSION
