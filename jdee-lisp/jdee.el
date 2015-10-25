@@ -1506,10 +1506,12 @@ that contain spaces."
      symbol)
    jdee-classpath-separator))
 
-(defun jdee-global-classpath ()
-  "Builds a classpath string from the path entries in
-`jdee-global-classpath'."
-  (jdee-build-classpath 'jdee-global-classpath))
+;; (defun jdee-global-classpath ()
+;;   "Builds a classpath string from the path entries in
+;; `jdee-global-classpath'."
+;;   (if (jdee-live-nrepl-available)
+;;       (cider-sync-request:classpath)
+;;     (jdee-build-classpath 'jdee-global-classpath)))
 
 
 (defun jdee-build-path-arg (arg path-list &optional quote symbol)
@@ -1566,15 +1568,17 @@ that contain spaces."
 the value of the CLASSPATH environment variable converted to a list,
 of normalized paths, i.e., with . and ~ characters expanded and backslashes
 replaces with slashes."
-  (if jdee-global-classpath
-      jdee-global-classpath
-    (let ((cp (getenv "CLASSPATH")))
-      (if (stringp cp)
-	  (mapcar
-	   (lambda (path)
-	     (let ((directory-sep-char ?/))
-		   (expand-file-name path)))
-	   (split-string cp jdee-classpath-separator))))))
+  (if (jdee-live-nrepl-available)
+      (cider-sync-request:classpath)
+    (if jdee-global-classpath
+        jdee-global-classpath
+      (let ((cp (getenv "CLASSPATH")))
+        (if (stringp cp)
+            (mapcar
+             (lambda (path)
+               (let ((directory-sep-char ?/))
+                 (expand-file-name path)))
+             (split-string cp jdee-classpath-separator)))))))
 
 (defvar jdee-entering-java-buffer-hook
   '(jdee-reload-project-file

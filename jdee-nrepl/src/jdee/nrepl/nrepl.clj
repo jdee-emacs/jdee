@@ -3,10 +3,8 @@
             [cider.nrepl.middleware
              classpath
              stacktrace]
-            [clojure.java.io :as io]))
-
-(import '[java.net ServerSocket])
-(import '[java.io IOException])
+            [clojure.java.io :as io])
+  (:import (java.net ServerSocket) (java.io IOException)))
 
 
 (def jdee-middleware
@@ -21,7 +19,7 @@
   (apply nrepl-server/default-handler
          (map resolve jdee-middleware)))
 
-(defn find-open-port [port]
+(defn- find-open-port [port]
   "Search for an open port, starting at PORT"
 
   (try
