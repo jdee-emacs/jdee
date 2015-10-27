@@ -66,6 +66,12 @@ we are able to successfully start it."
                   :documentation "Filter for evaluating output from server.
 Used to determine when server is up and what port it is using.")))
 
+(defmethod jdee-live-nrepl-get-session ((this jdee-live-nrepl))
+  "The session is stored as a buffer-local variable in the client buffer"
+
+  (when (slot-boundp this 'client)
+    (with-current-buffer (oref this client)
+      nrepl-session)))
 
 (defmethod initialize-instance ((this jdee-live-nrepl) &rest args)
   "Constructor.
@@ -122,6 +128,14 @@ Sets fields to null and adds it to the nREPL registry."
                    (oset this response 'connected)))))
           (setq server serv-proc)
           ;; FIXME: clojure:nrepl drops strange strings out!
+
+          ;; FIXME: There is a race condition here, if the server finishes
+          ;; initalizing before the process filter is set.  I have only seen
+          ;; this with the mvn build when debugging, so it is unlikely to be a
+          ;; real-world problem unless we get a nREPL that starts much faster.
+          ;;
+          ;; On the up side, it seems that the nREPL is available and
+          ;; functioning after the error.   -td 10/27/15 12:38am.
           (set-process-filter server server-filter))
           (jdee-live-nrepl-wait-for-server-ready this)
           ))))
@@ -138,32 +152,38 @@ there is no pom or the nREPL has not been started."
   "Shutdown the nREPL.
 Stops the associated processes and removes it from the nREPL registry."
 
-  (when (slot-boundp this 'client)
-    (with-slots ( client ) this
-      (unwind-protect
-          ;; Gracefully shutdown the client
-          (when (and (processp client)
-                     (process-live-p client))
-            (jdee-live-jeval "(System/exit 0)"))
+  (with-slots ( client server key ) this
+    ;; Gracefully shutdown the client
+    (let ((client-proc
+           (and (slot-boundp this 'client)
+                client
+                (get-buffer-process client))))
+      (when (process-live-p client-proc)
+        (unwind-protect
+            (nrepl-sync-request:eval "(jdee.nrepl.nrepl/stop-server)"
+                                     client
+                                     (jdee-live-nrepl-get-session this))
         ;; Ungracefully shut it down if there is an error
         (message "Unable to gracefully shutdown client")
-        (signal-process client 'kill))))
-  (when (slot-boundp this 'server)
-    (with-slots ( server ) this
-      (unwind-protect
-          (when (and (processp server)
-                     (process-live-p server))
-            ;; Kill the process
-            (signal-process server 'kill))
-        (message "Unable to gracefully shutdown server"))))
-  ;; Remove it from the lookup table
-  (setq jdee-live-nrepl-alist
-        (assq-delete-all (oref this key) jdee-live-nrepl-alist)))
+        (when (process-live-p client-proc)
+          (signal-process client-proc 'kill)))))
+
+    ;; Kill the server process
+    (unwind-protect
+        (when (and (slot-boundp this 'server)
+                   (processp server)
+                   (process-live-p server))
+          (signal-process server 'kill))
+      (message "Unable to kill server"))
+
+    ;; Remove it from the lookup table
+    (setq jdee-live-nrepl-alist
+          (assq-delete-all (oref this key) jdee-live-nrepl-alist))))
 
 
 (defun jdee-live-stop-nrepl ()
   "Stop the nREPL for this project."
-
+  (interactive)
   (let ((nrepl (jdee-live--get-nrepl)))
     (when nrepl
       (jdee-live-nrepl-shutdown nrepl))))
@@ -187,8 +207,8 @@ returns any text output by the nREPL's standard out or
 standard error pipes from evaluating STATEMENT.
 If EVAL-RETURN is non-nil, this function
 returns the result of evaluating the output as a Lisp
-expression.
-"
+expression."
+
 ;; Copied from bsh version.  Not clear if this is relevant.
 
 ;; NO-PRINT-P, if non-nil, don't wrap STATEMENT with a `print'
@@ -199,9 +219,10 @@ expression.
   (interactive "sClojure to evaluate ")
   (unless (jdee-live-connected-p)
     (jdee-live-jack-in))
-  (let ((nrepl (jdee-live--get-nrepl)))
+  (let* ((nrepl (jdee-live--get-nrepl))
+         (session (jdee-live-nrepl-get-session nrepl)))
     (with-slots (client) nrepl
-      (nrepl-sync-request:eval statement client 'session))))
+      (nrepl-sync-request:eval statement client session))))
           ;; (set-process-filter client eval-filter)
 ;;        (set-process-filter client nil)))))
 
@@ -241,12 +262,13 @@ Check the versions of the middle ware"
 
 
 (defun jdee-live-eval-filter (_process output nrepl)
-  "Process nREPL server output from PROCESS contained in OUTPUT during evaluation."
+  "Process nREPL server output from _PROCESS contained in OUTPUT during evaluation."
 
   (oset nrepl response (concat (oref nrepl response) output)))
 
 (defun jdee-live-server-filter (process output nrepl)
-  "Process nREPL server output from PROCESS contained in OUTPUT."
+  "Process nREPL server output from PROCESS contained in OUTPUT.
+If an error occurs, it is reported o NREPL."
   (nrepl-server-filter process output)
   ;; Check for errors
   (when (string-match "BUILD FAILURE" output)
