@@ -51,7 +51,7 @@ we are able to successfully start it."
              (jdee-live-connected-p)))))
 
 (defclass jdee-live-nrepl ()
-  ((client :type process
+  ((client :type buffer
            :documentation "nREPL client process")
    (server :type process
            :documentation "nREPL server process")
@@ -116,7 +116,10 @@ Sets fields to null and adds it to the nREPL registry."
                           " -Dexec.args=\"%s\""
                           " -Dexec.includePluginsDependencies=true"
                           )
-                  jdee-live-launch-script))))
+                  jdee-live-launch-script)
+                 (lambda (client-buf)
+                   (oset this client client-buf)
+                   (oset this response 'connected)))))
           (setq server serv-proc)
           ;; FIXME: clojure:nrepl drops strange strings out!
           (set-process-filter server server-filter))
@@ -129,7 +132,7 @@ This is shared by all classes under the pom.  Will return nil if
 there is no pom or the nREPL has not been started."
   (let* ((project-dir (jdee-live-project-directory-for (cider-current-dir))))
     (when project-dir
-      (memq (intern project-dir) jdee-live-nrepl-alist))))
+      (cdr-safe (assq (intern project-dir) jdee-live-nrepl-alist)))))
 
 (defmethod jdee-live-nrepl-shutdown ((this jdee-live-nrepl))
   "Shutdown the nREPL.
@@ -170,13 +173,13 @@ Stops the associated processes and removes it from the nREPL registry."
 If SERVER is given, check if that server is live"
   (let ((nrepl (jdee-live--get-nrepl)))
     (and nrepl
-         (slot-boundp nrepl server)
-         (slot-boundp nrepl client)
+         (slot-boundp nrepl 'server)
+         (slot-boundp nrepl 'client)
          (process-live-p (oref nrepl server))
          (process-live-p (oref nrepl client)))))
 
 
-(defun jdee-live-jeval (statement) ; &optional eval-return no-print-p)
+(defun jdee-live-eval (statement) ; &optional eval-return no-print-p)
   "Use the jdee-live nREPL to evaluate the Clojure expression EXPR.
 If the
 nREPL is not running, the JDEE starts an instance.  This function
@@ -197,16 +200,10 @@ expression.
   (unless (jdee-live-connected-p)
     (jdee-live-jack-in))
   (let ((nrepl (jdee-live--get-nrepl)))
-    (with-slots (client response eval-filter) nrepl
-      (unwind-protect
-        (progn
-          (setq response nil)
-          (set-process-filter client eval-filter)
-          (process-send-string client statement)
-          (if (not (accept-process-output client jdee-live-timeout))
-              (error "No response from nREPL")
-            response))
-        (set-process-filter client nil)))))
+    (with-slots (client) nrepl
+      (nrepl-sync-request:eval statement client 'session))))
+          ;; (set-process-filter client eval-filter)
+;;        (set-process-filter client nil)))))
 
 
 
@@ -250,23 +247,7 @@ Check the versions of the middle ware"
 
 (defun jdee-live-server-filter (process output nrepl)
   "Process nREPL server output from PROCESS contained in OUTPUT."
-  (with-current-buffer (process-buffer process)
-    (save-excursion
-      (goto-char (point-max))
-      (insert output)))
-  (message "checking <%s>" output)
-  (when (string-match "nREPL server started on port \\([0-9]+\\)" output)
-    (let ((port (string-to-number (match-string 1 output))))
-      (message (format "nREPL server started on %s" port))
-      (with-current-buffer (process-buffer process)
-        (let ((client-proc (nrepl-start-client-process nil port process)))
-          ;; FIXME: Bad connection tracking system. There can be multiple client
-          ;; connections per server.  I think this is fixed: there is now one
-          ;; connection per pom.xml, which is shared between files in the
-          ;; project.   -td 10/24/15.
-          (setq nrepl-connection-buffer (buffer-name (process-buffer client-proc)))
-          (oset nrepl client client-proc)
-          (oset nrepl response 'connected)))))
+  (nrepl-server-filter process output)
   ;; Check for errors
   (when (string-match "BUILD FAILURE" output)
     (oset nrepl response output)))

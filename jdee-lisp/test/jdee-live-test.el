@@ -16,10 +16,11 @@ the file."
   ;; Fake the current buffer being in the sample directory"
   `(let ((buffer-file-name (relative-expand-file-name
                             (concat "../../jdee-sample/" ,file))))
+     (should (file-exists-p buffer-file-name))
      (unwind-protect
-        (progn ,@body)
+         (progn ,@body)
        ;; Shutdown the server
-      (jdee-live-stop-nrepl))))
+       (jdee-live-stop-nrepl))))
 
 
 (ert-deftest test-jdee-live-no-server ()
