@@ -80,8 +80,6 @@ Sets fields to null and adds it to the nREPL registry."
   ;; Parent initialize-instance
   (call-next-method)
 
-  (message "Slots on nrepl: %s" (object-slots this))
-
   (oset this key
         (intern (jdee-live-project-directory-for (cider-current-dir))))
 
@@ -153,6 +151,13 @@ there is no pom or the nREPL has not been started."
 Stops the associated processes and removes it from the nREPL registry."
 
   (with-slots ( client server key ) this
+    ;; Remove the server sentinal, so it does not issue error messages during
+    ;; the shutdown
+    (when (and (slot-boundp this 'server)
+               (processp server)
+               (process-live-p server))
+      (set-process-filter server nil))
+
     ;; Gracefully shutdown the client
     (let ((client-proc
            (and (slot-boundp this 'client)
@@ -161,6 +166,9 @@ Stops the associated processes and removes it from the nREPL registry."
       (when (process-live-p client-proc)
         (unwind-protect
             (nrepl-sync-request:eval "(jdee.nrepl.nrepl/stop-server)"
+                                     client
+                                     (jdee-live-nrepl-get-session this))
+            (nrepl-sync-request:eval "(System/exit 0)"
                                      client
                                      (jdee-live-nrepl-get-session this))
         ;; Ungracefully shut it down if there is an error

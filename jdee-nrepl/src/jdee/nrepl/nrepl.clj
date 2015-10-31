@@ -37,12 +37,18 @@
         (clojure.tools.nrepl.server/start-server
          :handler jdee-nrepl-handler
          :port port)]
+
     (defonce the-server server)
     ;; This message is searched for in jde-interactive.el
     ;; so don't change it without keeping the two in sync
     (println "nREPL server started on port" port)))
 
+(defn say-hi []
+  (println "Hello"))
+
 (defn stop-server []
-  (when (bound? the-server)
+  (println "Stopping server")
+  (when (resolve 'the-server)
+    (println " server: " the-server)
     (clojure.tools.nrepl.server/stop-server the-server)))
 
