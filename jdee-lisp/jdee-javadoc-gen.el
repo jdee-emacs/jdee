@@ -318,15 +318,16 @@ by the jdee-javadoc-gen variables."
 
 
      ;; Insert classpath
-    (if jdee-global-classpath
-	(setq args
-	      (append
-	       args
-	       (list
-		"-classpath"
-		(jdee-build-classpath
-		 (jdee-get-global-classpath)
-		 'jdee-global-classpath)))))
+    (let ((classpath (jdee-get-global-classpath)))
+      (if classpath
+          (setq args
+                (append
+                 args
+                 (list
+                  "-classpath"
+                  (jdee-build-classpath
+                   classpath
+                   'jdee-global-classpath))))))
 
 
     ;; Insert sourcepath

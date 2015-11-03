@@ -206,7 +206,7 @@ PATH-TYPE is either `global classpath' for `jdee-global-classpath' or
 	(setq path-name "Source Path"
 	    path jdee-sourcepath)
       (setq path-name "Global Classpath"
-	      path jdee-global-classpath))
+	      path (jdee-get-global-classpath)))
     (with-current-buffer
 	(or buf (get-buffer-create (format "*JDEE %s*" path-name)))
       (setq truncate-lines t)

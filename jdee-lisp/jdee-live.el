@@ -158,23 +158,35 @@ Stops the associated processes and removes it from the nREPL registry."
                (process-live-p server))
       (set-process-filter server nil))
 
-    ;; Gracefully shutdown the client
-    (let ((client-proc
-           (and (slot-boundp this 'client)
-                client
-                (get-buffer-process client))))
-      (when (process-live-p client-proc)
-        (unwind-protect
-            (nrepl-sync-request:eval "(jdee.nrepl.nrepl/stop-server)"
-                                     client
-                                     (jdee-live-nrepl-get-session this))
-            (nrepl-sync-request:eval "(System/exit 0)"
-                                     client
-                                     (jdee-live-nrepl-get-session this))
-        ;; Ungracefully shut it down if there is an error
-        (message "Unable to gracefully shutdown client")
-        (when (process-live-p client-proc)
-          (signal-process client-proc 'kill)))))
+    ;; Gracefully shutdown the client.  Suppress asking the user about killing
+    ;; the server. The complicated lets are to rebind y-or-n-p with a dynamic
+    ;; binding.
+    (let ((orig-y-or-n-p (symbol-function 'y-or-n-p)))
+      (cl-letf
+          (((symbol-function 'y-or-n-p)
+            (lambda (prompt)
+              (if  (string-match "Also kill server process and buffer?" prompt)
+                  t
+                ;; For questions other than the one we expect, call the original function
+                (funcall orig-y-or-n-p prompt)))))
+
+        (let ((client-proc
+               (and (slot-boundp this 'client)
+                    client
+                    (get-buffer-process client))))
+          (when (process-live-p client-proc)
+            (unwind-protect
+                ;; Don't wait for a response.  The process will be dead by the
+                ;; time it would respond.
+                (nrepl-request:eval "(System/exit 0)"
+                                    #'ignore
+                                    client
+                                    (jdee-live-nrepl-get-session this))
+              ;; Ungracefully shut it down if there is an error
+              (message "Unable to gracefully shutdown client")
+              (when (process-live-p client-proc)
+                (signal-process client-proc 'kill))))))
+      )
 
     ;; Kill the server process
     (unwind-protect

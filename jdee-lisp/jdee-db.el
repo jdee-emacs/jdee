@@ -1330,7 +1330,7 @@ command list."
   (let ((classpath
 	 (if jdee-db-option-classpath
 	     jdee-db-option-classpath
-	   jdee-global-classpath))
+	   (jdee-get-global-classpath)))
 	(symbol
 	 (if jdee-db-option-classpath
 	     'jdee-db-option-classpath

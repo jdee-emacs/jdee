@@ -1506,13 +1506,6 @@ that contain spaces."
      symbol)
    jdee-classpath-separator))
 
-;; (defun jdee-global-classpath ()
-;;   "Builds a classpath string from the path entries in
-;; `jdee-global-classpath'."
-;;   (if (jdee-live-nrepl-available)
-;;       (cider-sync-request:classpath)
-;;     (jdee-build-classpath 'jdee-global-classpath)))
-
 
 (defun jdee-build-path-arg (arg path-list &optional quote symbol)
 "Build a command-line path argument from a list of paths."
@@ -2187,11 +2180,10 @@ Windows versions of both utilities."
 		(lambda (path)
 		  (jdee-normalize-path path 'jdee-compile-option-classpath))
 		jdee-compile-option-classpath))
-	      (jdee-global-classpath
-	       (mapcar
-		(lambda (path)
-		  (jdee-normalize-path path 'jdee-global-classpath))
-		jdee-global-classpath))
+	      ((mapcar
+            ((looking-at )mbda (path)
+             (jdee-normalize-path path 'jdee-global-classpath))
+            (jdee-get-global-classpath)))
 	      (t
 	       (list default-directory)))
 	     " ")

@@ -35,7 +35,8 @@
 ;; execte for classes that are compiled from a certain Java source file.
 ;;
 ;; There are also a few helper utilities here.
-
+;;
+;;; Code:
 (require 'cl-lib)
 (require 'jdee-parse-class)
 (require 'jdee-file-util)

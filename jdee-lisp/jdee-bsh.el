@@ -378,4 +378,4 @@ NO-QUOTE-WRAP-P, if non-nil, don't add double quotes around the whole statement.
 
 (provide 'jdee-bsh)
 
-;; End of jdee-bsh.el
+;;; jdee-bsh.el ends here

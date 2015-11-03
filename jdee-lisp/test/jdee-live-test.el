@@ -5,6 +5,8 @@
 (require 'ert)
 (require 'jdee-live)
 
+(defconst jdee-live-sample-dir (relative-expand-file-name "../../jdee-sample/"))
+
 (defmacro with-apparent-file (file &rest body)
   "Make it appear that we are currently editing FILE from the sample directory.
 Execute BODY then ensure that the nREPL server is not running.
@@ -14,8 +16,7 @@ the file."
   (declare (indent 1)
            (debug (sexp body)))
   ;; Fake the current buffer being in the sample directory"
-  `(let ((buffer-file-name (relative-expand-file-name
-                            (concat "../../jdee-sample/" ,file))))
+  `(let ((buffer-file-name (concat jdee-live-sample-dir ,file)))
      (should (file-exists-p buffer-file-name))
      (unwind-protect
          (progn ,@body)

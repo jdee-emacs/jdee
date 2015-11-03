@@ -327,11 +327,11 @@ classpath normalized with `jdee-build-classpath'."
 			    jdee-ant-user-jar-files))
 
     ;; silence the compiler
-    ;; TODO: remove this boundp and require 'jdee after resolving jde
+    ;; TODO: remove this boundp anetd require 'jdee after resolving jde
     ;; compilation warnings
     (with-no-warnings
       (when jdee-ant-use-global-classpath
-	(setq classpath (append classpath jdee-global-classpath))))
+        (setq classpath (append classpath (jdee-get-global-classpath)))))
 
     (jdee-build-classpath classpath)))
 

@@ -612,7 +612,7 @@ panel to specifying the applet document."
 	 (if jdee-run-option-classpath
 	     (if (and (stringp jdee-run-option-classpath)
 		      (string= jdee-run-option-classpath "global"))
-		 jdee-global-classpath
+		 (jdee-get-global-classpath)
 	       (unless (and (stringp jdee-run-option-classpath)
 			    (string= jdee-run-option-classpath "none"))
 		 jdee-run-option-classpath))))
