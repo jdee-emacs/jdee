@@ -331,14 +331,13 @@ by the jdee-javadoc-gen variables."
 
 
     ;; Insert sourcepath
-    (if jdee-sourcepath
+    (if (jdee-get-sourcepath)
 	(setq args
 	      (append
 	       args
 	       (list
 		"-sourcepath"
-		(jdee-build-classpath
-		 (jdee-expand-wildcards-and-normalize jdee-sourcepath 'jdee-sourcepath))))))
+		(jdee-build-classpath (jdee-get-sourcepath))))))
 
 
     ;; Insert bootclasspath

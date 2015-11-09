@@ -78,7 +78,6 @@
 (require 'tree-widget)
 
 ;; FIXME: refactor
-(defvar jdee-sourcepath);; jde
 (declare-function jdee-normalize-path "jdee" (path &optional symbol))
 (declare-function jdee-expand-wildcards-and-normalize "jdee" (path &optional symbol))
 (declare-function jdee-get-jdk-prog "jdee" (progname))
@@ -197,14 +196,13 @@ FILENAME must be created by `jdee-xref-pickle-hash'"
 		     (get-prefix base-path (concat package-path "/"
 						   (car files)))
 		   (subst-char-in-string ?/ ?. package-path)))))
-    (when (and (eq major-mode 'jdee-mode) jdee-sourcepath)
+    (when (and (eq major-mode 'jdee-mode) (jdee-get-sourcepath))
       (let ((first-prefix (car (split-string (jdee-parse-get-package-name)
 					     "\\."))) (prefixes))
 	(dolist (path (cl-remove-if-not
 		       (lambda (path)
 			 (file-exists-p path))
-		       (jdee-expand-wildcards-and-normalize jdee-sourcepath
-													   'jdee-sourcepath))
+		       (jdee-get-sourcepath))
 				  prefixes)
 	  (when (member first-prefix (directory-files path nil "[^.]$"))
 	    (message (concat "path = " path))

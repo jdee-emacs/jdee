@@ -19,6 +19,12 @@
   (apply nrepl-server/default-handler
          (map resolve jdee-middleware)))
 
+(defn jdee-get-sourcpath []
+  "Return the jdee-sourcepath.  If the process that launches the nREPL server
+knows the classpath, it can store it in the jdee.sourceRoots property.  If the
+property is not set, returns nil"
+  (System/getProperty  "jdee.sourceRoots"))
+
 (defn- find-open-port []
   "Search for an open port"
 

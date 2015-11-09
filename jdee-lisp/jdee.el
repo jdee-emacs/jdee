@@ -1573,6 +1573,15 @@ replaces with slashes."
                  (expand-file-name path)))
              (split-string cp jdee-classpath-separator)))))))
 
+(defun jdee-get-sourcepath ()
+  "Return the source path, either from the repl or `jdee-sourcepath'.  The result is fully expanded."
+  (let ((sourcepath (jdee-live-eval "(jdee-get-classpath)")))
+    (or sourcepath
+        (jdee-expand-wildcards-and-normalize
+         jdee-sourcepath
+         'jdee-sourcepath))))
+
+
 (defvar jdee-entering-java-buffer-hook
   '(jdee-reload-project-file
     jdee-which-method-update-on-entering-buffer)
@@ -1990,10 +1999,7 @@ supported by the -name option of the GNU find command."
 	  :tag "Directories to search recursively"
 	  :value (if (slot-boundp this 'dirs)
 		     (oref this dirs)
-		   (mapcar
-		    (lambda (p)
-		      (jdee-normalize-path p 'jdee-sourcepath))
-		    jdee-sourcepath))
+		   (jdee-get-sourcepath))
 	  (list 'file :tag "Path"))))
   (widget-insert "\n")
 
@@ -2165,11 +2171,7 @@ Windows versions of both utilities."
 	    (mapconcat
 	     (lambda (x) x)
 	     (cond
-	      (jdee-sourcepath
-	       (mapcar
-		(lambda (path)
-		  (jdee-normalize-path path 'jdee-sourcepath))
-		jdee-sourcepath))
+	      ((jdee-get-sourcepath))
 	      (jdee-compile-option-sourcepath
 	       (mapcar
 		(lambda (path)

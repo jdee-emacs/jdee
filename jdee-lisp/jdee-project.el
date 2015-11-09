@@ -204,7 +204,7 @@ PATH-TYPE is either `global classpath' for `jdee-global-classpath' or
 	path-name path desc)
     (if (equal "source path" path-type)
 	(setq path-name "Source Path"
-	    path jdee-sourcepath)
+	    path (jdee-get-sourcepath))
       (setq path-name "Global Classpath"
 	      path (jdee-get-global-classpath)))
     (with-current-buffer

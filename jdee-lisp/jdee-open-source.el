@@ -323,7 +323,7 @@ find the source for the class, it returns nil."
 		".java")
 	  package (jdee-parse-get-package-from-name outer-class))
     (catch 'found
-      (loop for path in (jdee-expand-wildcards-and-normalize jdee-sourcepath 'jdee-sourcepath) do
+      (loop for path in (jdee-get-sourcepath) do
 	      (if (and (file-exists-p path)
 		       (or (string-match "\.jar$" path)
 			   (string-match "\.zip$" path)))

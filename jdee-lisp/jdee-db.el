@@ -1990,7 +1990,7 @@ matches FILE."
        (string-match
 		(concat "^" dir-x)
 		filename))
-     (jdee-expand-wildcards-and-normalize jdee-sourcepath 'jdee-sourcepath))))
+     (jdee-get-sourcepath))))
 
 
 (provide 'jdee-db)
