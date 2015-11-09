@@ -13,3 +13,4 @@ build
 
 # Vagrant
 .vagrant
+.lein-repl-history

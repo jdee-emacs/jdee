@@ -19,20 +19,22 @@
   (apply nrepl-server/default-handler
          (map resolve jdee-middleware)))
 
-(defn- find-open-port [port]
-  "Search for an open port, starting at PORT"
+(defn- find-open-port []
+  "Search for an open port"
 
   (try
-    (with-open [server-sock (ServerSocket. port)]
-      ;; Port is free: use this one.
-      port)
+    ;; ServerSocket interprets port 0 as "any open port"
+    (with-open [server-sock (ServerSocket. 0)]
+      (let [port (.getLocalPort server-sock)]
+        (println "Found free port: " port)
+        ;; Port is free: use this one.
+        port))
    (catch IOException exc
-     ;; Port is already in use, try the next one
-     (println "Port " port " is already in use, trying next port")
-     (find-open-port (+ port 1)))))
+     (println "Unable to bind to an open port")
+     (throw exc))))
 
 (defn start-server []
-  (let [port (find-open-port 12345)
+  (let [port (find-open-port)
         server
         (clojure.tools.nrepl.server/start-server
          :handler jdee-nrepl-handler

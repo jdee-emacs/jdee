@@ -209,14 +209,14 @@ Stops the associated processes and removes it from the nREPL registry."
       (jdee-live-nrepl-shutdown nrepl))))
 
 (defun jdee-live-connected-p ()
-  "Test if there is a live server process for this buffer.
-If SERVER is given, check if that server is live"
+  "Test if there is a live server process for this buffer."
   (let ((nrepl (jdee-live--get-nrepl)))
     (and nrepl
          (slot-boundp nrepl 'server)
          (slot-boundp nrepl 'client)
-         (process-live-p (oref nrepl server))
-         (process-live-p (oref nrepl client)))))
+         (let ((client-proc (get-buffer-process (oref nrepl client))))
+           (and client-proc
+                (process-live-p client-proc))))))
 
 
 (defun jdee-live-eval (statement) ; &optional eval-return no-print-p)
