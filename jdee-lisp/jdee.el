@@ -1575,11 +1575,13 @@ replaces with slashes."
 
 (defun jdee-get-sourcepath ()
   "Return the source path, either from the repl or `jdee-sourcepath'.  The result is fully expanded."
-  (let ((sourcepath (jdee-live-eval "(jdee-get-classpath)")))
-    (or sourcepath
+  ;; sourcepath not set correctly
+  ;; (let ((sourcepath (jdee-live-eval "(jdee-get-classpath)")))
+  ;;   (or  sourcepath
         (jdee-expand-wildcards-and-normalize
          jdee-sourcepath
-         'jdee-sourcepath))))
+         'jdee-sourcepath))
+;; ))
 
 
 (defvar jdee-entering-java-buffer-hook
