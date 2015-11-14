@@ -5,7 +5,7 @@
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: lisp, tools, classes
 
-;; Copyright (C) 2001, 2002, 2003, 2004, 2005, 2015 Paul Kinnucan.
+;; Copyright (C) 2001, 2002, 2003, 2004, 2005 Paul Kinnucan.
 ;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
@@ -90,20 +90,20 @@ If nil then the default efc custom-based dialogs will be used."
   "Super class of EFC dialogs."
   )
 
-(defmethod initialize-instance ((this efc-dialog) &rest fields)
+(cl-defmethod initialize-instance ((this efc-dialog) &rest fields)
   "Constructor for dialog."
   ;; Call parent initializer.
-  (call-next-method))
+  (cl-call-next-method))
 
 
-(defmethod efc-dialog-create ((this efc-dialog)))
+(cl-defmethod efc-dialog-create ((this efc-dialog)))
 
-(defmethod efc-dialog-ok ((this efc-dialog))
+(cl-defmethod efc-dialog-ok ((this efc-dialog))
   "Invoked when the user clicks the dialog's okay button. The
 default method kills the dialog buffer."
   (kill-buffer (current-buffer)))
 
-(defmethod efc-dialog-cancel ((this efc-dialog))
+(cl-defmethod efc-dialog-cancel ((this efc-dialog))
   "Invoked when the user clicks the dialog's Cancel button. The
 default method kills the dialog buffer."
   (delete-window)
@@ -111,7 +111,7 @@ default method kills the dialog buffer."
   (pop-to-buffer (oref this initbuf))
   (kill-buffer (oref this buf)))
 
-(defmethod efc-dialog-show ((this efc-dialog))
+(cl-defmethod efc-dialog-show ((this efc-dialog))
   (oset this initbuf (current-buffer))
 
   (oset this buf (get-buffer-create (oref this title)))
@@ -152,9 +152,6 @@ default method kills the dialog buffer."
 ;;                                                                            ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; silence the compiler warnings
-(defun efc-option-dialog (&rest a))
-
 (defclass efc-option-dialog (efc-dialog)
   ((options        :initarg :options
 		   :documentation
@@ -175,11 +172,11 @@ a radio button next to the option. The dialog sets SELECTION to the option
 chosen by the user when the user selects the OK button on the dialog. This
 dialog uses recursive edit to emulate a modal dialog.")
 
-(defmethod initialize-instance ((this efc-option-dialog) &rest fields)
+(cl-defmethod initialize-instance ((this efc-option-dialog) &rest fields)
   "Dialog constructor."
-  (call-next-method))
+  (cl-call-next-method))
 
-(defmethod efc-dialog-create ((this efc-option-dialog))
+(cl-defmethod efc-dialog-create ((this efc-option-dialog))
   (widget-insert (oref this text))
   (widget-insert "\n\n")
   (oset this radio-buttons
@@ -195,17 +192,17 @@ dialog uses recursive edit to emulate a modal dialog.")
 		 (oref this options)))))
   (widget-insert "\n"))
 
-(defmethod efc-dialog-show ((this efc-option-dialog))
+(cl-defmethod efc-dialog-show ((this efc-option-dialog))
   "Shows the options dialog buffer. After showing the dialog buffer,
 this method invokes recursive-edit to emulate the behavior of a modal
 dialog. This suspends the current command until the user has selected
 an option or canceled the dialog. See `efc-dialog-ok' and
 `efc-dialog-cancel' for more information."
   (save-window-excursion
-    (call-next-method)
+    (cl-call-next-method)
     (recursive-edit)))
 
-(defmethod efc-dialog-ok ((this efc-option-dialog))
+(cl-defmethod efc-dialog-ok ((this efc-option-dialog))
   "Invoked when the user selects the OK button on the options
 dialog. Sets the :selection field of THIS to the option chosen by the
 user, kills the dialog buffer, and exits recursive-edit mode."
@@ -218,11 +215,11 @@ user, kills the dialog buffer, and exits recursive-edit mode."
   (kill-buffer (oref this buf))
   (exit-recursive-edit))
 
-(defmethod efc-dialog-cancel ((this efc-option-dialog))
+(cl-defmethod efc-dialog-cancel ((this efc-option-dialog))
   "Invoked when the user clicks the dialog's Cancel button.  Invokes
 the default cancel method, sets the :selection field of THIS to nil,
 and then exits recursive edit mode."
-  (call-next-method)
+  (cl-call-next-method)
   (oset this selection nil)
   (exit-recursive-edit))
 
@@ -246,11 +243,11 @@ and then exits recursive edit mode."
   "Provides a dialog with several sets of OPTIONS.
 The dialog sets SELECTION to the options selected by the user.")
 
-(defmethod initialize-instance ((this efc-multi-option-dialog) &rest fields)
+(cl-defmethod initialize-instance ((this efc-multi-option-dialog) &rest fields)
    "Dialog constructor."
-   (call-next-method))
+   (cl-call-next-method))
 
-(defmethod efc-dialog-create ((this efc-multi-option-dialog))
+(cl-defmethod efc-dialog-create ((this efc-multi-option-dialog))
   (message "%s..." (oref this build-message))
   (widget-insert (oref this text))
   (widget-insert "\n\n")
@@ -274,7 +271,7 @@ The dialog sets SELECTION to the options selected by the user.")
   (widget-insert "\n")
   (message "%s...done" (oref this text)))
 
-(defmethod efc-dialog-ok((this efc-multi-option-dialog))
+(cl-defmethod efc-dialog-ok((this efc-multi-option-dialog))
   ;; set the selection up as a list rather a simple result
   (oset this selection
 	(mapcar
@@ -288,12 +285,12 @@ The dialog sets SELECTION to the options selected by the user.")
   (exit-recursive-edit))
 
 
-(defmethod efc-multi-option-dialog-default ((this efc-multi-option-dialog) list)
+(cl-defmethod efc-multi-option-dialog-default ((this efc-multi-option-dialog) list)
   "Pick the default from a collection of options."
   (if (= 1 (length list))
       (car list)))
 
-(defmethod efc-multi-option-dialog-sort ((this efc-multi-option-dialog) list)
+(cl-defmethod efc-multi-option-dialog-sort ((this efc-multi-option-dialog) list)
   "Sort the options."
   ;; sort the ones with the most options first...
   (sort list
@@ -331,7 +328,7 @@ function is called with two arguments: the compilation buffer,
 and a string describing how the process finished."))
   "Class of compiler-like applications.")
 
-(defmethod create-buffer ((this efc-compiler))
+(cl-defmethod create-buffer ((this efc-compiler))
   "Create a buffer to display the output of a compiler process."
   (save-excursion
     (let ((buf (get-buffer-create (format "*%s*" (oref this name))))
@@ -409,12 +406,12 @@ and a string describing how the process finished."))
 	  (setq default-directory thisdir
 		compilation-directory-stack (list default-directory))))))
 
-(defmethod get-args ((this efc-compiler))
+(cl-defmethod get-args ((this efc-compiler))
   "Get a list of command-line arguments to pass to the
 compiler process.")
 
 
-(defmethod exec ((this efc-compiler))
+(cl-defmethod exec ((this efc-compiler))
   "Start the compiler process."
 
   (create-buffer this)
@@ -475,7 +472,7 @@ compiler process.")
 composed of elements of one type, or heterogeneous. The ELEM-TYPE property of
 a heterogeneous collection is nil.")
 
-(defmethod efc-coll-type-compatible-p ((this efc-collection) item)
+(cl-defmethod efc-coll-type-compatible-p ((this efc-collection) item)
   "Returns t if ITEM is type-compatible with this collection. An item is
 type-compatible with a collection if the collection is heterogeneous or
 the item's type is the same as the collection's element type."
@@ -483,18 +480,18 @@ the item's type is the same as the collection's element type."
     (or (eq element-type nil)
 	(cl-typep item element-type))))
 
-(defmethod efc-coll-iterator ((this efc-collection))
+(cl-defmethod efc-coll-iterator ((this efc-collection))
   "Returns an iterator for this collection."
   (error "Abstract method."))
 
-(defmethod efc-coll-visit ((this efc-collection) visitor)
+(cl-defmethod efc-coll-visit ((this efc-collection) visitor)
   "Maps VISITOR to each element of the collection. VISITOR
 is an object of efc-visitor class."
   (let ((iter (efc-coll-iterator this)))
     (while (efc-iter-has-next iter)
       (efc-visitor-visit visitor (efc-iter-next iter)))))
 
-(defmethod efc-coll-memberp ((this efc-collection) member)
+(cl-defmethod efc-coll-memberp ((this efc-collection) member)
   "Returns nonil if this contains item."
   (error "Abstract method."))
 
@@ -508,11 +505,11 @@ is an object of efc-visitor class."
   ()
   "Iterates over a collection.")
 
-(defmethod efc-iter-has-next ((this efc-iterator))
+(cl-defmethod efc-iter-has-next ((this efc-iterator))
   "Returns nonnil if the iterator has not returned all of the collection's elements."
   (error "Abstract method."))
 
-(defmethod efc-iter-next ((this efc-iterator))
+(cl-defmethod efc-iter-next ((this efc-iterator))
   "Return the next element of the collection."
   (error "Abstract method."))
 
@@ -526,7 +523,7 @@ is an object of efc-visitor class."
   ()
   "Visits each member of a collection.")
 
-(defmethod efc-visitor-visit ((this efc-visitor) member)
+(cl-defmethod efc-visitor-visit ((this efc-visitor) member)
   "Visits MEMBER, a member of a collection."
   (error "Abstract method."))
 
@@ -544,23 +541,23 @@ is an object of efc-visitor class."
 	   :documentation "List of items."))
   "List of items.")
 
-(defmethod initialize-instance ((this efc-list) &rest fields)
+(cl-defmethod initialize-instance ((this efc-list) &rest fields)
   "Iterator constructor."
-  (call-next-method))
+  (cl-call-next-method))
 
-(defmethod efc-coll-add ((this efc-list) item)
+(cl-defmethod efc-coll-add ((this efc-list) item)
   "Adds an item to the list."
   (if (efc-coll-type-compatible-p this item)
       (oset this items (append (oref this items) (list item)))
     (error "Tried to add an item of type %s to a list of items of type %s"
 	   (type-of item) (oref this elem-type))))
 
-(defmethod efc-coll-iterator ((this efc-list))
+(cl-defmethod efc-coll-iterator ((this efc-list))
   "Return an iterator for this list."
-  (efc-list-iterator "list iterator" :list-obj this))
+  (efc-list-iterator :list-obj this))
 
 
-(defmethod efc-coll-memberp ((this efc-list) item)
+(cl-defmethod efc-coll-memberp ((this efc-list) item)
   "Returns nonil if this list contains item."
   (member item (oref this items)))
 
@@ -570,9 +567,6 @@ is an object of efc-visitor class."
 ;;                                                                            ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; silence the compiler warnings
-(defun efc-list-iterator (&rest a))
-
 (defclass efc-list-iterator (efc-iterator)
   ((list-obj :initarg :list-obj
 	     :type efc-list
@@ -581,18 +575,18 @@ is an object of efc-visitor class."
 	     :documentation "Lisp list."))
   "Iterates over a list.")
 
-(defmethod initialize-instance ((this efc-list-iterator) &rest fields)
+(cl-defmethod initialize-instance ((this efc-list-iterator) &rest fields)
   "Iterator constructor."
-  (call-next-method)
+  (cl-call-next-method)
   (assert (oref this list-obj))
   (assert (cl-typep (oref this list-obj) efc-list))
   (oset this list (oref (oref this list-obj) items)))
 
-(defmethod efc-iter-has-next ((this efc-list-iterator))
+(cl-defmethod efc-iter-has-next ((this efc-list-iterator))
   "Returns true if this iterator has another list item to return."
   (oref this list))
 
-(defmethod efc-iter-next ((this efc-list-iterator))
+(cl-defmethod efc-iter-next ((this efc-list-iterator))
   "Get next item in the list."
   (let* ((list (oref this list))
 	 (next (car list)))
@@ -610,12 +604,12 @@ is an object of efc-visitor class."
   "List that contains no duplicates.")
 
 
-(defmethod efc-coll-add ((this efc-list-set) item)
+(cl-defmethod efc-coll-add ((this efc-list-set) item)
   "Adds an item to a set only if the set does not
 already contain the item."
   (if (efc-coll-memberp this item)
       (error "This set already contains %s" item)
-    (call-next-method)))
+    (cl-call-next-method)))
 
 
 
@@ -628,11 +622,11 @@ already contain the item."
   ()
   "Association")
 
-(defmethod efc-coll-put ((this efc-assoc) key value)
+(cl-defmethod efc-coll-put ((this efc-assoc) key value)
   "Put an item into the association list."
   (oset this items (append (oref this items) (list (cons key value)))))
 
-(defmethod efc-coll-get ((this efc-assoc) key)
+(cl-defmethod efc-coll-get ((this efc-assoc) key)
   "Get an item from the association list."
   (cdr (assq  key (oref this items))))
 
@@ -646,12 +640,12 @@ already contain the item."
   ()
   "Association that contains no duplicate keys.")
 
-(defmethod efc-coll-put ((this efc-assoc-set) key value)
+(cl-defmethod efc-coll-put ((this efc-assoc-set) key value)
   "Adds an item to a set only if the set does not
 already contain the item."
   (if (efc-coll-get this key)
       (error "This set already contains %s" key)
-    (call-next-method)))
+    (cl-call-next-method)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -665,23 +659,23 @@ already contain the item."
   "Hash table.")
 
 
-(defmethod initialize-instance ((this efc-hash-table) &rest fields)
+(cl-defmethod initialize-instance ((this efc-hash-table) &rest fields)
   "Hash table constructor."
-  (call-next-method)
+  (cl-call-next-method)
   (oset this table (make-hash-table)))
 
-(defmethod efc-coll-put ((this efc-hash-table) key value)
+(cl-defmethod efc-coll-put ((this efc-hash-table) key value)
   "Put an item into the table."
   (if (efc-coll-type-compatible-p this value)
       (puthash key value (oref this table))
     (error "Tried to add an item of type %s to a hash table of items of type %s"
 	   (type-of value) (oref this elem-type))))
 
-(defmethod efc-coll-get ((this efc-hash-table) key)
+(cl-defmethod efc-coll-get ((this efc-hash-table) key)
   "Get an item from the table."
   (gethash key (oref this table)))
 
-(defmethod efc-coll-visit ((this efc-hash-table) visitor)
+(cl-defmethod efc-coll-visit ((this efc-hash-table) visitor)
   "Visit each item in the hash table. VISITOR is an instance
 of efc-visitor class."
   (maphash
@@ -689,10 +683,9 @@ of efc-visitor class."
      (efc-visitor-visit visitor value))
    (oref this table)))
 
-(defmethod efc-coll-iterator ((this efc-hash-table))
+(cl-defmethod efc-coll-iterator ((this efc-hash-table))
   "Return an iterator for this hash table."
   (efc-list-iterator
-   "hash table iterator"
    :list-obj (let (values)
 	       (maphash
 		(lambda (key value)

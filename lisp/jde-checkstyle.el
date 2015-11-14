@@ -194,7 +194,7 @@ string describing how the compilation finished."
 		 (string :menu-tag "other" :tag "Extension")))
 
 
-(defmethod jde-checkstyle-get-property-args ((this jde-run-vm))
+(cl-defmethod jde-checkstyle-get-property-args ((this jde-run-vm))
     "Get property arguments."
     (mapcar
      (lambda (prop)
@@ -224,7 +224,7 @@ string describing how the compilation finished."
 		     "Arguments entered in the minibuffer."))
   "Class of Java style checkers.")
 
-(defmethod jde-checkstyle-create-checker-buffer ((this jde-checkstyle-checker))
+(cl-defmethod jde-checkstyle-create-checker-buffer ((this jde-checkstyle-checker))
   (save-excursion
     (let ((buf (get-buffer-create "*check style*"))
 	  (error-regexp-alist compilation-error-regexp-alist)
@@ -295,14 +295,14 @@ string describing how the compilation finished."
 	  (setq default-directory thisdir
 		compilation-directory-stack (list default-directory))))))
 
-(defmethod jde-checkstyle-get-property-args ((this jde-checkstyle-checker))
+(cl-defmethod jde-checkstyle-get-property-args ((this jde-checkstyle-checker))
     "Get property arguments."
     (mapcar
      (lambda (prop)
        (format "-D%s=%s" (car prop) (cdr prop)))
      jde-checkstyle-expanded-properties))
 
-(defmethod jde-checkstyle-exec ((this jde-checkstyle-checker))
+(cl-defmethod jde-checkstyle-exec ((this jde-checkstyle-checker))
 
   (jde-checkstyle-create-checker-buffer this)
 
@@ -400,7 +400,6 @@ history enabled."
 	     '(jde-checkstyle-interactive-arg-history . 1))))
 
   (let ((checker (jde-checkstyle-checker
-		  "checker"
 		  :interactive-args (if jde-checkstyle-read-args
 					jde-checkstyle-interactive-args))))
 

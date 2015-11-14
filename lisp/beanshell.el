@@ -186,17 +186,17 @@ buffer."
   "Buffer that displays BeanShell output.")
 
 
-(defmethod initialize-instance ((this bsh-buffer) &rest fields)
+(cl-defmethod initialize-instance ((this bsh-buffer) &rest fields)
   "Constructor for BeanShell buffer instance."
-  (call-next-method)
+  (cl-call-next-method)
 
   (oset this buffer (get-buffer-create (oref this buffer-name))))
 
-(defmethod bsh-buffer-live-p ((this bsh-buffer))
+(cl-defmethod bsh-buffer-live-p ((this bsh-buffer))
   "Return t if this buffer has not been killed."
   (buffer-live-p (oref this buffer)))
 
-(defmethod bsh-buffer-display ((this bsh-buffer))
+(cl-defmethod bsh-buffer-display ((this bsh-buffer))
   "Display this buffer."
   (pop-to-buffer (oref this buffer-name)))
 
@@ -205,14 +205,14 @@ buffer."
   ()
   "BeanShell buffer that runs in `comint-mode'.")
 
-(defmethod initialize-instance ((this bsh-comint-buffer) &rest fields)
+(cl-defmethod initialize-instance ((this bsh-comint-buffer) &rest fields)
   "Constructor for BeanShell buffer instance."
-  (call-next-method)
+  (cl-call-next-method)
   (with-current-buffer (oref this buffer)
     (comint-mode)
     (setq comint-prompt-regexp "bsh % ")))
 
-(defmethod bsh-comint-buffer-exec ((this bsh-comint-buffer) vm vm-args)
+(cl-defmethod bsh-comint-buffer-exec ((this bsh-comint-buffer) vm vm-args)
   (let ((win32-start-process-show-window t)
 	(w32-start-process-show-window t)
 	(w32-quote-process-args ?\")   ;; Emacs
@@ -229,11 +229,6 @@ buffer."
   (oset this process (get-buffer-process (oref this buffer)))
   (oset this filter (process-filter (oref this process)))
 
-  ;; moved to `process-query-on-exit-flag' per compile warning hint:
-  ;; `process-kill-without-query' is an obsolete function (as of Emacs 22.1);
-  ;; use `process-query-on-exit-flag' or `set-process-query-on-exit-flag'.
-  ;;
-  ;;(process-kill-without-query (oref this process))
   (set-process-query-on-exit-flag (oref this process) nil)
 
   (if (eq system-type 'windows-nt)
@@ -245,7 +240,7 @@ buffer."
   ()
   "Implements a `compilation-mode' buffer for BeanShell output.")
 
-(defmethod initialize-instance ((this bsh-compilation-buffer) &rest fields)
+(cl-defmethod initialize-instance ((this bsh-compilation-buffer) &rest fields)
   "Constructor for BeanShell compilation buffer instance."
 
   (bsh-compilation-buffer-create-native-buffer this)
@@ -261,12 +256,12 @@ buffer."
   (oset this process nil)
   (bsh-compilation-buffer-set-mode this))
 
-(defmethod bsh-compilation-buffer-create-native-buffer ((this bsh-compilation-buffer))
+(cl-defmethod bsh-compilation-buffer-create-native-buffer ((this bsh-compilation-buffer))
   "Creates the native Emacs buffer encapsulated by this eieio object."
   (oset this buffer-name "*bsh compilation*")
   (oset this buffer (get-buffer-create (oref this buffer-name))))
 
-(defmethod bsh-compilation-buffer-set-mode ((this bsh-compilation-buffer))
+(cl-defmethod bsh-compilation-buffer-set-mode ((this bsh-compilation-buffer))
   "Define buffer mode."
   (let ((thisdir default-directory))
     (with-current-buffer (oref this buffer)
@@ -330,7 +325,7 @@ buffer."
 	(if (boundp 'compilation-directory-stack)
 	    (setq compilation-directory-stack (list default-directory)))))))
 
-(defmethod bsh-compilation-buffer-filter ((this bsh-compilation-buffer) proc string)
+(cl-defmethod bsh-compilation-buffer-filter ((this bsh-compilation-buffer) proc string)
   "This filter prints out the result of the process without buffering.
 The result is inserted as it comes in the compilation buffer."
   (with-current-buffer (oref this buffer)
@@ -458,10 +453,10 @@ The result is inserted as it comes in the compilation buffer."
 			  "Whether or not to use a separate error buffer."))
 "Defines an instance of a BeanShell process.")
 
-(defmethod initialize-instance ((this bsh) &rest fields)
+(cl-defmethod initialize-instance ((this bsh) &rest fields)
   "Constructor for BeanShell instance."
 
-  (call-next-method)
+  (cl-call-next-method)
 
   (bsh-create-buffer this)
 
@@ -489,12 +484,12 @@ The result is inserted as it comes in the compilation buffer."
        (with-current-buffer (process-buffer process)
 	 (bsh-redirect-eval-output this-bsh process output))))))
 
-(defmethod bsh-create-buffer ((this bsh))
+(cl-defmethod bsh-create-buffer ((this bsh))
   "Creates the buffer used by this beanshell instance."
-    (oset this buffer (bsh-comint-buffer "bsh main buffer")))
+    (oset this buffer (bsh-comint-buffer)))
 
 
-(defmethod bsh-build-classpath-argument ((this bsh))
+(cl-defmethod bsh-build-classpath-argument ((this bsh))
   "Convert the list of classes specified by the cp slot
 to the string form required by the vm."
   (mapconcat
@@ -504,7 +499,7 @@ to the string form required by the vm."
     (list (oref this jar)))
    path-separator))
 
-(defmethod bsh-running-p ((this bsh))
+(cl-defmethod bsh-running-p ((this bsh))
   "Return t if this instance of a BeanShell is running; otherwise nil"
   (let* ((buffer (oref this buffer))
 	 (process
@@ -515,12 +510,12 @@ to the string form required by the vm."
      (processp process)
      (eq (process-status process) 'run))))
 
-(defmethod bsh-get-process ((this bsh))
+(cl-defmethod bsh-get-process ((this bsh))
   "Return the Lisp object representing the Beanshell process."
   (if (bsh-running-p this)
       (oref (oref this buffer) process)))
 
-(defmethod bsh-launch ((this bsh) &optional display-buffer)
+(cl-defmethod bsh-launch ((this bsh) &optional display-buffer)
 
   (cl-assert
    (or (file-exists-p (oref this vm))
@@ -575,7 +570,7 @@ to the string form required by the vm."
       (message "The BeanShell is already running.")
       (bsh-buffer-display (oref this buffer)))))
 
-(defmethod bsh-snag-lisp-output ((this bsh) process output)
+(cl-defmethod bsh-snag-lisp-output ((this bsh) process output)
   "Assemble Lisp OUTPUT from the BeanShell."
     (let ((end-of-output (string-match ".*bsh % " output)))
       ;; Check for case
@@ -593,7 +588,7 @@ to the string form required by the vm."
 	(oset this lisp-output (concat (oref this lisp-output) output))
 	(accept-process-output process bsh-eval-timeout 5))))
 
-(defmethod bsh-detect-java-eval-error ((this bsh) bsh-output)
+(cl-defmethod bsh-detect-java-eval-error ((this bsh) bsh-output)
   (if (string-match "// Error:" bsh-output)
       (if (oref this separate-error-buffer)
 	  (with-current-buffer (get-buffer-create "*Beanshell Error*")
@@ -609,7 +604,7 @@ to the string form required by the vm."
 	 (oref this java-expr) bsh-output)
 	(error "Beanshell eval error. See messages buffer for details."))))
 
-(defmethod bsh-eval-lisp-output ((this bsh))
+(cl-defmethod bsh-eval-lisp-output ((this bsh))
   (if (not (string= (oref this lisp-output) ""))
       (cl-flet ((format-error-msg (error-symbols)
 	       (mapconcat (lambda (s) (symbol-name s)) error-symbols " ")))
@@ -631,14 +626,14 @@ to the string form required by the vm."
       (message "bsh-eval-r error: Beanshell result is null. Cannot evaluate.")
       (message "  Expression: %s" (oref this java-expr)))))
 
-(defmethod bsh-snag-and-eval-lisp-output ((this bsh) process output)
+(cl-defmethod bsh-snag-and-eval-lisp-output ((this bsh) process output)
   "Assemble and parse Lisp OUTPUT from the BeanShell PROCESS."
   (bsh-snag-lisp-output this process output)
   (bsh-detect-java-eval-error this output)
   (bsh-eval-lisp-output this))
 
 
-(defmethod bsh-redirect-eval-output ((this bsh) process output)
+(cl-defmethod bsh-redirect-eval-output ((this bsh) process output)
   (let ((eval-buffer (oref this eval-buffer)))
     (cl-assert eval-buffer)
     (funcall (oref eval-buffer filter) process output)
@@ -649,7 +644,7 @@ to the string form required by the vm."
 	(set-process-filter process (oref (oref this buffer) filter))
 	 (oset this eval-buffer nil)))))
 
-(defmethod bsh-eval ((this bsh) expr &optional eval-return)
+(cl-defmethod bsh-eval ((this bsh) expr &optional eval-return)
   "Uses the BeanShell Java interpreter to evaluate the Java expression
 EXPR.  This function returns any text output by the Java interpreter's
 standard out or standard error pipes.  If EVAL-RETURN is non-nil, this
@@ -679,14 +674,14 @@ expression."
 	(bsh-eval-lisp-output this)
       (oref this lisp-output))))
 
-(defmethod bsh-eval-r ((this bsh) java-statement)
+(cl-defmethod bsh-eval-r ((this bsh) java-statement)
   "Convenience method for evaluating Java statements
 that return Lisp expressions as output. This function
 invokes bsh-eval with the evaluate-return option set to
 t."
   (bsh-eval this java-statement t))
 
-(defmethod bsh-async-eval ((this bsh) expr)
+(cl-defmethod bsh-async-eval ((this bsh) expr)
   "Send the Java statement EXPR to the BeanShell for
 evaluation. Do not wait for a response."
   (unless (bsh-running-p this)
@@ -699,7 +694,7 @@ evaluation. Do not wait for a response."
   (when (bsh-running-p this)
     (process-send-string (oref (oref this buffer) process) (concat expr "\n"))))
 
-(defmethod bsh-buffer-eval ((this bsh) expr buffer)
+(cl-defmethod bsh-buffer-eval ((this bsh) expr buffer)
   "Evaluate EXPR and displays its output in BUFFER. BUFFER
 must be an instance of `bsh-buffer' class. A typical use for this
 method is to invoke a Java application whose output is compiler-like,
@@ -715,7 +710,7 @@ an instance of a subclass of `bsh-compiler-buffer'."
     (set-process-filter bsh-process (oref this redir-filter))
     (process-send-string bsh-process expr)))
 
-(defmethod bsh-kill-process ((this bsh))
+(cl-defmethod bsh-kill-process ((this bsh))
   "Terminates the BeanShell process."
   (process-send-string  (oref (oref this buffer) process) "exit();\n"))
 
@@ -772,7 +767,7 @@ or `bsh-vm' point to a Java vm on your system."
 	 (progn
 
 	   ;; Create a BeanShell wrapper object
-	   (setq beanshell (bsh "BeanShell"))
+	   (setq beanshell (bsh))
 
 	   (oset (oref beanshell buffer) buffer-name "*bsh demo*")
 
@@ -813,9 +808,9 @@ or `bsh-vm' point to a Java vm on your system."
   "BeanShell intended to be used independently of any other
 Emacs package.")
 
-(defmethod initialize-instance ((this bsh-standalone-bsh) &rest fields)
+(cl-defmethod initialize-instance ((this bsh-standalone-bsh) &rest fields)
   "Constructor for the standard bsh BeanShell instance."
-  (call-next-method)
+  (cl-call-next-method)
 
   (cl-assert
    (file-exists-p (expand-file-name bsh-jar))
@@ -862,8 +857,8 @@ Emacs package.")
   "*Starts the standalone version of the BeanShell, a Java interpreter developed
 by Pat Niemeyer."
   (interactive)
-  (oset-default 'bsh-standalone-bsh the-bsh (bsh-standalone-bsh "Standalone BeanShell"))
-  (bsh-launch (oref bsh-standalone-bsh the-bsh) t))
+  (oset-default 'bsh-standalone-bsh the-bsh (bsh-standalone-bsh))
+  (bsh-launch (oref-default 'bsh-standalone-bsh the-bsh) t))
 
 (defun bsh-exit ()
   "Closes the standalone version of the BeanShell."

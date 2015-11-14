@@ -46,7 +46,7 @@
 ;; FIXME: refactor to eliminate these
 (defvar jde-devel-debug);; jde.el
 (defvar jde-current-project);; jde-project-file.el
-(declare-function jde-get-project "jde-project-file" (symbol project));;
+(declare-function jde-get-project "jde-project-file" (symbol project))
 (declare-function jde-run-get-vm "jde-run" ())
 (declare-function jde-build-classpath "jde" (paths &optional symbol quote-path-p))
 (declare-function jde-get-tools-jar "jde" ())
@@ -62,9 +62,9 @@
 (defclass jde-bsh-buffer (bsh-comint-buffer) ()
   "JDEE's beanshell buffer")
 
-(defmethod initialize-instance ((this jde-bsh-buffer) &rest fields)
+(cl-defmethod initialize-instance ((this jde-bsh-buffer) &rest fields)
   (oset this buffer-name "*JDEE bsh*")
-  (call-next-method))
+  (cl-call-next-method))
 
 (defclass jde-bsh (bsh)
   ((bsh-cmd-dir      :initarg :bsh-cmd-dir
@@ -98,9 +98,9 @@
 		   "The single instance of the JDEE's BeanShell."))
   "Class of JDEE BeanShells. There is only one per Emacs session.")
 
-(defmethod initialize-instance ((this jde-bsh) &rest fields)
+(cl-defmethod initialize-instance ((this jde-bsh) &rest fields)
   "Constructor for the JDEE BeanShell instance."
-  (call-next-method)
+  (cl-call-next-method)
   (let* ((jde-java-directory
 	  (concat
 	   (jde-find-jde-data-directory)
@@ -115,15 +115,15 @@
     (oset this separate-error-buffer jde-bsh-separate-buffer)
     (oset-default 'jde-bsh the-bsh this)))
 
-(defmethod bsh-create-buffer ((this jde-bsh))
+(cl-defmethod bsh-create-buffer ((this jde-bsh))
   "Creates the JDEE's beanshell buffer."
-  (oset this buffer (jde-bsh-buffer "JDEE bsh buffer")))
+  (oset this buffer (jde-bsh-buffer)))
 
-(defmethod bsh-build-classpath-argument ((this jde-bsh))
+(cl-defmethod bsh-build-classpath-argument ((this jde-bsh))
   (jde-build-classpath (oref this cp) 'jde-global-classpath t))
 
-(defmethod bsh-launch :BEFORE ((this jde-bsh) &optional display-buffer)
-  "Sets the vm and classpath to the vm and classpath for the current project before
+(cl-defmethod bsh-launch :before ((this jde-bsh) &optional display-buffer)
+	      "Sets the vm and classpath to the vm and classpath for the current project before
 the PRIMARY launch method is invoked."
   (let* ((project-ant-home
 	  ;; Code referring to jde-ant variables uses symbols to
@@ -160,7 +160,7 @@ the PRIMARY launch method is invoked."
 		      (jde-expand-classpath (jde-get-global-classpath)))))))
 
 ;; Create the BeanShell wrapper object.
-(jde-bsh "JDEE BeanShell")
+(jde-bsh)
 
 (defun jde-bsh-running-p ()
   "Returns t if the JDEE's BeanShell instance is running."
@@ -281,7 +281,7 @@ a file in the current directory:
 
  (jde-bsh-compile-mode-eval \"jde.util.CompileServer.compile(\\\"Test.java\\\");\"
    \"Compile Test.java\" 'jde-compile-finish-kill-buffer)"
-  (let* ((buffer-obj (bsh-compilation-buffer "buffer"))
+  (let* ((buffer-obj (bsh-compilation-buffer))
 	 (native-buf (oref buffer-obj buffer))
 	 (bufwin (display-buffer native-buf)))
 

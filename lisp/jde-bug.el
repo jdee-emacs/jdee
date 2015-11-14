@@ -615,7 +615,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   (interactive)
   (let* ((process (jde-dbs-get-target-process))
 	 (cmd
-	  (jde-dbs-step "step over" :process process)))
+	  (jde-dbs-step :process process)))
     (jde-dbs-cmd-exec cmd)))
 
 (defun jde-bug-step-into ()
@@ -624,7 +624,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   (interactive)
   (let* ((process (jde-dbs-get-target-process))
 	 (cmd
-	  (jde-dbs-step "step into" :process process :step-type "into")))
+	  (jde-dbs-step :process process :step-type "into")))
     (jde-dbs-cmd-exec cmd)))
 
 (defun jde-bug-step-into-all ()
@@ -632,7 +632,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   (interactive)
   (let* ((process (jde-dbs-get-target-process))
 	 (cmd
-	  (jde-dbs-step "step into" :process process :step-type "into-all")))
+	  (jde-dbs-step :process process :step-type "into-all")))
     (jde-dbs-cmd-exec cmd)))
 
 (defun jde-bug-step-out ()
@@ -640,7 +640,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   (interactive)
   (let* ((process (jde-dbs-get-target-process))
 	 (cmd
-	  (jde-dbs-step "step into" :process process :step-type "out")))
+	  (jde-dbs-step :process process :step-type "out")))
     (jde-dbs-cmd-exec cmd)))
 
 
@@ -714,7 +714,6 @@ You can use the notation [f1], [f2], etc., to specify function keys."
       (jde-db-breakpoints-add bp))
     (if (and bp proc)
 	(let* ((set-breakpoint (jde-dbs-set-breakpoint
-				"set breakpoint"
 				:process proc
 				:breakpoint bp))
 	       (result (jde-dbs-cmd-exec set-breakpoint)))
@@ -742,7 +741,6 @@ You can use the notation [f1], [f2], etc., to specify function keys."
     (if (and bp proc)
 	(let* ((clear-breakpoint
 		(jde-dbs-clear-breakpoint
-		 "clear breakpoint"
 		 :process proc
 		 :breakpoint bp))
 	       (result (jde-dbs-cmd-exec clear-breakpoint)))))
@@ -815,18 +813,18 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   "Class of trace methods dialogs."
 )
 
-(defmethod initialize-instance ((this jde-bug-trace-methods-dialog) &rest fields)
+(cl-defmethod initialize-instance ((this jde-bug-trace-methods-dialog) &rest fields)
   "Constructor for trace methods dialog."
 
   ;; Call parent initializer.
-  (call-next-method)
+  (cl-call-next-method)
 
   (assert (or (string= (oref this trace-type) "entry")
 	      (string= (oref this trace-type) "exit")))
 )
 
 
-(defmethod efc-dialog-create ((this jde-bug-trace-methods-dialog))
+(cl-defmethod efc-dialog-create ((this jde-bug-trace-methods-dialog))
 
   (widget-insert (concat "Trace method "
 			 (oref this trace-type)
@@ -877,17 +875,14 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 	    :tag "Filter"))))
   )
 
-(defmethod efc-dialog-ok ((this jde-bug-trace-methods-dialog))
+(cl-defmethod efc-dialog-ok ((this jde-bug-trace-methods-dialog))
   (let* ((thread-restriction (widget-value (oref this thread-restriction-field)))
 	 (thread-suspension-policy (widget-value (oref this suspend-policy-field)))
 	 (class-inclusion-filters (widget-value (oref this class-inclusion-field)))
 	 (class-exclusion-filters (widget-value (oref this class-exclusion-field)))
 	 (process (jde-dbs-get-target-process))
-	 (request (jde-dbs-trace-methods-request "trace methods request"
-						 :trace-type (oref this trace-type)))
-	 (cmd  (jde-dbs-trace-methods
-		"trace methods command"
-		:process process :trace-request request)))
+	 (request (jde-dbs-trace-methods-request :trace-type (oref this trace-type)))
+	 (cmd (jde-dbs-trace-methods :process process :trace-request request)))
 
     (if (and thread-restriction (not (string= thread-restriction "")))
 	(oset request :thread-restriction thread-restriction))
@@ -902,20 +897,19 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 	(oset request :exclusion-filters class-exclusion-filters))
 
     (jde-dbs-cmd-exec cmd)
-    (call-next-method)))
+    (cl-call-next-method)))
 
 
 (defun jde-bug-trace-method-entry ()
   "Displays the trace method entry dialog."
   (interactive)
-  (let ((dialog (jde-bug-trace-methods-dialog "trace method entry dialog")))
+  (let ((dialog (jde-bug-trace-methods-dialog)))
     (efc-dialog-show dialog)))
 
 (defun jde-bug-trace-method-exit ()
   "Displays the trace method exit dialog."
   (interactive)
-  (let ((dialog (jde-bug-trace-methods-dialog
-		 "trace method exit dialog" :trace-type "exit")))
+  (let ((dialog (jde-bug-trace-methods-dialog :trace-type "exit")))
     (efc-dialog-show dialog)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -944,18 +938,18 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   "Class of trace classes dialogs."
 )
 
-(defmethod initialize-instance ((this jde-bug-trace-classes-dialog) &rest fields)
+(cl-defmethod initialize-instance ((this jde-bug-trace-classes-dialog) &rest fields)
   "Constructor for trace classes dialog."
 
   ;; Call parent initializer.
-  (call-next-method)
+  (cl-call-next-method)
 
   (assert (or (string= (oref this trace-type) "preparation")
 	      (string= (oref this trace-type) "unloading")))
 )
 
 
-(defmethod efc-dialog-create ((this jde-bug-trace-classes-dialog))
+(cl-defmethod efc-dialog-create ((this jde-bug-trace-classes-dialog))
 
   (widget-insert (concat "Trace class "
 			 (oref this trace-type)
@@ -998,16 +992,13 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 	    :tag "Filter"))))
   )
 
-(defmethod efc-dialog-ok ((this jde-bug-trace-classes-dialog))
+(cl-defmethod efc-dialog-ok ((this jde-bug-trace-classes-dialog))
   (let* ((thread-suspension-policy (widget-value (oref this suspend-policy-field)))
 	 (class-inclusion-filters (widget-value (oref this class-inclusion-field)))
 	 (class-exclusion-filters (widget-value (oref this class-inclusion-field)))
 	 (process (jde-dbs-get-target-process))
-	 (request (jde-dbs-trace-classes-request "trace classes request"
-						 :trace-type (oref this trace-type)))
-	 (cmd  (jde-dbs-trace-classes
-		"trace classes command"
-		:process process :trace-request request)))
+	 (request (jde-dbs-trace-classes-request :trace-type (oref this trace-type)))
+	 (cmd  (jde-dbs-trace-classes :process process :trace-request request)))
 
     (if (and thread-suspension-policy (not (string= thread-suspension-policy "")))
 	(oset request :suspend-policy thread-suspension-policy))
@@ -1019,20 +1010,19 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 	(oset request :exclusion-filters class-exclusion-filters))
 
     (jde-dbs-cmd-exec cmd)
-    (call-next-method)))
+    (cl-call-next-method)))
 
 
 (defun jde-bug-trace-class-prep ()
   "Displays the trace class preparation dialog."
   (interactive)
-  (let ((dialog (jde-bug-trace-classes-dialog "trace class prep dialog")))
+  (let ((dialog (jde-bug-trace-classes-dialog)))
     (efc-dialog-show dialog)))
 
 (defun jde-bug-trace-class-unload ()
   "Displays the trace class unloading dialog."
   (interactive)
-  (let ((dialog (jde-bug-trace-classes-dialog
-		 "trace class unloading dialog" :trace-type "unloading")))
+  (let ((dialog (jde-bug-trace-classes-dialog :trace-type "unloading")))
     (efc-dialog-show dialog)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1065,16 +1055,16 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   "Defines a trace exception dialog."
 )
 
-(defmethod initialize-instance ((this jde-bug-trace-exceptions-dialog) &rest fields)
+(cl-defmethod initialize-instance ((this jde-bug-trace-exceptions-dialog) &rest fields)
   "Constructor for trace exceptions dialog."
 
   ;; Call parent initializer.
-  (call-next-method)
+  (cl-call-next-method)
 
 )
 
 
-(defmethod efc-dialog-create ((this jde-bug-trace-exceptions-dialog))
+(cl-defmethod efc-dialog-create ((this jde-bug-trace-exceptions-dialog))
 
   (widget-insert (concat "Trace exception\n\n"))
 
@@ -1142,7 +1132,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 	    :tag "Filter"))))
   )
 
-(defmethod efc-dialog-ok ((this jde-bug-trace-exceptions-dialog))
+(cl-defmethod efc-dialog-ok ((this jde-bug-trace-exceptions-dialog))
   (let* ((exception-class (widget-value (oref this exception-class-field)))
 	 (trace-type (widget-value (oref this trace-type-field)))
 	 (thread-restriction (widget-value (oref this thread-restriction-field)))
@@ -1151,11 +1141,9 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 	 (class-exclusion-filters (widget-value (oref this class-inclusion-field)))
 	 (process (jde-dbs-get-target-process))
 	 (request (jde-dbs-trace-exceptions-request
-		   "trace exceptions request"
 		   :exception-class exception-class
 		   :trace-type trace-type))
 	 (cmd  (jde-dbs-trace-exceptions
-		"trace exceptions command"
 		:process process :trace-request request)))
 
     (if (and thread-restriction (not (string= thread-restriction "")))
@@ -1171,18 +1159,16 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 	(oset request :exclusion-filters class-exclusion-filters))
 
     (jde-dbs-cmd-exec cmd)
-    (call-next-method)))
+    (cl-call-next-method)))
 
 (defun jde-bug-break-on-exception (exception-class)
   (interactive "sFully qualified exception: ")
   (let* ((process (jde-dbs-get-target-process))
 	 (request (jde-dbs-trace-exceptions-request
-		   "break on exceptions request"
 		   :exception-class exception-class
 		   :trace-type "both"
 		   :suspend-policy "all"))
 	 (cmd (jde-dbs-trace-exceptions
-	       "break on exceptions command"
 	       :process process :trace-request request)))
     (jde-dbs-cmd-exec cmd)
     (jde-dbs-proc-display-debug-message process "Use JDEbug->Trace->Cancel to remove this breakpoint")))
@@ -1191,7 +1177,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 (defun jde-bug-trace-exceptions ()
   "Displays the trace exceptions dialog."
   (interactive)
-  (let ((dialog (jde-bug-trace-exceptions-dialog "trace exceptions dialog")))
+  (let ((dialog (jde-bug-trace-exceptions-dialog)))
     (efc-dialog-show dialog)))
 
 
@@ -1205,8 +1191,8 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 
 (defun jde-bug-cancel-trace-request (process request)
   "Cancels a specified trace request on a specified process."
-  (let ((cmd (jde-dbs-cancel-trace "cancel trace" :process process
-				  :trace-request request)))
+  (let ((cmd (jde-dbs-cancel-trace :process process
+				   :trace-request request)))
     (jde-dbs-cmd-exec cmd)))
 
 (defclass jde-bug-cancel-trace-dialog (efc-dialog)
@@ -1217,7 +1203,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
    (check-boxes      :initarg :check-boxes))
 )
 
-(defmethod efc-dialog-create ((this jde-bug-cancel-trace-dialog))
+(cl-defmethod efc-dialog-create ((this jde-bug-cancel-trace-dialog))
   (let ((items
 	 (mapcar
 	  (lambda (x)
@@ -1228,7 +1214,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 	       :tag "Request"
 	       :doc
 	       (concat
-		(if (typep request 'jde-dbs-trace-methods-request)
+		(if (cl-typep request 'jde-dbs-trace-methods-request)
 		    (progn
 		      (concat
 		      (format "Trace method %s." (oref request trace-type))
@@ -1257,7 +1243,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 	   )))
   ))
 
-(defmethod efc-dialog-ok ((this jde-bug-cancel-trace-dialog))
+(cl-defmethod efc-dialog-ok ((this jde-bug-cancel-trace-dialog))
   (message (format "Check boxes: %s)" (widget-value (oref this check-boxes))))
   (mapc
    (lambda (id-x)
@@ -1268,7 +1254,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 	     (oref this requests)))))
      (jde-bug-cancel-trace-request  (oref this process) request)))
    (widget-value (oref this check-boxes)))
-  (call-next-method))
+  (cl-call-next-method))
 
 
 (defun jde-bug-cancel-trace ()
@@ -1284,8 +1270,7 @@ requests to cancel."
 	     (if (= (length trace-requests) 1)
 		 (jde-bug-cancel-trace-request process (cdr (car trace-requests)))
 	       (let ((dialog
-		      (jde-bug-cancel-trace-dialog "cancel trace dialog"
-						   :process process
+		      (jde-bug-cancel-trace-dialog :process process
 						   :requests trace-requests)))
 		 (efc-dialog-show dialog))))
 	 (error "The target process has no outstanding trace requests"))
@@ -1345,16 +1330,16 @@ requests to cancel."
   "Defines a watch field dialog."
 )
 
-(defmethod initialize-instance ((this jde-bug-watch-field-dialog) &rest fields)
+(cl-defmethod initialize-instance ((this jde-bug-watch-field-dialog) &rest fields)
   "Constructor for watch field dialog."
 
   ;; Call parent initializer.
-  (call-next-method)
+  (cl-call-next-method)
 
 )
 
 
-(defmethod efc-dialog-create ((this jde-bug-watch-field-dialog))
+(cl-defmethod efc-dialog-create ((this jde-bug-watch-field-dialog))
 
   (widget-insert (format "Watch for field %s\n\n" (oref this watch-type)))
 
@@ -1439,7 +1424,7 @@ Execution of the process is suspended only if the expression is true. The expres
 	    :size 40
 	    :tag "Filter")))))
 
-(defmethod efc-dialog-ok ((this jde-bug-watch-field-dialog))
+(cl-defmethod efc-dialog-ok ((this jde-bug-watch-field-dialog))
   (let* ((obj-class (widget-value (oref this object-class-widget)))
 	 (field-name (widget-value (oref this field-name-widget)))
 	 (expression (widget-value (oref this expression-widget)))
@@ -1450,12 +1435,10 @@ Execution of the process is suspended only if the expression is true. The expres
 	 (class-exclusion-filters (widget-value (oref this class-inclusion-widget)))
 	 (process (jde-dbs-get-target-process))
 	 (request (jde-dbs-watch-field-request
-		   "watch field request"
 		   :watch-type (oref this watch-type)
 		   :object-class obj-class
 		   :field-name field-name))
 	 (cmd  (jde-dbs-watch-field
-		"watch field command"
 		:process process :watch-request request)))
 
     (if (and expression (not (string= expression "")))
@@ -1477,7 +1460,7 @@ Execution of the process is suspended only if the expression is true. The expres
 	(oset request :exclusion-filters class-exclusion-filters))
 
     (jde-dbs-cmd-exec cmd)
-    (call-next-method)))
+    (cl-call-next-method)))
 
 
 (defun jde-bug-watch-field-access ()
@@ -1486,7 +1469,6 @@ field of an object or class of objects."
   (interactive)
   (let ((dialog
 	 (jde-bug-watch-field-dialog
-	  "watch field dialog"
 	  :object-class (concat
 			 "*."
 			 (car (jde-parse-get-innermost-class-at-point)))
@@ -1498,7 +1480,6 @@ field of an object or class of objects."
 field of an object or class of objects."
   (interactive)
   (let ((dialog (jde-bug-watch-field-dialog
-		 "watch field dialog"
 		 :watch-type "modification"
 		 :object-class (concat
 				"*."
@@ -1515,8 +1496,8 @@ field of an object or class of objects."
 
 (defun jde-bug-cancel-watch-request (process request)
   "Cancels a specified watch field request on a specified process."
-  (let ((cmd (jde-dbs-cancel-watch "cancel watch" :process process
-				  :watch-request request)))
+  (let ((cmd (jde-dbs-cancel-watch :process process
+				   :watch-request request)))
     (jde-dbs-cmd-exec cmd)))
 
 (defclass jde-bug-cancel-watch-dialog (efc-dialog)
@@ -1527,7 +1508,7 @@ field of an object or class of objects."
    (check-boxes      :initarg :check-boxes))
 )
 
-(defmethod efc-dialog-create ((this jde-bug-cancel-watch-dialog))
+(cl-defmethod efc-dialog-create ((this jde-bug-cancel-watch-dialog))
   (let ((items
 	 (mapcar
 	  (lambda (x)
@@ -1560,7 +1541,7 @@ field of an object or class of objects."
 	   )))
   ))
 
-(defmethod efc-dialog-ok ((this jde-bug-cancel-watch-dialog))
+(cl-defmethod efc-dialog-ok ((this jde-bug-cancel-watch-dialog))
   (message (format "Check boxes: %s)" (widget-value (oref this check-boxes))))
   (mapc
    (lambda (id-x)
@@ -1571,7 +1552,7 @@ field of an object or class of objects."
 	     (oref this requests)))))
      (jde-bug-cancel-watch-request  (oref this process) request)))
    (widget-value (oref this check-boxes)))
-  (call-next-method))
+  (cl-call-next-method))
 
 
 (defun jde-bug-cancel-watch ()
@@ -1587,8 +1568,7 @@ requests to cancel."
 	     (if (= (length watch-requests) 1)
 		 (jde-bug-cancel-watch-request process (cdr (car watch-requests)))
 	       (let ((dialog
-		      (jde-bug-cancel-watch-dialog "cancel watch dialog"
-						   :process process
+		      (jde-bug-cancel-watch-dialog :process process
 						   :requests watch-requests)))
 		 (efc-dialog-show dialog))))
 	 (error "The target process has no outstanding watch requests"))
@@ -1737,9 +1717,7 @@ any variables in scope in the program being debugged."
 
   (let* ((process (jde-dbs-get-target-process))
 	 (cmd
-	  (jde-dbs-get-loaded-classes
-	   "get_loaded_classes"
-	   :process process))
+	  (jde-dbs-get-loaded-classes :process process))
 	 (result
 	  (jde-dbs-cmd-exec cmd)))
     (if (not result)
@@ -1773,9 +1751,7 @@ button 2."
 
   (let* ((process (jde-dbs-get-target-process))
 	 (get-threads-command
-	  (jde-dbs-get-threads
-	   "get_threads"
-	   :process process))
+	  (jde-dbs-get-threads :process process))
 	 (result
 	  (jde-dbs-cmd-exec get-threads-command)))
     (if (not result)
@@ -1803,9 +1779,7 @@ that currently owns the object and threads that are waiting to access the object
 
   (let* ((process (jde-dbs-get-target-process))
 	 (get-monitors-command
-	  (jde-dbs-get-object-monitors
-	   "get_object_monitors"
-	   :process process :object-id object-id))
+	  (jde-dbs-get-object-monitors :process process :object-id object-id))
 	 (result
 	  (jde-dbs-cmd-exec get-monitors-command)))))
 
@@ -1825,9 +1799,7 @@ that currently owns the object and threads that are waiting to access the object
 
   (let* ((process (jde-dbs-get-target-process))
 	 (cmd
-	  (jde-dbs-get-path-info
-	   "get_path_info"
-	   :process process))
+	  (jde-dbs-get-path-info :process process))
 	 (result
 	  (jde-dbs-cmd-exec cmd)))
     (if (not result)
@@ -2294,7 +2266,7 @@ use JDEbug->Threads->Suspend Thread (`jde-bug-suspend-thread')."
   (interactive)
   (let* ((process (jde-dbs-get-target-process))
 	 (suspend-command
-	  (jde-dbs-suspend-thread "suspend process" :process process)))
+	  (jde-dbs-suspend-thread :process process)))
     (jde-dbs-cmd-exec suspend-command)))
 
 
@@ -2304,7 +2276,7 @@ use JDEbug->Threads->Resume Thread (`jde-bug-resume-thread')."
   (interactive)
   (let* ((process (jde-dbs-get-target-process))
 	 (resume-command
-	  (jde-dbs-resume-thread "resume process" :process process)))
+	  (jde-dbs-resume-thread :process process)))
     (jde-dbs-cmd-exec resume-command)))
 
 

@@ -646,7 +646,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 (defclass jde-compile-server-buffer (bsh-compilation-buffer) ()
   "Compiler server buffer.")
 
-(defmethod bsh-compilation-buffer-create-native-buffer ((this jde-compile-server-buffer))
+(cl-defmethod bsh-compilation-buffer-create-native-buffer ((this jde-compile-server-buffer))
   "Creates the native Emacs buffer for the JDEE compile server."
   (oset this buffer-name "*JDEE Compile Server*")
   (oset this buffer (get-buffer-create (oref this buffer-name))))
@@ -654,7 +654,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 (defclass jde-compile-exec-buffer (bsh-compilation-buffer) ()
   "Compiler exec buffer.")
 
-(defmethod initialize-instance ((this jde-compile-exec-buffer) &rest fields)
+(cl-defmethod initialize-instance ((this jde-compile-exec-buffer) &rest fields)
   "Constructor for exec compilation buffer instance."
 
   (bsh-compilation-buffer-create-native-buffer this)
@@ -685,7 +685,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 
   (bsh-compilation-buffer-set-mode this))
 
-(defmethod bsh-compilation-buffer-create-native-buffer ((this jde-compile-exec-buffer))
+(cl-defmethod bsh-compilation-buffer-create-native-buffer ((this jde-compile-exec-buffer))
   "Creates the native Emacs buffer for the JDEE compile server."
   (oset this buffer-name "*compilation*")
   (oset this buffer (get-buffer-create (oref this buffer-name))))
@@ -722,7 +722,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 		     "Run as a compile server in the Beanshell."))
   "Class of Java compilers.")
 
-(defmethod jde-compile-classpath-arg ((this jde-compile-compiler))
+(cl-defmethod jde-compile-classpath-arg ((this jde-compile-compiler))
   "Returns the classpath argument for this compiler."
   (let ((classpath
 	 (if jde-compile-option-classpath
@@ -740,7 +740,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 	  symbol)
 	 ))))
 
-(defmethod jde-compile-sourcepath-arg ((this jde-compile-compiler))
+(cl-defmethod jde-compile-sourcepath-arg ((this jde-compile-compiler))
   "Get the source path argument for this compiler."
     (if jde-compile-option-sourcepath
 	(list
@@ -749,7 +749,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 	  jde-compile-option-sourcepath
 	  'jde-compile-option-sourcepath))))
 
-(defmethod jde-compile-bootclasspath-arg ((this jde-compile-compiler))
+(cl-defmethod jde-compile-bootclasspath-arg ((this jde-compile-compiler))
   "Get the boot classpath argument for this compiler."
   (if jde-compile-option-bootclasspath
       (list
@@ -757,7 +757,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
        (jde-build-classpath jde-compile-option-bootclasspath
 			    'jde-compile-option-bootclasspath))))
 
-(defmethod jde-compile-extdirs-arg ((this jde-compile-compiler))
+(cl-defmethod jde-compile-extdirs-arg ((this jde-compile-compiler))
   "Get the extdirs argument for this compiler."
   (if jde-compile-option-extdirs
       (list
@@ -767,13 +767,13 @@ If t (or other non-nil non-number) then kill in 2 secs."
 	'jde-compile-option-extdirs))))
 
 
-(defmethod jde-compile-encoding-arg ((this jde-compile-compiler))
+(cl-defmethod jde-compile-encoding-arg ((this jde-compile-compiler))
   (if (not (string= jde-compile-option-encoding ""))
       (list
        "-encoding"
        jde-compile-option-encoding)))
 
-(defmethod jde-compile-debug-arg ((this jde-compile-compiler))
+(cl-defmethod jde-compile-debug-arg ((this jde-compile-compiler))
   "Get the debug arg for this compiler."
   (let* ((include-option (nth 0 jde-compile-option-debug))
 	 (selected (nth 1 jde-compile-option-debug))
@@ -805,29 +805,29 @@ If t (or other non-nil non-number) then kill in 2 secs."
 		(if src "vars," "vars")))
 	(if src "source")))))))
 
-(defmethod jde-compile-output-dir-arg ((this jde-compile-compiler))
+(cl-defmethod jde-compile-output-dir-arg ((this jde-compile-compiler))
   "Get the ouput directory arg for this compiler."
     (if (not (string= jde-compile-option-directory ""))
 	(list
 	 "-d"
 	 (jde-normalize-path 'jde-compile-option-directory))))
 
-(defmethod jde-compile-deprecation-arg ((this jde-compile-compiler))
+(cl-defmethod jde-compile-deprecation-arg ((this jde-compile-compiler))
   "Get deprecation argument for this compiler."
     (if jde-compile-option-deprecation
 	(list "-deprecation")))
 
-(defmethod jde-compile-optimize-arg ((this jde-compile-compiler))
+(cl-defmethod jde-compile-optimize-arg ((this jde-compile-compiler))
   "Get optimization argument for this compiler."
     (if jde-compile-option-optimize
 	(list "-O")))
 
-(defmethod jde-compile-depend-arg ((this jde-compile-compiler))
+(cl-defmethod jde-compile-depend-arg ((this jde-compile-compiler))
   "Get dependency-checking argument for this compiler."
   (if jde-compile-option-depend
     (list (car jde-compile-option-depend-switch))))
 
-(defmethod jde-compile-vm-args ((this jde-compile-compiler))
+(cl-defmethod jde-compile-vm-args ((this jde-compile-compiler))
   "Get arguments to pass to the vm used to run this compiler."
     (if jde-compile-option-vm-args
 	(cl-mapcan
@@ -835,38 +835,38 @@ If t (or other non-nil non-number) then kill in 2 secs."
 	   (list (concat "-J" arg)))
 	 jde-compile-option-vm-args)))
 
-(defmethod jde-compile-verbose-arg ((this jde-compile-compiler))
+(cl-defmethod jde-compile-verbose-arg ((this jde-compile-compiler))
   "Get verbosity level argument for this compiler."
     (if jde-compile-option-verbose
 	(list "-verbose")))
 
-(defmethod jde-compile-verbose-path-arg ((this jde-compile-compiler))
+(cl-defmethod jde-compile-verbose-path-arg ((this jde-compile-compiler))
   "Get verbose path argument for this compiler."
     (if jde-compile-option-verbose-path
 	(list "-Xverbosepath")))
 
-(defmethod jde-compile-nowarn-arg ((this jde-compile-compiler))
+(cl-defmethod jde-compile-nowarn-arg ((this jde-compile-compiler))
   "Get no warning argument for this compiler."
     (if jde-compile-option-nowarn
 	(list "-nowarn")))
 
-(defmethod jde-compile-command-line-args ((this jde-compile-compiler))
+(cl-defmethod jde-compile-command-line-args ((this jde-compile-compiler))
   "Get additional command line arguments for this compiler."
 	jde-compile-option-command-line-args)
 
-(defmethod jde-compile-target-arg ((this jde-compile-compiler))
+(cl-defmethod jde-compile-target-arg ((this jde-compile-compiler))
   "Get compiler target argument for this compiler."
     (let ((target (car jde-compile-option-target)))
       (if (not (string= target "default"))
 	  (list "-target" target))))
 
-(defmethod jde-compile-source-arg ((this jde-compile-compiler))
+(cl-defmethod jde-compile-source-arg ((this jde-compile-compiler))
   "Get compiler source argument for this compiler."
   (let ((source (car jde-compile-option-source)))
     (if (not (string= source "default"))
 	(list "-source" source))))
 
-(defmethod jde-compile-get-args ((this jde-compile-compiler))
+(cl-defmethod jde-compile-get-args ((this jde-compile-compiler))
   (append
    (jde-compile-classpath-arg this)
    (jde-compile-sourcepath-arg this)
@@ -887,7 +887,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
    (jde-compile-command-line-args this)))
 
 
-(defmethod jde-compile-run-exec ((this jde-compile-compiler))
+(cl-defmethod jde-compile-run-exec ((this jde-compile-compiler))
   (let* ((outbuf (oref (oref this buffer) buffer))
 	 (compiler-path (oref this :path))
 	 (source-file (file-name-nondirectory buffer-file-name))
@@ -931,7 +931,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 	(setq compilation-in-progress
 	      (cons proc compilation-in-progress))))))
 
-(defmethod jde-compile-run-server ((this jde-compile-compiler))
+(cl-defmethod jde-compile-run-server ((this jde-compile-compiler))
   (let* ((directory-sep-char ?/)
 	   (args
 	    (append
@@ -991,7 +991,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
        (oref this buffer))))
 
 
-(defmethod jde-compile-launch ((this jde-compile-compiler))
+(cl-defmethod jde-compile-launch ((this jde-compile-compiler))
 
   (if (oref this :use-server-p)
       (jde-compile-run-server this)
@@ -999,11 +999,11 @@ If t (or other non-nil non-number) then kill in 2 secs."
 
   (set-buffer-modified-p nil))
 
-(defmethod jde-compile-compile ((this jde-compile-compiler))
+(cl-defmethod jde-compile-compile ((this jde-compile-compiler))
 
   (if (oref this :use-server-p)
-      (oset this buffer (jde-compile-server-buffer "compilation buffer"))
-    (oset this buffer (jde-compile-exec-buffer "compilation buffer")))
+      (oset this buffer (jde-compile-server-buffer))
+    (oset this buffer (jde-compile-exec-buffer)))
 
 
   ;; Pop to compilation buffer.
@@ -1025,10 +1025,10 @@ If t (or other non-nil non-number) then kill in 2 secs."
   ()
   "Class of javac compilers.")
 
-(defmethod initialize-instance ((this jde-compile-javac) &rest fields)
+(cl-defmethod initialize-instance ((this jde-compile-javac) &rest fields)
  ;; Call parent initializer.
 
-  (call-next-method)
+  (cl-call-next-method)
 
   ;; Set compiler name.
   (oset this name "javac")
@@ -1044,15 +1044,15 @@ If t (or other non-nil non-number) then kill in 2 secs."
   ()
   "Class of JDK 1.1 javac compilers.")
 
-(defmethod initialize-instance ((this jde-compile-javac-11) &rest fields)
+(cl-defmethod initialize-instance ((this jde-compile-javac-11) &rest fields)
  ;; Call parent initializer.
 
-  (call-next-method)
+  (cl-call-next-method)
 
   ;; Set compiler version.
   (oset this version "1.1"))
 
-(defmethod jde-compile-debug-arg ((this jde-compile-javac-11))
+(cl-defmethod jde-compile-debug-arg ((this jde-compile-javac-11))
   "Get the debug arg for this compiler."
    (let ((include-option (nth 0 jde-compile-option-debug)))
      (cond
@@ -1061,12 +1061,12 @@ If t (or other non-nil non-number) then kill in 2 secs."
       ((string= include-option "selected")
        (error "JDK 1.1 version of javac does not support selected debug info.")))))
 
-(defmethod jde-compile-depend-arg ((this jde-compile-javac-11))
+(cl-defmethod jde-compile-depend-arg ((this jde-compile-javac-11))
   "Get dependency-checking argument for this compiler."
   (if jde-compile-option-depend
     (list "-depend")))
 
-(defmethod jde-compile-get-args ((this jde-compile-javac-11))
+(cl-defmethod jde-compile-get-args ((this jde-compile-javac-11))
   (append
    (jde-compile-classpath-arg this)
    (jde-compile-encoding-arg this)
@@ -1090,15 +1090,15 @@ If t (or other non-nil non-number) then kill in 2 secs."
   ()
   "Class of JDK 1.2 javac compilers.")
 
-(defmethod initialize-instance ((this jde-compile-javac-12) &rest fields)
+(cl-defmethod initialize-instance ((this jde-compile-javac-12) &rest fields)
  ;; Call parent initializer.
 
-  (call-next-method)
+  (cl-call-next-method)
 
   ;; Set compiler version.
   (oset this version "1.2"))
 
-(defmethod jde-compile-depend-arg ((this jde-compile-javac-12))
+(cl-defmethod jde-compile-depend-arg ((this jde-compile-javac-12))
   "Get dependency-checking argument for this compiler."
   (if jde-compile-option-depend
     (list "-Xdepend")))
@@ -1113,10 +1113,10 @@ If t (or other non-nil non-number) then kill in 2 secs."
   ()
   "Class of JDK 1.3 javac compilers.")
 
-(defmethod initialize-instance ((this jde-compile-javac-13) &rest fields)
+(cl-defmethod initialize-instance ((this jde-compile-javac-13) &rest fields)
  ;; Call parent initializer.
 
-  (call-next-method)
+  (cl-call-next-method)
 
   ;; Set compiler version.
   (oset this version "1.3"))
@@ -1131,10 +1131,10 @@ If t (or other non-nil non-number) then kill in 2 secs."
   ()
   "Class of JDK 1.4 javac compilers.")
 
-(defmethod initialize-instance ((this jde-compile-javac-14) &rest fields)
+(cl-defmethod initialize-instance ((this jde-compile-javac-14) &rest fields)
  ;; Call parent initializer.
 
-  (call-next-method)
+  (cl-call-next-method)
 
   ;; Set compiler version.
   (oset this version "1.4"))
@@ -1149,10 +1149,10 @@ If t (or other non-nil non-number) then kill in 2 secs."
   ()
   "Class of J2SDK 1.5 javac compilers.")
 
-(defmethod initialize-instance ((this jde-compile-javac-15) &rest fields)
+(cl-defmethod initialize-instance ((this jde-compile-javac-15) &rest fields)
  ;; Call parent initializer.
 
-  (call-next-method)
+  (cl-call-next-method)
 
   ;; Set compiler version.
   (oset this version "1.5"))
@@ -1167,15 +1167,15 @@ If t (or other non-nil non-number) then kill in 2 secs."
   ()
   "Class of JDK 1.6 javac compilers.")
 
-(defmethod initialize-instance ((this jde-compile-javac-16) &rest fields)
- ;; Call parent initializer.
+(cl-defmethod initialize-instance ((this jde-compile-javac-16) &rest fields)
+  ;; Call parent initializer.
 
-  (call-next-method)
+  (cl-call-next-method)
 
   ;; Set compiler version.
   (oset this version "1.6"))
 
-(defmethod jde-compile-annotation-processors-arg ((this jde-compile-javac-16))
+(cl-defmethod jde-compile-annotation-processors-arg ((this jde-compile-javac-16))
   "Get the annotation processors argument for this compiler."
   (if jde-compile-option-annotation-processors
     (list
@@ -1184,7 +1184,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 		jde-compile-option-annotation-processors
 		","))))
 
-(defmethod jde-compile-annotation-processing-arg ((this jde-compile-javac-16))
+(cl-defmethod jde-compile-annotation-processing-arg ((this jde-compile-javac-16))
   (let ((option (car jde-compile-option-annotation-processing)))
     (cond
      ((string= option "compile and process annotations")
@@ -1194,7 +1194,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
      ((string= option "process annotations only")
       (list "-proc:only")))))
 
-(defmethod jde-compile-annotation-processor-options-args ((this jde-compile-javac-16))
+(cl-defmethod jde-compile-annotation-processor-options-args ((this jde-compile-javac-16))
     "Get property arguments."
     (mapcar
      (lambda (option)
@@ -1205,7 +1205,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 	   (format "-A%s=%s" key value))))
      jde-compile-option-annotation-processor-options))
 
-(defmethod jde-compile-implicit-arg ((this jde-compile-javac-16))
+(cl-defmethod jde-compile-implicit-arg ((this jde-compile-javac-16))
   (let ((option (car jde-compile-option-implicit)))
     (cond
      ((string= option "Generate and warn")
@@ -1215,7 +1215,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
      ((string= option "Do not generate")
       (list "-implicit:none")))))
 
-(defmethod jde-compile-get-args ((this jde-compile-javac-16))
+(cl-defmethod jde-compile-get-args ((this jde-compile-javac-16))
   (append
    (jde-compile-classpath-arg this)
    (jde-compile-sourcepath-arg this)
@@ -1282,84 +1282,81 @@ If t (or other non-nil non-number) then kill in 2 secs."
   "Class for using the Eclipse java compiler as a JDEE compile server."
 )
 
-(defmethod jde-compile-run-server ((this jde-compile-ejc-server))
-    (let* ((directory-sep-char ?/)
-	   (args
-	    (append
-             (list
-              "-Xemacs"
-              "-noExit"
-;;               "-sourcepath"
-;;               (mapconcat 'identity (jde-expand-wildcards-and-normalize jde-sourcepath) ":")
-              )
-	    (jde-compile-get-args this)))
-	   (source-path
-	    (jde-normalize-path buffer-file-name))
-	   (arg-array (concat "new String[] {\"" source-path "\"")))
+(cl-defmethod jde-compile-run-server ((this jde-compile-ejc-server))
+  (let* ((directory-sep-char ?/)
+	 (args
+	  (append
+	   (list
+	    "-Xemacs"
+	    "-noExit"
+	    ;;               "-sourcepath"
+	    ;;               (mapconcat 'identity (jde-expand-wildcards-and-normalize jde-sourcepath) ":")
+	    )
+	   (jde-compile-get-args this)))
+	 (source-path
+	  (jde-normalize-path buffer-file-name))
+	 (arg-array (concat "new String[] {\"" source-path "\"")))
 
-      (if args
-	  (setq arg-array
-		(concat
-		 arg-array
-		 ","
-		 (mapconcat
-		  (lambda (arg)
-		    (concat "\"" arg "\""))
-		  args
-		  ","))))
+    (if args
+	(setq arg-array
+	      (concat
+	       arg-array
+	       ","
+	       (mapconcat
+		(lambda (arg)
+		  (concat "\"" arg "\""))
+		args
+		","))))
 
-      (setq arg-array (concat arg-array "}"))
+    (setq arg-array (concat arg-array "}"))
 
-      (with-current-buffer (oref (oref this buffer) buffer)
+    (with-current-buffer (oref (oref this buffer) buffer)
 
-	(insert "CompileServer output:\n\n")
+      (insert "CompileServer output:\n\n")
 
-	(let (flag temp)
-	  (setq temp
-	    (mapconcat
-	     (lambda (x)
-	       (if (and flag
-			jde-compile-option-hide-classpath)
-		   (progn
-		     (setq flag nil)
-		     "...")
-		 (if (not (string= x "-classpath"))
-		     x
-		   (progn
-		     (setq flag t)
-		     x)))) args " "))
+      (let (flag temp)
+	(setq temp
+	      (mapconcat
+	       (lambda (x)
+		 (if (and flag
+			  jde-compile-option-hide-classpath)
+		     (progn
+		       (setq flag nil)
+		       "...")
+		   (if (not (string= x "-classpath"))
+		       x
+		     (progn
+		       (setq flag t)
+		       x)))) args " "))
 
-	  (insert temp " "))
-	(insert source-path "\n"))
+	(insert temp " "))
+      (insert source-path "\n"))
 
-      (if (not (jde-bsh-running-p))
-	  (progn
-	    (bsh-launch (oref-default 'jde-bsh the-bsh))
-	    (bsh-eval (oref-default 'jde-bsh the-bsh) (jde-create-prj-values-str))))
-      (bsh-eval (oref-default 'jde-bsh the-bsh)
-                   (format "addClassPath(\"%s\");" (oref this :path)))
-      (bsh-buffer-eval
-       (oref-default 'jde-bsh the-bsh)
-       (concat
-	(format
-         "if ((new org.eclipse.jdt.internal.compiler.batch.Main(new java.io.PrintWriter(System.out), new java.io.PrintWriter(System.out), true, null, null)).compile(%s)) { print (\"0\");} else {print (\"1\");};"
-         arg-array)
-	"\n")
-       (oref this buffer))))
-
-
-
+    (if (not (jde-bsh-running-p))
+	(progn
+	  (bsh-launch (oref-default 'jde-bsh the-bsh))
+	  (bsh-eval (oref-default 'jde-bsh the-bsh) (jde-create-prj-values-str))))
+    (bsh-eval (oref-default 'jde-bsh the-bsh)
+	      (format "addClassPath(\"%s\");" (oref this :path)))
+    (bsh-buffer-eval
+     (oref-default 'jde-bsh the-bsh)
+     (concat
+      (format
+       "if ((new org.eclipse.jdt.internal.compiler.batch.Main(new java.io.PrintWriter(System.out), new java.io.PrintWriter(System.out), true, null, null)).compile(%s)) { print (\"0\");} else {print (\"1\");};"
+       arg-array)
+      "\n")
+     (oref this buffer))))
 
 (defvar jde-compile-javac-compilers
   (list
-   (jde-compile-javac-11 "javac 1.1.x")
-   (jde-compile-javac-12 "javac 1.2.x")
-   (jde-compile-javac-13 "javac 1.3.x")
-   (jde-compile-javac-14 "javac 1.4.x")
-   (jde-compile-javac-15 "javac 1.5.x")
-   (jde-compile-javac-16 "javac 1.6.x")
-   (jde-compile-javac-17 "javac 1.7.x")
-   (jde-compile-javac-18 "javac 1.8.x"))
+   (jde-compile-javac-11)
+   (jde-compile-javac-12)
+   (jde-compile-javac-13)
+   (jde-compile-javac-14)
+   (jde-compile-javac-15)
+   (jde-compile-javac-16)
+   (jde-compile-javac-17)
+   (jde-compile-javac-18))
   "List of supported javac compilers.")
 
 (defun jde-compile-get-javac ()
@@ -1411,7 +1408,6 @@ If t (or other non-nil non-number) then kill in 2 secs."
     (if (string= compiler-path "")
         (error "Cannot find jdt core jar"))
     (jde-compile-ejc-server
-     "Eclipse java compiler server"
      :use-server-p t
      :path compiler-path)))
 
