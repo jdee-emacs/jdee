@@ -14,8 +14,6 @@ public class ExecJavaMojo
     extends org.codehaus.mojo.exec.ExecJavaMojo
 
 {
-    // empty implementation -- we need nothing other than extra dependencies
-    // in the project.
 
     public ExecJavaMojo() {
     }

@@ -1575,13 +1575,11 @@ replaces with slashes."
 
 (defun jdee-get-sourcepath ()
   "Return the source path, either from the repl or `jdee-sourcepath'.  The result is fully expanded."
-  ;; sourcepath not set correctly
-  ;; (let ((sourcepath (jdee-live-eval "(jdee-get-classpath)")))
-  ;;   (or  sourcepath
-        (jdee-expand-wildcards-and-normalize
-         jdee-sourcepath
-         'jdee-sourcepath))
-;; ))
+  (if (jdee-live-nrepl-available)
+      (jdee-live-sync-request:sourcepath)
+    (jdee-expand-wildcards-and-normalize
+     jdee-sourcepath
+     'jdee-sourcepath)))
 
 
 (defvar jdee-entering-java-buffer-hook
@@ -2185,10 +2183,11 @@ Windows versions of both utilities."
 		  (jdee-normalize-path path 'jdee-compile-option-classpath))
 		jdee-compile-option-classpath))
 	      ((mapcar
-            ((looking-at )mbda (path)
-             (jdee-normalize-path path 'jdee-global-classpath))
-            (jdee-get-global-classpath)))
+            (lambda (path)
+               (jdee-normalize-path path 'jdee-global-classpath))
+             (jdee-get-global-classpath)))
 	      (t
+
 	       (list default-directory)))
 	     " ")
 	    0)
@@ -2300,3 +2299,4 @@ buffer, otherwise, return whether or not it is a legitimate buffer."
 (provide 'jdee)
 
 ;;; jdee.el ends here
+

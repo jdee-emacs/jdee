@@ -246,6 +246,21 @@ expression."
           ;; (set-process-filter client eval-filter)
 ;;        (set-process-filter client nil)))))
 
+(defun jdee-live-sync-request:sourcepath ()
+  "Returns a list of the source paths from the nREPL"
+
+  (when (jdee-live-nrepl-available)
+    (cider-ensure-op-supported "sourcepath")
+    (let ((nrepl (jdee-live--get-nrepl)))
+      (nrepl-dict-get
+       (cider-nrepl-send-sync-request
+        (list "op" "sourcepath" "session"
+              (jdee-live-nrepl-get-session nrepl)))
+       "sourcepath"))))
+;; (thread-first (list "op" "sourcepath"
+;;                           "session" (jdee-live-nrepl-get-session nrepl))
+;;         (cider-nrepl-send-sync-request)
+;;         (nrepl-dict-get "sourcepath")))))
 
 
 
