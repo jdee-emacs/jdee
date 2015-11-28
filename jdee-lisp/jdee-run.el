@@ -34,6 +34,7 @@
 (declare-function jdee-normalize-path "jdee" (path &optional symbol))
 (declare-function jdee-java-version "jdee" ())
 (declare-function jdee-get-jdk-prog "jdee" (progname))
+(declare-function jdee-get-global-class "jdee" ())
 
 (defcustom jdee-run-mode-hook nil
   "*List of hook functions run by `jdee-run-mode' (see `run-hooks')."

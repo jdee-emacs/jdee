@@ -1573,13 +1573,39 @@ replaces with slashes."
                  (expand-file-name path)))
              (split-string cp jdee-classpath-separator)))))))
 
+(defun jdee-get-sourcepath-nrepl ()
+  "Provider to get the sourcepath using the nREPL.
+Used as a value of `jdee-sourcepath-providers'"
+  (jdee-live-eval "(jdee.nrepl.nrepl/jdee-get-sourcepath)"))
+
+(defun jdee-get-sourcepath-var ()
+  "Provider to get the sourcepath using the `jdee-sourcepath' variable.
+This is intended as a fallback when there is no build file associated with the project, or the build file is not recognized by jdee.
+Used as a value of `jdee-sourcepath-providers'"
+  (jdee-expand-wildcards-and-normalize
+   jdee-sourcepath
+   'jdee-sourcepath))
+
+
+(defcustom jdee-sourcepath-providers
+  (list #'jdee-get-sourcepath-nrepl
+        #'jdee-get-sourcepath-var)
+  "List of methods to call to determine the sourcepath.
+
+If the method is able to determine the sourcepath, it should
+return a list of absolute paths.  Otherwise, it should return
+nil.
+
+If a method returns non-nil, the remaining methods are not called."
+  :group 'jdee-project
+  :type '(repeat (function :tag "Provider"))
+  :package-version '(jdee "2.4.2"))
+
 (defun jdee-get-sourcepath ()
   "Return the source path, either from the repl or `jdee-sourcepath'.  The result is fully expanded."
-  (if (jdee-live-nrepl-available)
-      (jdee-live-sync-request:sourcepath)
-    (jdee-expand-wildcards-and-normalize
-     jdee-sourcepath
-     'jdee-sourcepath)))
+  (let (sourcepath)
+    (dolist (provider jdee-sourcepath-providers sourcepath)
+            (setq sourcepath (or sourcepath (funcall provider))))))
 
 
 (defvar jdee-entering-java-buffer-hook

@@ -13,16 +13,18 @@
 
 
 (defn jdee-get-sourcepath []
-  "Return the jdee-sourcepath.  If the process that launches the nREPL server
-knows the sourcepath, it can store it in the jdee.sourceRoots property.  If the
-property is not set, returns nil"
-  (concat (.split (System/getProperty  "jdee.sourceRoots")
+  "Return the jdee-sourcepath.
+
+If the process that launches the nREPL server knows the sourcepath, it can store
+it in the jdee.sourceRoots property.  A separate path for test files can be
+stored in jdee.testSourceRoots.  If neither property is not set, returns nil"
+  (concat (.split (System/getProperty "jdee.sourceRoots")
                   java.io.File/pathSeparator)
-          (.split (System/getProperty  "jdee.testSourceRoots")
-               java.io.File/pathSeparator)))
+          (.split (System/getProperty "jdee.testSourceRoots")
+                  java.io.File/pathSeparator)))
 
 
-(defn sourcepath-reply
+(defn- sourcepath-reply
   [{:keys [transport] :as msg}]
   (transport/send
    transport
@@ -57,6 +59,7 @@ property is not set, returns nil"
   "JDE's nREPL handler"
   (apply nrepl-server/default-handler
          (map resolve jdee-middleware)))
+
 
 (defn- find-open-port []
   "Search for an open port"

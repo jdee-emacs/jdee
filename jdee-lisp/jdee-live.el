@@ -242,9 +242,10 @@ expression."
   (let* ((nrepl (jdee-live--get-nrepl))
          (session (jdee-live-nrepl-get-session nrepl)))
     (with-slots (client) nrepl
-      (nrepl-sync-request:eval statement client session))))
-          ;; (set-process-filter client eval-filter)
-;;        (set-process-filter client nil)))))
+      (nrepl-dict-get
+       (nrepl-sync-request:eval statement client session)
+       "value"))))
+
 
 (defun jdee-live-sync-request:sourcepath ()
   "Returns a list of the source paths from the nREPL"
