@@ -47,11 +47,77 @@ stored in jdee.testSourceRoots.  If neither property is not set, returns nil"
    {:doc "Obtain a list of entries in the Java sourcepath."
     :returns {"sourcepath" "A list of the Java sourcepath entries."}}}})
 
+(defn- jdee-get-parent-path []
+  "Return the path to the parent, if it exists.
+
+If the process that launches the nREPL server knows the parent location, it can
+store it in the jdee.parentPath property.  If the property is not set, returns
+nil"
+  (System/getProperty "jdee.parentPath"))
+
+
+(defn- parent-path-reply
+  [{:keys [transport] :as msg}]
+  (transport/send
+   transport
+   (response-for msg
+                 :parent-path (jdee-get-parent-path)
+                 :status :done)))
+
+(defn wrap-parent-path
+  "Middleware that provides the parent-path."
+  [handler]
+  (fn [{:keys [op] :as msg}]
+    (if (= "parent-path" op)
+      (parent-path-reply msg)
+      (handler msg))))
+
+(set-descriptor!
+ #'wrap-parent-path
+ {:handles
+  {"parent-path"
+   {:doc "Obtain a the path to the parent module."
+    :returns {"parent-path" "The parent module path."}}}})
+
+(defn- jdee-get-child-paths []
+  "Return the path to the children, if any exist.
+
+If the process that launches the nREPL server knows the child location(s), it
+can store it in the jdee.childPaths property.  If the property is not set,
+returns nil"
+  (System/getProperty "jdee.childPaths"))
+
+
+(defn- child-paths-reply
+  [{:keys [transport] :as msg}]
+  (transport/send
+   transport
+   (response-for msg
+                 :child-paths (jdee-get-child-paths)
+                 :status :done)))
+
+(defn wrap-child-paths
+  "Middleware that provides the child-paths."
+  [handler]
+  (fn [{:keys [op] :as msg}]
+    (if (= "child-paths" op)
+      (child-paths-reply msg)
+      (handler msg))))
+
+(set-descriptor!
+ #'wrap-child-paths
+ {:handles
+  {"child-paths"
+   {:doc "Obtain the paths to the child modules."
+    :returns {"child-paths" "The child module paths."}}}})
+
 (def jdee-middleware
   "A vector of symbols for all the JDEE middleware"
   '[cider.nrepl.middleware.classpath/wrap-classpath
     cider.nrepl.middleware.stacktrace/wrap-stacktrace
     jdee.nrepl.nrepl/wrap-sourcepath
+    jdee.nrepl.nrepl/wrap-parent-path
+    jdee.nrepl.nrepl/wrap-child-paths
     ]
   )
 
