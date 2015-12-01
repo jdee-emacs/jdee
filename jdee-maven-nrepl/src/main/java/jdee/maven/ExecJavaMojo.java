@@ -1,6 +1,7 @@
 package jdee.maven;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -22,6 +23,14 @@ public class ExecJavaMojo
     public void execute() throws MojoExecutionException, MojoFailureException {
         System.setProperty("jdee.sourceRoots", asPath(compileSourceRoots));
         System.setProperty("jdee.testSourceRoots", asPath(testCompileSourceRoots));
+        if ((null != parent) &&
+            (null != parent.getBasedir())) {
+            System.out.println("parent: " + parent +
+                               ", basedir: " + parent.getBasedir());
+            System.setProperty("jdee.parentPath",
+                               parent.getBasedir().getAbsolutePath());
+        }
+        System.setProperty("jdee.childPaths", asPath(childPaths));
 
         super.execute();
     }
@@ -41,6 +50,21 @@ public class ExecJavaMojo
     }
 
     /**
+     * Convert the list into a path
+     */
+    private String asPathFromFiles(List<File> pathList) {
+        System.out.println("asPathFromFiles(" + pathList + ")");
+        for (Object file: pathList) {
+            System.out.println(" class: " + file.getClass().getName());
+        }
+        List<String> names = new ArrayList<String>(pathList.size());
+        for (File file: pathList) {
+            names.add(file.getAbsolutePath());
+        }
+        return asPath(names);
+    }
+
+    /**
      * The source directories containing the sources to be processed.
      *
      */
@@ -54,6 +78,12 @@ public class ExecJavaMojo
     @Parameter(defaultValue="${project.testCompileSourceRoots}", readonly=true)
     private List<String> testCompileSourceRoots;
 
-
+    @Parameter(defaultValue="${project.parent}", readonly=true)
+    private MavenProject parent;
+    /**
+     * Path to child projects
+     */
+    @Parameter(defaultValue="${project.modules}", readonly=true)
+    private List<String> childPaths;
 }
 
