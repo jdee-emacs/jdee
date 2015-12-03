@@ -1490,20 +1490,24 @@ existing paths are already normalized."
 (defun jdee-build-classpath (paths &optional symbol quote-path-p)
   "Builds a classpath from PATHS.  PATHS is a either list of paths or
 a symbol whose value is a list of paths, in which case the optional
-arg SYMBOL is unnecessary. If QUOTE-PATH-P is nonnil, quote paths
-that contain spaces."
-  (if (symbolp paths)
-      (setq symbol paths
-	    paths (symbol-value symbol)))
+arg SYMBOL is unnecessary. QUOTE-PATH-P is no longer used"
+  (if (or (eq paths 'jdee-global-classpath)
+          (eq paths jdee-global-classpath))
+      (setq symbol 'jdee-global-classpath
+            paths (jdee-get-global-classpath))
+    (if (symbolp paths)
+        (setq symbol paths
+              paths (symbol-value symbol))))
+
   (mapconcat
    (lambda (path)
      path)
-    (jdee-expand-classpath
+   (jdee-expand-classpath
      (mapcar
-      (lambda (path)
-	(jdee-normalize-path path symbol))
+     (lambda (path)
+       (jdee-normalize-path path symbol))
       paths)
-     symbol)
+    symbol)
    jdee-classpath-separator))
 
 
