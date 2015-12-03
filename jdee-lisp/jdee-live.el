@@ -227,17 +227,32 @@ expression."
        "value"))))
 
 
+(defun jdee-live--sync-request (op &optional name)
+  "Returns the result of a named request OP on the nREPL.  The result is extracted with the key NAME, which defaults to OP"
+
+  (when (jdee-live-nrepl-available)
+    (cider-ensure-op-supported op)
+    (let ((nrepl (jdee-live--get-nrepl)))
+      (thread-first (list "op" op
+                          "session" (jdee-live-nrepl-get-session nrepl))
+        (cider-nrepl-send-sync-request)
+        (nrepl-dict-get (or name op))))))
+
 (defun jdee-live-sync-request:sourcepath ()
   "Returns a list of the source paths from the nREPL"
 
-  (when (jdee-live-nrepl-available)
-    (cider-ensure-op-supported "sourcepath")
-    (let ((nrepl (jdee-live--get-nrepl)))
-      (thread-first (list "op" "sourcepath"
-                          "session" (jdee-live-nrepl-get-session nrepl))
-        (cider-nrepl-send-sync-request)
-        (nrepl-dict-get "sourcepath")))))
+  (jdee-live--sync-request "sourcepath"))
 
+(defun jdee-live-sync-request:parent-path ()
+  "Returns the path to the parent project from the nREPL.
+Returns nil if there is no parent"
+
+  (jdee-live--sync-request "parent-path"))
+
+(defun jdee-live-sync-request:child-paths ()
+  "Returns a list of the child paths from the nREPL"
+
+  (jdee-live--sync-request "child-paths"))
 
 
 

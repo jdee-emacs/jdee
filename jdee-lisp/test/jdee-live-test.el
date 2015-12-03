@@ -87,5 +87,34 @@ the file."
       (should (cl-find-if (lambda (path) (string-match "project-1-2.0.jar" path))
                           classpath)))))
 
+(ert-deftest test-jdee-live-parent-child-in-child ()
+  "Test that we find the parent and no children when in a project with only a parent project"
+  (with-apparent-test-file "project-2/src/main/java/org/jdee/Project2.java"
+    (let ((parent (jdee-live-sync-request:parent-path))
+          (children (jdee-live-sync-request:child-paths)))
+      (should (string-equal (concat parent "/") jdee-live-test-dir))
+      (should-not children))))
+
+(ert-deftest test-jdee-live-parent-child-in-parent ()
+  "Test that we find no parent and the children when in a project with only a child projects"
+  (with-apparent-test-file "pom.xml"
+    (let ((parent (jdee-live-sync-request:parent-path))
+          (children (jdee-live-sync-request:child-paths)))
+      (should-not parent)
+      (should (member "project-1" children))
+      (should (member "project-2" children))
+      (should (eq 2 (length children))))))
+
+(ert-deftest test-jdee-live-sourcepath-multi-module ()
+  "Test that we find all the source paths in a multi-module build"
+  (with-apparent-test-file "project-2/src/main/java/org/jdee/Project2.java"
+                           (let ((source-paths (jdee-get-sourcepath-nrepl)))
+                             (should (listp source-paths))
+                             (should (eq 4 (length source-paths)))
+                             (dolist (type ("main" "test"))
+                                     (dolist (project ("1" "2"))
+                                             (should (member (concat jdee-live-test-dir "project-" project "/src/" type "/java")
+                                                             source-paths)))))))
+
 (provide 'jdee-live-test)
 ;;; jdee-live-test.el ends here

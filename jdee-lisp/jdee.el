@@ -1573,10 +1573,33 @@ replaces with slashes."
                  (expand-file-name path)))
              (split-string cp jdee-classpath-separator)))))))
 
-(defun jdee-get-sourcepath-nrepl ()
-  "Provider to get the sourcepath using the nREPL.
+(defun jdee-get-sourcepath-this-nrepl (dir)
+  "Provider to get the sourcepath using the nREPL for DIR.
 Used as a value of `jdee-sourcepath-providers'"
-  (jdee-live-sync-request:sourcepath))
+  (let ((buffer-file-name dir))
+    (jdee-live-sync-request:sourcepath)))
+
+(defun jdee-get-sourcepath-nrepl-1 (dir already-checked)
+  "Get the the sourcepath based on DIR, using the nREPL.
+It also asks the parent and child nREPLs.  ALREADY-CHECKED is a list of directories that have already been checked."
+  (let ((buffer-file-name dir)
+        (also-checked (append (list dir) already-checked)))
+    (append (jdee-get-sourcepath-this-nrepl dir)
+            (mapcar (lambda (child)
+                      (jdee-get-sourcepath-nrepl-1
+                       (expand-file-name (concat dir child)) also-checked))
+                    (jdee-live-sync-request:child-paths))
+            (-when-let (parent (jdee-live-sync-request:parent-path))
+              (jdee-get-sourcepath-nrepl-1 parent also-checked)))))
+
+
+(defun jdee-get-sourcepath-nrepl ()
+  "Provider to the the sourcepath using the nREPL.
+It also asks the parent and child nREPLs."
+  (jdee-get-sourcepath-nrepl-1
+   (jdee-live-project-directory-for (file-name-directory buffer-file-name)) nil))
+
+
 
 (defun jdee-get-sourcepath-var ()
   "Provider to get the sourcepath using the `jdee-sourcepath' variable.
