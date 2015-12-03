@@ -8,7 +8,7 @@
              classpath
              stacktrace]
             [clojure.java.io :as io])
-  (:import (java.net ServerSocket) (java.io IOException)))
+  (:import (java.net ServerSocket) (java.io IOException File)))
 
 
 
@@ -85,7 +85,13 @@ nil"
 If the process that launches the nREPL server knows the child location(s), it
 can store it in the jdee.childPaths property.  If the property is not set,
 returns nil"
-  (System/getProperty "jdee.childPaths"))
+
+  ;; The value is stored as a colon separated path, since that is the best way
+  ;; to put a list into a string.
+  (when-let [paths (System/getProperty "jdee.childPaths")]
+    (when (> (.length paths) 0)
+      (seq (.split paths File/pathSeparator)))))
+
 
 
 (defn- child-paths-reply
