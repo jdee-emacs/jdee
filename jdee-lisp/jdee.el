@@ -1576,7 +1576,7 @@ replaces with slashes."
 (defun jdee-get-sourcepath-nrepl ()
   "Provider to get the sourcepath using the nREPL.
 Used as a value of `jdee-sourcepath-providers'"
-  (jdee-live-eval "(jdee.nrepl.nrepl/jdee-get-sourcepath)"))
+  (jdee-live-sync-request:sourcepath))
 
 (defun jdee-get-sourcepath-var ()
   "Provider to get the sourcepath using the `jdee-sourcepath' variable.
