@@ -25,4 +25,7 @@ jdee-live:
 jdee-lisp:
 	$(MAKE) -C jdee-lisp build
 
-.PHONY: jdee-nrepl jdee-maven-nrepl jdee-live jdee-sample jdee-lisp
+.PHONY: jdee-nrepl jdee-maven-nrepl jdee-live jdee-sample jdee-lisp test
+
+test:
+	$(MAKE) -C jdee-lisp test

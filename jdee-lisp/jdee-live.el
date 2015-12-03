@@ -9,9 +9,9 @@
 
 ;;; Code:
 ;; The contents of this file are subject to the GPL License, Version 3.0.
-                                        ;(require 'cider-client)
 (require 'cider)
 (require 'load-relative)
+(require 'dash)
 
 (defconst jdee-live-version "0.1-SNAPSHOT")
 
@@ -20,7 +20,7 @@
   :group 'jdee
   :prefix "jdee-live-")
 
-(defcustom jdee-live-timeout 10
+(defcustom jdee-live-timeout 20
   "Time (in seconds) to wait for a response from the nREPL."
   :type 'number
   :group 'jdee-live
@@ -158,43 +158,23 @@ Stops the associated processes and removes it from the nREPL registry."
                (process-live-p server))
       (set-process-filter server nil))
 
-    ;; Gracefully shutdown the client.  Suppress asking the user about killing
-    ;; the server. The complicated lets are to rebind y-or-n-p with a dynamic
-    ;; binding.
-    (let ((orig-y-or-n-p (symbol-function 'y-or-n-p)))
-      (cl-letf
-          (((symbol-function 'y-or-n-p)
-            (lambda (prompt)
-              (if  (string-match "Also kill server process and buffer?" prompt)
-                  t
-                ;; For questions other than the one we expect, call the original function
-                (funcall orig-y-or-n-p prompt)))))
+    ;; Gracefully shutdown the client.
+    (let ((client-proc
+           (and (slot-boundp this 'client)
+                client
+                (get-buffer-process client))))
+      (when (process-live-p client-proc)
+        (cider-quit)
+        (kill-buffer client)))
 
-        (let ((client-proc
-               (and (slot-boundp this 'client)
-                    client
-                    (get-buffer-process client))))
-          (when (process-live-p client-proc)
-            (unwind-protect
-                ;; Don't wait for a response.  The process will be dead by the
-                ;; time it would respond.
-                (nrepl-request:eval "(System/exit 0)"
-                                    #'ignore
-                                    client
-                                    (jdee-live-nrepl-get-session this))
-              ;; Ungracefully shut it down if there is an error
-              (message "Unable to gracefully shutdown client")
-              (when (process-live-p client-proc)
-                (signal-process client-proc 'kill))))))
-      )
 
     ;; Kill the server process
-    (unwind-protect
-        (when (and (slot-boundp this 'server)
-                   (processp server)
-                   (process-live-p server))
-          (signal-process server 'kill))
-      (message "Unable to kill server"))
+    ;; (unwind-protect
+    ;;     (when (and (slot-boundp this 'server)
+    ;;                (processp server)
+    ;;                (process-live-p server))
+    ;;       (signal-process server 'kill))
+    ;;   (message "Unable to kill server"))
 
     ;; Remove it from the lookup table
     (setq jdee-live-nrepl-alist
@@ -247,21 +227,32 @@ expression."
        "value"))))
 
 
+(defun jdee-live--sync-request (op &optional name)
+  "Returns the result of a named request OP on the nREPL.  The result is extracted with the key NAME, which defaults to OP"
+
+  (when (jdee-live-nrepl-available)
+    (cider-ensure-op-supported op)
+    (let ((nrepl (jdee-live--get-nrepl)))
+      (thread-first (list "op" op
+                          "session" (jdee-live-nrepl-get-session nrepl))
+        (cider-nrepl-send-sync-request)
+        (nrepl-dict-get (or name op))))))
+
 (defun jdee-live-sync-request:sourcepath ()
   "Returns a list of the source paths from the nREPL"
 
-  (when (jdee-live-nrepl-available)
-    (cider-ensure-op-supported "sourcepath")
-    (let ((nrepl (jdee-live--get-nrepl)))
-      (nrepl-dict-get
-       (cider-nrepl-send-sync-request
-        (list "op" "sourcepath" "session"
-              (jdee-live-nrepl-get-session nrepl)))
-       "sourcepath"))))
-;; (thread-first (list "op" "sourcepath"
-;;                           "session" (jdee-live-nrepl-get-session nrepl))
-;;         (cider-nrepl-send-sync-request)
-;;         (nrepl-dict-get "sourcepath")))))
+  (jdee-live--sync-request "sourcepath"))
+
+(defun jdee-live-sync-request:parent-path ()
+  "Returns the path to the parent project from the nREPL.
+Returns nil if there is no parent"
+
+  (jdee-live--sync-request "parent-path"))
+
+(defun jdee-live-sync-request:child-paths ()
+  "Returns a list of the child paths from the nREPL"
+
+  (jdee-live--sync-request "child-paths"))
 
 
 
