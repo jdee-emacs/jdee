@@ -1577,31 +1577,43 @@ replaces with slashes."
                  (expand-file-name path)))
              (split-string cp jdee-classpath-separator)))))))
 
-(defun jdee-get-sourcepath-this-nrepl (dir)
-  "Provider to get the sourcepath using the nREPL for DIR.
-Used as a value of `jdee-sourcepath-providers'"
-  (let ((buffer-file-name dir))
-    (jdee-live-sync-request:sourcepath)))
-
 (defun jdee-get-sourcepath-nrepl-1 (dir already-checked)
   "Get the the sourcepath based on DIR, using the nREPL.
 It also asks the parent and child nREPLs.  ALREADY-CHECKED is a list of directories that have already been checked."
-  (let ((buffer-file-name dir)
-        (also-checked (append (list dir) already-checked)))
-    (append (jdee-get-sourcepath-this-nrepl dir)
-            (mapcar (lambda (child)
-                      (jdee-get-sourcepath-nrepl-1
-                       (expand-file-name (concat dir child)) also-checked))
-                    (jdee-live-sync-request:child-paths))
-            (-when-let (parent (jdee-live-sync-request:parent-path))
-              (jdee-get-sourcepath-nrepl-1 parent also-checked)))))
+  ;; Ensure directory name ends with /
+  (let ((debug-trace-prefix
+         (if (boundp 'debug-trace-prefix)
+             (concat "." debug-trace-prefix)
+           ".")))
+  (message "%sjdee-get-sourcepath-nrepl-1 %s %s" debug-trace-prefix dir already-checked)
+  (unless (string-match "/$" dir)
+    (setq dir (concat dir "/")))
+  ;; If we already checked this directory, return nil to stop the recursion.
+  (unless (member dir already-checked)
+    ;; Bind buffer-file-name so that cider-current-dir thinks we are in this
+    ;; directory.  Actually name does not matter, but it needs to be something
+    ;; that can be removed.
+    (let ((buffer-file-name (expand-file-name "SomeFile.java" dir))
+          (also-checked (append (list dir) already-checked)))
+      ;; Build up the source path from this directory
+      (append (jdee-live-sync-request:sourcepath)
+              ;; and the children
+              (mapcar (lambda (child)
+                        (jdee-get-sourcepath-nrepl-1
+                         (expand-file-name child dir) also-checked))
+                      (jdee-live-sync-request:child-paths))
+              ;; and the parent.
+              (-when-let (parent (jdee-live-sync-request:parent-path))
+                (jdee-get-sourcepath-nrepl-1 parent also-checked)))))
+  (message "%sjdee-get-sourcepath-nrepl-1 %s %s done" debug-trace-prefix dir already-checked))
+)
 
 
 (defun jdee-get-sourcepath-nrepl ()
   "Provider to the the sourcepath using the nREPL.
 It also asks the parent and child nREPLs."
   (jdee-get-sourcepath-nrepl-1
-   (jdee-live-project-directory-for (file-name-directory buffer-file-name)) nil))
+   (expand-file-name (jdee-live-project-directory-for buffer-file-name)) nil))
 
 
 

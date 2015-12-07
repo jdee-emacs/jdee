@@ -111,8 +111,8 @@ the file."
                            (let ((source-paths (jdee-get-sourcepath-nrepl)))
                              (should (listp source-paths))
                              (should (eq 4 (length source-paths)))
-                             (dolist (type ("main" "test"))
-                                     (dolist (project ("1" "2"))
+                             (dolist (type '("main" "test"))
+                                     (dolist (project '("1" "2"))
                                              (should (member (concat jdee-live-test-dir "project-" project "/src/" type "/java")
                                                              source-paths)))))))
 

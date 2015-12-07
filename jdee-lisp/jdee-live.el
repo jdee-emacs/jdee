@@ -124,6 +124,7 @@ Sets fields to null and adds it to the nREPL registry."
                  (lambda (client-buf)
                    (oset this client client-buf)
                    (oset this response 'connected)))))
+          (message "Starting nrepl server with mvn for %s" project-dir)
           (setq server serv-proc)
           ;; FIXME: clojure:nrepl drops strange strings out!
 
