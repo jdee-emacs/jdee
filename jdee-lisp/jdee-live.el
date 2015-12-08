@@ -234,10 +234,11 @@ expression."
   (when (jdee-live-nrepl-available)
     (cider-ensure-op-supported op)
     (let ((nrepl (jdee-live--get-nrepl)))
-      (thread-first (list "op" op
-                          "session" (jdee-live-nrepl-get-session nrepl))
-        (cider-nrepl-send-sync-request)
-        (nrepl-dict-get (or name op))))))
+      (with-slots (client) nrepl
+        (thread-first (list "op" op
+                            "session" (jdee-live-nrepl-get-session nrepl))
+          (cider-nrepl-send-sync-request client)
+          (nrepl-dict-get (or name op)))))))
 
 (defun jdee-live-sync-request:sourcepath ()
   "Returns a list of the source paths from the nREPL"

@@ -1581,11 +1581,6 @@ replaces with slashes."
   "Get the the sourcepath based on DIR, using the nREPL.
 It also asks the parent and child nREPLs.  ALREADY-CHECKED is a list of directories that have already been checked."
   ;; Ensure directory name ends with /
-  (let ((debug-trace-prefix
-         (if (boundp 'debug-trace-prefix)
-             (concat "." debug-trace-prefix)
-           ".")))
-  (message "%sjdee-get-sourcepath-nrepl-1 %s %s" debug-trace-prefix dir already-checked)
   (unless (string-match "/$" dir)
     (setq dir (concat dir "/")))
   ;; If we already checked this directory, return nil to stop the recursion.
@@ -1594,18 +1589,20 @@ It also asks the parent and child nREPLs.  ALREADY-CHECKED is a list of director
     ;; directory.  Actually name does not matter, but it needs to be something
     ;; that can be removed.
     (let ((buffer-file-name (expand-file-name "SomeFile.java" dir))
+          (default-directory dir)
           (also-checked (append (list dir) already-checked)))
       ;; Build up the source path from this directory
       (append (jdee-live-sync-request:sourcepath)
-              ;; and the children
-              (mapcar (lambda (child)
+              ;; and the children.  This returns a list of lists, so we need to
+              ;; flatten it.
+              (apply #'append
+                     (mapcar (lambda (child)
                         (jdee-get-sourcepath-nrepl-1
                          (expand-file-name child dir) also-checked))
-                      (jdee-live-sync-request:child-paths))
+                      (jdee-live-sync-request:child-paths)))
               ;; and the parent.
               (-when-let (parent (jdee-live-sync-request:parent-path))
                 (jdee-get-sourcepath-nrepl-1 parent also-checked)))))
-  (message "%sjdee-get-sourcepath-nrepl-1 %s %s done" debug-trace-prefix dir already-checked))
 )
 
 
