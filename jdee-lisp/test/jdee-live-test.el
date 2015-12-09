@@ -84,6 +84,7 @@ the file."
     (let ((classpath (jdee-get-global-classpath)))
       (should classpath)
       ;; Should contain the project-1 jar
+      (message "classpath: %s" classpath)
       (should (cl-find-if (lambda (path) (string-match "project-1-2.0.jar" path))
                           classpath)))))
 
@@ -110,7 +111,9 @@ the file."
   (with-apparent-test-file "project-2/src/main/java/org/jdee/Project2.java"
                            (let ((source-paths (jdee-get-sourcepath-nrepl)))
                              (should (listp source-paths))
-                             (should (eq 4 (length source-paths)))
+                             ;; Should have main and test for project-1, project-2 and
+                             ;; the root
+                             (should (eq 6 (length source-paths)))
                              (dolist (type '("main" "test"))
                                      (dolist (project '("1" "2"))
                                              (should (member (concat jdee-live-test-dir "project-" project "/src/" type "/java")
