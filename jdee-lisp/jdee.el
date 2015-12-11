@@ -1609,8 +1609,11 @@ It also asks the parent and child nREPLs.  ALREADY-CHECKED is a list of director
 (defun jdee-get-sourcepath-nrepl ()
   "Provider to the the sourcepath using the nREPL.
 It also asks the parent and child nREPLs."
-  (jdee-get-sourcepath-nrepl-1
-   (expand-file-name (jdee-live-project-directory-for buffer-file-name)) nil))
+  (let ((project-dir (jdee-live-project-directory-for buffer-file-name)))
+    ;; If we cannot find the project directory, then this won't work
+    (when project-dir
+      (jdee-get-sourcepath-nrepl-1
+       (expand-file-name project-dir) nil))))
 
 
 
