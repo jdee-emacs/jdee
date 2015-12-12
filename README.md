@@ -1,5 +1,4 @@
 [![MELPA](http://melpa.org/packages/jdee-badge.svg)](http://melpa.org/#/jdee)
-[![MELPA Stable](http://stable.melpa.org/packages/jdee-badge.svg)](http://stable.melpa.org/#/jdee)
 [![Build Status](https://travis-ci.org/jdee-emacs/jdee.png?branch=master)](https://travis-ci.org/jdee-emacs/jdee)
 
 # JDEE
