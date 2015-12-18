@@ -613,21 +613,21 @@ to the string form required by the vm."
 (defmethod bsh-eval-lisp-output ((this bsh))
   (if (not (string= (oref this lisp-output) ""))
       (cl-flet ((format-error-msg (error-symbols)
-	       (mapconcat (lambda (s) (symbol-name s)) error-symbols " ")))
+                                  (mapconcat (lambda (s) (symbol-name s)) error-symbols " ")))
 	(condition-case eval-error
 	    (eval (read (oref this lisp-output)))
 	  (error
-	    (message "Error evaluating Lisp result of Java expression evaluation.")
-	    (message "  Java expression: %s." (oref this java-expr))
-	    (message "  Java evaluation result: %s." (oref this lisp-output))
-	    ;; The following causes an unreadable object error on XEmacs when
-	    ;; trying to load the byte-compiled file:
-	    ;;
-	    ;; (message "  Error from evaluating result as Lisp: %s"
-	    ;;	  (mapconcat (lambda (s) (symbol-name s)) eval-error " ")
-	    (message "  Error from evaluating result as Lisp: %s"
-		     (format-error-msg eval-error))
-	    (error "Error evaluating Java expresson. See *Messages* buffer."))))
+           (message "Error evaluating Lisp result of Java expression evaluation.")
+           (message "  Java expression: %s." (oref this java-expr))
+           (message "  Java evaluation result: %s." (oref this lisp-output))
+           ;; The following causes an unreadable object error on XEmacs when
+           ;; trying to load the byte-compiled file:
+           ;;
+           ;; (message "  Error from evaluating result as Lisp: %s"
+           ;;	  (mapconcat (lambda (s) (symbol-name s)) eval-error " ")
+           (message "  Error from evaluating result as Lisp: %s"
+                    (format-error-msg eval-error))
+           (error "Error evaluating Java expresson. See *Messages* buffer."))))
     (progn
       (message "bsh-eval-r error: Beanshell result is null. Cannot evaluate.")
       (message "  Expression: %s" (oref this java-expr)))))
