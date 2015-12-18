@@ -523,7 +523,8 @@ to the string form required by the vm."
 
   (cl-assert
    (not (string= "" jdee-server-dir))
-   nil "Point `jdee-server-dir' to dir with JDEE jars.")
+   nil (concat "Customize `jdee-server-dir' to point to dir with JDEE jars."
+               " See http://github.com/jdee-emacs/jdee-server"))
 
   (cl-assert
    (directory-files jdee-server-dir t ".*\.jar")
