@@ -214,7 +214,7 @@ FILENAME must be created by `jdee-xref-pickle-hash'"
 (defun jdee-xref-make-xref-db ()
   "Create a database of caller to callee (and the reverse) from the
 classes in `jdee-built-class-path' and store the data in the location
-specified by `jdee-xref-db-file'"
+specified by `jdee-xref-db-base-directory'"
   (interactive)
   (when (null jdee-xref-db-base-directory)
     (error "The variable `jdee-xref-db-base-directory' must be defined to make a caller database"))
@@ -223,8 +223,8 @@ specified by `jdee-xref-db-file'"
   (when (null jdee-xref-store-prefixes)
     (error "The variable `jdee-xref-store-prefixes' must be defined to make a caller database"))
   (unless (file-exists-p (jdee-xref-get-db-directory))
-    (make-directory (jdee-xref-get-db-directory)))
-  (jdee-xref-update-xref-db )
+    (make-directory (jdee-xref-get-db-directory) t))
+  (jdee-xref-update-xref-db)
   (message "Finished creating xref database")
   (add-hook 'after-save-hook 'jdee-xref-file-saved))
 
