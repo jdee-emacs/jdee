@@ -679,12 +679,12 @@ while. If it does, you might want to consider increasing
 			(jdee-xref-class-and-token-to-signature
 			 (jdee-xref-get-current-class) token))))))
       (let ((uncalled-methods
-             (cl-mapcan 'get-unused-string
+             (cl-mapcan #'get-unused-string
                         (semantic-brute-find-tag-by-class 'function
                                                           (current-buffer)
                                                           t)))
             (unreferenced-variables
-             (cl-mapcan 'get-unused-string
+             (cl-mapcan #'get-unused-string
                         (cl-mapcan 'jdee-xref-get-class-variables
                                    (semantic-brute-find-tag-by-type "class"
                                                                     (current-buffer)
