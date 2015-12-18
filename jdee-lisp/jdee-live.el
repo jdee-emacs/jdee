@@ -26,6 +26,13 @@
   :group 'jdee-live
   :package-version '("jdee-live" . "0.1"))
 
+(defcustom jdee-live-mvn-args nil
+  "Additional args to pass to mvn when using mvn to start the nREPL.
+This should be a list of strings.  No quoting is done of the values."
+  :type '(repeat (string :tag "Command line arg"))
+  :group 'jdee-live
+  :package-version '("jdee-live" . "0.1"))
+
 (defvar jdee-live-nrepl-alist nil
   "Mapping from pom files to the corresponding nREPL objects.")
 
@@ -118,7 +125,8 @@ Sets fields to null and adds it to the nREPL registry."
                   (concat "mvn jdee:jdee-maven-nrepl:java "
                           "-Dexec.mainClass=\"clojure.main\""
                           " -Dexec.args=\"%s\""
-                          " -Dexec.includePluginsDependencies=true"
+                          " -Dexec.includePluginsDependencies=true "
+                          (mapconcat #'identity jdee-live-mvn-args " ")
                           )
                   jdee-live-launch-script)
                  (lambda (client-buf)
