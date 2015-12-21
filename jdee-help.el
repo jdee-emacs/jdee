@@ -310,7 +310,9 @@ This defaults to false."
 (defmethod jdee-jdurl-resolver-url-exists ((this jdee-jdurl-w3-resolver) url)
   (require 'url-http)
   (if (fboundp 'url-http-file-exists-p)
-      (url-http-file-exists-p url)
+      (condition-case err
+          (url-http-file-exists-p (jdee-url-name url))
+        (error nil))
     (error "Cannot find url-http-file-exists-p function")))
 
 
