@@ -11,6 +11,8 @@ Java applications.
 
 As of 2015-07-13, https://github.com/jdee-emacs/jdee/ is the primary source repository.
 
+See [CHANGES.md](CHANGES.md) for migration instructions.
+
 Additional information can be found at http://jdee.sourceforge.net/rootpage.html and at https://github.com/jdee-emacs/jdee/wiki
 
 ## Requirements
