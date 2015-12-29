@@ -212,7 +212,7 @@ FILENAME must be created by `jdee-xref-pickle-hash'"
 (defun jdee-xref-make-xref-db ()
   "Create a database of caller to callee (and the reverse) from the
 classes in `jdee-built-class-path' and store the data in the location
-specified by `jdee-xref-db-file'"
+specified by `jdee-xref-db-base-directory'"
   (interactive)
   (when (null jdee-xref-db-base-directory)
     (error "The variable `jdee-xref-db-base-directory' must be defined to make a caller database"))
@@ -221,8 +221,8 @@ specified by `jdee-xref-db-file'"
   (when (null jdee-xref-store-prefixes)
     (error "The variable `jdee-xref-store-prefixes' must be defined to make a caller database"))
   (unless (file-exists-p (jdee-xref-get-db-directory))
-    (make-directory (jdee-xref-get-db-directory)))
-  (jdee-xref-update-xref-db )
+    (make-directory (jdee-xref-get-db-directory) t))
+  (jdee-xref-update-xref-db)
   (message "Finished creating xref database")
   (add-hook 'after-save-hook 'jdee-xref-file-saved))
 
@@ -676,38 +676,38 @@ while. If it does, you might want to consider increasing
 		 (list (jdee-xref-signature-to-string
 			(jdee-xref-class-and-token-to-signature
 			 (jdee-xref-get-current-class) token))))))
-    (let ((uncalled-methods
-	   (cl-mapcan 'get-unused-string
-		      (semantic-brute-find-tag-by-class 'function
-							(current-buffer)
-							t)))
-	  (unreferenced-variables
-	   (cl-mapcan 'get-unused-string
-		      (cl-mapcan 'jdee-xref-get-class-variables
-				 (semantic-brute-find-tag-by-type "class"
-								  (current-buffer)
-								  t))))
-	  (outbuf (get-buffer-create "Unreferenced Methods and Members")))
-      (switch-to-buffer outbuf)
-      (erase-buffer)
-      (insert "The following is a list of methods and members that are\n")
-      (insert "uncalled directly by any Java classes that are in the\n")
-      (insert "following locations: \n")
-      (insert (mapconcat (lambda (x) x) jdee-built-class-path ", "))
-      (newline)
-      (newline)
-      (if uncalled-methods
-	(progn
-	  (insert "Unreferenced methods:\n")
-	  (insert (mapconcat (lambda (x) x) uncalled-methods "\n")))
-	(insert "There are no uncalled methods\n\n"))
-      (if unreferenced-variables
-	(progn
-	  (insert "\n\nUnreferenced class variables:\n")
-	  (insert (mapconcat (lambda (x) x) unreferenced-variables "\n")))
-	(insert "\n\nThere are no unreferenced variables\n\n"))
-      (read-only-mode 1)
-      (not-modified)))))
+      (let ((uncalled-methods
+             (cl-mapcan #'get-unused-string
+                        (semantic-brute-find-tag-by-class 'function
+                                                          (current-buffer)
+                                                          t)))
+            (unreferenced-variables
+             (cl-mapcan #'get-unused-string
+                        (cl-mapcan 'jdee-xref-get-class-variables
+                                   (semantic-brute-find-tag-by-type "class"
+                                                                    (current-buffer)
+                                                                    t))))
+            (outbuf (get-buffer-create "Unreferenced Methods and Members")))
+        (switch-to-buffer outbuf)
+        (erase-buffer)
+        (insert "The following is a list of methods and members that are\n")
+        (insert "uncalled directly by any Java classes that are in the\n")
+        (insert "following locations: \n")
+        (insert (mapconcat (lambda (x) x) jdee-built-class-path ", "))
+        (newline)
+        (newline)
+        (if uncalled-methods
+            (progn
+              (insert "Unreferenced methods:\n")
+              (insert (mapconcat (lambda (x) x) uncalled-methods "\n")))
+          (insert "There are no uncalled methods\n\n"))
+        (if unreferenced-variables
+            (progn
+              (insert "\n\nUnreferenced class variables:\n")
+              (insert (mapconcat (lambda (x) x) unreferenced-variables "\n")))
+          (insert "\n\nThere are no unreferenced variables\n\n"))
+        (read-only-mode 1)
+        (not-modified)))))
 
 (defun jdee-xref-remove-classes-from-subclasses-table (classes)
   (maphash (lambda (key value)

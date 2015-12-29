@@ -154,8 +154,7 @@ If EVAL-RETURN is t, then return (jdee-jeval ... t), else return (read (jdee-jev
 	       (not (string-equal dollar-name interface-name)))
 	  (jdee-jeval-classname fmt dollar-name eval-return) ; try again with dollar-name
 	code)
-      )
-    ))
+      )))
 
 (defun jdee-wiz-generate-interface (interface-name)
   "*Generate a skeleton implementation of a specified interface."

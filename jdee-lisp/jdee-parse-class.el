@@ -88,9 +88,9 @@ keys: version, this-class, interfaces, fields, and methods."
     (error (concat "Class file " class-file " does not exist")))
   (let ((buf (find-file-noselect class-file nil t)))
     (set-buffer buf)
-    (let* ((constants (jdee-parse-class-get-constants))
-	   (version (jdee-parse-class-get-version))
-	   (access (jdee-parse-class-get-access-flags))
+    (let* ((version (jdee-parse-class-get-version)) ;do first to validate class file version early
+	   (constants (jdee-parse-class-get-constants))
+	   (access (jdee-parse-class-get-class-access-flags))
 	   (this-class
 	     (subst-char-in-string
 	      ?/ ?. (cadr (jdee-parse-class-lookup-constant
@@ -232,8 +232,8 @@ Returns the constant information contained at the reference"
       (add-to-list 'methods (jdee-parse-class-get-method constants)))))
 
 (defun jdee-parse-class-get-method (constants)
-  (list (cons 'access-flags (jdee-parse-class-get-access-flags))
-	(cons 'name (jdee-parse-class-get-next-const-val constants))
+  (list (cons 'access-flags (jdee-parse-class-get-method-access-flags))
+        (cons 'name (jdee-parse-class-get-next-const-val constants))
 	(cons 'descriptor (jdee-parse-class-parse-complete-arg-signature
 			   (jdee-parse-class-get-next-const-val constants)))
 	(cons 'attributes (jdee-parse-class-get-attributes constants))))
@@ -245,8 +245,8 @@ Returns the constant information contained at the reference"
       (add-to-list 'fields (jdee-parse-class-get-field constants)))))
 
 (defun jdee-parse-class-get-field (constants)
-  (list (cons 'access-flags (jdee-parse-class-get-access-flags))
-	(cons 'name (jdee-parse-class-get-next-const-val constants))
+  (list (cons 'access-flags (jdee-parse-class-get-field-access-flags))
+        (cons 'name (jdee-parse-class-get-next-const-val constants))
 	(cons 'descriptor (car (jdee-parse-class-parse-first-arg
 			   (jdee-parse-class-get-next-const-val constants))))
 	(cons 'attributes (jdee-parse-class-get-attributes constants))))
@@ -320,6 +320,9 @@ Returns the constant information contained at the reference"
 			  (jdee-parse-class-lookup-method
 			   (jdee-parse-class-get-const-ref (point) constants)
 			   constants))))))
+              ((eq opcode-val 'invokedynamic)
+               ;; TODO -- possible to parse out a call?
+               (forward-char (- opcode-length 1)))
 	      ((eq opcode-val 'tableswitch)
 		;; skip padding to go to a multiple of 4 from the begin-point.
 		;; The second mod is to make sure on an offset of 4 we really don't skip anything
@@ -336,6 +339,8 @@ Returns the constant information contained at the reference"
 		  (if (eq opcode2 'iinc)
 		    (forward-char 5)
 		    (forward-char 2))))
+              ((< opcode-length 0)
+               (error "Invalid opcode-length %s" opcode-info))
 	      (t (forward-char (- opcode-length 1))))))
     (let ((num-exceptions (jdee-parse-class-get-next-length-val)))
       (dotimes (i num-exceptions)
@@ -392,7 +397,7 @@ Returns the constant information contained at the reference"
 	  ((equal char "[") (let ((rest (jdee-parse-class-parse-first-arg
 					 (substring sig 1))))
 			      (cons (concat (car rest) "[]") (+ (cdr rest) 1))))
-	    (t (error (concat "Could not find char " char))))))
+          (t (error (concat "Could not find char " char))))))
 
 (defun jdee-parse-class-parse-arg-signature (sig)
   (when (> (length sig) 0)
@@ -436,7 +441,7 @@ Returns the constant information contained at the reference"
 (defun get-bit-flags-for-byte (byte flag-vec)
   "Gets the bit flags for BYTE, given the flags that apply to each bit,
 a vector of length 8 (one for each bit).  Nulls in the FLAG-VEC are
-taken to mean there is no flag for that byte, which causes the byte to be
+taken to mean there is no flag for that bit, which causes the bit to be
 ignored.
 
 For example: (get-bit-flags-for-byte 6 ['a 'b 'c 'd 'e 'f 'g 'h])
@@ -445,25 +450,48 @@ returns ('f 'g)"
     (dotimes (i 8 flags)
       (when (and (aref flag-vec (- 7 i))
 		 (> (logand (expt 2 i)  byte) 0))
-	(add-to-list 'flags (aref flag-vec (- 7 i)))))))
+	(add-to-list 'flags (aref flag-vec (- 7 i)))))
+    flags))
 
-(defun jdee-parse-class-get-access-flags ()
+(defun jdee-parse-class-get-access-flags (bits0 bits1)
   (do-and-advance-chars 2
     (let ((raw0 (char-int (char-after (point))))
 	  (raw1 (char-int (char-after (+ (point) 1)))))
       (append
-       (get-bit-flags-for-byte raw0
-			       [nil nil nil nil 'string 'abstract
-				    'interface 'native])
-       (get-bit-flags-for-byte raw1
-			       ['transient 'volatile 'synchronized 'final
-					   'static 'protected
-					   'private 'public])))))
+       (get-bit-flags-for-byte raw0 bits0)
+       (get-bit-flags-for-byte raw1 bits1)))))
+
+(defun jdee-parse-class-get-class-access-flags ()
+  (jdee-parse-class-get-access-flags
+   [nil enum annotation synthetic nil abstract interface nil]
+   [nil nil super final nil nil nil public]))
+
+(defun jdee-parse-class-get-method-access-flags ()
+  (jdee-parse-class-get-access-flags
+   [nil nil nil synthetic strict abstract nil native]
+   [varargs bridge synchronized final static protected private public]))
+
+(defun jdee-parse-class-get-field-access-flags ()
+  (jdee-parse-class-get-access-flags
+   [nil enum nil synthetic nil nil nil nil]
+   [transient volatile nil final static protected private public]))
 
 (defun jdee-parse-class-get-version ()
   "Return a list - (major-version minor-version)"
-  (list (jdee-parse-class-get-2byte 5)
-		  (jdee-parse-class-get-2byte 7)))
+  (let ((minor (jdee-parse-class-get-2byte 5))
+        (major (jdee-parse-class-get-2byte 7)))
+    (if (or
+         (and (eq major 45) (eq minor 3)) ;Java v 1.1
+         (and (eq major 46) (eq minor 0)) ;Java v 1.2 -- strictfp
+         (and (eq major 47) (eq minor 0)) ;Java v 1.3
+         (and (eq major 48) (eq minor 0)) ;Java v 1.4
+         (and (eq major 49) (eq minor 0)) ;Java v 1.5 -- new attributes for generics etc
+         (and (eq major 50) (eq minor 0)) ;Java v 1.6 -- StackMaps
+         (and (eq major 51) (eq minor 0)) ;Java v 1.7 -- InvokeDynamic
+         (and (eq major 52) (eq minor 0)) ;Java v 1.8 -- RuntimeVisibleTypeAnnotations, MethodParameters etc
+         )
+        (list major minor)
+      (error "Unsupported class file version: %s.%s" major minor))))
 
 (defun jdee-parse-class-get-2byte (point)
   "Gets the value of two bytes (0 - 65535) as an int"
@@ -558,6 +586,29 @@ of the constants) and a vector of all constants"
     (goto-char (+ len (point)))
     result))
 
+(defsubst jdee-parse-class-get-method-handle ()
+  (let ((kind (do-and-advance-chars 1 (char-int (char-after (point)))))
+        (index (jdee-parse-class-get-next-2-bytes)))
+    (list 
+     (cond ((eq kind 1) 'get-field)
+           ((eq kind 2) 'get-static)
+           ((eq kind 3) 'put-field)
+           ((eq kind 4) 'put-static)
+           ((eq kind 5) 'invoke-virtual)
+           ((eq kind 6) 'invoke-static)
+           ((eq kind 7) 'invoke-special)
+           ((eq kind 8) 'new-invoke-special)
+           ((eq kind 9) 'invoke-interface)
+           (t (error "Unrecognized MethodHandle_info kind: %s" kind)))
+     index)))
+
+(defsubst jdee-parse-class-get-method-type ()
+  (list (jdee-parse-class-get-next-2-bytes)))
+
+(defsubst jdee-parse-class-get-invoke-dynamic ()
+  (list (jdee-parse-class-get-next-2-bytes)
+        (jdee-parse-class-get-next-2-bytes)))
+
 (defun jdee-parse-class-get-next-constant ()
   (let ((const-type (char-int (char-after (point)))))
     (forward-char)
@@ -582,7 +633,15 @@ of the constants) and a vector of all constants"
 	  ((eq const-type 12)
 	    `(name-and-type ,@(jdee-parse-class-get-nameandtype-constant)))
 	  ((eq const-type 1)
-	    `(utf8 ,(jdee-parse-class-get-utf8-constant))))))
+	    `(utf8 ,(jdee-parse-class-get-utf8-constant)))
+          ((eq const-type 15)
+           `(method-handle ,@(jdee-parse-class-get-method-handle)))
+          ((eq const-type 16)
+           `(method-type ,@(jdee-parse-class-get-method-type)))
+          ((eq const-type 18)
+           `(invoke-dynamic ,@(jdee-parse-class-get-invoke-dynamic)))
+          (t
+           (error "Unrecognized constant type: %s" const-type)))))
 
 (defconst jdee-parse-class-opcode-vec
   [(nop . 1)  ;; 0
@@ -771,7 +830,7 @@ of the constants) and a vector of all constants"
    (invokespecial . 3)  ;; 183
    (invokestatic . 3)  ;; 184
    (invokeinterface . 5)  ;; 185
-   (unused . -1) ;; 186
+   (invokedynamic . 4) ;; 186
    (new . 3)  ;; 187
    (newarray . 2)  ;; 188
    (anewarray . 3)  ;; 189

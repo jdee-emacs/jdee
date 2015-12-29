@@ -61,7 +61,8 @@
   :type 'boolean)
 
 (defcustom jdee-server-dir ""
-  "Path to JDEE Java Backend JARs."
+  "Path to JDEE Java Backend JARs.
+See https://github.com/jdee-emacs/jdee-server"
   :group 'jdee
   :type 'directory)
 
