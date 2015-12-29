@@ -109,10 +109,10 @@ Sets fields to null and adds it to the nREPL registry."
 
 
 
-(defmethod jdee-live-nrepl-connect ((this jdee-live-nrepl))
+(defmethod jdee-live-nrepl-connect ((this jdee-live-nrepl) async)
   "Start the nREPL and connect to it."
 
-  (with-slots (server server-filter key) this
+  (with-slots (server server-filter key response) this
     (let ((project-dir (symbol-name key)))
       (-when-let (repl-buff (cider-find-reusable-repl-buffer nil project-dir))
         (let* ((nrepl-create-client-buffer-function #'cider-repl-create)
@@ -143,9 +143,11 @@ Sets fields to null and adds it to the nREPL registry."
           ;;
           ;; On the up side, it seems that the nREPL is available and
           ;; functioning after the error.   -td 10/27/15 12:38am.
-          (set-process-filter server server-filter))
-          (jdee-live-nrepl-wait-for-server-ready this)
-          ))))
+          (set-process-filter server server-filter)
+          (if async
+              (setq response 'initializing)
+            (jdee-live-nrepl-wait-for-server-ready this))
+          )))))
 
 (defun jdee-live--get-nrepl ()
   "Get the nREPL class for this buffer.
@@ -203,6 +205,7 @@ Stops the associated processes and removes it from the nREPL registry."
     (and nrepl
          (slot-boundp nrepl 'server)
          (slot-boundp nrepl 'client)
+         (not (eq (oref nrepl response) 'initializing))
          (let ((client-proc (get-buffer-process (oref nrepl client))))
            (and client-proc
                 (process-live-p client-proc))))))
@@ -226,15 +229,13 @@ expression."
 ;; prints out, Emacs has nothing to evaluate or report."
 
   (interactive "sClojure to evaluate ")
-  (unless (jdee-live-connected-p)
-    (jdee-live-jack-in))
-  (let* ((nrepl (jdee-live--get-nrepl))
-         (session (jdee-live-nrepl-get-session nrepl)))
-    (with-slots (client) nrepl
-      (nrepl-dict-get
-       (nrepl-sync-request:eval statement client session)
-       "value"))))
-
+  (when (jdee-live-nrepl-available)
+    (let* ((nrepl (jdee-live--get-nrepl))
+           (session (jdee-live-nrepl-get-session nrepl)))
+      (with-slots (client) nrepl
+        (nrepl-dict-get
+         (nrepl-sync-request:eval statement client session)
+         "value")))))
 
 (defun jdee-live--sync-request (op &optional name)
   "Returns the result of a named request OP on the nREPL.  The result is extracted with the key NAME, which defaults to OP"
@@ -267,15 +268,29 @@ Returns nil if there is no parent"
 
 
 ;;;###autoload
-(defun jdee-live-jack-in ()
+(defun jdee-live-jack-in (&optional async)
   "Start a maven process which connects to the nrepl client.
-Check the versions of the middle ware"
-  (interactive)
+Check the versions of the middle ware.  If ASYNC is present and
+non-nil, start creating the nREPL, but do not block until it is
+available.
+
+If the nrepl is initializing because it was created
+asynchronously, it waits for the nrepl to be ready (unless ASYNC
+is again true)."
+
+  (interactive "P")
   (if (jdee-live-connected-p)
       (message "nREPL server already running")
     ;; Get the existing nrepl (if the process died) or create a new one
     (let ((nrepl (jdee-live--get-nrepl)))
-      (jdee-live-nrepl-connect (or nrepl (make-instance 'jdee-live-nrepl))))))
+      (if (and nrepl (eq (oref nrepl response) 'initializing))
+          ;; Repl was create asynchronously and is not yet done initializing.
+          ;; Wait for it to finish starting, unless it was again request
+          ;; asynchronously
+          (unless async (jdee-live-nrepl-wait-for-server-ready nrepl))
+        ;; Repl does not exist or is not doing asynchonous initialization.
+        (jdee-live-nrepl-connect (or nrepl (make-instance 'jdee-live-nrepl))
+                                 async)))))
 
 (defmethod jdee-live-nrepl-wait-for-server-ready ((this jdee-live-nrepl))
   "Wait for SERV-PROC to be ready to accept input."

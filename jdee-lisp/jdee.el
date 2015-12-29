@@ -871,6 +871,12 @@ idle moments.")
 	(jdee-annotations-setup)
 
 
+    ;; Try to start the nrepl asynchronously.
+    ;; TODO: Start nrepls for the child and parent directories, so that
+    ;; jdee-get-source path (and other functions that want nrepls for the entire
+    ;; project) respond quickly on the first call.
+    (unless (jdee-live-connected-p) (jdee-live-jack-in 'async))
+
 	;; The next form must be the last executed
 	;; by jdee-mode.
 	(derived-mode-run-hooks 'jdee-mode))
