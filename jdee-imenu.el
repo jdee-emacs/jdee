@@ -151,9 +151,9 @@ Use *Rescan* to rebuild the imenu when you have changed this option."
 	  ;; buffer local
 	  (setq semantic-imenu-sort-bucket-function
 		(cond ((eq val 'asc)
-		       'semantic-sort-tokens-by-name-increasing-ci)
+		       'semantic-sort-tags-by-name-increasing-ci)
 		      ((eq val 'desc)
-		       'semantic-sort-tokens-by-name-decreasing-ci)
+		       'semantic-sort-tags-by-name-decreasing-ci)
 		      (t
 		       nil)))
 	  ;; global
