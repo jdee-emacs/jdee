@@ -1583,9 +1583,12 @@ replaces with slashes."
                  (expand-file-name path)))
              (split-string cp jdee-classpath-separator)))))))
 
+
 (defun jdee-get-sourcepath-nrepl-1 (dir already-checked)
   "Get the the sourcepath based on DIR, using the nREPL.
-It also asks the parent and child nREPLs.  ALREADY-CHECKED is a list of directories that have already been checked."
+It also asks the parent and child nREPLs.  ALREADY-CHECKED is a
+list of directories that have already been checked.  Directories
+that do not exist are filtered from the result."
   ;; Ensure directory name ends with /
   (unless (string-match "/$" dir)
     (setq dir (concat dir "/")))
@@ -1598,7 +1601,7 @@ It also asks the parent and child nREPLs.  ALREADY-CHECKED is a list of director
           (default-directory dir)
           (also-checked (append (list dir) already-checked)))
       ;; Build up the source path from this directory
-      (append (jdee-live-sync-request:sourcepath)
+      (append (delete-if-not #'file-exists-p (jdee-live-sync-request:sourcepath))
               ;; and the children.  This returns a list of lists, so we need to
               ;; flatten it.
               (apply #'append
