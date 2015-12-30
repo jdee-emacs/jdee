@@ -1,4 +1,4 @@
-;;; jdee-imenu.el --- imenu setup for the JDE -*-coding: utf-8;-*-
+;;; jdee-imenu.el --- imenu setup for the JDEE -*-coding: utf-8;-*-
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>,
 ;;         David Ponce <david@dponce.com>
@@ -395,7 +395,7 @@ This function uses the semantic bovinator to index the buffer."
       index))
 
 ;;;;
-;;;; JDE's imenu setup
+;;;; JDEE's imenu setup
 ;;;;
 
 (defun jdee-imenu-setup ()
