@@ -4,7 +4,7 @@
   "jdee"
   "2.4"
   "Java Development Environment for Emacs"
-  '((cider 0.11))
+  '((cider "0.11"))
   :url "http://github.com/jdee-emacs/jdee.git"
   :keywords '("java" "tools"))
 
