@@ -42,8 +42,8 @@
 ;; FIXME: refactor
 (declare-function jdee-jeval-r "jdee-bsh" (java-statement))
 
-;; FIXME: can't find working-status-forms		
-(defvar working-message);; for byte-compiler		
+;; FIXME: can't find working-status-forms
+(defvar working-message);; for byte-compiler
 (declare-function working-status-forms "working")
 
 ;;;; Customization
