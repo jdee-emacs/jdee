@@ -37,7 +37,10 @@ This should be a list of strings.  No quoting is done of the values."
   "Mapping from pom files to the corresponding nREPL objects.")
 
 (defvar jdee-live-launch-script
-  (relative-expand-file-name "../jdee-live/clj/jdee-launch-nrepl.clj"))
+  ;; When packaged for MELPA, files get moved around
+  (let ((script-1 (relative-expand-file-name "../jdee-live/clj/jdee-launch-nrepl.clj"))
+        (script-2(relative-expand-file-name "clj/jdee-launch-nrepl.clj")))
+    (if (file-exists-p script-2) script-2 script-1)))
 
 (defun jdee-live-project-directory-for (dir-name)
   "Find the first directory in DIR-NAME contain a pom.xml.
