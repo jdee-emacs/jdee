@@ -1053,7 +1053,7 @@ expressions."
             java-font-lock-keywords-1
             java-font-lock-keywords-2
             java-font-lock-keywords-3)
-           nil nil ((?_ . "w") (?$ . "w")) nil
+           nil nil ((?_ . "w") (?$ . "w") (?@ . "w")) nil
            (font-lock-mark-block-function . mark-defun))))
     (cons (append (car java-defaults) '(java-font-lock-keywords-4))
 	  (cdr java-defaults)))
