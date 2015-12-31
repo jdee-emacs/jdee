@@ -42,40 +42,6 @@
 ;; FIXME: refactor
 (declare-function jdee-jeval-r "jdee-bsh" (java-statement))
 
-;; Copied from the old working lib and tweaked
-(eval-and-compile
-  (condition-case nil
-	 (require 'working)
-    (error
-	(progn
-          (defvar working-message)
-          (defvar working-donestring)
-          (defvar working-ref1)
-	  (defmacro working-status-forms (message donestr &rest forms)
-	    "Contain a block of code during which a working status is shown."
-            `(let ((working-message message)
-                   (working-donestring donestr)
-                   (working-ref1 0))
-               ,@forms))
-  
-	  (defun working-status (&optional percent &rest args)
-	    "Called within the macro `working-status-forms', show the status."
-	    (message "%s%s" (apply 'format working-message args)
-		     (if (eq percent t) 
-                         (concat "... " working-donestring)
-		       (format "... %3d%%"
-			       (or percent
-				   (floor (* 100.0 (/ (float (point))
-						      (point-max)))))))))
-  
-	  (defun working-dynamic-status (&optional number &rest args)
-	    "Called within the macro `working-status-forms', show the status."
-	    (message "%s%s" (apply 'format working-message args)
-		     (format "... %c" (aref [ ?- ?/ ?| ?\\ ] (% working-ref1 4))))
-	    (setq working-ref1 (1+ working-ref1)))
-  
-	  (put 'working-status-forms 'lisp-indent-function 2)))))
-
 
 ;;;; Customization
 ;;;; -------------
