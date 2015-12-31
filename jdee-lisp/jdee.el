@@ -1601,7 +1601,7 @@ that do not exist are filtered from the result."
           (default-directory dir)
           (also-checked (append (list dir) already-checked)))
       ;; Build up the source path from this directory
-      (append (delete-if-not #'file-exists-p (jdee-live-sync-request:sourcepath))
+      (append (cl-delete-if-not #'file-exists-p (jdee-live-sync-request:sourcepath))
               ;; and the children.  This returns a list of lists, so we need to
               ;; flatten it.
               (apply #'append
