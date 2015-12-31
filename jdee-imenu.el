@@ -1,4 +1,4 @@
-;;; jdee-imenu.el --- imenu setup for the JDE -*-coding: utf-8;-*-
+;;; jdee-imenu.el --- imenu setup for the JDEE -*-coding: utf-8;-*-
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>,
 ;;         David Ponce <david@dponce.com>
@@ -134,6 +134,21 @@ association are not displayed (see also `jdee-imenu-include-modifiers')."
 				   ))
 		)))
 
+(defun jdee--imenu-setup-sorting (sym val)
+  ;; setup sorting for `semantic-create-imenu-index'
+  ;; buffer local
+  (setq semantic-imenu-sort-bucket-function
+        (cond ((eq val 'asc)
+               'semantic-sort-tags-by-name-increasing-ci)
+              ((eq val 'desc)
+               'semantic-sort-tags-by-name-decreasing-ci)
+              (t
+               nil)))
+  ;; global
+  (set-default 'semantic-imenu-sort-bucket-function
+               semantic-imenu-sort-bucket-function)
+  (set-default sym val))
+
 (defcustom jdee-imenu-sort nil
   "*If non-nil sorts items in the index menu.
 You can choose:
@@ -146,20 +161,7 @@ Use *Rescan* to rebuild the imenu when you have changed this option."
   :type '(choice (const :tag "No sort"    nil )
 		 (const :tag "Ascending"  asc )
 		 (const :tag "Descending" desc))
-  :set '(lambda (sym val)
-	  ;; setup sorting for `semantic-create-imenu-index'
-	  ;; buffer local
-	  (setq semantic-imenu-sort-bucket-function
-		(cond ((eq val 'asc)
-		       'semantic-sort-tokens-by-name-increasing-ci)
-		      ((eq val 'desc)
-		       'semantic-sort-tokens-by-name-decreasing-ci)
-		      (t
-		       nil)))
-	  ;; global
-	  (set-default 'semantic-imenu-sort-bucket-function
-		       semantic-imenu-sort-bucket-function)
-	  (set-default sym val)))
+  :set #'jdee--imenu-setup-sorting)
 
 ;;;;
 ;;;; Helper functions
@@ -355,47 +357,47 @@ index menu displays full method signatures and field types."
   "Creates an imenu index for a Java source buffer.
 This function uses the semantic bovinator to index the buffer."
 
-    (semantic-fetch-tags)
+  (semantic-fetch-tags)
 
-    (let* ((tags   (semantic-fetch-tags))
-	   (packages (semantic-brute-find-tag-by-class 'package tags))
-	   (depends  (semantic-brute-find-tag-by-class 'include tags))
-	   (classes  (semantic-brute-find-tag-by-class 'type tags))
-	   depend-index
-	   index)
+  (let* ((tags   (semantic-fetch-tags))
+         (packages (semantic-brute-find-tag-by-class 'package tags))
+         (depends  (semantic-brute-find-tag-by-class 'include tags))
+         (classes  (semantic-brute-find-tag-by-class 'type tags))
+         depend-index
+         index)
 
 
-      (setq classes (jdee-imenu-sort-tags classes))
-      (while classes
-	(let* ((class-tag  (car classes))
-	       (class-index  (jdee-imenu-index-class class-tag)))
-	  (setq index (append index class-index)))
-	(setq classes (cdr classes)))
+    (setq classes (jdee-imenu-sort-tags classes))
+    (while classes
+      (let* ((class-tag  (car classes))
+             (class-index  (jdee-imenu-index-class class-tag)))
+        (setq index (append index class-index)))
+      (setq classes (cdr classes)))
 
-      (setq depends (jdee-imenu-sort-tags depends))
-      (while depends
-	(let* ((depend-tag (car depends))
-	       (depend-name  (semantic-tag-name  depend-tag))
-	       (depend-pos   (semantic-tag-start depend-tag)))
-	  (setq depend-index (append depend-index (list (cons depend-name depend-pos)))))
-	(setq depends (cdr depends)))
-      (if depend-index
-	  (setq index (append index (list (cons "imports" depend-index)))))
+    (setq depends (jdee-imenu-sort-tags depends))
+    (while depends
+      (let* ((depend-tag (car depends))
+             (depend-name  (semantic-tag-name  depend-tag))
+             (depend-pos   (semantic-tag-start depend-tag)))
+        (setq depend-index (append depend-index (list (cons depend-name depend-pos)))))
+      (setq depends (cdr depends)))
+    (if depend-index
+        (setq index (append index (list (cons "imports" depend-index)))))
 
-      (setq packages (jdee-imenu-sort-tags packages))
-      (while packages
-	(let* ((package-tag (car packages))
-	       (package-name  (semantic-tag-name  package-tag))
-	       (package-pos   (semantic-tag-start package-tag)))
-	  (setq index
-		(append
-		 index
-		 (list (cons (concat "package " package-name) package-pos)))))
-	(setq packages (cdr packages)))
-      index))
+    (setq packages (jdee-imenu-sort-tags packages))
+    (while packages
+      (let* ((package-tag (car packages))
+             (package-name  (semantic-tag-name  package-tag))
+             (package-pos   (semantic-tag-start package-tag)))
+        (setq index
+              (append
+               index
+               (list (cons (concat "package " package-name) package-pos)))))
+      (setq packages (cdr packages)))
+    index))
 
 ;;;;
-;;;; JDE's imenu setup
+;;;; JDEE's imenu setup
 ;;;;
 
 (defun jdee-imenu-setup ()
