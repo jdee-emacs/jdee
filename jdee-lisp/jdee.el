@@ -1572,7 +1572,7 @@ the value of the CLASSPATH environment variable converted to a list,
 of normalized paths, i.e., with . and ~ characters expanded and backslashes
 replaces with slashes."
   (if (jdee-live-nrepl-available)
-      (cider-sync-request:classpath)
+      (jdee-live-sync-request:classpath)
     (if jdee-global-classpath
         jdee-global-classpath
       (let ((cp (getenv "CLASSPATH")))

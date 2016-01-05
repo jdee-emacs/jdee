@@ -252,6 +252,16 @@ expression."
           (cider-nrepl-send-sync-request client)
           (nrepl-dict-get (or name op)))))))
 
+
+(defun jdee-live-sync-request:classpath ()
+  "Get class path using cider, but ensure that we use the correct session.
+Cider can find the wrong session since it looks for Clojure files
+to find the project root."
+  (when (jdee-live-nrepl-available)
+    (let ((nrepl (jdee-live--get-nrepl)))
+      (cl-letf (((symbol-function 'cider-current-connection) (lambda nil (oref nrepl client))))
+        (cider-sync-request:classpath)))))
+
 (defun jdee-live-sync-request:sourcepath ()
   "Returns a list of the source paths from the nREPL"
 

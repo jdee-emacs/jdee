@@ -919,15 +919,15 @@ string -  show completions in-line, cycling thru them."
 			       nil jdee-complete-protected)))
 
     (if completion-list
-	(let ((title (concat (car pair) "."
-			     (car (cdr pair)) "[...]")))
-	  (if (null completion-type)
-	      (jdee-complete-choose-completion title (car (cdr pair)))
-	    (if (string= completion-type "in-line")
-		(progn
-		  (setq jdee-complete-current-list-index -1)
-		  (jdee-complete-complete-cycle))
-	      (jdee-complete-choose-completion title (car (cdr pair)) t))))
+        (let ((title (concat (car pair) "."
+                             (car (cdr pair)) "[...]")))
+          (if (null completion-type)
+              (jdee-complete-choose-completion title (car (cdr pair)))
+            (if (string= completion-type "in-line")
+                (progn
+                  (setq jdee-complete-current-list-index -1)
+                  (jdee-complete-complete-cycle))
+              (jdee-complete-choose-completion title (car (cdr pair)) t))))
       (error "No completion at this point"))))
 
 (defun jdee-complete-get-access (pair)
