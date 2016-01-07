@@ -26,6 +26,41 @@ class have the same name, but different spellings."
         (should (looking-at "String string"))))))
 
 
+(ert-deftest jdee-complete-on-newline ()
+  "Test that `jdee-complete' works when there is a newline between the previous text and the point."
+
+  (with-temp-buffer
+
+    ;; Set up the mode
+    (let ((jdee-mode-hook nil)
+          (java-mode-hook nil)
+          (c-mode-common-hook nil)
+          (prog-mode-hook nil))
+      (jdee-mode))
+
+    ;; Insert a basic class
+    (insert "class Testing {
+
+     public String someString() { return \"some\"; }
+
+     public String foo() {
+         someString().
+
+         // Point on previous line
+
+     }
+
+}")
+
+    ;; Goto to line after text
+    (goto-char (point-min))
+    (search-forward "previous line")
+    (forward-line -1)
+
+    ;; Find the variable we are completing
+    (let ((pair (jdee-parse-java-variable-at-point)))
+      (should (equal '("someString" "") pair)))))
+
 (provide 'jdee-parse-test)
 ;;; jdee-parse-test.el ends here
 

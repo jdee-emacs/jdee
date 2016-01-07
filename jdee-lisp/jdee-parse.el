@@ -1051,6 +1051,13 @@ at point. This function would return the list (obj.f1 ge)."
 		first-paren cast-type second-paren
 		args (offset 0) (bracket-count 0) (paren-count 0))
 
+      ;; Back up past any white space.  This lets completion work when
+      ;; continuing onto a new-line.  Skipping whitespace ( ) and end of comment
+      ;; style b (>), which is end of line
+      ;;
+      (skip-syntax-backward " >")
+
+
       ;; Move cursor to the beginning of the partially
       ;; completed part of the expression, e.g., move point
       ;; from
@@ -1085,6 +1092,13 @@ at point. This function would return the list (obj.f1 ge)."
 		(setq found (point))))
 	      (setq curcar (char-before)))
 	    (setq intermediate-point found)
+
+        ;; Back up past any white space.  This lets completion work when
+        ;; continuing onto a new-line.
+        ;;
+        (skip-syntax-backward " >")
+
+
 	   ;; Now move point to the beginning of the expression, e.g.,
 	    ;; from
 	    ;;
@@ -1142,6 +1156,9 @@ at point. This function would return the list (obj.f1 ge)."
 	      (setq second-part
 		    (buffer-substring-no-properties
 		     intermediate-point original-point))
+
+          (while (string-match "\\s-\\|\\s>" second-part)
+            (setq second-part (replace-match "" nil nil second-part)))
 
 	      ;;Checking for casting
 	      ;; ((Object) obj).ge
