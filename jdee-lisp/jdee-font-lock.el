@@ -345,22 +345,25 @@ to match and the complexity of each regexp."
 
 (defconst jdee-font-lock-number-regexp
   (eval-when-compile
+    ;; As of Java 7, underscores can appear anywhere _between_ digits
     (concat "\\("
-	    "\\<[0-9]+[.][0-9]+\\([eE][-+]?[0-9]+\\)?[fFdD]?\\>"
+	    "\\<[0-9]\\([0-9_]*[0-9]\\)?[.][0-9]\\([0-9_]*[0-9]\\)?\\([eE][-+]?[0-9]\\([0-9_]*[0-9]\\)?\\)?[fFdD]?\\>"
 	    "\\|"
-	    "\\<[0-9]+[.][eE][-+]?[0-9]+[fFdD]?\\>"
+	    "\\<[0-9]\\([0-9_]*[0-9]\\)?[.][eE][-+]?[0-9]\\([0-9_]*[0-9]\\)?[fFdD]?\\>"
 	    "\\|"
-	    "\\<[0-9]+[.][fFdD]\\>"
+	    "\\<[0-9]\\([0-9_]*[0-9]\\)?[.][fFdD]\\>"
 	    "\\|"
-	    "\\<[0-9]+[.]"
+	    "\\<[0-9]\\([0-9_]*[0-9]\\)?[.]"
 	    "\\|"
-	    "[.][0-9]+\\([eE][-+]?[0-9]+\\)?[fFdD]?\\>"
+	    "[.][0-9]\\([0-9_]*[0-9]\\)?\\([eE][-+]?[0-9]\\([0-9_]*[0-9]\\)?\\)?[fFdD]?\\>"
 	    "\\|"
-	    "\\<[0-9]+[eE][-+]?[0-9]+[fFdD]?\\>"
+	    "\\<[0-9]\\([0-9_]*[0-9]\\)?[eE][-+]?[0-9]+[fFdD]?\\>"
 	    "\\|"
-	    "\\<0[xX][0-9a-fA-F]+[lL]?\\>"
+	    "\\<0[xX][0-9a-fA-F]\\([0-9a-fA-F_]*[0-9a-fA-F]\\)?[lL]?\\>"
 	    "\\|"
-	    "\\<[0-9]+[lLfFdD]?\\>"
+	    "\\<0[bB][01]\\([01_]*[01]\\)?[lL]?\\>" ; Binary literal, introduced in Java 7
+	    "\\|"
+	    "\\<[0-9]\\([0-9_]*[0-9]\\)?+[lLfFdD]?\\>"
 	    "\\)"
 	    ))
   "Regular expression to match Java numbers.")
@@ -858,24 +861,24 @@ expressions."
 	;; Fontify default and assert as keywords
 	`(,(c-make-font-lock-search-function
 	    "\\<\\(default\\|assert\\)\\>"
-	    '(1 'font-lock-keyword-face t)))
+	    '(1 font-lock-keyword-face t)))
 	;; Fontify const and goto with warning face. These keywords are
 	;; reserved, even though they are not currently used.
 	`(,(c-make-font-lock-search-function
 	    "\\<\\(const\\|goto\\)\\>"
-	    '(1 'font-lock-warning-face t)))
+	    '(1 font-lock-warning-face t)))
 	;; package and imports
 	`(,(c-make-font-lock-search-function
 	    "\\<\\(package\\|import\\(?:\\s-+static\\)?\\)\\s-+\\(\\(?:[a-z_$*][a-zA-Z0-9_$]*\\.?\\)*\\)"
-	    '(1 'font-lock-keyword-face t)
-	    '(2 'jdee-font-lock-package-face t)))
+	    '(1 font-lock-keyword-face t)
+	    '(2 jdee-font-lock-package-face t)))
 	;; constructor
 	`(,(c-make-font-lock-search-function
 	    (concat
 	     "^\\s-*\\<\\(?:public\\|private\\|protected\\)\\>?\\s-*"
 	     "\\([" jdee-font-lock-capital-letter "]\\sw*\\)"
 	     "(.*?)")
-	    '(1 'jdee-font-lock-constructor-face t)))
+	    '(1 jdee-font-lock-constructor-face t)))
 	;; class names
 	`(,(c-make-font-lock-search-function
 	    "\\<\\(new\\|instanceof\\)\\>[ \t]+\\(\\sw+\\)"
@@ -884,13 +887,13 @@ expressions."
 	;; modifier protections
         `(,(c-make-font-lock-search-function
 	    "\\<\\(private\\)\\>"
-	    '(1 'jdee-font-lock-private-face t)))
+	    '(1 jdee-font-lock-private-face t)))
 	`(,(c-make-font-lock-search-function
 	    "\\<\\(protected\\)\\>"
-	    '(1 'jdee-font-lock-protected-face t)))
+	    '(1 jdee-font-lock-protected-face t)))
 	`(,(c-make-font-lock-search-function
 	    "\\<\\(public\\)\\>"
-	    '(1 'jdee-font-lock-public-face t)))
+	    '(1 jdee-font-lock-public-face t)))
 	;; Fontify numbers
 	`(,(c-make-font-lock-search-function
 	    jdee-font-lock-number-regexp
@@ -938,14 +941,14 @@ expressions."
       '("\\<\\(import\\)\\>\\s-+\\(\\sw+\\)"
 	(1 font-lock-keyword-face)
 	(2 (if (equal (char-after (match-end 0)) ?\.)
-	       'jdee-font-lock-package-face
-	     'font-lock-type-face))
+	       jdee-font-lock-package-face
+	     font-lock-type-face))
 	("\\=\\.\\(\\*\\|\\sw+\\)" nil nil
 	 (1 (if (equal (char-after (match-end 0)) ?\.)
-		'jdee-font-lock-package-face
+		jdee-font-lock-package-face
 	      (if (equal (char-before (match-end 0)) ?\*)
-		  'jdee-font-lock-number-face
-		'font-lock-type-face)))))
+		  jdee-font-lock-number-face
+		font-lock-type-face)))))
       ;; modifier protections
       '("\\<\\(private\\)\\>" (1 jdee-font-lock-private-face))
       '("\\<\\(protected\\)\\>" (1 jdee-font-lock-protected-face))
@@ -1043,7 +1046,7 @@ expressions."
             java-font-lock-keywords-1
             java-font-lock-keywords-2
             java-font-lock-keywords-3)
-           nil nil ((?_ . "w") (?$ . "w")) nil
+           nil nil ((?_ . "w") (?$ . "w") (?@ . "w")) nil
            (font-lock-mark-block-function . mark-defun))))
     (cons (append (car java-defaults) '(java-font-lock-keywords-4))
 	  (cdr java-defaults)))
