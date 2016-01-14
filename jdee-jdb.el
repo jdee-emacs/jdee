@@ -1692,7 +1692,7 @@ the debuggee process at (e.g., jdbconn)."
 	(cons "[?\C-c ?\C-a ?\C-u]" 'jdee-debug-up)
 	(cons "[?\C-c ?\C-a ?\C-d]" 'jdee-debug-down)
 	(cons "[?\C-c ?\C-a ?\C-p]" 'jdee-jdb-print)
-	(cons "[?\C-c ?\C-a ?\C-d]" 'jdee-jdb-dump)
+	(cons "[?\C-c ?\C-a ?\C-x]" 'jdee-jdb-dump)
 	(cons "[?\C-c ?\C-a ?\C-e]" 'jdee-jdb-eval)
 	(cons "[?\C-c ?\C-a ?\C-v]" 'jdee-jdb-set)
 	(cons "[?\C-c ?\C-a ?\C-l]" 'jdee-jdb-locals))
