@@ -226,7 +226,7 @@ when called interactively.
 GETTERP, if non-nil, make it a getter, otherwise make it a setter.  If
 \\[universal-argument] is used while calling interactively, then make it a
 setter, otherwise, make a getter."
-  (interactive (list (thing-at-point 'word) (not current-prefix-arg)))
+  (interactive (list (thing-at-point 'word t) (not current-prefix-arg)))
   (let* ((toks (jdee-split-by-camel-notation member-name))
 	 (attr (apply 'concat
 		      (append (list (if getterp "get" "set")

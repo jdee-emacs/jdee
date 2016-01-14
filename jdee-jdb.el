@@ -487,7 +487,7 @@ on the list."
 (defmethod jdee-db-cmd-init ((this jdee-jdb-cmd-print))
   "The debugger invokes this method before executing the
 command."
-  (oset this expr (read-from-minibuffer "expr: " (thing-at-point 'word)
+  (oset this expr (read-from-minibuffer "expr: " (thing-at-point 'word t)
 					nil nil 'jdee-jdb-cmd-print-history)))
 
 (defmethod jdee-db-cmd-make-command-line ((this jdee-jdb-cmd-print))
@@ -528,7 +528,7 @@ command."
 (defmethod jdee-db-cmd-init ((this jdee-jdb-cmd-set-var))
   "The debugger invokes this method before executing the
 command."
-  (oset this expr (read-from-minibuffer "variable: " (thing-at-point 'word)
+  (oset this expr (read-from-minibuffer "variable: " (thing-at-point 'word t)
 					nil nil 'jdee-jdb-cmd-print-history))
   (oset this value (read-from-minibuffer "value: " nil
 					nil nil '(null))))
@@ -1455,16 +1455,16 @@ the debuggee process at (e.g., jdbconn)."
 	     (oref debuggee-status stopped-p))
 	(let* ((cmd-set (oref debugger cmd-set))
 	       cmd)
-	  (if (string= "print" key)
-	      (setq cmd (oref cmd-set print))
-	    (if (string= "dump" key)
-		(setq cmd (oref cmd-set dump))
-	      (if (string= "eval" key)
-		  (setq cmd (oref cmd-set eval))
-		(if (string= "set" key)
-		    (setq cmd (oref cmd-set set-var))
-		  (if (string= "locals" key)
-		      (setq cmd (oref cmd-set locals)))))))
+	  (cond ((string= "print" key)
+                 (setq cmd (oref cmd-set print)))
+                ((string= "dump" key)
+                 (setq cmd (oref cmd-set dump)))
+                ((string= "eval" key)
+                 (setq cmd (oref cmd-set eval)))
+		((string= "set" key)
+                 (setq cmd (oref cmd-set set-var)))
+                ((string= "locals" key)
+                 (setq cmd (oref cmd-set locals))))
 	  (jdee-db-exec-cmd debugger cmd))
       (let ((class (oref debuggee main-class)))
 	(error "Application %s is not stopped" class)))))
@@ -1733,7 +1733,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 	   val)
 	  (set-default sym val)))
 
-(defun jdee-jdb-string-to-int(number)
+(defun jdee-jdb-string-to-int (number)
   "This method removes punctuation from a string, e.g, 1,200 (1.200 in Danish),
 and converts the result to an integer."
   (if (string-match "[^[:digit:]]" number)
