@@ -1490,7 +1490,7 @@ field of an object or class of objects."
 	  :object-class (concat
 			 "*."
 			 (car (jdee-parse-get-innermost-class-at-point)))
-	  :field (thing-at-point 'symbol))))
+	  :field (thing-at-point 'symbol t))))
     (efc-dialog-show dialog)))
 
 (defun jdee-bug-watch-field-modification ()
@@ -1503,7 +1503,7 @@ field of an object or class of objects."
 		 :object-class (concat
 				"*."
 				(car (jdee-parse-get-innermost-class-at-point)))
-		 :field (thing-at-point 'symbol))))
+		 :field (thing-at-point 'symbol t))))
     (efc-dialog-show dialog)))
 
 
@@ -1673,7 +1673,7 @@ requests to cancel."
       (error "No target process or process is not suspended."))
   ;; Previously we used semantic. I recently have been having problems
   ;; with it, so I just replaced it with word-at-point
-  (let ((qualified-expr (thing-at-point 'word)))
+  (let ((qualified-expr (thing-at-point 'word t)))
     (jdee-bug-evaluate-expression qualified-expr)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

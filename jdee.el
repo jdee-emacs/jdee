@@ -2260,7 +2260,7 @@ This command has the  same requirements to work as the field/method-completion
 feature in JDEE (see `jdee-complete-at-point')."
   (interactive)
   (if (jdee-open-functions-exist)
-      (let* ((thing-of-interest (thing-at-point 'symbol))
+      (let* ((thing-of-interest (thing-at-point 'symbol t))
 	     (pair (save-excursion (end-of-thing 'symbol)
 				   (jdee-parse-java-variable-at-point)))
 	     (class-to-open (jdee-open-get-class-to-open

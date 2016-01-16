@@ -605,7 +605,7 @@ point is
 In this case, this function returns (cons \"error.msg\" \"length\").
 This function works only for qualified names that do not contain
 white space. It returns null if there is no qualified name at point."
-  (let ((symbol-at-point (thing-at-point 'symbol)))
+  (let ((symbol-at-point (thing-at-point 'symbol t)))
     (when symbol-at-point
        (thing-at-point-looking-at "[^ \n\t();,:+<]+") ;; add < to prevent like "Map<String"
       (let ((qualified-name
@@ -1042,7 +1042,7 @@ in a method; otherwise, nil."
 (defun jdee-parse-java-variable-at-point ()
   "Returns a list (VAR PARTIAL) where VAR.PARTIAL is the partially completed
 method or field name at point. For example, suppose obj.f1.ge were the name
-at point. This function would return the list (obj.f1 ge)."
+at point. This function would return the list (\"obj.f1\" \"ge\")."
   (save-excursion
     (let (start middle-point varname curcar dot (dot-offset 0) found
 		(original-point (point))
@@ -1736,9 +1736,9 @@ The first two elements of the list are `nil' if CLASSNAME isn't fully qualifed."
 	;; (i.e. [a-zA-Z.])  but this need to be refined to use the Sun Java
 	;; standards of class name parsing
 	(or (let ((thing-at-point-file-name-chars "-~/[:alnum:]_.${}#%:"))
-	      (parse-at-point (thing-at-point 'filename)))
-	    (parse-at-point (thing-at-point 'word))
-	    (parse-at-point (thing-at-point 'symbol)))
+	      (parse-at-point (thing-at-point 'filename t)))
+	    (parse-at-point (thing-at-point 'word t))
+	    (parse-at-point (thing-at-point 'symbol t)))
       (parse-at-point classname))))
 
 (provide 'jdee-parse)
