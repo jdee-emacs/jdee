@@ -1127,11 +1127,10 @@ Does nothing but return nil if `jdee-log-max' is nil."
   :set '(lambda (sym val)
 	  (set-default sym val)
           ;; Define JDEE menu for FSF Emacs.
-	  (if (featurep 'infodock)
-	      (easy-menu-define jdee-menu
-                jdee-mode-map
-                "Menu for JDE."
-                val))))
+	  (easy-menu-define jdee-menu
+            jdee-mode-map
+            "Menu for JDEE."
+            val)))
 
 (defcustom jdee-new-buffer-menu
   (list
