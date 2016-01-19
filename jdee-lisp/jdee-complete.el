@@ -747,34 +747,34 @@ ACCESS-LEVEL is one of: `jdee-complete-private'
 completions from beanshell."
   (let ((type (jdee-parse-eval-type-of (car pair))))
     (if type
-	(cond
-	 ((member type jdee-parse-primitive-types)
-	  (error "Cannot complete primitive type: %s" type))
+        (cond
+         ((member type jdee-parse-primitive-types)
+          (error "Cannot complete primitive type: %s" type))
 
-	 ((string= type "void")
-	  (error "Cannot complete return type of %s is void." (car pair)))
+         ((string= type "void")
+          (error "Cannot complete return type of %s is void." (car pair)))
 
-	 (access-level
-	  (let ((classinfo (jdee-complete-get-classinfo type access-level)))
-	    ;; FIXME: when is classinfo nil?
-	    (when classinfo
-	      (if (and (string= (nth 1 pair) "")
-		       (not exact-completion))
-		  (setq jdee-complete-current-list classinfo)
-		(setq jdee-complete-current-list
-		      (jdee-complete-find-all-completions
-		       pair classinfo exact-completion))))))
+         (access-level
+          (let ((classinfo (jdee-complete-get-classinfo type access-level)))
+            ;; FIXME: when is classinfo nil?
+            (when classinfo
+              (if (and (string= (nth 1 pair) "")
+                       (not exact-completion))
+                  (setq jdee-complete-current-list classinfo)
+                (setq jdee-complete-current-list
+                      (jdee-complete-find-all-completions
+                       pair classinfo exact-completion))))))
 
-	 (t
-	  (let ((classinfo (jdee-complete-get-classinfo type)))
-	    ;; FIXME: when is classinfo nil?
-	    (when classinfo
-	      (if (and (string= (nth 1 pair) "")
-		       (not exact-completion))
-		  (setq jdee-complete-current-list classinfo)
-		(setq jdee-complete-current-list
-		      (jdee-complete-find-all-completions
-		       pair classinfo exact-completion)))))))
+         (t
+          (let ((classinfo (jdee-complete-get-classinfo type)))
+            ;; FIXME: when is classinfo nil?
+            (when classinfo
+              (if (and (string= (nth 1 pair) "")
+                       (not exact-completion))
+                  (setq jdee-complete-current-list classinfo)
+                (setq jdee-complete-current-list
+                      (jdee-complete-find-all-completions
+                       pair classinfo exact-completion)))))))
 
       ;; type is nil
       nil)))

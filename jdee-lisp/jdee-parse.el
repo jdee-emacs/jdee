@@ -33,6 +33,8 @@
 (require 'semantic/sb)
 (require 'thingatpt)
 
+(eval-when-compile (require 'cl))
+
 ;; FIXME: refactor
 (defvar jdee-complete-private)
 (defvar jdee-complete-current-list)
@@ -1295,59 +1297,62 @@ Java type name, e.g., int."
 		  (cond
 		   ((eq last-char ?\))
 		    (let* ((result
-			    (jdee-parse-isolate-before-matching-of-last-car
-			     expr))
-			   (temp (if (not (string= "this.this" result))
-				     (jdee-parse-split-by-dots result)))
-			   to-complete)
+                    (jdee-parse-isolate-before-matching-of-last-car
+                     expr))
+                   (temp (if (not (string= "this.this" result))
+                             (jdee-parse-split-by-dots result)))
+                   to-complete)
 		      (if temp
-			  (jdee-parse-find-completion-for-pair temp)
-			;;we need exact completion here
-			(jdee-parse-find-completion-for-pair
-			 (list "this" result) nil jdee-complete-private))
+                  (jdee-parse-find-completion-for-pair temp)
+                ;;we need exact completion here
+                (jdee-parse-find-completion-for-pair
+                 (list "this" result) nil jdee-complete-private))
 
 		      ;;if the previous did not work try only result
 		      (if (not jdee-complete-current-list)
-			  (jdee-parse-find-completion-for-pair (list result "")))
+                  (jdee-parse-find-completion-for-pair (list result "")))
 
 		      ;;if the previous did not work try again
 		      (setq qualified-name
-			    (jdee-parse-get-qualified-name result t))
+                    (jdee-parse-get-qualified-name result t))
 		      (if qualified-name
-			  qualified-name
-			(if jdee-complete-current-list
-			    (progn
-			      (setq to-complete
-				    (car (car jdee-complete-current-list)))
-			      (setq chop-pos (+ 3 (string-match " : " to-complete)))
-			      (let* ((space-pos (string-match " " to-complete chop-pos))
-				     (uqname (if space-pos (substring to-complete chop-pos space-pos)
-					       (substring to-complete chop-pos))))
-				uqname))))))
+                  qualified-name
+                (if jdee-complete-current-list
+                    (progn
+                      (setq to-complete
+                            (car (car jdee-complete-current-list)))
+                      (setq chop-pos (+ 3 (string-match " : " to-complete)))
+                      (let* ((space-pos (string-match " " to-complete chop-pos))
+                             (uqname (if space-pos (substring to-complete chop-pos space-pos)
+                                       (substring to-complete chop-pos))))
+                        uqname))))))
 
 		   ;;if it's an array
 		   ((eq last-char ?\])
 		    (let ((temp (jdee-parse-eval-type-of
-				 (jdee-parse-isolate-before-matching-of-last-car
-				  expr))))
+                         (jdee-parse-isolate-before-matching-of-last-car
+                          expr))))
 		      (jdee-parse-get-component-type-of-array-class temp)))
 
 		   ;;we look for atoms if expr is splittable by dots
 		   ((setq temp (if (not (string= "this.this" expr))
-				   (jdee-parse-split-by-dots expr)))
-		    ;;we need exact completion here
-		    (jdee-parse-find-completion-for-pair temp t)
-		    (if jdee-complete-current-list
-			(progn
-			  (setq to-complete (car (car
-						  jdee-complete-current-list)))
-			  (setq chop-pos (+ 3 (string-match " : " to-complete)))
-			  (let* ((space-pos (string-match " " to-complete chop-pos))
-				 (uqname (if space-pos (substring to-complete chop-pos space-pos)
-					   (substring to-complete chop-pos))))
-			    (jdee-parse-get-qualified-name uqname)))
-
-		      nil))
+                           (jdee-parse-split-by-dots expr)))
+		    ;;we need exact completion here.  However, if we are parsing
+            ;;something like "foo().", where there is nothing after the dot,
+            ;;then we just need the type of the predot expression
+            (if (and temp (string-equal "" (cadr temp)))
+                (jdee-parse-eval-type-of (car temp))
+              (jdee-parse-find-completion-for-pair temp t)
+              (if jdee-complete-current-list
+                  (progn
+                    (setq to-complete (car (car
+                                            jdee-complete-current-list)))
+                    (setq chop-pos (+ 3 (string-match " : " to-complete)))
+                    (let* ((space-pos (string-match " " to-complete chop-pos))
+                           (uqname (if space-pos (substring to-complete chop-pos space-pos)
+                                     (substring to-complete chop-pos))))
+                      (jdee-parse-get-qualified-name uqname)))
+                nil)))
 		   (t
 		    ;; See if it's declared somewhere in this buffer.
 		    (let (parsed-type result result-qualifier)
@@ -1356,67 +1361,67 @@ Java type name, e.g., int."
 		      (setq result-qualifier (cdr parsed-type))
 
 		      (if result
-			  (let ((count 0) type)
-			    (while (string-match ".*\\[\\]" result)
-			      (setq result (substring result 0
-						      (- (length result) 2)))
-			      (setq count (1+ count)))
+                  (let ((count 0) type)
+                    (while (string-match ".*\\[\\]" result)
+                      (setq result (substring result 0
+                                              (- (length result) 2)))
+                      (setq count (1+ count)))
 
-			    (let (work)
-			      (setq type
-				    (cond
-				  ;; handle primitive types, e.g., int
-				     ((member result jdee-parse-primitive-types)
-				      result)
-			     ;; quickly make sure fully qualified name
-				     ;;doesn't exist
-				     ((and result-qualifier
-					   (jdee-parse-class-exists
-					    (setq work (concat result-qualifier
-							       "."
-							       result))))
-				      work)
-				     ;; then check for inner classes
-				     ((setq work
-					    (jdee-parse-get-inner-class-name
-					     result result-qualifier))
-				      work)
-			       ;; otherwise use unqualified class name
-				     (t
-				      (jdee-parse-get-qualified-name result
-								    t)))))
+                    (let (work)
+                      (setq type
+                            (cond
+                             ;; handle primitive types, e.g., int
+                             ((member result jdee-parse-primitive-types)
+                              result)
+                             ;; quickly make sure fully qualified name
+                             ;;doesn't exist
+                             ((and result-qualifier
+                                   (jdee-parse-class-exists
+                                    (setq work (concat result-qualifier
+                                                       "."
+                                                       result))))
+                              work)
+                             ;; then check for inner classes
+                             ((setq work
+                                    (jdee-parse-get-inner-class-name
+                                     result result-qualifier))
+                              work)
+                             ;; otherwise use unqualified class name
+                             (t
+                              (jdee-parse-get-qualified-name result
+                                                             t)))))
 
-			    (if type
-				(progn
-				  (while (> count 0)
-				    (setq type (concat type "[]"))
-				    (setq count (1- count)))
-				  (jdee-parse-transform-array-classes-names
-				   type))
-			      (if (y-or-n-p
-				   (format (concat "Could not find type of %s"
-						   " Attempt to import %s? ")
-					   expr result))
-				  (progn
-				    ;; import
-				    (jdee-import-find-and-import result)
-				    ;; recursive call of eval-type-of
-				    (jdee-parse-eval-type-of expr))
-				(error "Could not find type of %s" result))))
-			(if (and jdee-parse-casting
-				 (null jdee-parse-attempted-to-import)
-				 (y-or-n-p
-				  (format (concat "Could not find type of %s"
-						  " Attempt to import %s? ")
-					  expr expr)))
-			    (progn
-			      (setq jdee-parse-attempted-to-import t)
-			      (setq jdee-parse-casting nil)
-			      (jdee-import-find-and-import expr)
-			      (jdee-parse-eval-type-of expr))
-			  (progn
-			    (setq jdee-parse-attempted-to-import nil)
-			    nil))))))))))
+                    (if type
+                        (progn
+                          (while (> count 0)
+                            (setq type (concat type "[]"))
+                            (setq count (1- count)))
+                          (jdee-parse-transform-array-classes-names
+                           type))
+                      (if (y-or-n-p
+                           (format (concat "Could not find type of %s"
+                                           " Attempt to import %s? ")
+                                   expr result))
+                          (progn
+                            ;; import
+                            (jdee-import-find-and-import result)
+                            ;; recursive call of eval-type-of
+                            (jdee-parse-eval-type-of expr))
+                        (error "Could not find type of %s" result))))
+                (if (and jdee-parse-casting
+                         (null jdee-parse-attempted-to-import)
+                         (y-or-n-p
+                          (format (concat "Could not find type of %s"
+                                          " Attempt to import %s? ")
+                                  expr expr)))
+                    (progn
+                      (setq jdee-parse-attempted-to-import t)
+                      (setq jdee-parse-casting nil)
+                      (jdee-import-find-and-import expr)
+                      (jdee-parse-eval-type-of expr))
+                  (progn
+                    (setq jdee-parse-attempted-to-import nil)
+                    nil))))))))))
 	answer)))
 
 (defun jdee-parse-convert-args-to-types (args)

@@ -17,8 +17,12 @@ elpa:
 build : elpa $(OBJECTS)
 
 .PHONY: test
-test : clean
+test : clean build-test-java
 	$(CASK) exec ert-runner -L .
+
+.PHONY: build-test-java
+build-test-java:
+	cd ../jdee-test && mvn install
 
 .PHONY: clean
 clean :
