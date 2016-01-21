@@ -752,7 +752,7 @@ This command invokes the function defined by `jdee-build-function'."
 idle moments.")
 
 ; (define-derived-mode
-;   jdee-mode java-mode "JDE"
+;   jdee-mode java-mode "JDEE"
 ;   "Major mode for developing Java applications and applets.
 ;   \\{jdee-mode-map}"
 ;   (jdee-mode-internal)
@@ -782,7 +782,7 @@ idle moments.")
 	(if (get 'java-mode 'special)
 	    (put 'jdee-mode 'special t))
 	(setq major-mode 'jdee-mode)
-	(setq mode-name "JDE")
+	(setq mode-name "JDEE")
 	(derived-mode-set-keymap 'jdee-mode)
 	(derived-mode-set-syntax-table 'jdee-mode)
 	(derived-mode-set-abbrev-table 'jdee-mode)
