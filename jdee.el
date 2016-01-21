@@ -59,7 +59,6 @@
 (require 'jdee-jdb)
 (require 'jdee-jdk-manager)
 (require 'jdee-open-source)
-(require 'jdee-plugins)
 (require 'jdee-project-file)
 (require 'jdee-run)
 (require 'jdee-util)
@@ -764,6 +763,9 @@ idle moments.")
 (derived-mode-init-mode-variables 'jdee-mode)
 (put 'jdee-mode 'derived-mode-parent 'java-mode)
 
+;; Lazy load the plugins file, to avoid recursive requires
+(autoload 'jdee-plugin-minor-mode "jdee-plugins")
+
 ;;;###autoload
 (defun jdee-mode ()
   "Major mode for developing Java applications and applets.
@@ -975,7 +977,7 @@ Does nothing but return nil if `jdee-log-max' is nil."
 (add-to-list 'auto-mode-alist '("\\.java\\'" . jdee-mode))
 
 (defcustom jdee-menu-definition
-  (list "JDE"
+  (list "JDEE"
 	["Compile"           jdee-compile t]
 	;; ["Run App"           jdee-run (not (jdee-run-application-running-p))]
 	["Run App"           jdee-run t]
@@ -1127,11 +1129,10 @@ Does nothing but return nil if `jdee-log-max' is nil."
   :set '(lambda (sym val)
 	  (set-default sym val)
           ;; Define JDEE menu for FSF Emacs.
-	  (if (featurep 'infodock)
-	      (easy-menu-define jdee-menu
-                jdee-mode-map
-                "Menu for JDE."
-                val))))
+	  (easy-menu-define jdee-menu
+            jdee-mode-map
+            "Menu for JDEE."
+            val)))
 
 (defcustom jdee-new-buffer-menu
   (list
