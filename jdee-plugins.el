@@ -4,7 +4,7 @@
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
-;; Copyright (C) 2003, 2004 Paul Kinnucan.
+;; Copyright (C) 2003, 2004, 2016 Paul Kinnucan.
 ;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
@@ -38,9 +38,11 @@
 (defclass jdee-plugin ()
   ((bsh-cp    :initarg :bsh-cp
 	      :type list
+              :initform nil
 	      :documentation "Beanshell classpath for this plugin.")
    (menu-spec :initarg :menu-spec
 	      :type list
+              :initform nil
 	      :documentation "Specifies menu for this plugin.")
    (plugins   :type list
 	      :allocation :class
