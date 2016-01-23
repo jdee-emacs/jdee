@@ -498,7 +498,7 @@ the cursor"
   (interactive)
   (let* ((class
 	 (or class-name
-	     (read-from-minibuffer "Class: " (thing-at-point 'symbol t))))
+	     (read-from-minibuffer "Class: " (thing-at-point 'symbol))))
 	 (fq-class-name
 	  (jdee-parse-select-qualified-class-name class)))
     (if fq-class-name

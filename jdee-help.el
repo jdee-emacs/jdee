@@ -647,7 +647,7 @@ documented."
 		   (jdee-jdhelper-show-class jdee-jdhelper-singleton class member))))))
     (condition-case err
 	(let* ((parse-result (jdee-help-parse-symbol-at-point))
-	       (unqualified-name (thing-at-point 'symbol t))
+	       (unqualified-name (thing-at-point 'symbol))
 	       (class-name (jdee-parse-get-qualified-name unqualified-name t))
 	       (pair (jdee-parse-java-variable-at-point)))
 	  (if (not class-name)

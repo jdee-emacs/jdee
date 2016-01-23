@@ -182,7 +182,7 @@ $CLASSPATH, then in the current directory."
 			    (prog1
 				(point)
 			      (goto-char position))))
-	     (thing-of-interest (thing-at-point 'symbol t))
+	     (thing-of-interest (thing-at-point 'symbol))
 	     (pair (save-excursion
 		     (end-of-thing 'symbol)
 		     (jdee-parse-java-variable-at-point)))
@@ -239,7 +239,7 @@ not associated with any project."
   (condition-case err
       (let* ((unqualified-name
 	      (or unqual-class
-		  (read-from-minibuffer "Class: " (thing-at-point 'symbol t))))
+		  (read-from-minibuffer "Class: " (thing-at-point 'symbol))))
 	     (class-names
 	      ;;expand the names into full names, or a list of names
 	      (jdee-jeval-r
