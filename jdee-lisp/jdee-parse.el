@@ -1071,29 +1071,30 @@ at point. This function would return the list (obj.f1 ge)."
       ;;                      ^              ^
       (setq curcar (char-before))
       (if curcar
-	  (progn
-	    (while (null found)
-	      (cond
-	       ((or (and (>= curcar ?a) (<= curcar ?z)) ; a-z
-		    (and (>= curcar ?A) (<= curcar ?Z)) ; A-z
-		    (and (>= curcar ?0) (<= curcar ?9))
-		    (>= curcar 127)
-		    (member curcar '(?$ ?_ ?\\))) ;; _ \
-		(forward-char -1))
-	       ((eq ?. curcar)
-		(setq dot-offset 1)
-		(if (eq ?\) (char-before (- (point) 1)))
-		    (progn
-		      (forward-char -2)
-		      (setq first-paren (point))
-		      (setq second-paren (jdee-parse-match-paren-position))
-		      (setq offset (+ (- first-paren second-paren) 1))
-		      (forward-char 2)
-		      (setq found (point)))
-		  (setq found (point))))
-	       (t
-		(setq found (point))))
-	      (setq curcar (char-before)))
+          (progn
+            (while (null found)
+              (cond
+               ((or (and (>= curcar ?a) (<= curcar ?z)) ; a-z
+                    (and (>= curcar ?A) (<= curcar ?Z)) ; A-z
+                    (and (>= curcar ?0) (<= curcar ?9))
+                    (>= curcar 127)
+                    (member curcar '(?$ ?_ ?\\))) ;; _ \
+                (forward-char -1))
+               ((looking-back "\\.\\(\\(\\s-\\|\\s>\\)*\\)")
+                (setq dot-offset 1)
+                (goto-char (match-beginning 1))
+                (if (eq ?\) (char-before (- (point) 1)))
+                   (progn
+                     (forward-char -2)
+                     (setq first-paren (point))
+                     (setq second-paren (jdee-parse-match-paren-position))
+                     (setq offset (+ (- first-paren second-paren) 1))
+                     (forward-char 2)
+                     (setq found (point)))
+                 (setq found (point))))
+              (t
+               (setq found (point))))
+            (setq curcar (char-before)))
 	    (setq intermediate-point found)
 
         ;; Back up past any white space.  This lets completion work when
@@ -1102,7 +1103,7 @@ at point. This function would return the list (obj.f1 ge)."
         (skip-syntax-backward " >")
 
 
-	   ;; Now move point to the beginning of the expression, e.g.,
+        ;; Now move point to the beginning of the expression, e.g.,
 	    ;; from
 	    ;;
 	    ;;  obj.f1.ge
@@ -1115,50 +1116,55 @@ at point. This function would return the list (obj.f1 ge)."
 	    (progn
 	      (setq curcar (char-before))
 	      (while (or (and (>= curcar ?a) (<= curcar ?z))
-			 (and (>= curcar ?A) (<= curcar ?Z))
-			 (and (>= curcar ?0) (<= curcar ?9))
-			 (>= curcar 127)
-			 (and (eq curcar ? ) (or (< 0 paren-count)
-						 (< 0 bracket-count)))
-			 (and (member curcar '(?$ ?\" ?\. ?\_ ?\\ ?\( ?\) ?\, ?\[ ?\]))
-			      (if (eq curcar ?\[)
-				  (> bracket-count 0)
-				t)))
-		(cond
-		 ((eq curcar ?\))
-		  (progn
-		    (forward-char -1)
-		    (goto-char (jdee-parse-match-paren-position))))
-		 ((eq curcar ?\( )
-		  (setq paren-count (1- paren-count)))
-		 ((eq curcar ?\] )
-		  (setq bracket-count (1+ bracket-count)))
-		 ((eq curcar ?\[ )
-		  (setq bracket-count (1- bracket-count))))
-		(forward-char -1)
-		(setq curcar (char-before)))
+                     (and (>= curcar ?A) (<= curcar ?Z))
+                     (and (>= curcar ?0) (<= curcar ?9))
+                     (>= curcar 127)
+                     (and (eq curcar ? ) (or (< 0 paren-count)
+                                             (< 0 bracket-count)))
+                     (member curcar '(?$ ?\_ ?\\ ?\( ?\, ))
+                     ;; There can be whitespace between dotted terms and similar things
+                     (and (looking-back "\\([][.\")]\\)\\(\\s-\\|\\s>\\)*")
+                          (setq curcar (string-to-char (match-string 1)))
+                          (goto-char (match-end 1))
+                          (if (eq curcar ?\[)
+                              (> bracket-count 0)
+                            t))
+                     )
+            (cond
+             ((eq curcar ?\))
+              (progn
+                (forward-char -1)
+                (goto-char (jdee-parse-match-paren-position))))
+             ((eq curcar ?\( )
+              (setq paren-count (1- paren-count)))
+             ((eq curcar ?\] )
+              (setq bracket-count (1+ bracket-count)))
+             ((eq curcar ?\[ )
+              (setq bracket-count (1- bracket-count))))
+            (forward-char -1)
+            (setq curcar (char-before)))
 
 	      (setq beg-point (point))
 	      (set-marker jdee-parse-current-beginning intermediate-point)
 	      (set-marker jdee-parse-current-end original-point)
 	      (setq middle-point (- intermediate-point dot-offset offset))
 	      (setq first-part
-		    (buffer-substring-no-properties beg-point middle-point))
+                (buffer-substring-no-properties beg-point middle-point))
 	      (setq first-part (jdee-parse-isolate-to-parse first-part))
 
 	      ;;replacing newline by empty strings new lines seems to break the
 	      ;;beanshell
 	      (while (string-match "\n" first-part)
-		(setq first-part (replace-match "" nil nil first-part)))
+            (setq first-part (replace-match "" nil nil first-part)))
 
 	      ;;replacing extra spaces for "". This done to reduce the space
 	      ;;that the completion title takes
 	      (while (string-match " " first-part)
-		(setq first-part (replace-match "" nil nil first-part)))
+            (setq first-part (replace-match "" nil nil first-part)))
 
 	      (setq second-part
-		    (buffer-substring-no-properties
-		     intermediate-point original-point-before-ws))
+                (buffer-substring-no-properties
+                 intermediate-point original-point-before-ws))
 
           (while (string-match "\\s-\\|\\s>" second-part)
             (setq second-part (replace-match "" nil nil second-part)))
@@ -1167,15 +1173,15 @@ at point. This function would return the list (obj.f1 ge)."
 	      ;; ((Object) obj).ge
 	      ;; FIXME can't work ok for generic type, eg: ((List<String>) obj).ge
 	      (if (and (not cast-type)
-		       (string= first-part "")
-		       (eq (char-before (+ 1 middle-point)) ?\()
-		       (eq (char-before (+ 2 middle-point)) ?\())
-		  (save-excursion
-		    (goto-char (+ middle-point 1))
-		    (setq first-paren (point))
-		    (setq second-paren (jdee-parse-match-paren-position))
-		    (setq cast-type (buffer-substring-no-properties
-				     (+ 1 first-paren) second-paren))))
+                   (string= first-part "")
+                   (eq (char-before (+ 1 middle-point)) ?\()
+                   (eq (char-before (+ 2 middle-point)) ?\())
+              (save-excursion
+                (goto-char (+ middle-point 1))
+                (setq first-paren (point))
+                (setq second-paren (jdee-parse-match-paren-position))
+                (setq cast-type (buffer-substring-no-properties
+                                 (+ 1 first-paren) second-paren))))
 
           ;; If the parsed region is just white-space, move the start of the
           ;; region to the end of the region to preserve the whitespace

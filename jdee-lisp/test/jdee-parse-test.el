@@ -31,6 +31,23 @@ If DIRECTORY is non-nil, it used as the current directory for the test."
        (goto-char (point-min))
        ,@body)))
 
+(defmacro jdee-test-with-existing-class (class &rest body)
+  "Fake CLASS being defined and run BODY"
+  (declare (debug t)
+           (indent 1))
+  `(let ((advice-name (concat "class-exists-" ,class)))
+     (unwind-protect
+       (progn
+        ;; Add advice to make the class be defined
+        (advice-add
+         'jdee-parse-class-exists
+          :before-until
+          (lambda (name)
+            (string-equal name ,class))
+          '((name . advice-name)))
+        ,@body)
+       ;; When done, remove the advice
+       (advice-remove #'jdee-parse-class-exists advice-name))))
 
 (ert-deftest jdee-parse-find-decl-same-name ()
   "Test that `jdee-parse-find-declaration-of' works when the variable and the
@@ -87,6 +104,7 @@ class have the same name, but different spellings."
 (ert-deftest jdee-parse-method-from-class ()
   "Completion of 'static_method().'"
 
+  (message "running jdee-parse-method-from-class")
   (jdee-test-with-jdee-buffer
       "class Testing {
 private static String hello() { return \"Hello\"; }
@@ -95,11 +113,49 @@ private static String hello() { return \"Hello\"; }
 }"
       nil
 
-    (should (equal (jdee-parse-eval-type-of "hello().") "java.lang.String"))))
+    (jdee-test-with-existing-class "Testing"
+      ;; Put the class-info into the cache
+      (let ((jdee-complete-classinfo-cache
+             '(("Testing"
+                ;; Public
+                ((nil
+                  (("Testing" nil)) ;; Constructors
+                  (("hello" "java.lang.String" nil)) ;; Methods
+                  nil)
+                 (nil nil nil nil) ;; Protected
+                 (nil nil nil nil) ;; Package
+                 (nil nil nil nil) ;; Private
+                )))))
+        (search-forward "hello") ;; Parse only checks classes that the point is inside
+        (should (equal (jdee-parse-eval-type-of "hello().") "java.lang.String"))))))
+
+(ert-deftest jdee-parse-split-line-style ()
+  "Parsing of an expression split over multiple lines:
+    foo().
+    bar().
+    b"
+
+  (message "Running jdee-parse-split-line-style")
+
+  (jdee-test-with-jdee-buffer
+      "class Testing {
+             Testing() {
+               foo().
+               bar().
+               b
+      }"
+      nil
+
+    (goto-char (point-min))
+    (search-forward-regexp "b$")
+    (end-of-line)
+
+    (let ((pair (jdee-parse-java-variable-at-point)))
+      (should (string-equal (car pair) "foo().bar"))
+      (should (string-equal (cadr pair) "b")))))
 
 
 (provide 'jdee-parse-test)
 ;;; jdee-parse-test.el ends here
-
 
 
