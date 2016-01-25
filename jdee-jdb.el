@@ -487,7 +487,7 @@ on the list."
 (defmethod jdee-db-cmd-init ((this jdee-jdb-cmd-print))
   "The debugger invokes this method before executing the
 command."
-  (oset this expr (read-from-minibuffer "expr: " (thing-at-point 'word t)
+  (oset this expr (read-from-minibuffer "expr: " (thing-at-point 'word)
 					nil nil 'jdee-jdb-cmd-print-history)))
 
 (defmethod jdee-db-cmd-make-command-line ((this jdee-jdb-cmd-print))
@@ -528,7 +528,7 @@ command."
 (defmethod jdee-db-cmd-init ((this jdee-jdb-cmd-set-var))
   "The debugger invokes this method before executing the
 command."
-  (oset this expr (read-from-minibuffer "variable: " (thing-at-point 'word t)
+  (oset this expr (read-from-minibuffer "variable: " (thing-at-point 'word)
 					nil nil 'jdee-jdb-cmd-print-history))
   (oset this value (read-from-minibuffer "value: " nil
 					nil nil '(null))))
