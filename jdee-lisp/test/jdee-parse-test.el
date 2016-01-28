@@ -101,6 +101,29 @@ class have the same name, but different spellings."
     (let ((pair (jdee-parse-java-variable-at-point)))
       (should (equal '("someString" "") pair)))))
 
+
+(ert-deftest jdee-parse-partial-value ()
+  "Parsing of partly written method call"
+
+  (jdee-test-with-jdee-buffer
+      "class Testing {
+  void foo() {
+     String s = null;
+     s.get
+
+}
+}"
+      nil
+    (goto-char (point-min))
+    (search-forward "s.get")
+    (goto-char (match-end 0))
+    (let ((pair (jdee-parse-java-variable-at-point)))
+      (should (equal '("s" "get") pair))
+      (goto-char jdee-parse-current-beginning)
+      (should (looking-at "get"))
+      (should (= (+ jdee-parse-current-beginning 3) jdee-parse-current-end)))))
+
+
 (ert-deftest jdee-parse-method-from-class ()
   "Completion of 'static_method().'"
 

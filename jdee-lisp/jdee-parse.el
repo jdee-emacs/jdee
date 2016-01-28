@@ -1188,7 +1188,7 @@ at point. This function would return the list (obj.f1 ge)."
           (when (string-match "^\\(\\s-\\|\\s>\\)+$"
                               (buffer-substring-no-properties jdee-parse-current-beginning
                                                               jdee-parse-current-end))
-            (setq jdee-parse-current-beginning jdee-parse-current-end))
+            (set-marker jdee-parse-current-beginning jdee-parse-current-end))
 
 	      (if cast-type
               (progn

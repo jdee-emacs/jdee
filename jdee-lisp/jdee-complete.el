@@ -909,13 +909,13 @@ string -  show completions in-line, cycling thru them."
 	;; Check if PREFIX is in the current class
 	(setq completion-list
 	      (jdee-complete-find-completion-for-pair
-	       (list (concat "this." (car pair)) "")
+	       (list (concat "this." (car pair)) (cadr pair))
 	       nil jdee-complete-private)))
     ;;if completions is still null check if the method is in the
     ;;super class
     (if (null completion-list)
 	(setq completion-list (jdee-complete-find-completion-for-pair
-			       (list (concat "super." (car pair)) "")
+			       (list (concat "super." (car pair)) (cadr pair))
 			       nil jdee-complete-protected)))
 
     (if completion-list
