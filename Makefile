@@ -24,6 +24,10 @@ test : clean
 clean :
 	rm -f $(OBJECTS)
 
+.PHONY: package
+package : test
+	$(CASK) package
+
 .PHONY: elpaclean
 elpaclean : clean
 	rm -f elpa
