@@ -510,15 +510,13 @@ be an interactive function that can be called by
 ;;(makunbound 'jdee-debugger)
 (defcustom jdee-debugger (list "jdb")
   "Specify the debugger you want to use to debug Java programs.
-Select JDEbug, if you want to use the JDE's builtin debugger.  Select
-jdb, if you want to use the default version of jdb for the JDK used by
-the current project (see `jdee-jdk'). Select old jdb, if you are using
-JDK 1.2.2 or later and want to use the the old (e.g., pre-JPDA)
+Select jdb, if you want to use the default version of jdb for the JDK
+used by the current project (see `jdee-jdk'). Select old jdb, if you
+are using JDK 1.2.2 or later and want to use the the old (e.g., pre-JPDA)
 version of jdb instead of the new (JPDA-based) version of jdb."
   :group 'jdee-project
   :type '(list
 	  (radio-button-choice
-	  (item "JDEbug")
 	  (item "jdb")
 	  (item "old jdb")))
   :set '(lambda (sym val)
