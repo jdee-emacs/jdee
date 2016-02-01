@@ -1045,7 +1045,7 @@ in a method; otherwise, nil."
 (defun jdee-parse-java-variable-at-point ()
   "Returns a list (VAR PARTIAL) where VAR.PARTIAL is the partially completed
 method or field name at point. For example, suppose obj.f1.ge were the name
-at point. This function would return the list (obj.f1 ge)."
+at point. This function would return the list (\"obj.f1\" \"ge\")."
   (save-excursion
     (let (start middle-point varname curcar dot (dot-offset 0) found
                 (original-point (point))

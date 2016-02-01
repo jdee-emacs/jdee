@@ -11,6 +11,10 @@ nrepl-client-exit:
 
 jdee-sample:
 	$(MAKE) -C jdee-sample compile
+.PHONY: package
+package : test
+	$(CASK) package
+
 
 jdee-maven-nrepl:
 	$(MAKE) -C jdee-maven-nrepl install

@@ -39,12 +39,41 @@
 (require 'regexp-opt)
 (require 'tempo)
 
+;; working-XXX are from CEDET/working library, which is not included
+;; in Emacs, so need to workaround that with this code (also from
+;; the library).
+(eval-and-compile
+  (condition-case nil
+      (require 'working)
+    (error
+     (progn
+       (defvar working-message nil
+         "Message stored when in a status loop.")
+       (defmacro working-status-forms (message donestr &rest forms)
+         "Contain a block of code during which a working status is shown."
+         (list 'let (list (list 'msg message) (list 'dstr donestr)
+                          '(ref1 0))
+               (cons 'progn forms)))
+
+       (defun working-status (&optional percent &rest args)
+         "Called within the macro `working-status-forms', show the status."
+         (message "%s%s" (apply 'format msg args)
+                  (if (eq percent t) (concat "... " dstr)
+                    (format "... %3d%%"
+                            (or percent
+                                (floor (* 100.0 (/ (float (point))
+                                                   (point-max)))))))))
+
+       (defun working-dynamic-status (&optional number &rest args)
+         "Called within the macro `working-status-forms', show the status."
+         (message "%s%s" (apply 'format msg args)
+                  (format "... %c" (aref [ ?- ?/ ?| ?\\ ] (% ref1 4))))
+         (setq ref1 (1+ ref1)))
+
+       (put 'working-status-forms 'lisp-indent-function 2)))))
+
 ;; FIXME: refactor
 (declare-function jdee-jeval-r "jdee-bsh" (java-statement))
-
-;; FIXME: can't find working-status-forms
-(defvar working-message);; for byte-compiler
-(declare-function working-status-forms "working")
 
 ;;;; Customization
 ;;;; -------------

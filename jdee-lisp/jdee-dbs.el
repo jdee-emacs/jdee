@@ -24,15 +24,8 @@
 
 ;;; Commentary:
 
-;; This is one of a set of packages that make up the
-;; Java Development Environment (JDE) for Emacs. See the
-;; JDE User's Guide for more information.
-
-;; The latest version of the JDE is available at
-;; <URL:http://jdee.sourceforge.net/>.
-
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Kinnucan at paulk@mathworks.com.
+;; This is one of a set of packages that make up the JDEE.
+;; See the JDEE User's Guide for more information.
 
 ;;; Code:
 
@@ -887,9 +880,6 @@ for the breakpoint."
 		  (jdee-normalize-path 'jdee-run-working-directory)
 		source-directory))
 	     (vm (oref (jdee-run-get-vm) :path))
-	     (jdee-java-directory
-	      (expand-file-name "java"
-	       (jdee-find-jdee-data-directory)))
 	     (vm-args
 		(let (args)
 		  (setq args
@@ -899,9 +889,7 @@ for the breakpoint."
 			  "-classpath"
 			  (jdee-build-classpath
 			       (list
-				 (expand-file-name
-				  (if jdee-bug-debug "classes" "lib/jde.jar")
-				  jdee-java-directory)
+                                 jdee-server-dir
 				 (if (jdee-bug-vm-includes-jpda-p)
 				   (jdee-get-tools-jar)
 				   (expand-file-name

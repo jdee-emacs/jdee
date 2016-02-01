@@ -178,5 +178,92 @@ buffer."
     ;; private before field:
     (should (eq (jdee-test-face-at 24) 'jdee-font-lock-private-face))))
 
+(ert-deftest jdee-font-lock/fontify-constants ()
+  :tags '(fontification)
+  (jdee-test-with-temp-buffer
+      "class Sample {  int foo = 42; }"
+    (should (eq (jdee-test-face-at 27) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 28) 'jdee-font-lock-number-face))
+    (should (null (jdee-test-face-at 29))))
+  (jdee-test-with-temp-buffer
+      "class Sample {  float foo = 3.14; }"
+    (should (eq (jdee-test-face-at 29) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 30) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 31) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 32) 'jdee-font-lock-number-face))
+    (should (null (jdee-test-face-at 33))))
+  (jdee-test-with-temp-buffer
+      "class Sample {  int foo = 1_000; }" ; (syntax introduced in Java 7)
+    (should (eq (jdee-test-face-at 27) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 28) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 29) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 30) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 31) 'jdee-font-lock-number-face))
+    (should (null (jdee-test-face-at 32))))
+  (jdee-test-with-temp-buffer
+      "class Sample {  int foo = 0xa1B2CF; }"
+    (should (eq (jdee-test-face-at 27) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 28) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 29) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 30) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 31) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 32) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 33) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 34) 'jdee-font-lock-number-face))
+    (should (null (jdee-test-face-at 35))))
+  (jdee-test-with-temp-buffer
+      "class Sample {  int foo = 0xa1_B2_CF; }" ; (syntax introduced in Java 7)
+    (should (eq (jdee-test-face-at 27) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 28) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 29) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 30) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 31) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 32) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 33) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 34) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 35) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 36) 'jdee-font-lock-number-face))
+    (should (null (jdee-test-face-at 37))))
+  (jdee-test-with-temp-buffer
+      "class Sample {  int foo = 0b1_0_1; }" ; (syntax introduced in Java 7)
+    (should (eq (jdee-test-face-at 27) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 28) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 29) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 30) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 31) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 32) 'jdee-font-lock-number-face))
+    (should (eq (jdee-test-face-at 33) 'jdee-font-lock-number-face))
+    (should (null (jdee-test-face-at 34))))
+  (jdee-test-with-temp-buffer
+      "class Sample {  boolean foo = true; }"
+    (should (eq (jdee-test-face-at 31) 'jdee-font-lock-constant-face))
+    (should (eq (jdee-test-face-at 32) 'jdee-font-lock-constant-face))
+    (should (eq (jdee-test-face-at 33) 'jdee-font-lock-constant-face))
+    (should (eq (jdee-test-face-at 34) 'jdee-font-lock-constant-face))
+    (should (null (jdee-test-face-at 35))))
+  (jdee-test-with-temp-buffer
+      "class Sample {  boolean foo = false; }"
+    (should (eq (jdee-test-face-at 31) 'jdee-font-lock-constant-face))
+    (should (eq (jdee-test-face-at 32) 'jdee-font-lock-constant-face))
+    (should (eq (jdee-test-face-at 33) 'jdee-font-lock-constant-face))
+    (should (eq (jdee-test-face-at 34) 'jdee-font-lock-constant-face))
+    (should (eq (jdee-test-face-at 35) 'jdee-font-lock-constant-face))
+    (should (null (jdee-test-face-at 36))))
+  (jdee-test-with-temp-buffer
+      "class Sample {  Object foo = null; }"
+    (should (eq (jdee-test-face-at 30) 'jdee-font-lock-constant-face))
+    (should (eq (jdee-test-face-at 31) 'jdee-font-lock-constant-face))
+    (should (eq (jdee-test-face-at 32) 'jdee-font-lock-constant-face))
+    (should (eq (jdee-test-face-at 33) 'jdee-font-lock-constant-face))
+    (should (null (jdee-test-face-at 34))))
+  (jdee-test-with-temp-buffer
+      "class Sample {  String foo = \"foo\"; }"
+    (should (eq (jdee-test-face-at 30) 'font-lock-string-face))
+    (should (eq (jdee-test-face-at 31) 'font-lock-string-face))
+    (should (eq (jdee-test-face-at 32) 'font-lock-string-face))
+    (should (eq (jdee-test-face-at 33) 'font-lock-string-face))
+    (should (eq (jdee-test-face-at 34) 'font-lock-string-face))
+    (should (null (jdee-test-face-at 35)))))
+
 (provide 'jdee-font-lock-test)
 ;;; jdee-font-lock-test.el ends here

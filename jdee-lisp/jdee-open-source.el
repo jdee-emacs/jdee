@@ -79,21 +79,19 @@ If this fails point is on a method or an attribute of a class in the current
 buffer or in a superclass. In this cases we check first if the parsed-symbol
 is a possible member of the current class(\"this\") and if this fails it
 checks if it is a member of the base class(\"super\")."
- (if (and (stringp (car pair))
-	  (> (length (car pair)) 0))
-     ;; if we got a pair all should work fine.
-     (jdee-parse-eval-type-of (car pair))
-   (or (condition-case ()
-	   (jdee-parse-eval-type-of parsed-symbol)
-	 (error nil))
-       (if (jdee-parse-find-completion-for-pair
-	    `("this" ,parsed-symbol) nil jdee-complete-private)
-	   (jdee-parse-eval-type-of "this")
-	 nil)
-       (if (jdee-parse-find-completion-for-pair
-	    `("super" ,parsed-symbol) nil jdee-complete-private)
-	   (jdee-parse-eval-type-of "super")
-	 nil))))
+  (cond ((and (stringp (car pair))
+              (> (length (car pair)) 0))
+         ;; if we got a pair all should work fine.
+         (concat (car pair) "." (cadr pair)))
+        ((condition-case ()
+             (jdee-parse-eval-type-of parsed-symbol)
+           (error nil)) )
+        ((jdee-parse-find-completion-for-pair
+          `("this" ,parsed-symbol) nil jdee-complete-private)
+         (jdee-parse-eval-type-of "this"))
+        ((jdee-parse-find-completion-for-pair
+          `("super" ,parsed-symbol) nil jdee-complete-private)
+         (jdee-parse-eval-type-of "super"))))
 
 
 (defun jdee-open-functions-exist ()
@@ -313,15 +311,11 @@ CLASS. If it finds the source file in a directory, it returns the
 file's path. If it finds the source file in an archive, it returns a
 buffer containing the contents of the file. If this function does not
 find the source for the class, it returns nil."
-  (let ((verified-name (jdee-parse-class-exists class))
-	outer-class file package)
-    (if (null verified-name)
-	(error "Class not found: %s" class))
-    (setq outer-class (car (split-string verified-name "[$]"))
-	  file (concat
+  (let* ((outer-class (car (split-string class "[$]")))
+         (file (concat
 		(jdee-parse-get-unqualified-name outer-class)
-		".java")
-	  package (jdee-parse-get-package-from-name outer-class))
+		".java"))
+         (package (jdee-parse-get-package-from-name outer-class)))
     (catch 'found
       (loop for path in (jdee-get-sourcepath) do
 	      (if (and (file-exists-p path)
