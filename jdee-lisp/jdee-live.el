@@ -302,8 +302,22 @@ is again true)."
           ;; asynchronously
           (unless async (jdee-live-nrepl-wait-for-server-ready nrepl))
         ;; Repl does not exist or is not doing asynchonous initialization.
+
         (jdee-live-nrepl-connect (or nrepl (make-instance 'jdee-live-nrepl))
                                  async)))))
+
+(defun jdee-live-suppress-cider-buffer (cider-buffer)
+  "Keep the cider buffer from popping up when it it is ready.
+The user is programming in java and does not want to see a clojure buffer."
+  (with-current-buffer cider-buffer
+    (let ((nrepl (jdee-live--get-nrepl)))
+      (when nrepl
+        (set (make-local-variable 'cider-repl-pop-to-buffer-on-connect) nil))))
+  ;; Don't actually change the return value
+  cider-buffer)
+
+(advice-add 'cider-repl-create :filter-return #'jdee-live-suppress-cider-buffer)
+
 
 (defmethod jdee-live-nrepl-wait-for-server-ready ((this jdee-live-nrepl))
   "Wait for SERV-PROC to be ready to accept input."
