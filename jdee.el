@@ -7,7 +7,7 @@
 ;; Version: 2.4.2
 ;; Package-Requires: ((emacs "24.3"))
 
-;; Copyright (C) 1997-2008 Paul Kinnucan.
+;; Copyright (C) 1997-2008, 2016 Paul Kinnucan.
 ;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
@@ -763,9 +763,6 @@ idle moments.")
 (derived-mode-init-mode-variables 'jdee-mode)
 (put 'jdee-mode 'derived-mode-parent 'java-mode)
 
-;; Lazy load the plugins file, to avoid recursive requires
-(autoload 'jdee-plugin-minor-mode "jdee-plugins")
-
 ;;;###autoload
 (defun jdee-mode ()
   "Major mode for developing Java applications and applets.
@@ -774,6 +771,7 @@ idle moments.")
   (condition-case err
       (progn
 	(jdee-check-versions)
+        (require 'jdee-plugins)
 
 	(add-to-list 'semantic-new-buffer-setup-functions
 		     '(jdee-mode . jdee-parse-semantic-default-setup))
@@ -859,9 +857,6 @@ idle moments.")
 	(if (string= (car jdee-debugger) "JDEbug")
 	    (jdee-bug-minor-mode 1)
 	  (jdee-jdb-minor-mode 1))
-
-	;; Install plugin menu.
-	(jdee-plugin-minor-mode 1)
 
 	(when (boundp 'jdee-mode-map)
 	  (let ((key (car (read-from-string "[return]"))))

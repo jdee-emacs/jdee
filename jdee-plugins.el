@@ -28,7 +28,6 @@
 (require 'eieio)
 (require 'executable)
 (require 'jdee-util);; jdee-root
-(require 'semantic/util-modes);; semantic-add-minor-mode
 
 (defcustom jdee-plugins-directory (expand-file-name "plugins" (jdee-root))
   "Location of the JDEE's plugins directory."
@@ -99,9 +98,14 @@ a file named jdee-PLUGIN.el. This function loads jdee-PLUGIN.el."
                   (jdee-pi-load-plugin (file-name-nondirectory f))))
             (directory-files jdee-plugins-directory t)))
   ;; Update the menu after the plugins have been loaded
-  (setq jdee-plugin-minor-mode-map (jdee-pi-mode-map))
-  (setcdr (assq 'jdee-plugin-minor-mode minor-mode-map-alist)
-          jdee-plugin-minor-mode-map))
+  (let* ((menu (jdee-pi-make-menu-spec))
+         (p (assoc (car menu) jdee-menu-definition))
+         (new-menu (cond ((null menu) (if p (remove p jdee-menu-definition)))
+                         ((null p) (append jdee-menu-definition (list menu)))
+                         (t (append (remove p jdee-menu-definition) (list menu))))))
+    (if new-menu
+        (custom-set-variables `(jdee-menu-definition ',new-menu t))))
+  )
 
 (defun jdee-pi-get-bsh-classpath ()
   "Get the plugin directories and jar files to include in the Beanshell classpath."
@@ -147,27 +151,13 @@ jar program is on the system path."
 (defun jdee-pi-make-menu-spec ()
   (if (oref-default 'jdee-plugin plugins)
       (append
-       (list "JDEEpi")
+       (list "Plug-Ins")
        (delq
 	nil
 	(cl-mapcan
 	 (lambda (plugin)
 	   (oref plugin menu-spec))
 	 (oref-default 'jdee-plugin plugins))))))
-
-(defun jdee-pi-mode-map ()
-  "Keymap for JDEE plugin minor mode."
-  (let ((km (make-sparse-keymap))
-	(menu-spec (jdee-pi-make-menu-spec)))
-    (if menu-spec
-	(easy-menu-define jdee-pi-menu km "JDEE Plugin Minor Mode Menu"
-	  menu-spec))
-    km))
-
-(define-minor-mode jdee-plugin-minor-mode nil
-  :keymap (jdee-pi-mode-map))
-
-(semantic-add-minor-mode 'jdee-plugin-minor-mode " plugin")
 
 (provide 'jdee-plugins)
 
