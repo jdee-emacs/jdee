@@ -553,7 +553,6 @@ expand button causes the widget to display the values of the array."
 		'(cons :tag "Debugger Options"
 		   (radio-button-choice :format "%t \n%v"
 					:tag "Debugger "
-					(const "JDEbug")
 					(const "jdb")
 					(const "oldjdb")
 					(const "Other"))

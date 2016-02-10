@@ -28,11 +28,6 @@
 ;; This is one of a set of packages that make up the
 ;; Java Development Environment (JDE) for Emacs. See the
 ;; JDE User's Guide for more information.
-;; The latest version of the JDE is available at
-;; <URL:http://jdee.sourceforge.net/>.
-
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Kinnucan at paulk@mathworks.com.
 
 ;;; Code:
 
@@ -2471,4 +2466,4 @@ of the variable `jdee-bug-stack-info'"
 
 (provide 'jdee-bug)
 
-;; End of jdee-bug.el
+;;; jdee-bug.el ends here

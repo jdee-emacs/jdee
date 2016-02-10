@@ -509,15 +509,13 @@ be an interactive function that can be called by
 ;;(makunbound 'jdee-debugger)
 (defcustom jdee-debugger (list "jdb")
   "Specify the debugger you want to use to debug Java programs.
-Select JDEbug, if you want to use the JDE's builtin debugger.  Select
-jdb, if you want to use the default version of jdb for the JDK used by
-the current project (see `jdee-jdk'). Select old jdb, if you are using
-JDK 1.2.2 or later and want to use the the old (e.g., pre-JPDA)
+Select jdb, if you want to use the default version of jdb for the JDK
+used by the current project (see `jdee-jdk'). Select old jdb, if you
+are using JDK 1.2.2 or later and want to use the the old (e.g., pre-JPDA)
 version of jdb instead of the new (JPDA-based) version of jdb."
   :group 'jdee-project
   :type '(list
 	  (radio-button-choice
-	  (item "JDEbug")
 	  (item "jdb")
 	  (item "old jdb")))
   :set '(lambda (sym val)
@@ -1867,22 +1865,6 @@ This is done if FILE.el is newer than FILE.elc or if FILE.elc doesn't exist."
 			       (file-name-nondirectory file)))
 	      (byte-compile-file file))))))
 
-;;;###autoload
-(defun jdee-compile-jde ()
-  "Byte-compile all uncompiled files of jde."
-
-  ;; Be sure to have . in load-path since a number of files in jde
-  ;; depend on other files and we always want the newer one even if
-  ;; a previous version of jde exists.
-
-  (interactive)
-  (let ((load-path (append '(".") load-path))
-	(jdee-lisp-directory (jdee-find-jdee-data-directory)))
-    (save-excursion
-      (mapcar
-       (function jdee-compile-file-if-necessary)
-       (directory-files jdee-lisp-directory t)))))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                            ;;
 ;; Find command                                                               ;;
@@ -1894,7 +1876,7 @@ This is done if FILE.el is newer than FILE.elc or if FILE.elc doesn't exist."
 If non-nil, the search is case-sensitive; otherwise, the search ignores case."
   :group 'jdee-project
   :type 'boolean
-)
+  )
 
 ;; (makunbound 'jdee-find-granularity)
 (defcustom jdee-find-granularity '("Character")
@@ -2237,17 +2219,6 @@ version of speedar is installed."
   (interactive)
   (require 'speedbar)
   (speedbar-frame-mode))
-
-(defun jdee-autoload-update ()
-  "Updates autoload definitions in jdee-autoload.el."
-  (interactive)
-  (let* ((default-directory (expand-file-name "lisp" (jdee-find-jdee-data-directory)))
-	 (generated-autoload-file (expand-file-name "jdee-autoload.el" default-directory)))
-    (mapc 'update-file-autoloads (directory-files "." nil "\\.el$"))
-    (with-current-buffer "jdee-autoload.el"
-      (save-buffer))
-    (kill-buffer "jdee-autoload.el")))
-
 
 (defun jdee-browse-class-at-point ()
   "Displays the class of the object at point in the BeanShell Class
