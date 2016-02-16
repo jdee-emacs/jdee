@@ -7,7 +7,7 @@
 ;; Version: 2.4.2
 ;; Package-Requires: ((emacs "24.3"))
 
-;; Copyright (C) 1997-2008, 2016 Paul Kinnucan.
+;; Copyright (C) 1997-2008 Paul Kinnucan.
 ;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
