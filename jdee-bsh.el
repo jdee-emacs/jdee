@@ -36,7 +36,6 @@
 (require 'eieio)
 (require 'beanshell)
 (require 'jdee-parse-expr)
-(require 'jdee-plugins);; jdee-pi-get-bsh-classpath
 (require 'jdee-util)
 
 ;; FIXME: there is no cl-lexical-let
@@ -54,6 +53,9 @@
 (declare-function jdee-expand-classpath "jdee" (classpath &optional symbol))
 (declare-function jdee-get-global-classpath "jdee" ())
 (declare-function jdee-create-prj-values-str "jdee" ())
+
+;; Avoid recursive requires, where a plugin might require this file
+(autoload 'jdee-pi-get-bsh-classpath "jdee-plugins")
 
 (defcustom jdee-bsh-separate-buffer nil
   "*Whether or not to use a separate buffer for errors."
