@@ -501,6 +501,7 @@ specify a custom function to use. The custom function must
 be an interactive function that can be called by
 `call-interactively'."
   :group 'jdee-project
+  :safe (lambda (val) (member val '(jdee-make jdee-ant-build)))
   :type '(radio
 	  (const :tag "Make" jdee-make)
 	  (const :tag "Ant" jdee-ant-build)
