@@ -208,6 +208,7 @@ current directory for the build definition file. Also note that, if non-nil,
 this will relax the requirement for an explicit jdee project file.  If
 `jdee-ant-read-buildfile' is enable that value is used as a default if valid."
    :group 'jdee-ant
+   :safe 'booleanp
    :type 'boolean)
 
 (defcustom jdee-ant-complete-target t
