@@ -1650,7 +1650,7 @@ If a method returns non-nil, the remaining methods are not called."
   "Return the source path, either from the repl or `jdee-sourcepath'.  The result is fully expanded."
   (let (sourcepath)
     (dolist (provider jdee-sourcepath-providers sourcepath)
-            (setq sourcepath (or sourcepath (funcall provider))))))
+            (setq sourcepath (append sourcepath (funcall provider))))))
 
 
 (defvar jdee-entering-java-buffer-hook
