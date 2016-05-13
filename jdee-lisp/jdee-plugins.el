@@ -28,7 +28,6 @@
 (require 'eieio)
 (require 'executable)
 (require 'jdee-util);; jdee-root
-(require 'semantic/util-modes);; semantic-add-minor-mode
 
 (defcustom jdee-plugins-directory (expand-file-name "plugins" (jdee-root))
   "Location of the JDEE's plugins directory."
@@ -38,9 +37,11 @@
 (defclass jdee-plugin ()
   ((bsh-cp    :initarg :bsh-cp
 	      :type list
+              :initform nil
 	      :documentation "Beanshell classpath for this plugin.")
    (menu-spec :initarg :menu-spec
 	      :type list
+              :initform nil
 	      :documentation "Specifies menu for this plugin.")
    (plugins   :type list
 	      :allocation :class
@@ -56,7 +57,10 @@ type `jdee-plugin'."
   (oset-default
    'jdee-plugin
    plugins
-   (cons plugin (oref-default 'jdee-plugin plugins))))
+   (cons plugin (cl-mapcan (lambda (p) (if (not (equal (eieio-object-name-string p)
+                                                       (eieio-object-name-string plugin)))
+                                           (list p)))
+                           (oref-default 'jdee-plugin plugins)))))
 
 
 (defun jdee-pi-get-plugin-dir (plugin)
@@ -87,25 +91,21 @@ a file named jdee-PLUGIN.el. This function loads jdee-PLUGIN.el."
 (defun jdee-pi-load-plugins ()
   "Loads the plugins in the JDEE's plugins directory."
   (interactive)
-  (if (file-exists-p jdee-plugins-directory)
-      (let ((plugins
-	     (delq
-	      nil
-	      (mapcar
-	       (lambda (file)
-		 (let ((file-name (file-name-nondirectory file)))
-		   (if (and
-			(file-directory-p file)
-			(not (string= file-name "."))
-			(not (string= file-name ".."))
-			(not (string= file-name "CVS"))
-			(not (string= file-name "RCS")))
-		       file-name)))
-	       (directory-files jdee-plugins-directory t)))))
-	(loop for plugin in plugins do
-	  (jdee-pi-load-plugin plugin)))))
-
-(jdee-pi-load-plugins)
+  (if (and jdee-plugins-directory (file-directory-p jdee-plugins-directory))
+      (mapc (lambda (f)
+              (if (and (not (member (file-name-nondirectory f) '("." ".." ".git" "CVS" "RCS")))
+                       (file-directory-p f))
+                  (jdee-pi-load-plugin (file-name-nondirectory f))))
+            (directory-files jdee-plugins-directory t)))
+  ;; Update the menu after the plugins have been loaded
+  (let* ((menu (jdee-pi-make-menu-spec))
+         (p (assoc (car menu) jdee-menu-definition))
+         (new-menu (cond ((null menu) (if p (remove p jdee-menu-definition)))
+                         ((null p) (append jdee-menu-definition (list menu)))
+                         (t (append (remove p jdee-menu-definition) (list menu))))))
+    (if new-menu
+        (custom-set-variables `(jdee-menu-definition ',new-menu t))))
+  )
 
 (defun jdee-pi-get-bsh-classpath ()
   "Get the plugin directories and jar files to include in the Beanshell classpath."
@@ -148,10 +148,10 @@ jar program is on the system path."
 	    (insert "\n\nInstallation complete"))))))
 
 
-(defun jdee-plugin-make-menu-spec ()
+(defun jdee-pi-make-menu-spec ()
   (if (oref-default 'jdee-plugin plugins)
       (append
-       (list "JDEpi")
+       (list "Plug-Ins")
        (delq
 	nil
 	(cl-mapcan
@@ -159,22 +159,9 @@ jar program is on the system path."
 	   (oref plugin menu-spec))
 	 (oref-default 'jdee-plugin plugins))))))
 
-(defvar jdee-plugin-mode-map
-  (let ((km (make-sparse-keymap))
-	(menu-spec (jdee-plugin-make-menu-spec)))
-    (if menu-spec
-	(easy-menu-define jdee-plugin-menu km "JDEE Plugin Minor Mode Menu"
-	  menu-spec))
-    km)
-  "Keymap for JDEE plugin minor mode.")
-
-
-(define-minor-mode jdee-plugin-minor-mode nil
-                   :keymap jdee-plugin-mode-map)
-
-(semantic-add-minor-mode 'jdee-plugin-minor-mode " plugin")
-
-
 (provide 'jdee-plugins)
+
+;; Only load the plugins after the provide, to avoid potential recursive require issues.
+(jdee-pi-load-plugins)
 
 ;;; jdee-plugins.el ends here

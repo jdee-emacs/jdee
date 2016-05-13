@@ -59,7 +59,6 @@
 (require 'jdee-jdb)
 (require 'jdee-jdk-manager)
 (require 'jdee-open-source)
-(require 'jdee-plugins)
 (require 'jdee-project-file)
 (require 'jdee-run)
 (require 'jdee-util)
@@ -771,6 +770,7 @@ idle moments.")
   (condition-case err
       (progn
 	(jdee-check-versions)
+        (require 'jdee-plugins)
 
 	(add-to-list 'semantic-new-buffer-setup-functions
 		     '(jdee-mode . jdee-parse-semantic-default-setup))
@@ -856,9 +856,6 @@ idle moments.")
 	(if (string= (car jdee-debugger) "JDEbug")
 	    (jdee-bug-minor-mode 1)
 	  (jdee-jdb-minor-mode 1))
-
-	;; Install plugin menu.
-	(jdee-plugin-minor-mode 1)
 
 	(when (boundp 'jdee-mode-map)
 	  (let ((key (car (read-from-string "[return]"))))
