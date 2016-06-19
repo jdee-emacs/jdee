@@ -67,4 +67,4 @@ class."
 
 (provide 'jdee-refactor)
 
-;; End of jdee-refactor.el
+;;; jdee-refactor.el ends here
