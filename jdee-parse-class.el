@@ -1,5 +1,4 @@
 ;; jdee-parse-class.el --- Parse a Java class file.
-;; $Id$
 ;;
 ;; Copyright (C) 2002, 2004, 2005 Andrew Hyatt
 ;; Copyright (C) 2009 by Paul Landes
@@ -33,15 +32,13 @@
 
 ;; This file parses Java .class files to get information about what
 ;; methods call what other methods.  On the way there, we happen to
-;; pick up all sorts of useful information. If someone needs the
-;; functionality, contact me and I could easiliy put in more
-;; functionality.
+;; pick up all sorts of useful information.
 ;;
 ;; Also, we could return a semantic-compatible structure, but at the
 ;; moment there is no point in doing this.
 ;;
 ;; There are two public functions, `jdee-parse-class', which returns
-;; everything we have parsed about the class. The resultant structures
+;; everything we have parsed about the class.  The resultant structures
 ;; can be passed to `jdee-parse-class-extract-method-calls' which
 ;; returns the method calls a particular class uses, and
 ;; `jdee-parse-class-extract-interfaces' to retrieve the interfaces a
@@ -57,6 +54,8 @@
 ;; code, advances the current point a certain number of chars (here
 ;; equivalent to bytes).  This is useful for the kind of parsing we are
 ;; doing.
+
+;;; Code:
 
 ;; for XEmacs compatibilty
 (unless (fboundp 'char-int)
@@ -589,7 +588,7 @@ of the constants) and a vector of all constants"
 (defsubst jdee-parse-class-get-method-handle ()
   (let ((kind (do-and-advance-chars 1 (char-int (char-after (point)))))
         (index (jdee-parse-class-get-next-2-bytes)))
-    (list 
+    (list
      (cond ((eq kind 1) 'get-field)
            ((eq kind 2) 'get-static)
            ((eq kind 3) 'put-field)
