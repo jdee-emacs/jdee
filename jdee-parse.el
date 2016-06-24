@@ -1,4 +1,4 @@
-;;; jdee-parse.el
+;;; jdee-parse.el --- Class parsing mechanisms
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -21,6 +21,10 @@
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
+
+;;; Commentary:
+
+;;; Code:
 
 (require 'avl-tree)
 (require 'cl-lib)
@@ -1171,11 +1175,11 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
 	 (inside-quotes nil))
     (while (and (> index 0)
 		(not stop))
-      (setq index (- index 1))
+      (setq index (1- index))
       (setq curcar (aref s index))
       (cond
        ((eq ?\" curcar);;Checking if we are inside double quotes
-	(if (not (eq ?\\ (aref s (- index 1))));;if the quote is not escape
+	(if (not (eq ?\\ (aref s (max 0 (1- index))))) ;;if the quote is not escape
 	    (setq inside-quotes (not inside-quotes))))
        ((eq ?\) curcar)
 	(if (not inside-quotes)
@@ -1208,6 +1212,42 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
     (goto-char current)
     match))
 
+(defun jdee--parse-integer-p (thing)
+  "Return true when `THING' is an integer."
+  (not (null (string-match-p "^-?[0-9][0-9_]*$" thing))))
+
+(defun jdee--parse-long-p (thing)
+  "Return true when `THING' is a long.
+For example: 001L or 134l."
+  (not (null (string-match-p "^-?[0-9][0-9_]*[lL]$" thing))))
+
+(defun jdee--parse-double-p (thing)
+  "Return true when `THING' is a double."
+  (not (null (string-match-p
+              "^[-+]?[0-9_]*\\.?[0-9_]*[0-9]\\([eE][-+]?[0-9]+\\)?$"
+              thing))))
+
+(defun jdee--parse-float-p (thing)
+  "Return true when `THING' is a float.
+For example: 000F or 123f."
+  (not (null (string-match-p
+              "^[-+]?[0-9_]*\\.?[0-9_]*[0-9]\\([eE][-+]?[0-9]+\\)?[fF]$"
+              thing))))
+
+(defun jdee--parse-boolean-p (thing)
+  "Return true when `THING' is a boolean."
+  (string-match "false\\|true" thing))
+
+(defun jdee--parse-char-p (thing)
+  "Return true when `THING' is a char."
+  (and (= (length thing) 3)
+       (and (string= "'" (substring thing 0 1))
+            (string= "'" (substring thing 2 3)))))
+
+(defun jdee--parse-string-p (thing)
+  "Return true when `THING' is a string literal."
+  (not (null (string-match "\".*\"" thing))))
+
 (defun jdee-parse-eval-type-of (expr)
   "Get type of EXPR. This function returns a class name or builtin
 Java type name, e.g., int."
@@ -1217,31 +1257,13 @@ Java type name, e.g., int."
 	    qualified-name chop-pos temp answer)
 	(setq answer
 	      (cond
-	       ;;If it's number returns an int
-	       ((integerp expr)
-		"int")
-	       ;;If it's 001L or 134l return long
-	       ((if (and (integerp (substring expr 0 (- (length expr) 1)))
-			 (or (string= "L" (substring expr (- (length expr) 1)
-						     (length expr)))
-			     (string= "l" (substring expr (- (length expr) 1)
-						     (length expr)))))
-		    "long"))
-	       ;;If it's a floating point return float
-	       ((floatp expr)
-		"double")
-	       ;;If it's 000F or 1234f return float
-	       ((if (and (floatp (substring expr 0 (- (length expr) 1)))
-			 (or (string= "F" (substring expr (- (length expr) 1)
-						     (length expr)))
-			     (string= "f" (substring expr (- (length expr) 1)
-						     (length expr)))))
-		    "float"))
-	       ((string-match "false\\|true" expr)
-		"boolean")
-	       ;;Checking if it's a character
-	       ((string= "'" (substring expr 0 1))
-		"char")
+	       ((jdee--parse-integer-p expr) "int")
+	       ((jdee--parse-long-p expr) "long")
+	       ((jdee--parse-double-p expr) "double")
+	       ((jdee--parse-float-p expr) "float")
+	       ((jdee--parse-boolean-p expr) "boolean")
+	       ((jdee--parse-char-p expr) "char")
+	       ((jdee--parse-string-p expr) "java.lang.String")
 	       ;; If it's "this", we return the class name of the class we code in
 	       ((and class-at-point (string= "this" expr))
 		(jdee-parse-get-qualified-name class-at-point t))
@@ -1339,10 +1361,10 @@ Java type name, e.g., int."
 			    (let (work)
 			      (setq type
 				    (cond
-				  ;; handle primitive types, e.g., int
+                                     ;; handle primitive types, e.g., int
 				     ((member result jdee-parse-primitive-types)
 				      result)
-			     ;; quickly make sure fully qualified name
+                                     ;; quickly make sure fully qualified name
 				     ;;doesn't exist
 				     ((and result-qualifier
 					   (jdee-parse-class-exists
@@ -1355,10 +1377,10 @@ Java type name, e.g., int."
 					    (jdee-parse-get-inner-class-name
 					     result result-qualifier))
 				      work)
-			       ;; otherwise use unqualified class name
+                                     ;; otherwise use unqualified class name
 				     (t
 				      (jdee-parse-get-qualified-name result
-								    t)))))
+                                                                     t)))))
 
 			    (if type
 				(progn
