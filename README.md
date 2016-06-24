@@ -58,18 +58,19 @@ Some of the features of JDEE include:
 - runs on any platform supported by GNU Emacs 24.3 and later
 - easily and infinitely customizable
 
-### Known Issues
+### [Known Issues](https://github.com/jdee-emacs/jdee/issues)
 
 - Static imports don't quite work
 - Limited support for Java template beyond basic highlighting, parsing, and
   indenting.
 - Indentation after multi-line annotations might be unexpected
-- It's a little crufty after all these years - patches welcome :-)
 
 ### Troubleshooting
 
-- If you notice a bug, open an issue on Github on the
-  [JDEE repository](https://github.com/jdee-emacs/jdee)
+- If you notice a bug, open an issue on Github
+  [Issues](https://github.com/jdee-emacs/jdee/issues)
+
+*Always include JDEE and Emacs versions when reporting issues. Thanks!*
 
 ## Community
 
