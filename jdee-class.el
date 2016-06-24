@@ -36,8 +36,10 @@
 ;;
 ;; There are also a few helper utilities here.
 
+;;; Code:
+
 (require 'cl-lib)
-(require 'jdee-parse-class)
+(require 'jdee-bytecode)
 (require 'jdee-file-util)
 
 ;; FIXME: refactor
@@ -145,10 +147,10 @@ Example:(with-all-class-infos-when (info) (lambda (x)
        (with-all-class-files (,class-file-sym ,@(cdr spec))
 			     (when (and (not (jdee-class-path-in-classes-p ,class-file-sym ,parsed-class-sym))
 					(funcall ,pred ,class-file-sym))
-			       (let ((,var-sym (jdee-parse-class ,class-file-sym)))
+			       (let ((,var-sym (jdee-bytecode ,class-file-sym)))
 				 ,@body
 				 (add-to-list (quote ,parsed-class-sym)
-					      (jdee-parse-class-extract-classname info)))))
+					      (jdee-bytecode-extract-classname info)))))
        ,(cadr spec))))
 
 (defmacro with-all-corresponding-class-infos (spec &rest body)
@@ -157,11 +159,11 @@ source file.  SPEC is a list of the variable name to store the class
 info, the package name of the source file, the source name of the source file, and the optional return val.
 \((with-all-corresponding-class-infos (VAR PACKAGE FILENAME [RESULT]) BODY...)"
   `(with-all-class-infos-when (,(nth 0 spec) ,(nth 3 spec) ,(nth 1 spec))
-     (lambda (class-file)
-       (string-match ,(nth 1 spec)
-		     (replace-regexp-in-string "/" "." (file-name-directory class-file))))
-     (when (equal (jdee-parse-class-extract-sourcefile info) ,(nth 2 spec))
-       ,@body)))
+                              (lambda (class-file)
+                                (string-match ,(nth 1 spec)
+                                              (replace-regexp-in-string "/" "." (file-name-directory class-file))))
+                              (when (equal (jdee-bytecode-extract-sourcefile info) ,(nth 2 spec))
+                                ,@body)))
 
 (defun jdee-class-path-in-classes-p (path classes)
   "Returns true if the PATH looks like it represents a class in CLASSES"
@@ -190,17 +192,17 @@ will not be."
 	(classes '()))
     (with-all-corresponding-class-infos (info package source-file classes)
 					;;a. super class type
-					(add-to-list 'classes (jdee-parse-class-extract-superclass info))
+					(add-to-list 'classes (jdee-bytecode-extract-superclass info))
 					;;b. super interfaces type
-					(append-to-list 'classes (jdee-parse-class-extract-interfaces info))
+					(append-to-list 'classes (jdee-bytecode-extract-interfaces info))
 					;;c. types of declared fields
 					;;d. local variable types
 					;; (all called types should wrk for this...)
 					(append-to-list 'classes (mapcar (lambda(item) (caadr item))
-									 (jdee-parse-class-extract-method-calls info)))
+									 (jdee-bytecode-extract-method-calls info)))
 					;;e. method return type
 					;;f. method parameter type
-					(dolist (sig (jdee-parse-class-extract-method-signatures info))
+					(dolist (sig (jdee-bytecode-extract-method-signatures info))
 					  (when (and (nth 1 sig) (not (member (nth 1 sig) primitives)))
 					    (add-to-list 'classes (nth 1 sig)))
 					  (append-to-list 'classes
@@ -208,11 +210,11 @@ will not be."
 								  (nth 2 sig))))
 					;;g. method exception types
 					(dolist (exceptions (mapcar (lambda (method-exceptions) (nth 1 method-exceptions))
-								    (jdee-parse-class-extract-thrown-exception-types info)))
+								    (jdee-bytecode-extract-thrown-exception-types info)))
 					  (append-to-list 'classes exceptions))
 					;;h. type of exceptions in 'catch' statements.
 					(dolist (exceptions (mapcar (lambda (method-exceptions) (nth 1 method-exceptions))
-								    (jdee-parse-class-extract-caught-exception-types info)))
+								    (jdee-bytecode-extract-caught-exception-types info)))
 					  (append-to-list 'classes exceptions)))))
 
 (provide 'jdee-class)
