@@ -128,7 +128,7 @@ match `jdee-auto-parse-max-buffer-size' threshold."
 	(<= jdee-auto-parse-max-buffer-size 0)
 	(< (buffer-size) jdee-auto-parse-max-buffer-size))))
 
-(eval-when (compile)
+(eval-when-compile
   (defsubst jdee-auto-parse-delay ()
     "Return the time in seconds before auto-parse triggering."
     (- (timer-until jdee-auto-parse-buffer-timer (current-time)))))
