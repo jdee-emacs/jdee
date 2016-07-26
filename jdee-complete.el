@@ -10,33 +10,26 @@
 
 ;; Keywords: java, intellisense, completion
 
-;; Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 Rodrigo Reyes, Paul Kinnucan,
-;;                          Stephane Nicolas, David Ponce, Javier Lopez
+;; Copyright (C) 1999-2004 Rodrigo Reyes, Paul Kinnucan,
+;;                         Stephane Nicolas, David Ponce, Javier Lopez
 ;; Copyright (C) 2009 by Paul Landes
 
 ;; This package follows the GNU General Public Licence (GPL), see the
 ;; COPYING file that comes along with GNU Emacs. This is free software,
 ;; you can redistribute it and/or modify it under the GNU GPL terms.
 
-;; Java is a registered trademark of Sun Microsystem, Inc.
-
 ;;; Commentary:
 
-;; This is one of a set of packages that make up the
-;; Java Development Environment for Emacs (JDEE). See the
-;; JDEE User's Guide for more information.
-
-
-;; This package adds smart completion to the JDE. How it works is
+;; This package adds smart completion to the JDEE.  How it works is
 ;; simple : put the cursor at the end of a statement "under
 ;; construction", eg. "myVariable.rem<CURSOR HERE> and call the
 ;; jdee-complete-at-point emacs-lisp function (this is by default
-;; C-.). A completion is then inserted. If multiple completions are
+;; C-.). A completion is then inserted.  If multiple completions are
 ;; possible, calling the completion function again will cycle through
 ;; all the possibilities (as dabbrev-mode does).
 
 ;; To retrieve all the possible completions, it uses the java code in
-;; jde.util.Completion.getClassInfo(), called by beanshell. That
+;; jde.util.Completion.getClassInfo(), called by beanshell.  That
 ;; need the class to be compiled (but that's not worst than an etag
 ;; call).
 
@@ -46,13 +39,7 @@
 ;; Move all the strings manipulation to the java side so that
 ;; class info can be loaded in the background.
 
-;; The latest version of the JDEE is available at
-;; <URL:http://jdee.sourceforge.net>.
-
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Kinnucan at pkinnucan@attbi.com
-
-;;jdee-eldoc for completion signatures
+;;; Code:
 
 (require 'eldoc)
 (require 'jdee-parse)

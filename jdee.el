@@ -60,6 +60,7 @@
 (require 'jdee-jdk-manager)
 (require 'jdee-open-source)
 (require 'jdee-project-file)
+(require 'jdee-refactor)
 (require 'jdee-run)
 (require 'jdee-util)
 (require 'jdee-which-method)

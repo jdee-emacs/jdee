@@ -1,5 +1,4 @@
-;; jdee-parse-class.el --- Parse a Java class file.
-;; $Id$
+;; jdee-bytecode.el --- Parse bytecode from Java class file.
 ;;
 ;; Copyright (C) 2002, 2004, 2005 Andrew Hyatt
 ;; Copyright (C) 2009 by Paul Landes
@@ -24,28 +23,21 @@
 ;; ) or from the Free Software
 ;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-;; LCD Archive Entry:
-;; jdee-parse-class|Andrew Hyatt|
-;; |Parse a Java class file to get xref info for the JDEE.
-;; |$Date$|$Revision$|~/packages/jdee-parse-class.el
-
 ;;; Commentary:
 
 ;; This file parses Java .class files to get information about what
 ;; methods call what other methods.  On the way there, we happen to
-;; pick up all sorts of useful information. If someone needs the
-;; functionality, contact me and I could easiliy put in more
-;; functionality.
+;; pick up all sorts of useful information.
 ;;
 ;; Also, we could return a semantic-compatible structure, but at the
 ;; moment there is no point in doing this.
 ;;
-;; There are two public functions, `jdee-parse-class', which returns
-;; everything we have parsed about the class. The resultant structures
-;; can be passed to `jdee-parse-class-extract-method-calls' which
+;; There are two public functions, `jdee-bytecode', which returns
+;; everything we have parsed about the class.  The resultant structures
+;; can be passed to `jdee-bytecode-extract-method-calls' which
 ;; returns the method calls a particular class uses, and
-;; `jdee-parse-class-extract-interfaces' to retrieve the interfaces a
-;; class uses, and `jdee-parse-class-extract-classname' to get the
+;; `jdee-bytecode-extract-interfaces' to retrieve the interfaces a
+;; class uses, and `jdee-bytecode-extract-classname' to get the
 ;; fully qualified classname the class represents.  This is used in
 ;; jdee-xref.el
 ;;
@@ -57,6 +49,8 @@
 ;; code, advances the current point a certain number of chars (here
 ;; equivalent to bytes).  This is useful for the kind of parsing we are
 ;; doing.
+
+;;; Code:
 
 ;; for XEmacs compatibilty
 (unless (fboundp 'char-int)
@@ -70,16 +64,16 @@
      (goto-char (+ (point) ,num))
      ,result-sym)))
 
-(defsubst jdee-parse-class-get-next-const-val (constants)
-  (cadr (jdee-parse-class-lookup-constant
-	 (jdee-parse-class-get-next-2-bytes) constants)))
+(defsubst jdee-bytecode-get-next-const-val (constants)
+  (cadr (jdee-bytecode-lookup-constant
+	 (jdee-bytecode-get-next-2-bytes) constants)))
 
-(setq jdee-parse-class-encoding 'utf-8)
+(setq jdee-bytecode-encoding 'utf-8)
 
-(defun jdee-parse-class-slash-to-dot (string)
+(defun jdee-bytecode-slash-to-dot (string)
   (subst-char-in-string ?/ ?. string))
 
-(defun jdee-parse-class (class-file)
+(defun jdee-bytecode (class-file)
   "Parse the class in CLASS-FILE, and return an alist, with the following
 keys: version, this-class, interfaces, fields, and methods."
   ;; we must visit the file in such a way as to not use any encoding,
@@ -88,26 +82,26 @@ keys: version, this-class, interfaces, fields, and methods."
     (error (concat "Class file " class-file " does not exist")))
   (let ((buf (find-file-noselect class-file nil t)))
     (set-buffer buf)
-    (let* ((version (jdee-parse-class-get-version)) ;do first to validate class file version early
-	   (constants (jdee-parse-class-get-constants))
-	   (access (jdee-parse-class-get-class-access-flags))
+    (let* ((version (jdee-bytecode-get-version)) ;do first to validate class file version early
+	   (constants (jdee-bytecode-get-constants))
+	   (access (jdee-bytecode-get-class-access-flags))
 	   (this-class
 	     (subst-char-in-string
-	      ?/ ?. (cadr (jdee-parse-class-lookup-constant
-			     (jdee-parse-class-get-next-const-val constants)
+	      ?/ ?. (cadr (jdee-bytecode-lookup-constant
+			     (jdee-bytecode-get-next-const-val constants)
 			      constants))))
-	   (superclass (jdee-parse-class-slash-to-dot
+	   (superclass (jdee-bytecode-slash-to-dot
 			(do-and-advance-chars 2
-			  (let ((val (jdee-parse-class-get-const-ref
+			  (let ((val (jdee-bytecode-get-const-ref
 				      (point) constants)))
 			    (if (eq (cadr val) 0)
 			      nil ;; only Object can have no superclass
-			      (cadr (jdee-parse-class-lookup-constant
+			      (cadr (jdee-bytecode-lookup-constant
 				     (cadr val) constants)))))))
-	   (interfaces (jdee-parse-class-get-interfaces constants))
-	   (fields (jdee-parse-class-get-fields constants))
-	   (methods (jdee-parse-class-get-methods constants))
-	   (attributes (jdee-parse-class-get-attributes constants)))
+	   (interfaces (jdee-bytecode-get-interfaces constants))
+	   (fields (jdee-bytecode-get-fields constants))
+	   (methods (jdee-bytecode-get-methods constants))
+	   (attributes (jdee-bytecode-get-attributes constants)))
       (kill-buffer buf)
       `((version . ,version) (access . ,access)
 	(this-class . ,this-class) (superclass . ,superclass)
@@ -116,7 +110,7 @@ keys: version, this-class, interfaces, fields, and methods."
 	(methods . ,methods)
 	(attributes . ,attributes)))))
 
-(defun jdee-parse-class-extract-caught-exception-types (info)
+(defun jdee-bytecode-extract-caught-exception-types (info)
   "Returns a list of a two-element of list of method signatures to
   caught exception types for each method"
   (mapcar (lambda (method)
@@ -124,7 +118,7 @@ keys: version, this-class, interfaces, fields, and methods."
 		      ,(cdr (assoc 'name method))
 		      ,@(cdr (assoc 'descriptor method)))
 		  (mapcar (lambda (class) (when class
-					    (jdee-parse-class-slash-to-dot class)))
+					    (jdee-bytecode-slash-to-dot class)))
 			  (cdr (assoc
 				'catch-types
 				(cdr
@@ -134,7 +128,7 @@ keys: version, this-class, interfaces, fields, and methods."
 						method)))))))))
 	  (cdr (assoc 'methods info))))
 
-(defun jdee-parse-class-extract-thrown-exception-types (info)
+(defun jdee-bytecode-extract-thrown-exception-types (info)
   "Returns a two element list of method signatures to thrown exception
   types for each method"
   (mapcar (lambda (method)
@@ -148,11 +142,11 @@ keys: version, this-class, interfaces, fields, and methods."
 				  method))))))
 	  (cdr (assoc 'methods info))))
 
-(defun jdee-parse-class-extract-method-calls (info)
+(defun jdee-bytecode-extract-method-calls (info)
   "Return a cons of a method signature, and a list of the methods it
 calls.  Each method in the list is a list of the calling method or
 line number if available, the Class, method, and return value, and
-arguments.  INFO is the result of `jdee-parse-class'"
+arguments.  INFO is the result of `jdee-bytecode'"
   (cl-mapcan
    (lambda (method)
      (mapcar (lambda (attr)
@@ -170,141 +164,141 @@ arguments.  INFO is the result of `jdee-parse-class'"
 				   method))))))))
    (cdr (assoc 'methods info))))
 
-(defun jdee-parse-class-extract-interfaces (info)
+(defun jdee-bytecode-extract-interfaces (info)
   "Returns a list of fully qualified interface names that the class
-  implements.  INFO is the result of `jdee-parse-class'"
-  (mapcar 'jdee-parse-class-slash-to-dot
+  implements.  INFO is the result of `jdee-bytecode'"
+  (mapcar 'jdee-bytecode-slash-to-dot
 	  (cdr (assoc 'interfaces info))))
 
-(defun jdee-parse-class-extract-superclass (info)
+(defun jdee-bytecode-extract-superclass (info)
   "Returns a list of fully qualified class names that are superclasses
   of the parsed class"
-  (jdee-parse-class-slash-to-dot (cdr (assoc 'superclass info))))
+  (jdee-bytecode-slash-to-dot (cdr (assoc 'superclass info))))
 
-(defun jdee-parse-class-extract-method-signatures (info)
+(defun jdee-bytecode-extract-method-signatures (info)
   "Returns a list of method names that the class implements"
   (mapcar (lambda (method-info) (cons (cdr (assoc 'name method-info))
 				      (cdr (assoc 'descriptor method-info))))
 	  (cdr (assoc 'methods info))))
 
-(defun jdee-parse-class-extract-field-signatures (info)
+(defun jdee-bytecode-extract-field-signatures (info)
   "Return a list of field names that the class defines"
   (mapcar (lambda (field-info)
 	    (list (cdr (assoc 'name field-info))
 		  (cdr (assoc 'descriptor field-info))))
 	  (cdr (assoc 'fields info))))
 
-(defun jdee-parse-class-extract-classname (info)
+(defun jdee-bytecode-extract-classname (info)
   "Returns the fully qualified classname that the class implements.
-INFO is the result of `jdee-parse-class'"
+INFO is the result of `jdee-bytecode'"
   (cdr (assoc 'this-class info)))
 
-(defun jdee-parse-class-extract-sourcefile (info)
+(defun jdee-bytecode-extract-sourcefile (info)
   (cdr (assoc 'source-file (cdr (assoc 'attributes info)))))
 
-(defun jdee-parse-class-get-const-ref (point constants)
+(defun jdee-bytecode-get-const-ref (point constants)
   "Look at point in the class file and read it as a reference to the array.
 Returns the constant information contained at the reference"
   ;; we have to subtract one since the array index starts at 1
   ;; (according to the class file, not us
-  (jdee-parse-class-lookup-constant (jdee-parse-class-get-2byte point)
+  (jdee-bytecode-lookup-constant (jdee-bytecode-get-2byte point)
 				   constants))
 
-(defun jdee-parse-class-lookup-constant (num constants)
+(defun jdee-bytecode-lookup-constant (num constants)
   "From an index value, get the constant for that index"
   (aref constants (- num 1)))
 
-(defsubst jdee-parse-class-get-next-length-val ()
-  (jdee-parse-class-get-next-2-bytes))
+(defsubst jdee-bytecode-get-next-length-val ()
+  (jdee-bytecode-get-next-2-bytes))
 
-(defun jdee-parse-class-get-interfaces (constants)
-  (let ((num (jdee-parse-class-get-next-length-val))
+(defun jdee-bytecode-get-interfaces (constants)
+  (let ((num (jdee-bytecode-get-next-length-val))
 	(interfaces '()))
     (dotimes (i num interfaces)
-      (add-to-list 'interfaces (cadr (jdee-parse-class-lookup-constant
-				     (jdee-parse-class-get-next-const-val
+      (add-to-list 'interfaces (cadr (jdee-bytecode-lookup-constant
+				     (jdee-bytecode-get-next-const-val
 				      constants) constants))))))
 
-(defun jdee-parse-class-get-methods (constants)
-  (let ((num (jdee-parse-class-get-next-length-val))
+(defun jdee-bytecode-get-methods (constants)
+  (let ((num (jdee-bytecode-get-next-length-val))
 	(methods '()))
     (dotimes (i num (nreverse methods))
-      (add-to-list 'methods (jdee-parse-class-get-method constants)))))
+      (add-to-list 'methods (jdee-bytecode-get-method constants)))))
 
-(defun jdee-parse-class-get-method (constants)
-  (list (cons 'access-flags (jdee-parse-class-get-method-access-flags))
-        (cons 'name (jdee-parse-class-get-next-const-val constants))
-	(cons 'descriptor (jdee-parse-class-parse-complete-arg-signature
-			   (jdee-parse-class-get-next-const-val constants)))
-	(cons 'attributes (jdee-parse-class-get-attributes constants))))
+(defun jdee-bytecode-get-method (constants)
+  (list (cons 'access-flags (jdee-bytecode-get-method-access-flags))
+        (cons 'name (jdee-bytecode-get-next-const-val constants))
+	(cons 'descriptor (jdee-bytecode-parse-complete-arg-signature
+			   (jdee-bytecode-get-next-const-val constants)))
+	(cons 'attributes (jdee-bytecode-get-attributes constants))))
 
-(defun jdee-parse-class-get-fields (constants)
-  (let ((num (jdee-parse-class-get-next-length-val))
+(defun jdee-bytecode-get-fields (constants)
+  (let ((num (jdee-bytecode-get-next-length-val))
 	(fields '()))
     (dotimes (i num (nreverse fields))
-      (add-to-list 'fields (jdee-parse-class-get-field constants)))))
+      (add-to-list 'fields (jdee-bytecode-get-field constants)))))
 
-(defun jdee-parse-class-get-field (constants)
-  (list (cons 'access-flags (jdee-parse-class-get-field-access-flags))
-        (cons 'name (jdee-parse-class-get-next-const-val constants))
-	(cons 'descriptor (car (jdee-parse-class-parse-first-arg
-			   (jdee-parse-class-get-next-const-val constants))))
-	(cons 'attributes (jdee-parse-class-get-attributes constants))))
+(defun jdee-bytecode-get-field (constants)
+  (list (cons 'access-flags (jdee-bytecode-get-field-access-flags))
+        (cons 'name (jdee-bytecode-get-next-const-val constants))
+	(cons 'descriptor (car (jdee-bytecode-parse-first-arg
+			   (jdee-bytecode-get-next-const-val constants))))
+	(cons 'attributes (jdee-bytecode-get-attributes constants))))
 
-(defun jdee-parse-class-get-attributes (constants)
-  (let ((num (jdee-parse-class-get-next-length-val))
+(defun jdee-bytecode-get-attributes (constants)
+  (let ((num (jdee-bytecode-get-next-length-val))
 	(attributes '()))
     (dotimes (i num attributes)
-      (add-to-list 'attributes (jdee-parse-class-get-attribute constants)))))
+      (add-to-list 'attributes (jdee-bytecode-get-attribute constants)))))
 
-(defun jdee-parse-class-get-attribute (constants)
-  (let ((attribute-type (jdee-parse-class-get-next-const-val constants))
-	(numbytes (jdee-parse-class-get-next-4-bytes (point))))
+(defun jdee-bytecode-get-attribute (constants)
+  (let ((attribute-type (jdee-bytecode-get-next-const-val constants))
+	(numbytes (jdee-bytecode-get-next-4-bytes (point))))
     ;; TODO: implement the rest of the common attribute types
     (cond ((equal attribute-type "Code")
 	    (cons 'code
-		  (jdee-parse-class-get-code-attribute numbytes constants)))
+		  (jdee-bytecode-get-code-attribute numbytes constants)))
 	  ((equal attribute-type "LineNumberTable")
 	    (cons 'line-number-table
-		  (jdee-parse-class-get-line-number-attribute)))
+		  (jdee-bytecode-get-line-number-attribute)))
 	  ((equal attribute-type "Exceptions")
 	    (cons 'throws
-		  (jdee-parse-class-get-exception-attribute constants)))
+		  (jdee-bytecode-get-exception-attribute constants)))
 	  ((equal attribute-type "SourceFile")
 	    (cons 'source-file
-		  (jdee-parse-class-get-source-file-attribute constants)))
+		  (jdee-bytecode-get-source-file-attribute constants)))
 	  (t (forward-char numbytes)))))
 
-(defun jdee-parse-class-get-source-file-attribute (constants)
-  (jdee-parse-class-get-next-const-val constants))
+(defun jdee-bytecode-get-source-file-attribute (constants)
+  (jdee-bytecode-get-next-const-val constants))
 
-(defun jdee-parse-class-get-exception-attribute (constants)
-  (let ((num (jdee-parse-class-get-next-length-val))
+(defun jdee-bytecode-get-exception-attribute (constants)
+  (let ((num (jdee-bytecode-get-next-length-val))
 	(classes '()))
     (dotimes (i num classes)
       (add-to-list 'classes
-		   (cadr (jdee-parse-class-lookup-constant
-			  (jdee-parse-class-get-next-const-val constants)
+		   (cadr (jdee-bytecode-lookup-constant
+			  (jdee-bytecode-get-next-const-val constants)
 			  constants))))))
 
-(defun jdee-parse-class-get-line-number-attribute ()
-  (let ((num (jdee-parse-class-get-next-length-val))
+(defun jdee-bytecode-get-line-number-attribute ()
+  (let ((num (jdee-bytecode-get-next-length-val))
 	(line-number-infos '()))
     (dotimes (i num (nreverse line-number-infos))
       (add-to-list
        'line-number-infos
-       (cons (jdee-parse-class-get-next-2-bytes)
-	     (jdee-parse-class-get-next-2-bytes))))))
+       (cons (jdee-bytecode-get-next-2-bytes)
+	     (jdee-bytecode-get-next-2-bytes))))))
 
-(defun jdee-parse-class-get-code-attribute (numbytes constants)
+(defun jdee-bytecode-get-code-attribute (numbytes constants)
   (goto-char (+ (point) 4)) ;; no one cares about max_stack and max_locals, right?
-  (let* ((code-numbytes (jdee-parse-class-get-next-4-bytes (point)))
+  (let* ((code-numbytes (jdee-bytecode-get-next-4-bytes (point)))
 	 (end-point (+ (point) code-numbytes))
 	 (begin-point (point))
 	 (calls '())
 	 (catch-types '()))
     (while (< (point) end-point)
-      (let* ((opcode-info (aref jdee-parse-class-opcode-vec
+      (let* ((opcode-info (aref jdee-bytecode-opcode-vec
 				(char-int (char-after))))
 	     (opcode-val (car opcode-info))
 	     (opcode-length (cdr opcode-info)))
@@ -316,9 +310,9 @@ Returns the constant information contained at the reference"
 		  (add-to-list
 		   'calls
 		   (cons (- (point) begin-point)
-			 (jdee-parse-class-parse-method-signature
-			  (jdee-parse-class-lookup-method
-			   (jdee-parse-class-get-const-ref (point) constants)
+			 (jdee-bytecode-parse-method-signature
+			  (jdee-bytecode-lookup-method
+			   (jdee-bytecode-get-const-ref (point) constants)
 			   constants))))))
               ((eq opcode-val 'invokedynamic)
                ;; TODO -- possible to parse out a call?
@@ -328,12 +322,12 @@ Returns the constant information contained at the reference"
 		;; The second mod is to make sure on an offset of 4 we really don't skip anything
 		(forward-char (mod (- 4 (mod (- (point) begin-point) 4)) 4))
 		(forward-char 4)  ;; we don't care about default
-		(let ((diff (jdee-parse-class-diff-next-two-4-bytes-as-signed)))
+		(let ((diff (jdee-bytecode-diff-next-two-4-bytes-as-signed)))
 		  (forward-char (* 4 (+ diff 1)))))
 	      ((eq opcode-val 'lookupswitch)
 		(forward-char (mod (- 4 (mod (- (point) begin-point) 4)) 4))
 		(forward-char 4)
-		(forward-char (* 8 (jdee-parse-class-get-next-4-bytes-as-signed))))
+		(forward-char (* 8 (jdee-bytecode-get-next-4-bytes-as-signed))))
 	      ((eq opcode-val 'wide)
 		(let ((opcode2 (char-int (char-after))))
 		  (if (eq opcode2 'iinc)
@@ -342,14 +336,14 @@ Returns the constant information contained at the reference"
               ((< opcode-length 0)
                (error "Invalid opcode-length %s" opcode-info))
 	      (t (forward-char (- opcode-length 1))))))
-    (let ((num-exceptions (jdee-parse-class-get-next-length-val)))
+    (let ((num-exceptions (jdee-bytecode-get-next-length-val)))
       (dotimes (i num-exceptions)
 	(let ((type (cdr (assoc 'catch-type
-				 (jdee-parse-class-get-exception-handler
+				 (jdee-bytecode-get-exception-handler
 				  constants)))))
 	  (when type
 	    (add-to-list 'catch-types type)))))
-    (let ((attributes (jdee-parse-class-get-attributes constants)))
+    (let ((attributes (jdee-bytecode-get-attributes constants)))
       ;; Get the line numbers if there, if not use -1's to iondicate no line number
       (let ((table (when (assoc 'line-number-table attributes)
 		     (cdr (assoc 'line-number-table attributes)))))
@@ -369,17 +363,17 @@ Returns the constant information contained at the reference"
 		    (cons -1 (cdr call)))) (nreverse calls)))
 	      (cons 'catch-types catch-types))))))
 
-(defun jdee-parse-class-get-exception-handler (constants)
-  (list (cons 'start-pc (jdee-parse-class-get-next-2-bytes))
-    (cons 'end-pc (jdee-parse-class-get-next-2-bytes))
-    (cons 'handler-pc (jdee-parse-class-get-next-2-bytes))
-    (cons 'catch-type (let ((val (jdee-parse-class-get-next-2-bytes)))
+(defun jdee-bytecode-get-exception-handler (constants)
+  (list (cons 'start-pc (jdee-bytecode-get-next-2-bytes))
+    (cons 'end-pc (jdee-bytecode-get-next-2-bytes))
+    (cons 'handler-pc (jdee-bytecode-get-next-2-bytes))
+    (cons 'catch-type (let ((val (jdee-bytecode-get-next-2-bytes)))
 			(when (> val 0)
-			  (cadr (jdee-parse-class-lookup-constant
-				 (cadr (jdee-parse-class-lookup-constant val constants))
+			  (cadr (jdee-bytecode-lookup-constant
+				 (cadr (jdee-bytecode-lookup-constant val constants))
 			      constants)))))))
 
-(defun jdee-parse-class-parse-first-arg (sig)
+(defun jdee-bytecode-parse-first-arg (sig)
   (let ((char (char-to-string (string-to-char sig))))
     (cond ((equal char "B") `("byte" . 1))
 	  ((equal char "C") `("char" . 1))
@@ -388,54 +382,54 @@ Returns the constant information contained at the reference"
 	  ((equal char "I") `("int" . 1))
 	  ((equal char "J") `("long" . 1))
 	  ((equal char "L") (let ((endpos (string-match ";" sig)))
-			      (cons (jdee-parse-class-slash-to-dot
+			      (cons (jdee-bytecode-slash-to-dot
 				     (substring sig 1
 						endpos))
 				    (+ 1 endpos))))
 	  ((equal char "S") `("short" . 1))
 	  ((equal char "Z") `("boolean" . 1))
-	  ((equal char "[") (let ((rest (jdee-parse-class-parse-first-arg
+	  ((equal char "[") (let ((rest (jdee-bytecode-parse-first-arg
 					 (substring sig 1))))
 			      (cons (concat (car rest) "[]") (+ (cdr rest) 1))))
           (t (error (concat "Could not find char " char))))))
 
-(defun jdee-parse-class-parse-arg-signature (sig)
+(defun jdee-bytecode-parse-arg-signature (sig)
   (when (> (length sig) 0)
-    (let ((arg (jdee-parse-class-parse-first-arg sig)))
+    (let ((arg (jdee-bytecode-parse-first-arg sig)))
       (if (> (cdr arg) (length sig))
 	(list (car arg))
-	(cons (car arg) (jdee-parse-class-parse-arg-signature
+	(cons (car arg) (jdee-bytecode-parse-arg-signature
 			 (substring sig (cdr arg))))))))
 
 
-(defun jdee-parse-class-parse-complete-arg-signature (sig)
+(defun jdee-bytecode-parse-complete-arg-signature (sig)
   (let* ((match (string-match "(\\(.*\\))\\(.*\\)" sig)))
     (if match
       (let ((args (match-string 1 sig))
 	    (return-val (match-string 2 sig)))
 	(list (unless (equal "V" return-val)
-		(car (jdee-parse-class-parse-arg-signature return-val)))
-	      (jdee-parse-class-parse-arg-signature args)))
-      (list nil (jdee-parse-class-parse-arg-signature sig)))))
+		(car (jdee-bytecode-parse-arg-signature return-val)))
+	      (jdee-bytecode-parse-arg-signature args)))
+      (list nil (jdee-bytecode-parse-arg-signature sig)))))
 
 
-(defun jdee-parse-class-parse-method-signature (siglist)
-  `(,(jdee-parse-class-slash-to-dot (car siglist))
-    ,(cadr siglist) ,@(jdee-parse-class-parse-complete-arg-signature
+(defun jdee-bytecode-parse-method-signature (siglist)
+  `(,(jdee-bytecode-slash-to-dot (car siglist))
+    ,(cadr siglist) ,@(jdee-bytecode-parse-complete-arg-signature
 		      (nth 2 siglist))))
 
-(defun jdee-parse-class-lookup-method (method constants)
-  (list (cadr (jdee-parse-class-lookup-constant
-	       (cadr (jdee-parse-class-lookup-constant
+(defun jdee-bytecode-lookup-method (method constants)
+  (list (cadr (jdee-bytecode-lookup-constant
+	       (cadr (jdee-bytecode-lookup-constant
 		       (cadr method) constants))
 	       constants))
-	(cadr (jdee-parse-class-lookup-constant
+	(cadr (jdee-bytecode-lookup-constant
 	       (cadr
-		(jdee-parse-class-lookup-constant (nth 2 method) constants))
+		(jdee-bytecode-lookup-constant (nth 2 method) constants))
 	       constants))
-	(cadr (jdee-parse-class-lookup-constant
+	(cadr (jdee-bytecode-lookup-constant
 	       (nth 2
-		(jdee-parse-class-lookup-constant (nth 2 method) constants))
+		(jdee-bytecode-lookup-constant (nth 2 method) constants))
 	       constants))))
 
 (defun get-bit-flags-for-byte (byte flag-vec)
@@ -453,7 +447,7 @@ returns ('f 'g)"
 	(add-to-list 'flags (aref flag-vec (- 7 i)))))
     flags))
 
-(defun jdee-parse-class-get-access-flags (bits0 bits1)
+(defun jdee-bytecode-get-access-flags (bits0 bits1)
   (do-and-advance-chars 2
     (let ((raw0 (char-int (char-after (point))))
 	  (raw1 (char-int (char-after (+ (point) 1)))))
@@ -461,25 +455,25 @@ returns ('f 'g)"
        (get-bit-flags-for-byte raw0 bits0)
        (get-bit-flags-for-byte raw1 bits1)))))
 
-(defun jdee-parse-class-get-class-access-flags ()
-  (jdee-parse-class-get-access-flags
+(defun jdee-bytecode-get-class-access-flags ()
+  (jdee-bytecode-get-access-flags
    [nil enum annotation synthetic nil abstract interface nil]
    [nil nil super final nil nil nil public]))
 
-(defun jdee-parse-class-get-method-access-flags ()
-  (jdee-parse-class-get-access-flags
+(defun jdee-bytecode-get-method-access-flags ()
+  (jdee-bytecode-get-access-flags
    [nil nil nil synthetic strict abstract nil native]
    [varargs bridge synchronized final static protected private public]))
 
-(defun jdee-parse-class-get-field-access-flags ()
-  (jdee-parse-class-get-access-flags
+(defun jdee-bytecode-get-field-access-flags ()
+  (jdee-bytecode-get-access-flags
    [nil enum nil synthetic nil nil nil nil]
    [transient volatile nil final static protected private public]))
 
-(defun jdee-parse-class-get-version ()
+(defun jdee-bytecode-get-version ()
   "Return a list - (major-version minor-version)"
-  (let ((minor (jdee-parse-class-get-2byte 5))
-        (major (jdee-parse-class-get-2byte 7)))
+  (let ((minor (jdee-bytecode-get-2byte 5))
+        (major (jdee-bytecode-get-2byte 7)))
     (if (or
          (and (eq major 45) (eq minor 3)) ;Java v 1.1
          (and (eq major 46) (eq minor 0)) ;Java v 1.2 -- strictfp
@@ -493,19 +487,19 @@ returns ('f 'g)"
         (list major minor)
       (error "Unsupported class file version: %s.%s" major minor))))
 
-(defun jdee-parse-class-get-2byte (point)
+(defun jdee-bytecode-get-2byte (point)
   "Gets the value of two bytes (0 - 65535) as an int"
   (let ((b1 (char-int (char-after point)))
 	(b2 (char-int (char-after (+ 1 point)))))
     (+ (* b1 256) b2)))
 
-(defun jdee-parse-class-get-next-2-bytes ()
+(defun jdee-bytecode-get-next-2-bytes ()
   (do-and-advance-chars 2
-    (jdee-parse-class-get-2byte (point))))
+    (jdee-bytecode-get-2byte (point))))
 
-(defun jdee-parse-class-get-4byte (point &optional ignore-large-val)
-  (let ((db1 (jdee-parse-class-get-2byte point))
-	(db2 (jdee-parse-class-get-2byte (+ 2 point))))
+(defun jdee-bytecode-get-4byte (point &optional ignore-large-val)
+  (let ((db1 (jdee-bytecode-get-2byte point))
+	(db2 (jdee-bytecode-get-2byte (+ 2 point))))
     (if (< db1 2047)
       ;; don't go over the maxint in elisp (2047, since we have 1 more db1 could be 65536)
       (+ (* 65536 db1) db2)
@@ -513,39 +507,39 @@ returns ('f 'g)"
 	0
 	(error "Class file has a larger 4 byte value then emacs can handle")))))
 
-(defun jdee-parse-class-get-next-4-bytes-as-signed (&optional ignore-large-val)
-  (let ((db1 (jdee-parse-class-get-next-2-bytes))
-	(db2 (jdee-parse-class-get-next-2-bytes)))
+(defun jdee-bytecode-get-next-4-bytes-as-signed (&optional ignore-large-val)
+  (let ((db1 (jdee-bytecode-get-next-2-bytes))
+	(db2 (jdee-bytecode-get-next-2-bytes)))
     (if (> (logand 32768 db1) 0)  ;; if its high-bit is set, then it's negative.
       (if (> db1 63488)
 	(- (+ 1 (+ (* (- 65535 db1) 65536) (- 65535 db2))))
 	(if ignore-large-val
 	  0
 	  (error "Class file has an unsigned int who is smaller than emacs can handle")))
-      (jdee-parse-class-get-4byte (- (point) 4)))))
+      (jdee-bytecode-get-4byte (- (point) 4)))))
 
-(defun jdee-parse-class-diff-next-two-4-bytes-as-signed ()
-  (let ((low1 (jdee-parse-class-get-next-2-bytes))
-        (low2 (jdee-parse-class-get-next-2-bytes))
-        (high1 (jdee-parse-class-get-next-2-bytes))
-        (high2 (jdee-parse-class-get-next-2-bytes)))
+(defun jdee-bytecode-diff-next-two-4-bytes-as-signed ()
+  (let ((low1 (jdee-bytecode-get-next-2-bytes))
+        (low2 (jdee-bytecode-get-next-2-bytes))
+        (high1 (jdee-bytecode-get-next-2-bytes))
+        (high2 (jdee-bytecode-get-next-2-bytes)))
     (if (and (> (logand 32768 low1) 0)
              (<= (logand 32768 high1) 0))
         (+ (* 65536 (- (+ high1 65535) low1)) (- (+ high2 65536) low2))
       (+ (* 65535 (- high1 low1)) (- high2 low2)))))
 
-(defun jdee-parse-class-get-next-4-bytes (&optional ignore-large-val)
+(defun jdee-bytecode-get-next-4-bytes (&optional ignore-large-val)
   (do-and-advance-chars 4
-    (jdee-parse-class-get-4byte (point) ignore-large-val)))
+    (jdee-bytecode-get-4byte (point) ignore-large-val)))
 
-(defun jdee-parse-class-get-constants ()
+(defun jdee-bytecode-get-constants ()
   "Returns a list of the constant ending location (not inclusive of
 of the constants) and a vector of all constants"
-  (let* ((count (- (jdee-parse-class-get-2byte 9) 1))
+  (let* ((count (- (jdee-bytecode-get-2byte 9) 1))
 	 (const-vec (make-vector count '())))
     (goto-char 11) ;; start of constants
     (dotimes (i count const-vec)
-      (let ((const (jdee-parse-class-get-next-constant)))
+      (let ((const (jdee-bytecode-get-next-constant)))
 	(aset const-vec i const)
 	;; doubles and longs take up two places on the const table.
 	(when (or (eq (car const) 'double)
@@ -553,43 +547,43 @@ of the constants) and a vector of all constants"
 	  (aset const-vec (+ 1 i) nil)
 	  (setq i (+ 1 i)))))))
 
-(defsubst jdee-parse-class-get-long-constant (&optional ignore-large-val)
-  (let ((qb1 (jdee-parse-class-get-next-4-bytes ignore-large-val))
-	(qb2 (jdee-parse-class-get-next-4-bytes ignore-large-val)))
+(defsubst jdee-bytecode-get-long-constant (&optional ignore-large-val)
+  (let ((qb1 (jdee-bytecode-get-next-4-bytes ignore-large-val))
+	(qb2 (jdee-bytecode-get-next-4-bytes ignore-large-val)))
     (if (> qb2 0)
       (if ignore-large-val
 	0
 	(error "Class file has a large 8 byte value than emacs can handle"))
       qb1)))
 
-(defsubst jdee-parse-class-get-double-constant ()
+(defsubst jdee-bytecode-get-double-constant ()
   "NOT IMPLEMENTED YET"
   (do-and-advance-chars 8
     "0.0"))
 
-(defsubst jdee-parse-class-get-ref-constant ()
-  (list (jdee-parse-class-get-next-2-bytes) (jdee-parse-class-get-next-2-bytes)))
+(defsubst jdee-bytecode-get-ref-constant ()
+  (list (jdee-bytecode-get-next-2-bytes) (jdee-bytecode-get-next-2-bytes)))
 
-(defsubst jdee-parse-class-get-float-constant ()
+(defsubst jdee-bytecode-get-float-constant ()
   "NOT IMPLEMENTED YET"
   (do-and-advance-chars 4
     "0.0"))
 
-(defsubst jdee-parse-class-get-nameandtype-constant ()
-  (list (jdee-parse-class-get-next-2-bytes) (jdee-parse-class-get-next-2-bytes)))
+(defsubst jdee-bytecode-get-nameandtype-constant ()
+  (list (jdee-bytecode-get-next-2-bytes) (jdee-bytecode-get-next-2-bytes)))
 
-(defsubst jdee-parse-class-get-utf8-constant ()
-  (let* ((len (jdee-parse-class-get-next-2-bytes))
+(defsubst jdee-bytecode-get-utf8-constant ()
+  (let* ((len (jdee-bytecode-get-next-2-bytes))
 	 (result (encode-coding-string (buffer-substring (point)
 							(+ len (point)))
-				       jdee-parse-class-encoding)))
+				       jdee-bytecode-encoding)))
     (goto-char (+ len (point)))
     result))
 
-(defsubst jdee-parse-class-get-method-handle ()
+(defsubst jdee-bytecode-get-method-handle ()
   (let ((kind (do-and-advance-chars 1 (char-int (char-after (point)))))
-        (index (jdee-parse-class-get-next-2-bytes)))
-    (list 
+        (index (jdee-bytecode-get-next-2-bytes)))
+    (list
      (cond ((eq kind 1) 'get-field)
            ((eq kind 2) 'get-static)
            ((eq kind 3) 'put-field)
@@ -602,48 +596,48 @@ of the constants) and a vector of all constants"
            (t (error "Unrecognized MethodHandle_info kind: %s" kind)))
      index)))
 
-(defsubst jdee-parse-class-get-method-type ()
-  (list (jdee-parse-class-get-next-2-bytes)))
+(defsubst jdee-bytecode-get-method-type ()
+  (list (jdee-bytecode-get-next-2-bytes)))
 
-(defsubst jdee-parse-class-get-invoke-dynamic ()
-  (list (jdee-parse-class-get-next-2-bytes)
-        (jdee-parse-class-get-next-2-bytes)))
+(defsubst jdee-bytecode-get-invoke-dynamic ()
+  (list (jdee-bytecode-get-next-2-bytes)
+        (jdee-bytecode-get-next-2-bytes)))
 
-(defun jdee-parse-class-get-next-constant ()
+(defun jdee-bytecode-get-next-constant ()
   (let ((const-type (char-int (char-after (point)))))
     (forward-char)
     (cond ((eq const-type 7)
-	    `(class ,(jdee-parse-class-get-next-2-bytes)))
+           `(class ,(jdee-bytecode-get-next-2-bytes)))
 	  ((eq const-type 9)
-	    `(field ,@(jdee-parse-class-get-ref-constant)))
+           `(field ,@(jdee-bytecode-get-ref-constant)))
 	  ((eq const-type 10)
-	    `(method ,@(jdee-parse-class-get-ref-constant)))
+           `(method ,@(jdee-bytecode-get-ref-constant)))
 	  ((eq const-type 11)
-	    `(interface-method ,@(jdee-parse-class-get-ref-constant)))
+           `(interface-method ,@(jdee-bytecode-get-ref-constant)))
 	  ((eq const-type 8)
-	    `(string ,(jdee-parse-class-get-next-2-bytes)))
+           `(string ,(jdee-bytecode-get-next-2-bytes)))
 	  ((eq const-type 3)
-	    `(integer ,(jdee-parse-class-get-next-4-bytes t)))
+           `(integer ,(jdee-bytecode-get-next-4-bytes t)))
 	  ((eq const-type 4)
-	    `(float ,(jdee-parse-class-get-float-constant)))
+           `(float ,(jdee-bytecode-get-float-constant)))
 	  ((eq const-type 5)
-	    `(long ,(jdee-parse-class-get-long-constant t)))
+           `(long ,(jdee-bytecode-get-long-constant t)))
 	  ((eq const-type 6)
-	    `(double ,(jdee-parse-class-get-double-constant)))
+           `(double ,(jdee-bytecode-get-double-constant)))
 	  ((eq const-type 12)
-	    `(name-and-type ,@(jdee-parse-class-get-nameandtype-constant)))
+           `(name-and-type ,@(jdee-bytecode-get-nameandtype-constant)))
 	  ((eq const-type 1)
-	    `(utf8 ,(jdee-parse-class-get-utf8-constant)))
+           `(utf8 ,(jdee-bytecode-get-utf8-constant)))
           ((eq const-type 15)
-           `(method-handle ,@(jdee-parse-class-get-method-handle)))
+           `(method-handle ,@(jdee-bytecode-get-method-handle)))
           ((eq const-type 16)
-           `(method-type ,@(jdee-parse-class-get-method-type)))
+           `(method-type ,@(jdee-bytecode-get-method-type)))
           ((eq const-type 18)
-           `(invoke-dynamic ,@(jdee-parse-class-get-invoke-dynamic)))
+           `(invoke-dynamic ,@(jdee-bytecode-get-invoke-dynamic)))
           (t
            (error "Unrecognized constant type: %s" const-type)))))
 
-(defconst jdee-parse-class-opcode-vec
+(defconst jdee-bytecode-opcode-vec
   [(nop . 1)  ;; 0
    (aconst_null . 1) ;; 1
    (iconst_m1 . 1)  ;; 2
@@ -854,6 +848,6 @@ this vector to see both the name of the instruction, and the size of
 the operation in bytes.  A few opcodes have variable length, so those
 must be calculated at runtime.")
 
-(provide 'jdee-parse-class)
+(provide 'jdee-bytecode)
 
-;;; jdee-parse-class.el ends here
+;;; jdee-bytecode.el ends here
