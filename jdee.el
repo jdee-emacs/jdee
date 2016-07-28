@@ -1104,7 +1104,7 @@ Does nothing but return nil if `jdee-log-max' is nil."
 	      [ "Fully Qualify Class" jdee-replace-fully-qualified-class-at-point t]
 	      )
 	(list "Help"
-	      ["JDEE Users Guide"      jdee-show-help t]
+	      ["JDEE Users Guide"      jdee-help-show-jdee-doc t]
 	      ["JDK"                   jdee-help-browse-jdk-doc t]
 	      ["JDEE Key Bindings"     jdee-keys t]
 	      "-"
@@ -1641,21 +1641,6 @@ expects to find the documentation in a subdirectory
 named doc of the directory that contains the file
 jde.el."
   (jdee-find-jdee-data-directory))
-
-;;;###autoload
-(defun jdee-show-help ()
-  "Displays the JDEE User's Guide in a browser."
-  (interactive)
-  (let* ((jdee-dir (jdee-find-jdee-doc-directory))
-	 (jdee-help
-	  (if jdee-dir
-	      (expand-file-name "doc/html/jdee-ug/jdee-ug.html" jdee-dir))))
-    (if (and
-	 jdee-help
-	 (file-exists-p jdee-help))
-	(browse-url (concat "file://" (jdee-convert-cygwin-path jdee-help)))
-      (signal 'error '("Cannot find JDEE help file.")))))
-
 
 ;; Problem reporting functions contributed by
 ;; Phillip Lord <plord < at > hgmp.mrc.ac.uk>.
