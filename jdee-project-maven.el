@@ -27,6 +27,27 @@
 (require 'jdee)
 (require 'jdee-open-source)
 
+(defgroup jdee-project-maven nil
+  "JDEE Maven Project Options"
+  :group 'jdee
+  :prefix "jdee-")
+
+
+(defcustom jdee-project-maven-file-name "pom.xml"
+  "Specify the name of the maven project file."
+  :group 'jdee-project-maven
+  :type 'string)
+
+
+(defun jdee-project-maven-pom-dir (&optional dir)
+  "Find the directory of the closest maven maven project
+file (see `jdee-project-maven-file-name') starting at
+DIR (default to `default-directory')"
+  (let ((pom-path  (jdee-find-project-file (or dir default-directory)
+                                           jdee-project-maven-file-name)))
+    (when pom-path
+      (file-name-directory pom-path))))
+
 (defun jdee-project-maven-classpath-from-file (file-name &optional sep)
   "Read a classpath from a file that contains a classpath.  Useful in conjunction with
 a maven plugin to create the classpath like:
