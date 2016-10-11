@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'jdee)
+
 (require 'jdee-open-source)
 (require 'cl)
 
@@ -34,13 +34,23 @@
   :prefix "jdee-")
 
 
+(defcustom jdee-project-maven-disabled-p nil
+  "When nil (default) add maven support to project startup."
+  :group 'jdee-project-maven
+  :type 'boolean)
+
 (defcustom jdee-project-maven-file-name "pom.xml"
   "Specify the name of the maven project file."
   :group 'jdee-project-maven
   :type 'string)
 
+(defcustom jdee-project-maven-init-hook '(jdee-project-maven-from-file-hook)
+  "A list of functions to call to try and initialize the maven integeration.  Each function will be passed the directory that contains the pom.xml.  Stop calling functions after the first non-nil return."
+  :group 'jdee-project-maven
+  :type 'hook)
+
 (defcustom jdee-project-maven-dir-scope-map (list "target/compile.cp" '("src/main/java")
-                                                  "target/test.cp" '("src/main/test"))
+                                                  "target/test.cp" '("src/test/java"))
 
   "Specify a map of directories to maven dependency scope type."
   :group 'jdee-project-maven
@@ -56,21 +66,31 @@ DIR (default to `default-directory')"
     (when pom-path
       (file-name-directory pom-path))))
 
-(defun jdee-project-maven-scope-file (&optional dir)
-  "Return which classpath file to use based on the `jdee-project-maven-dir-scope-map'."
-  (cl-loop for (key paths) on jdee-project-maven-dir-scope-map by 'cddr
-           if (-any-p (lambda (path) (string-match path (or dir default-directory))) paths)
-           return key))
+(defun jdee-project-maven-scope-file (&optional file-dir)
+  "Return which classpath file to use based on the `jdee-project-maven-dir-scope-map'.
 
-(defun jdee-project-maven-from-file-hook ()
-  "Run as a hook to setup the classpath based on having the classpath in a file on disk.  See `jdee-project-maven-dir-scope-map' for how the files are chosen."
-  (let ((pom-dir (jdee-project-maven-pom-dir)))
+FILE-Dir is the directory containing the source code in question.  Default to `default-directory'. "
+  (cl-loop for (key paths) on jdee-project-maven-dir-scope-map by 'cddr
+           if (-any-p (lambda (path) (string-match path (or file-dir default-directory))) paths)
+           return key))
+;;;###autoload
+(defun jdee-project-maven-hook ()
+  "Initialize the maven integration if available."
+  (unless jdee-project-maven-disabled-p 
+    (run-hook-with-args-until-success 'jdee-project-maven-init-hook (jdee-project-maven-pom-dir))))
+
+(defun jdee-project-maven-from-file-hook (&optional dir)
+  "Run as a hook to setup the classpath based on having the
+classpath in a file on disk.  See
+`jdee-project-maven-dir-scope-map' for how the files are chosen. 
+
+DIR is the directory containing the pom.xml.  If nil, hunt for it."
+  (let ((pom-dir (or dir (jdee-project-maven-pom-dir))))
     (when pom-dir
       (let ((cp (jdee-project-maven-classpath-from-file
                  (expand-file-name (jdee-project-maven-scope-file) pom-dir))))
         (jdee-set-variables '(jdee-global-classpath cp))))))
 
-(add-hook 'jdee-project-hooks 'jdee-project-maven-from-file-hook)
 
 (defun jdee-project-maven-classpath-from-file (file-name &optional sep)
   "Read a classpath from a file that contains a classpath.  Useful in conjunction with
@@ -122,6 +142,10 @@ and this in src/main
     (jdee-with-file-contents
      the-file
      (split-string (buffer-string) (or sep path-separator t)))))
+
+
+
+
 
 (provide 'jdee-project-maven)
 
