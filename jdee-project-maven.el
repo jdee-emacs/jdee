@@ -26,6 +26,7 @@
 
 (require 'jdee)
 (require 'jdee-open-source)
+(require 'cl)
 
 (defgroup jdee-project-maven nil
   "JDEE Maven Project Options"
@@ -38,6 +39,13 @@
   :group 'jdee-project-maven
   :type 'string)
 
+(defcustom jdee-project-maven-dir-scope-map (list "target/compile.cp" '("src/main/java")
+                                                  "target/test.cp" '("src/main/test"))
+
+  "Specify a map of directories to maven dependency scope type."
+  :group 'jdee-project-maven
+  :type '(plist :key-type string :value-type (repeat string)))
+
 
 (defun jdee-project-maven-pom-dir (&optional dir)
   "Find the directory of the closest maven maven project
@@ -47,6 +55,22 @@ DIR (default to `default-directory')"
                                            jdee-project-maven-file-name)))
     (when pom-path
       (file-name-directory pom-path))))
+
+(defun jdee-project-maven-scope-file (&optional dir)
+  "Return which classpath file to use based on the `jdee-project-maven-dir-scope-map'."
+  (cl-loop for (key paths) on jdee-project-maven-dir-scope-map by 'cddr
+           if (-any-p (lambda (path) (string-match path (or dir default-directory))) paths)
+           return key))
+
+(defun jdee-project-maven-from-file-hook ()
+  "Run as a hook to setup the classpath based on having the classpath in a file on disk.  See `jdee-project-maven-dir-scope-map' for how the files are chosen."
+  (let ((pom-dir (jdee-project-maven-pom-dir)))
+    (when pom-dir
+      (let ((cp (jdee-project-maven-classpath-from-file
+                 (expand-file-name (jdee-project-maven-scope-file) pom-dir))))
+        (jdee-set-variables '(jdee-global-classpath cp))))))
+
+(add-hook 'jdee-project-hooks 'jdee-project-maven-from-file-hook)
 
 (defun jdee-project-maven-classpath-from-file (file-name &optional sep)
   "Read a classpath from a file that contains a classpath.  Useful in conjunction with
