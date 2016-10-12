@@ -132,7 +132,7 @@ relative the maven project dir."
                              nil))))
           (erase-buffer)
           (pop-to-buffer (current-buffer))
-          (apply 'call-process "mvn" nil t t args))
+          (apply 'call-process "mvn" nil t t (remove-if-not 'identity args)))
         (goto-char (point-min))
         (when (search-forward "BUILD SUCCESS" nil t)
           (kill-buffer (current-buffer)))))))
