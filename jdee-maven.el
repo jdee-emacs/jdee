@@ -101,6 +101,22 @@ relative the maven project dir."
   (unless jdee-maven-disabled-p 
     (run-hook-with-args-until-success 'jdee-maven-init-hook (jdee-maven-get-default-directory))))
 
+(defun jdee-maven-check-classpath-file (scope classpath-file pom-dir)
+  (let ((classpath-file-path (expand-file-name classpath-file pom-dir)))
+    (unless (file-readable-p classpath-file-path)
+      (with-current-buffer (get-buffer-create (format "*%s*"  "jdee-maven-check-classpath-file"))
+        (erase-buffer)
+        (pop-to-buffer (current-buffer))
+        
+        (let ((default-directory pom-dir))
+          (call-process "mvn" nil t t "dependency:build-classpath"
+                        (format "-DincludeScope=%s" scope)
+                        (format "-Dmdep.outputFile=%s" classpath-file)))
+        (goto-char (point-min))
+        (when (search-forward "BUILD SUCCESS" nil t)
+          (kill-buffer (current-buffer)))))))
+
+
 (defun jdee-maven-from-file-hook (&optional dir)
   "Run as a hook to setup the classpath based on having the
 classpath in a file on disk.  See
@@ -111,6 +127,7 @@ DIR is the directory containing the pom.xml.  If nil, hunt for it."
     (when pom-dir
       (let ((scope-info (jdee-maven-scope-file)))
         (when scope-info
+          (jdee-maven-check-classpath-file (nth 0 scope-info) (nth 1 scope-info) pom-dir)
           (let ((cp (jdee-maven-classpath-from-file
                      (expand-file-name (nth 1 scope-info) pom-dir)))
                 (sp (mapcar (lambda(p) (expand-file-name p pom-dir))
@@ -122,6 +139,7 @@ DIR is the directory containing the pom.xml.  If nil, hunt for it."
                                 '(jdee-build-function 'jdee-maven-build)
                                 '(jdee-run-working-directory pom-dir)
                                 '(jdee-run-option-classpath (append rp cp))
+                                '(jdee-db-option-classpath (append rp sp cp))
                                 '(jdee-compile-option-directory (first rp))
                                 '(jdee-compile-option-classpath (append sp cp))
                                 '(jdee-sourcepath  sp))
