@@ -49,6 +49,12 @@
  :group 'jdee-maven
  :type 'string)
 
+(defcustom jdee-maven-artifacts-excluded-from-sources '("ojdbc16" "wlfullclient" "wlthint3client"
+                                                        "common-tools-ihc" "ihc-ldap-client" "audit3-ejb" "CDRClientEJB" "spring-context-support" "spring-js-resources")
+  "Artifact IDs to exclude from sources"
+ :group 'jdee-maven
+ :type '(repeat (string :tag "Artifact:")))
+
 
 (defcustom jdee-maven-init-hook '(jdee-maven-from-file-hook)
   "A list of functions to call to try and initialize the maven integeration.  Each function will be passed the directory that contains the pom.xml.  Stop calling functions after the first non-nil return."
@@ -57,12 +63,15 @@
 
 (defcustom jdee-maven-dir-scope-map
   (list
-   (list  'compile "target/compile.cp"
+   (list  'compile
+          "target/compile.cp"
+          "target/compile-sources.cp"
          '("src/main/java")
          '("src/main/java")
          '("target/classes"))
    (list  'test
          "target/test.cp"
+         "target/test-sources.cp"
          '("src/test/java")
          '("src/test/java" "src/main/java" )
          '("target/test-classes" "target/classes")))
@@ -71,6 +80,7 @@
   :group 'jdee-maven
   :type '(alist :key-type (symbol :tag "Scope")
                 :value-type (list (string :tag "Relative path to classpath file")
+                                  (string :tag "Relative path to classpath source file")
                                   (repeat (regexp :tag "Path regexp to match"))
                                   (repeat (string :tag "Source path"))
                                   (repeat (string :tag "Runtime path")))))
@@ -91,9 +101,9 @@ Default to `default-directory'.
 
 Return nil if not found or a list of (cp-file source-paths) both
 relative the maven project dir."
-  (cl-loop for (scope key paths source-paths runtime-paths) in jdee-maven-dir-scope-map ; by 'cddr
+  (cl-loop for (scope key sources-file paths source-paths runtime-paths) in jdee-maven-dir-scope-map ; by 'cddr
            if (-any-p (lambda (path) (string-match path (or file-dir default-directory))) paths)
-           return (list scope key source-paths runtime-paths)))
+           return (list scope key source-paths runtime-paths sources-file)))
 
 ;;;###autoload
 (defun jdee-maven-hook ()
@@ -101,17 +111,28 @@ relative the maven project dir."
   (unless jdee-maven-disabled-p 
     (run-hook-with-args-until-success 'jdee-maven-init-hook (jdee-maven-get-default-directory))))
 
-(defun jdee-maven-check-classpath-file (scope classpath-file pom-dir)
-  (let ((classpath-file-path (expand-file-name classpath-file pom-dir)))
+(defun jdee-maven-check-classpath-file (scope classpath-file sources-classpath-file pom-dir)
+  (jdee-maven-check-classpath-file* scope classpath-file pom-dir nil)
+  (jdee-maven-check-classpath-file* scope sources-classpath-file pom-dir "sources")
+  )
+
+(defun jdee-maven-check-classpath-file* (scope output-file pom-dir classifier)
+  (let ((classpath-file-path (expand-file-name output-file pom-dir)))
     (unless (file-readable-p classpath-file-path)
       (with-current-buffer (get-buffer-create (format "*%s*"  "jdee-maven-check-classpath-file"))
-        (erase-buffer)
-        (pop-to-buffer (current-buffer))
-        
-        (let ((default-directory pom-dir))
-          (call-process "mvn" nil t t "dependency:build-classpath"
-                        (format "-DincludeScope=%s" scope)
-                        (format "-Dmdep.outputFile=%s" classpath-file)))
+        (let* ((default-directory pom-dir)
+               (args (list "dependency:build-classpath"
+                           (format "-DincludeScope=%s" scope)
+                           (format "-Dmdep.outputFile=%s" output-file)
+                           (if classifier
+                               (format "-Dclassifier=%s" classifier)
+                             nil)
+                           (if (and classifier jdee-maven-artifacts-excluded-from-sources)
+                               (format "-DexcludeArtifactIds=%s" (mapconcat 'identity jdee-maven-artifacts-excluded-from-sources ",")) 
+                             nil))))
+          (erase-buffer)
+          (pop-to-buffer (current-buffer))
+          (apply 'call-process "mvn" nil t t args))
         (goto-char (point-min))
         (when (search-forward "BUILD SUCCESS" nil t)
           (kill-buffer (current-buffer)))))))
@@ -127,8 +148,10 @@ DIR is the directory containing the pom.xml.  If nil, hunt for it."
     (when pom-dir
       (let ((scope-info (jdee-maven-scope-file)))
         (when scope-info
-          (jdee-maven-check-classpath-file (nth 0 scope-info) (nth 1 scope-info) pom-dir)
-          (let ((cp (jdee-maven-classpath-from-file
+          (jdee-maven-check-classpath-file (nth 0 scope-info) (nth 1 scope-info) (nth 4 scope-info) pom-dir)
+          (let ((sources-classpath (jdee-maven-classpath-from-file
+                                    (expand-file-name (nth 4 scope-info) pom-dir)))
+                (cp (jdee-maven-classpath-from-file
                      (expand-file-name (nth 1 scope-info) pom-dir)))
                 (sp (mapcar (lambda(p) (expand-file-name p pom-dir))
                             (nth 2 scope-info)))
@@ -142,7 +165,7 @@ DIR is the directory containing the pom.xml.  If nil, hunt for it."
                                 '(jdee-db-option-classpath (append rp sp cp))
                                 '(jdee-compile-option-directory (first rp))
                                 '(jdee-compile-option-classpath (append sp cp))
-                                '(jdee-sourcepath  sp))
+                                '(jdee-sourcepath  (append sp sources-classpath)))
             pom-dir))))))
 
 
