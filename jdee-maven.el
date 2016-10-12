@@ -39,57 +39,67 @@
   :group 'jdee-maven
   :type 'boolean)
 
-(defcustom jdee-maven-file-name "pom.xml"
+(defcustom jdee-maven-buildfile "pom.xml"
   "Specify the name of the maven project file."
   :group 'jdee-maven
   :type 'string)
+
+(defcustom jdee-maven-program "mvn"
+  "*Specifies name of ant program/script."
+ :group 'jdee-maven
+ :type 'string)
+
 
 (defcustom jdee-maven-init-hook '(jdee-maven-from-file-hook)
   "A list of functions to call to try and initialize the maven integeration.  Each function will be passed the directory that contains the pom.xml.  Stop calling functions after the first non-nil return."
   :group 'jdee-maven
   :type 'hook)
 
-(defcustom jdee-maven-dir-scope-map-old (list "target/compile.cp" '("src/main/java")
-                                                      "target/test.cp" '("src/test/java"))
+(defcustom jdee-maven-dir-scope-map
+  (list
+   (list  'compile "target/compile.cp"
+         '("src/main/java")
+         '("src/main/java")
+         '("target/classes"))
+   (list  'test
+         "target/test.cp"
+         '("src/test/java")
+         '("src/test/java" "src/main/java" )
+         '("target/test-classes" "target/classes")))
 
   "Specify a map of directories to maven dependency scope type."
   :group 'jdee-maven
-  :type '(plist :key-type string :value-type (repeat string)))
+  :type '(alist :key-type (symbol :tag "Scope")
+                :value-type (list (string :tag "Relative path to classpath file")
+                                  (repeat (regexp :tag "Path regexp to match"))
+                                  (repeat (string :tag "Source path"))
+                                  (repeat (string :tag "Runtime path")))))
 
-(defcustom jdee-maven-dir-scope-map '(("target/compile.cp" ("src/main/java")  ("src/main/java"))
-                                              ("target/test.cp" ("src/test/java") ("src/test/java" "src/main/java" )))
-
-  "Specify a map of directories to maven dependency scope type."
-  :group 'jdee-maven
-  :type '(alist :key-type (string :tag "Relative path to classpath file")
-                :value-type (list (repeat (regexp :tag "Path regexp to match"))
-                                  (repeat (string :tag "Source path")))))
-
-
-(defun jdee-maven-pom-dir (&optional dir)
-  "Find the directory of the closest maven maven project
-file (see `jdee-maven-file-name') starting at
-DIR (default to `default-directory')"
-  (let ((pom-path  (jdee-find-project-file (or dir default-directory)
-                                           jdee-maven-file-name)))
+(defun jdee-maven-get-default-directory (&optional path)
+  "Gets the default-directory by searching for the `jdee-maven-buildfile' usually pom.xml.
+  Find the directory of the closest  maven project file (see
+`jdee-maven-buildfile') starting at DIR (default to `default-directory')"
+  (let ((pom-path (jdee-find-project-file (or path default-directory) jdee-maven-buildfile)))
     (when pom-path
       (file-name-directory pom-path))))
 
 (defun jdee-maven-scope-file (&optional file-dir)
   "Return which classpath file to use based on the `jdee-maven-dir-scope-map'.
 
-FILE-Dir is the directory containing the source code in question.  Default to `default-directory'. 
+FILE-DIR is the directory containing the source code in question.
+Default to `default-directory'.
 
-Return nil if not found or a list of (cp-file source-paths) both relative the maven project dir."
-  (cl-loop for (key paths source-paths) in jdee-maven-dir-scope-map ; by 'cddr
+Return nil if not found or a list of (cp-file source-paths) both
+relative the maven project dir."
+  (cl-loop for (scope key paths source-paths runtime-paths) in jdee-maven-dir-scope-map ; by 'cddr
            if (-any-p (lambda (path) (string-match path (or file-dir default-directory))) paths)
-           return (list key source-paths)))
+           return (list scope key source-paths runtime-paths)))
 
 ;;;###autoload
 (defun jdee-maven-hook ()
   "Initialize the maven integration if available."
   (unless jdee-maven-disabled-p 
-    (run-hook-with-args-until-success 'jdee-maven-init-hook (jdee-maven-pom-dir))))
+    (run-hook-with-args-until-success 'jdee-maven-init-hook (jdee-maven-get-default-directory))))
 
 (defun jdee-maven-from-file-hook (&optional dir)
   "Run as a hook to setup the classpath based on having the
@@ -97,15 +107,22 @@ classpath in a file on disk.  See
 `jdee-maven-dir-scope-map' for how the files are chosen. 
 
 DIR is the directory containing the pom.xml.  If nil, hunt for it."
-  (let ((pom-dir (or dir (jdee-maven-pom-dir))))
+  (let ((pom-dir (or dir (jdee-maven-get-default-directory))))
     (when pom-dir
       (let ((scope-info (jdee-maven-scope-file)))
         (when scope-info
           (let ((cp (jdee-maven-classpath-from-file
-                     (expand-file-name (nth 0 scope-info) pom-dir)))
+                     (expand-file-name (nth 1 scope-info) pom-dir)))
                 (sp (mapcar (lambda(p) (expand-file-name p pom-dir))
-                            (nth 1 scope-info))))
+                            (nth 2 scope-info)))
+                (rp (mapcar (lambda(p) (expand-file-name p pom-dir))
+                            (nth 3 scope-info))))
+            
             (jdee-set-variables '(jdee-global-classpath cp)
+                                '(jdee-build-function 'jdee-maven-build)
+                                '(jdee-run-working-directory pom-dir)
+                                '(jdee-run-option-classpath (append rp cp))
+                                '(jdee-compile-option-directory (first rp))
                                 '(jdee-compile-option-classpath (append sp cp))
                                 '(jdee-sourcepath  sp))
             pom-dir))))))
@@ -161,6 +178,17 @@ and this in src/main
     (jdee-with-file-contents
      the-file
      (split-string (buffer-string) (or sep path-separator t)))))
+
+;;
+;; Building
+;;
+;;;###autoload
+(defun jdee-maven-build (&optional path)
+  
+  "Build using the maven command from PATH (default to `default-directory')"
+  (interactive)
+  (let ((default-directory (jdee-maven-get-default-directory path)))
+    (compilation-start (format "%s package" jdee-maven-program))))
 
 (provide 'jdee-maven)
 
