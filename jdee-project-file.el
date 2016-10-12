@@ -27,13 +27,13 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'jdee-project-maven)
+(require 'jdee-maven)
 
 ;; FIXME: refactor
 (declare-function jdee-wiz-set-bsh-project "jdee-wiz" ())
 (declare-function jdee-root-dir-p "jdee" (dir))
 (declare-function jdee-log-msg "jdee" (msg &rest args))
-(declare-function jdee-project-maven-hook "jdee-project-maven" ())
+(declare-function jdee-maven-hook "jdee-maven" ())
 
 
 (defconst jdee-project-file-version "1.0"
@@ -522,9 +522,9 @@ defined by the current project's project file."
   (jdee-custom-adjust-groups)
   (jdee-load-project-file))
 
-(when  (or (not (boundp 'jdee-project-maven-disabled-p))
-           (not jdee-project-maven-disabled-p))
-  (add-hook 'jdee-mode-hook 'jdee-project-maven-hook))
+(when  (or (not (boundp 'jdee-maven-disabled-p))
+           (not jdee-maven-disabled-p))
+  (add-hook 'jdee-mode-hook 'jdee-maven-hook))
 
 (provide 'jdee-project-file)
 

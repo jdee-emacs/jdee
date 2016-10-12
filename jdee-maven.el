@@ -1,4 +1,4 @@
-;;; jdee-project-maven.el -- Project maven integration
+;;; jdee-maven.el -- Project maven integration
 
 ;; Author: Matthew O. Smith <matt@m0smith.com>
 ;; Keywords: java, tools
@@ -28,71 +28,90 @@
 (require 'jdee-open-source)
 (require 'cl)
 
-(defgroup jdee-project-maven nil
+(defgroup jdee-maven nil
   "JDEE Maven Project Options"
   :group 'jdee
   :prefix "jdee-")
 
 
-(defcustom jdee-project-maven-disabled-p nil
+(defcustom jdee-maven-disabled-p nil
   "When nil (default) add maven support to project startup."
-  :group 'jdee-project-maven
+  :group 'jdee-maven
   :type 'boolean)
 
-(defcustom jdee-project-maven-file-name "pom.xml"
+(defcustom jdee-maven-file-name "pom.xml"
   "Specify the name of the maven project file."
-  :group 'jdee-project-maven
+  :group 'jdee-maven
   :type 'string)
 
-(defcustom jdee-project-maven-init-hook '(jdee-project-maven-from-file-hook)
+(defcustom jdee-maven-init-hook '(jdee-maven-from-file-hook)
   "A list of functions to call to try and initialize the maven integeration.  Each function will be passed the directory that contains the pom.xml.  Stop calling functions after the first non-nil return."
-  :group 'jdee-project-maven
+  :group 'jdee-maven
   :type 'hook)
 
-(defcustom jdee-project-maven-dir-scope-map (list "target/compile.cp" '("src/main/java")
-                                                  "target/test.cp" '("src/test/java"))
+(defcustom jdee-maven-dir-scope-map-old (list "target/compile.cp" '("src/main/java")
+                                                      "target/test.cp" '("src/test/java"))
 
   "Specify a map of directories to maven dependency scope type."
-  :group 'jdee-project-maven
+  :group 'jdee-maven
   :type '(plist :key-type string :value-type (repeat string)))
 
+(defcustom jdee-maven-dir-scope-map '(("target/compile.cp" ("src/main/java")  ("src/main/java"))
+                                              ("target/test.cp" ("src/test/java") ("src/test/java" "src/main/java" )))
 
-(defun jdee-project-maven-pom-dir (&optional dir)
+  "Specify a map of directories to maven dependency scope type."
+  :group 'jdee-maven
+  :type '(alist :key-type (string :tag "Relative path to classpath file")
+                :value-type (list (repeat (regexp :tag "Path regexp to match"))
+                                  (repeat (string :tag "Source path")))))
+
+
+(defun jdee-maven-pom-dir (&optional dir)
   "Find the directory of the closest maven maven project
-file (see `jdee-project-maven-file-name') starting at
+file (see `jdee-maven-file-name') starting at
 DIR (default to `default-directory')"
   (let ((pom-path  (jdee-find-project-file (or dir default-directory)
-                                           jdee-project-maven-file-name)))
+                                           jdee-maven-file-name)))
     (when pom-path
       (file-name-directory pom-path))))
 
-(defun jdee-project-maven-scope-file (&optional file-dir)
-  "Return which classpath file to use based on the `jdee-project-maven-dir-scope-map'.
+(defun jdee-maven-scope-file (&optional file-dir)
+  "Return which classpath file to use based on the `jdee-maven-dir-scope-map'.
 
-FILE-Dir is the directory containing the source code in question.  Default to `default-directory'. "
-  (cl-loop for (key paths) on jdee-project-maven-dir-scope-map by 'cddr
+FILE-Dir is the directory containing the source code in question.  Default to `default-directory'. 
+
+Return nil if not found or a list of (cp-file source-paths) both relative the maven project dir."
+  (cl-loop for (key paths source-paths) in jdee-maven-dir-scope-map ; by 'cddr
            if (-any-p (lambda (path) (string-match path (or file-dir default-directory))) paths)
-           return key))
-;;;###autoload
-(defun jdee-project-maven-hook ()
-  "Initialize the maven integration if available."
-  (unless jdee-project-maven-disabled-p 
-    (run-hook-with-args-until-success 'jdee-project-maven-init-hook (jdee-project-maven-pom-dir))))
+           return (list key source-paths)))
 
-(defun jdee-project-maven-from-file-hook (&optional dir)
+;;;###autoload
+(defun jdee-maven-hook ()
+  "Initialize the maven integration if available."
+  (unless jdee-maven-disabled-p 
+    (run-hook-with-args-until-success 'jdee-maven-init-hook (jdee-maven-pom-dir))))
+
+(defun jdee-maven-from-file-hook (&optional dir)
   "Run as a hook to setup the classpath based on having the
 classpath in a file on disk.  See
-`jdee-project-maven-dir-scope-map' for how the files are chosen. 
+`jdee-maven-dir-scope-map' for how the files are chosen. 
 
 DIR is the directory containing the pom.xml.  If nil, hunt for it."
-  (let ((pom-dir (or dir (jdee-project-maven-pom-dir))))
+  (let ((pom-dir (or dir (jdee-maven-pom-dir))))
     (when pom-dir
-      (let ((cp (jdee-project-maven-classpath-from-file
-                 (expand-file-name (jdee-project-maven-scope-file) pom-dir))))
-        (jdee-set-variables '(jdee-global-classpath cp))))))
+      (let ((scope-info (jdee-maven-scope-file)))
+        (when scope-info
+          (let ((cp (jdee-maven-classpath-from-file
+                     (expand-file-name (nth 0 scope-info) pom-dir)))
+                (sp (mapcar (lambda(p) (expand-file-name p pom-dir))
+                            (nth 1 scope-info))))
+            (jdee-set-variables '(jdee-global-classpath cp)
+                                '(jdee-compile-option-classpath (append sp cp))
+                                '(jdee-sourcepath  sp))
+            pom-dir))))))
 
 
-(defun jdee-project-maven-classpath-from-file (file-name &optional sep)
+(defun jdee-maven-classpath-from-file (file-name &optional sep)
   "Read a classpath from a file that contains a classpath.  Useful in conjunction with
 a maven plugin to create the classpath like:
 	    <plugin>
@@ -128,25 +147,21 @@ a maven plugin to create the classpath like:
 It can be used in a prj.el like this in src/test
 
 (jdee-set-variables
- '(jdee-global-classpath (jdee-project-classpath-from-file \"./../../target/test.cp\")))
+ '(jdee-global-classpath (jdee-maven-classpath-from-file \"./../../target/test.cp\")))
 
 and this in src/main
 
 (jdee-set-variables
- '(jdee-global-classpath (jdee-project-classpath-from-file \"./../../target/compile.cp\")))
+ '(jdee-global-classpath (jdee-maven-classpath-from-file \"./../../target/compile.cp\")))
 
 
 "
   (let ((the-file (jdee-normalize-path file-name)))
-    (message "loading file %s %s" the-file (file-exists-p the-file))
+    ;;(message "loading file %s %s" the-file (file-exists-p the-file))
     (jdee-with-file-contents
      the-file
      (split-string (buffer-string) (or sep path-separator t)))))
 
+(provide 'jdee-maven)
 
-
-
-
-(provide 'jdee-project-maven)
-
-;;; jdee-project-maven.el ends here
+;;; jdee-maven.el ends here
