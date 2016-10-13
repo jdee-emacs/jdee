@@ -30,7 +30,7 @@ doesn't try to hit the file system."
 
     (let ((default-directory (caar (last dirs))))
       
-      (flet ((directory-files (d) (cadr (assoc d dirs))))
+      (cl-letf (((symbol-function 'directory-files) (lambda (d) (cadr (assoc d dirs)))))
         (with-mock
           (stub file-readable-p => t)
           
