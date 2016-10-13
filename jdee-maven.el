@@ -49,6 +49,11 @@
  :group 'jdee-maven
  :type 'string)
 
+(defcustom jdee-maven-build-phase "package"
+  "*Specifies maven phase to specify when calling Build."
+ :group 'jdee-maven
+ :type 'string)
+
 (defcustom jdee-maven-artifacts-excluded-from-sources '("ojdbc16" "wlfullclient" "wlthint3client"
                                                         "common-tools-ihc" "ihc-ldap-client" "audit3-ejb" "CDRClientEJB" "spring-context-support" "spring-js-resources")
   "Artifact IDs to exclude from sources"
@@ -229,7 +234,7 @@ and this in src/main
   "Build using the maven command from PATH (default to `default-directory')"
   (interactive)
   (let ((default-directory (jdee-maven-get-default-directory path)))
-    (compilation-start (format "%s package" jdee-maven-program))))
+    (compilation-start (format "%s %s" jdee-maven-program jdee-maven-build-phase))))
 
 (provide 'jdee-maven)
 
