@@ -104,26 +104,39 @@
 FILE-DIR is the directory containing the source code in question.
 Default to `default-directory'.
 
-Return nil if not found or a list of (cp-file source-paths) both
+Return nil if not found or a list of (scope cp-file source-paths runtime-paths sources-cp-file) both
 relative the maven project dir."
   (cl-loop for (scope key sources-file paths source-paths runtime-paths) in jdee-maven-dir-scope-map ; by 'cddr
            if (-any-p (lambda (path) (string-match path (or file-dir default-directory))) paths)
            return (list scope key source-paths runtime-paths sources-file)))
 
-;;;###autoload
-(defun jdee-maven-hook ()
-  "Initialize the maven integration if available."
-  (unless jdee-maven-disabled-p 
-    (run-hook-with-args-until-success 'jdee-maven-init-hook (jdee-maven-get-default-directory))))
-
 (defun jdee-maven-check-classpath-file (scope classpath-file sources-classpath-file pom-dir)
+  "Check that the CLASSPATH-FILE and SOURCES-CLASSPATH-FILE for the given SOURCE  exist relative to POM-DIR, creating them if they don't.  See `jdee-maven-check-classpath-file*' for more info."
   (jdee-maven-check-classpath-file* scope classpath-file pom-dir nil)
   (jdee-maven-check-classpath-file* scope sources-classpath-file pom-dir "sources")
   )
 
 (defun jdee-maven-check-classpath-file* (scope output-file pom-dir classifier)
+  "Check that the specified classpath file, OUTPUT-FILE,  exists.  If it doesn't
+try to load it by calling mvn dependency:build-classpath directly
+with the appropriate arguments.
+
+If there is an error in creating the file, it leaves the maven buffer open so the error can be seen and diagnosed.  See `jdee-maven-dir-scope-map' for the various values of scope and output-file.
+
+Returns nil if it is unable to find or create the file, otherwise it returns the full path to the file.
+
+SCOPE - the maven scope, probably 'compile or 'test
+
+OUTPUT-FILE - the file, relative to the POM-DIR, that is being
+checked or created
+
+POM-DIR - directory contatining the pom.xml
+
+CLASSIFIER - the maven the classifier, usually nil or \"sources\""
+  
   (let ((classpath-file-path (expand-file-name output-file pom-dir)))
-    (unless (file-readable-p classpath-file-path)
+    (if (file-readable-p classpath-file-path)
+        classpath-file-path
       (with-current-buffer (get-buffer-create (format "*%s*"  "jdee-maven-check-classpath-file"))
         (let* ((default-directory pom-dir)
                (args (list "dependency:build-classpath"
@@ -140,7 +153,9 @@ relative the maven project dir."
           (apply 'call-process "mvn" nil t t (remove-if-not 'identity args)))
         (goto-char (point-min))
         (when (search-forward "BUILD SUCCESS" nil t)
-          (kill-buffer (current-buffer)))))))
+          (kill-buffer (current-buffer))
+          classpath-file-path)))))
+          
 
 
 (defun jdee-maven-from-file-hook (&optional dir)
@@ -228,6 +243,7 @@ and this in src/main
 ;;
 ;; Building
 ;;
+
 ;;;###autoload
 (defun jdee-maven-build (&optional path)
   
@@ -235,6 +251,12 @@ and this in src/main
   (interactive)
   (let ((default-directory (jdee-maven-get-default-directory path)))
     (compilation-start (format "%s %s" jdee-maven-program jdee-maven-build-phase))))
+
+;;;###autoload
+(defun jdee-maven-hook ()
+  "Initialize the maven integration if available."
+  (unless jdee-maven-disabled-p 
+    (run-hook-with-args-until-success 'jdee-maven-init-hook (jdee-maven-get-default-directory))))
 
 (provide 'jdee-maven)
 
