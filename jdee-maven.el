@@ -34,13 +34,20 @@
   :prefix "jdee-")
 
 
+(defvar jdee-maven-mode-hook nil
+  "*Lists functions to run when a buffer is successfully initialized as being
+in a maven project.")
+
+(defvar jdee-maven-project-dir nil
+  "*When a buffer is in a maven project, the full path to the project directory, the one with the pom.xml.  It will be set buffer local by the `jdee-maven-hook'.")
+
 (defcustom jdee-maven-disabled-p nil
-  "When nil (default) add maven support to project startup."
+  "*When nil (default) add maven support to project startup."
   :group 'jdee-maven
   :type 'boolean)
 
 (defcustom jdee-maven-buildfile "pom.xml"
-  "Specify the name of the maven project file."
+  "*Specify the name of the maven project file."
   :group 'jdee-maven
   :type 'string)
 
@@ -254,9 +261,16 @@ and this in src/main
 
 ;;;###autoload
 (defun jdee-maven-hook ()
-  "Initialize the maven integration if available."
-  (unless jdee-maven-disabled-p 
-    (run-hook-with-args-until-success 'jdee-maven-init-hook (jdee-maven-get-default-directory))))
+  "Initialize the maven integration if available.  Runs all the
+functions in `jdee-maven-init-hook' until one returns non-nil.
+If all return nil, maven mode is not initialized.  If one of the
+functions returns non-nil, set `jdee-maven-project-dir' buffer
+local and then run the functions in `jdee-maven-mode-hook'."
+  (unless jdee-maven-disabled-p
+    (let ((jdee-maven-project-dir* (jdee-maven-get-default-directory)))
+      (when (run-hook-with-args-until-success 'jdee-maven-init-hook jdee-maven-project-dir*)
+        (setq-local jdee-maven-project-dir jdee-maven-project-dir*)
+        (run-hooks 'jdee-maven-mode-hook)))))
 
 (provide 'jdee-maven)
 
