@@ -61,9 +61,13 @@ in a maven project.")
  :group 'jdee-maven
  :type 'string)
 
-(defcustom jdee-maven-artifacts-excluded-from-sources '("ojdbc16" "wlfullclient" "wlthint3client"
-                                                        "common-tools-ihc" "ihc-ldap-client" "audit3-ejb" "CDRClientEJB" "spring-context-support" "spring-js-resources")
-  "Artifact IDs to exclude from sources"
+(defcustom jdee-maven-artifacts-excluded-from-sources nil
+  "*Specifies a list of artifact IDs to exclude from sources.  Should be added
+to the prj.el with something like:
+
+(jdee-set-variables
+ '(jdee-maven-artifacts-excluded-from-sources '(\"ojdbc16\")))
+"
  :group 'jdee-maven
  :type '(repeat (string :tag "Artifact:")))
 
