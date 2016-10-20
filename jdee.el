@@ -866,6 +866,10 @@ idle moments.")
 	;; Set up indentation of Java annotations.
 	(jdee-annotations-setup)
 
+        ;; Setup flycheck mode
+        (when (featurep 'flycheck)
+          (require 'jdee-flycheck)
+          (jdee-flycheck-mode))
 
 	;; The next form must be the last executed
 	;; by jdee-mode.
