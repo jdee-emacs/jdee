@@ -31,7 +31,12 @@
 (require 'flycheck)
 
 
-(defclass jdee-flycheck-compiler (jdee-compile-compiler)()
+(defclass jdee-flycheck-compiler (jdee-compile-compiler)
+  ((post-fn         :initarg :post-fn
+                    :type function
+                    :documentation
+                    "Function to run after compilation is complete.")
+   )
   "Compiler used by flycheck")
 
 (defmethod initialize-instance ((this jdee-flycheck-compiler) &rest fields)
@@ -61,6 +66,10 @@
   (if (oref this :use-server-p)
       (oset this buffer (jdee-compile-server-buffer "compilation buffer"))
     (oset this buffer (jdee-compile-exec-buffer "compilation buffer")))
+  (with-current-buffer (oref (oref this buffer) buffer)
+    (add-hook 'jdee-compile-finish-hook
+              (oref this post-fn)
+              nil t))
 
 
   ;; Pop to compilation buffer.
@@ -78,7 +87,7 @@
 
 
 (defun jdee-flycheck-javac-command ( checker cback )
-  (message "Calling jdee-flycheck-javac-command")
+  ;(message "Calling jdee-flycheck-javac-command")
   
   (jdee-flycheck-compile-buffer checker cback)
 
@@ -126,6 +135,8 @@
                                                                    
         (kill-buffer temp-buffer)
         ;;(kill-buffer buf)
+        (set (make-local-variable 'jdee-compile-jump-to-first-error) nil)
+        ;(message "ERRORS: %s" errors)
         (funcall cback 'finished errors)))))
 
 (defun jdee-flycheck-compile-buffer (checker cback &optional buffer)
@@ -138,17 +149,17 @@
     (with-current-buffer orig-buffer
       (write-region (point-min) (point-max) temp-file nil :silent))
     (with-current-buffer (find-file-noselect temp-file)
-      (add-hook 'jdee-compile-finish-hook
-                (jdee-flycheck-compile-buffer-after checker cback
-                                                    orig-file orig-buffer
-                                                    temp-file (current-buffer)) t)
       (setq compilation-finish-functions
             (lambda (buf msg)
               (run-hook-with-args 'jdee-compile-finish-hook buf msg)
               (setq compilation-finish-functions nil)))
 
-      
-      (jdee-compile-compile (jdee-flycheck-compiler "flycheck")))))
+      (let ((compiler (jdee-flycheck-compiler "flycheck")))
+        (oset compiler post-fn 
+              (jdee-flycheck-compile-buffer-after checker cback
+                                                  orig-file orig-buffer
+                                                  temp-file (current-buffer)))
+        (jdee-compile-compile compiler)))))
 
 
 
