@@ -106,6 +106,7 @@ See also the function `jdee-check-versions'."
    (cons "[?\C-c ?\C-v ?\C-d]" 'jdee-debug)
    (cons "[?\C-c ?\C-v ?\C-f]" 'jdee-find)
    (cons "[?\C-c ?\C-v ?\C-g]" 'jdee-open-class-at-point)
+   (cons "[?\C-c ?\C-v ?*]"    'jdee-copy-qualified-class-name-to-kill-ring)
    (cons "[?\C-c ?\C-v ?\C-k]" 'jdee-bsh-run)
    (cons "[?\C-c ?\C-v ?\C-l]" 'jdee-gen-println)
    (cons "[?\C-c ?\C-v ?\C-n]" 'jdee-help-browse-jdk-doc)
@@ -1074,6 +1075,7 @@ Does nothing but return nil if `jdee-log-max' is nil."
 	(list "Browse"
 	      ["Source Files"          jdee-show-speedbar t]
 	      ["Class at Point"        jdee-browse-class-at-point t]
+	      ["Copy Fully Qualified Class Name"        jdee-copy-qualified-class-name-to-kill-ring t]
               )
 	["Check Style"  jdee-checkstyle]
 	(list "Project"
@@ -2210,6 +2212,21 @@ version of speedar is installed."
   (interactive)
   (require 'speedbar)
   (speedbar-frame-mode))
+
+(defun jdee-copy-qualified-class-name-to-kill-ring (mute)
+  "Copy the qualified class name of class containing point to the kill ring.
+Return the fully qualified name."
+  (interactive "P")
+  (let* ((pkg (jdee-db-get-package))
+         (class (or (jdee-db-get-class)
+                    (car (nth 1 (semantic-fetch-tags-fast)))))
+         (rtnval  (if pkg
+                      (format "%s%s" pkg class)
+                    class)))
+    (kill-new rtnval)
+    (unless mute
+      (message "%s added to kill ring" rtnval))
+    rtnval))
 
 (defun jdee-browse-class-at-point ()
   "Displays the class of the object at point in the BeanShell Class
