@@ -60,6 +60,8 @@
     (when (slot-boundp compiler 'interactive-args)
       (oset this interactive-args (oref compiler interactive-args)))))
 
+(defun jdee-flycheck-unmute (&rest _)
+  (set 'jdee-compile-mute nil))
     
 (defmethod jdee-compile-compile ((this jdee-flycheck-compiler))
 
@@ -69,7 +71,9 @@
   (with-current-buffer (oref (oref this buffer) buffer)
     (add-hook 'jdee-compile-finish-hook
               (oref this post-fn)
-              nil t))
+              nil t)
+    (add-hook 'jdee-compile-finish-hook 'jdee-flycheck-unmute t))
+  
 
 
   ;; Pop to compilation buffer.
@@ -136,6 +140,7 @@
         (kill-buffer temp-buffer)
         ;;(kill-buffer buf)
         (set (make-local-variable 'jdee-compile-jump-to-first-error) nil)
+        (set 'jdee-compile-mute t)
         ;(message "ERRORS: %s" errors)
         (funcall cback 'finished errors)))))
 
@@ -213,15 +218,17 @@
 			output)))
     rtnval))
 	
-
-(flycheck-define-generic-checker 'jdee-flycheck-javac-checker
-  "Integrate flycheck with the jdee using javac."
-  :start #'jdee-flycheck-javac-command
-  :modes '(jdee-mode)
+;;;###autoload
+(defun jdee-flycheck-mode ()
+  (flycheck-define-generic-checker 'jdee-flycheck-javac-checker
+    "Integrate flycheck with the jdee using javac."
+    :start #'jdee-flycheck-javac-command
+    :modes '(jdee-mode)
+    )
+  
+  (add-to-list 'flycheck-checkers 'jdee-flycheck-javac-checker)
+  (flycheck-mode)
 )
-
-(add-to-list 'flycheck-checkers 'jdee-flycheck-javac-checker)
-
 (provide 'jdee-flycheck)
 
 ;;; jdee-flycheck.el ends here
