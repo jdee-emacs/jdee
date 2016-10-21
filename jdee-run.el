@@ -1184,7 +1184,7 @@ to a debugger."
    (jdee-run-vm-1-5 "JDK 1.5 vm")
    (jdee-run-vm-1-6 "JDK 1.6 vm")
    (jdee-run-vm-1-7 "JDK 1.7 vm")
-   (jdee-run-vm-1-8 "JDK 1.8 vm"))
+   (jdee-run-vm-1-8 "JDK 1.8 vm")
    (jdee-run-vm-1-9 "JDK 1.9 vm"))
   "*List of supported virtual machines.")
 
