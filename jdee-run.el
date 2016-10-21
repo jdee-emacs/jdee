@@ -1140,6 +1140,28 @@ to a debugger."
 
   (oset this :version "1.6"))
 
+(defclass jdee-run-vm-1-7 (jdee-run-vm-1-6) ()
+  "Represents the JDK 1.7.x vm")
+
+(defmethod initialize-instance ((this jdee-run-vm-1-7) &rest fields)
+  "Constructor for the class representing the JDK 1.7 vm."
+
+  ;; Call parent initializer.
+  (call-next-method)
+
+  (oset this :version "1.7"))
+
+(defclass jdee-run-vm-1-8 (jdee-run-vm-1-7) ()
+  "Represents the JDK 1.8.x vm")
+
+(defmethod initialize-instance ((this jdee-run-vm-1-8) &rest fields)
+  "Constructor for the class representing the JDK 1.8 vm."
+
+  ;; Call parent initializer.
+  (call-next-method)
+
+  (oset this :version "1.8"))
+
 
 
 (defvar jdee-run-virtual-machines
@@ -1149,7 +1171,9 @@ to a debugger."
    (jdee-run-vm-1-3 "JDK 1.3 vm")
    (jdee-run-vm-1-4 "JDK 1.4 vm")
    (jdee-run-vm-1-5 "JDK 1.5 vm")
-   (jdee-run-vm-1-6 "JDK 1.6 vm"))
+   (jdee-run-vm-1-6 "JDK 1.6 vm")
+   (jdee-run-vm-1-7 "JDK 1.7 vm")
+   (jdee-run-vm-1-8 "JDK 1.8 vm"))
   "*List of supported virtual machines.")
 
 (defun jdee-run-get-vm ()
