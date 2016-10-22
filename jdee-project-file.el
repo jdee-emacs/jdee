@@ -27,11 +27,14 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'jdee-maven)
 
 ;; FIXME: refactor
 (declare-function jdee-wiz-set-bsh-project "jdee-wiz" ())
 (declare-function jdee-root-dir-p "jdee" (dir))
 (declare-function jdee-log-msg "jdee" (msg &rest args))
+(declare-function jdee-maven-hook "jdee-maven" ())
+
 
 (defconst jdee-project-file-version "1.0"
   "*The current JDEE project file version number.")
@@ -89,17 +92,18 @@ being loaded.")
 (defvar jdee-current-project ""
   "Path of the project file for the current project.")
 
-(defun jdee-find-project-file (dir)
-  "Finds the next project file upwards in the directory tree
-from DIR. Returns nil if it cannot find a project file in DIR
-or an ascendant directory."
+(defun jdee-find-project-file (dir &optional file-name)
+  "Finds the next project file named FILE-NAME (defaults to
+`jdee-project-file-name') upwards in the directory tree from
+DIR. Returns nil if it cannot find a project file in DIR or an
+ascendant directory."
   (let* ((directory-sep-char ?/) ;; Override NT/XEmacs setting
-	 (file (cl-find jdee-project-file-name
+	 (file (cl-find (or file-name jdee-project-file-name)
 			(directory-files dir) :test 'string=)))
     (if file
 	(expand-file-name file dir)
       (if (not (jdee-root-dir-p dir))
-	  (jdee-find-project-file (expand-file-name ".." dir))))))
+	  (jdee-find-project-file (expand-file-name ".." dir) file-name)))))
 
 (defvar jdee-buffer-project-file ""
   "Path of project file associated with the current Java source buffer.")
@@ -518,6 +522,9 @@ defined by the current project's project file."
   (jdee-custom-adjust-groups)
   (jdee-load-project-file))
 
+(when  (or (not (boundp 'jdee-maven-disabled-p))
+           (not jdee-maven-disabled-p))
+  (add-hook 'jdee-mode-hook 'jdee-maven-hook))
 
 (provide 'jdee-project-file)
 

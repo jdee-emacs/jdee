@@ -505,6 +505,7 @@ be an interactive function that can be called by
   :type '(radio
 	  (const :tag "Make" jdee-make)
 	  (const :tag "Ant" jdee-ant-build)
+	  (const :tag "Maven" jdee-maven-build)
 	  (function :tag "Custom function" identity)))
 
 ;;(makunbound 'jdee-debugger)
