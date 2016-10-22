@@ -92,10 +92,7 @@
 
 (defun jdee-flycheck-javac-command ( checker cback )
   ;(message "Calling jdee-flycheck-javac-command")
-  
-  (jdee-flycheck-compile-buffer checker cback)
-
-  )
+  (jdee-flycheck-compile-buffer checker cback))
 
 (defun jdee-flycheck-compile-buffer-error (checker file line col message buffer)
   "Expects a match with file line message"
@@ -153,7 +150,9 @@
          (temp-file (expand-file-name name dir)))
     (with-current-buffer orig-buffer
       (write-region (point-min) (point-max) temp-file nil :silent))
-    (with-current-buffer (find-file-noselect temp-file)
+    (with-current-buffer (generate-new-buffer name)
+      (insert-file-contents-literally temp-file)
+      (setq buffer-file-name temp-file)
       (setq compilation-finish-functions
             (lambda (buf msg)
               (run-hook-with-args 'jdee-compile-finish-hook buf msg)
