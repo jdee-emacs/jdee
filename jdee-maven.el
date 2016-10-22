@@ -39,30 +39,30 @@
 in a maven project.")
 
 (defvar jdee-maven-project-dir nil
-  "*When a buffer is in a maven project, the full path to the project directory, the one with the pom.xml.  It will be set buffer local by the `jdee-maven-hook'.")
+  "When a buffer is in a maven project, the full path to the project directory, the one with the pom.xml.  It will be set buffer local by the `jdee-maven-hook'.")
 
 (defcustom jdee-maven-disabled-p nil
-  "*When nil (default) add maven support to project startup."
+  "When nil (default) add maven support to project startup."
   :group 'jdee-maven
   :type 'boolean)
 
 (defcustom jdee-maven-buildfile "pom.xml"
-  "*Specify the name of the maven project file."
+  "Specify the name of the maven project file."
   :group 'jdee-maven
   :type 'string)
 
 (defcustom jdee-maven-program "mvn"
-  "*Specifies name of ant program/script."
+  "Specifies name of ant program/script."
  :group 'jdee-maven
  :type 'string)
 
 (defcustom jdee-maven-build-phase "package"
-  "*Specifies maven phase to specify when calling Build."
+  "Specifies maven phase to specify when calling Build."
  :group 'jdee-maven
  :type 'string)
 
 (defcustom jdee-maven-artifacts-excluded-from-sources nil
-  "*Specifies a list of artifact IDs to exclude from sources.  Should be added
+  "Specifies a list of artifact IDs to exclude from sources.  Should be added
 to the prj.el with something like:
 
 (jdee-set-variables
