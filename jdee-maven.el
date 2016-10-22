@@ -122,7 +122,9 @@ relative the maven project dir."
            return (list scope key source-paths runtime-paths sources-file)))
 
 (defun jdee-maven-check-classpath-file (scope classpath-file sources-classpath-file pom-dir)
-  "Check that the CLASSPATH-FILE and SOURCES-CLASSPATH-FILE for the given SOURCE  exist relative to POM-DIR, creating them if they don't.  See `jdee-maven-check-classpath-file*' for more info."
+  "Check that the CLASSPATH-FILE and SOURCES-CLASSPATH-FILE for
+the given SOURCE exist relative to POM-DIR, creating them if they
+don't.  See `jdee-maven-check-classpath-file*' for more info."
   (jdee-maven-check-classpath-file* scope classpath-file pom-dir nil)
   (jdee-maven-check-classpath-file* scope sources-classpath-file pom-dir "sources")
   )
@@ -132,9 +134,13 @@ relative the maven project dir."
 try to load it by calling mvn dependency:build-classpath directly
 with the appropriate arguments.
 
-If there is an error in creating the file, it leaves the maven buffer open so the error can be seen and diagnosed.  See `jdee-maven-dir-scope-map' for the various values of scope and output-file.
+If there is an error in creating the file, it leaves the maven
+buffer open so the error can be seen and diagnosed.  See
+`jdee-maven-dir-scope-map' for the various values of scope and
+output-file.
 
-Returns nil if it is unable to find or create the file, otherwise it returns the full path to the file.
+Returns nil if it is unable to find or create the file, otherwise
+it returns the full path to the file.
 
 SCOPE - the maven scope, probably 'compile or 'test
 
@@ -175,6 +181,8 @@ classpath in a file on disk.  See
 `jdee-maven-dir-scope-map' for how the files are chosen. 
 
 DIR is the directory containing the pom.xml.  If nil, hunt for it."
+
+  ;(message "jdee-maven-from-file-hook: %s" (pwd))
   (let ((pom-dir (or dir (jdee-maven-get-default-directory))))
     (when pom-dir
       (let ((scope-info (jdee-maven-scope-file)))
