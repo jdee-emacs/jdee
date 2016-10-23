@@ -109,7 +109,7 @@
    :level 'error))
 
 (defun jdee-flymake-get-col ()
-  "Get the column if the point is looking at spaces and caret.
+  "Get the column of the compiliation error.
 
 An error looks like:
 
@@ -157,19 +157,36 @@ cleans up after the compilation."
         ;(message "ERRORS: %s" errors)
         (funcall cback 'finished errors)))))
 
+(defun jdee-flycheck-cleanup (dir)
+  "Cleans up after flycheck.
+
+Deletes the temporary files."
+  (lambda ()
+    (when (and (file-directory-p dir)
+               (string-prefix-p temporary-file-directory dir))
+      (delete-directory dir t))))
+     
+
 (defun jdee-flycheck-compile-buffer (checker cback &optional buffer)
   "Compile the buffer without saving it.  Creates a temporary
 file and buffer with the contents of the current buffer and compiles that one."
   (let* ((name (file-name-nondirectory buffer-file-name))
          (orig-file buffer-file-name)
          (orig-buffer (or buffer (current-buffer)))
-         (dir (make-temp-file "JDEE" t))
+         (dir (make-temp-file "JDEE_flycheck_" t))
          (temp-file (expand-file-name name dir)))
     (with-current-buffer orig-buffer
       (write-region (point-min) (point-max) temp-file nil :silent))
     (with-current-buffer (generate-new-buffer name)
       (insert-file-contents-literally temp-file)
       (setq buffer-file-name temp-file)
+      (add-hook 'kill-buffer-hook
+                (jdee-flycheck-cleanup dir))
+      ;; Don't write the class file to the source directory
+      (unless jdee-compile-option-directory
+        (set (make-local-variable 'jdee-compile-option-directory)
+             (expand-file-name "classes" dir)))
+
       (setq compilation-finish-functions
             (lambda (buf msg)
               (run-hook-with-args 'jdee-compile-finish-hook buf msg)
