@@ -62,6 +62,7 @@
 (require 'jdee-project-file)
 (require 'jdee-refactor)
 (require 'jdee-run)
+(require 'jdee-test)
 (require 'jdee-util)
 (require 'jdee-which-method)
 (require 'jdee-wiz)
@@ -103,6 +104,7 @@ See also the function `jdee-check-versions'."
    (cons "[?\C-c ?\C-v ?\C-a]" 'jdee-run-menu-run-applet)
    (cons "[?\C-c ?\C-v ?\C-b]" 'jdee-build)
    (cons "[?\C-c ?\C-v ?\C-c]" 'jdee-compile)
+   (cons "[?\C-c ?\C-v ?\C-u]" 'jdee-test-unittest)
    (cons "[?\C-c ?\C-v ?\C-d]" 'jdee-debug)
    (cons "[?\C-c ?\C-v ?\C-f]" 'jdee-find)
    (cons "[?\C-c ?\C-v ?\C-g]" 'jdee-open-class-at-point)
@@ -976,6 +978,7 @@ Does nothing but return nil if `jdee-log-max' is nil."
 	["Compile"           jdee-compile t]
 	;; ["Run App"           jdee-run (not (jdee-run-application-running-p))]
 	["Run App"           jdee-run t]
+	["Run Unit Test"     jdee-test-unittest t]
 	["Debug App"         jdee-debug t]
 	"-"
 	;;["-"                 ignore nil]
