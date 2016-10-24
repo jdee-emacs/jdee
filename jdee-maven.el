@@ -199,6 +199,7 @@ DIR is the directory containing the pom.xml.  If nil, hunt for it."
             
             (jdee-set-variables '(jdee-global-classpath cp)
                                 '(jdee-build-function 'jdee-maven-build)
+                                '(jdee-test-function 'jdee-maven-unit-test)
                                 '(jdee-run-working-directory pom-dir)
                                 '(jdee-run-option-classpath (append rp cp))
                                 '(jdee-db-option-classpath (append rp sp cp))
@@ -258,6 +259,66 @@ and this in src/main
     (jdee-with-file-contents
      the-file
      (split-string (buffer-string) (or sep path-separator t)))))
+
+;;
+;; Unit tests
+;;
+
+(defvar jdee-maven-unit-test-error-regexp
+  "\\([[:alpha:]][[:alnum:].$_]*\\)(\\([[:alpha:]][[:alnum:].$_]*\\)):")
+
+;; FIXME: Does this belong here?  Seems more like a parsing function.
+(defun jdee-maven-annotations ()
+  "Get the annotations of the current tag.
+
+It cheats and looks at the face property for c-annotation-face."
+  (save-excursion
+    (let* ((current-tag (semantic-current-tag))
+           (prev-tag (and current-tag
+                          (progn
+                            (goto-char (semantic-tag-start current-tag))
+                            (semantic-find-tag-by-overlay-prev)))))
+      (when (and current-tag prev-tag)
+        (let* ((start (semantic-tag-end prev-tag))
+              (end (semantic-tag-start current-tag))
+              (annotation-start (text-property-any start end 'face 'c-annotation-face)))
+          (when annotation-start
+            (let ((annotation-end (next-single-property-change  annotation-start 'face (current-buffer) end)))
+              (buffer-substring-no-properties annotation-start annotation-end))))))))
+
+
+(defun jdee-maven-unit-test-run-method-args ()
+  "Return the arguments needed to pass to maven to run a single unit test method"
+
+  (when (string= (jdee-maven-annotations) "@Test")
+    (format "-Dtest=%s#%s test" (buffer-name) (semantic-tag-name (semantic-current-tag)))))
+
+
+(defun jdee-maven-unit-test-run-class-args ()
+  "Return the arguments needed to pass to maven to run class of  unit test method"
+
+  (when (text-property-any (point-min) (point-max) 'face 'c-annotation-face)
+    (format "-Dtest=%s test" (buffer-name))))
+
+(defun jdee-maven-unit-test (&optional path)
+  
+  "Unit test using maven with project based in PATH (default to `default-directory')
+
+Tries to limit the scope of the unit test based on current point.  If in a class that 
+is a test class, just run that file.
+"
+  (interactive)
+  (let* ((tags (semantic-fetch-tags-fast))
+         (default-directory (jdee-maven-get-default-directory path))
+         ;; FIXME: use a hook instead
+         (args (or (jdee-maven-unit-test-run-method-args)
+                   (jdee-maven-unit-test-run-class-args)
+                   "test"))
+         (compile-buffer (compilation-start (format "%s %s" jdee-maven-program args))))
+    (with-current-buffer compile-buffer
+      (add-to-list 'compilation-error-regexp-alist
+                   (list jdee-maven-unit-test-error-regexp
+                         'jdee-stacktrace-file 2)))))
 
 ;;
 ;; Building
