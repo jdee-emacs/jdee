@@ -300,15 +300,17 @@ Tries to limit the scope of the unit test based on current point.  If in a class
 is a test class, just run that file.
 "
   (interactive)
-  (let ((tags (semantic-fetch-tags-fast)))
-    (let ((default-directory (jdee-maven-get-default-directory path))
-          ;; FIXME: use a hook instead
-          (args (or (jdee-maven-unit-test-run-method-args)
-                    (jdee-maven-unit-test-run-class-args)
-                    "test")))
-      
-      (compilation-start (format "%s %s" jdee-maven-program args)))))
-
+  (let* ((tags (semantic-fetch-tags-fast))
+         (default-directory (jdee-maven-get-default-directory path))
+         ;; FIXME: use a hook instead
+         (args (or (jdee-maven-unit-test-run-method-args)
+                   (jdee-maven-unit-test-run-class-args)
+                   "test"))
+         (compile-buffer (compilation-start (format "%s %s" jdee-maven-program args))))
+    (with-current-buffer compile-buffer
+      (add-to-list 'compilation-error-regexp-alist
+                   (list jdee-maven-unit-test-error-regexp
+                         'jdee-stacktrace-file 2)))))
 
 ;;
 ;; Building
