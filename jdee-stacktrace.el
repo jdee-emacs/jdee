@@ -53,7 +53,7 @@ qualified name of the class."
         ;; 3 = method
         ;; 4 = file
         ;; 5 = line
-        '(("\tat \\(\\([[:alpha:]_$][[:alnum:]._$]*\\)[.]\\([[:alpha:]_$][[:alnum:]_$]*\\)(\\([[:alnum:].]+\\):\\([0-9]+\\))\\)"
+        '(("\t?at \\(\\([[:alpha:]_$][[:alnum:]._$]*\\)[.]\\([[:alpha:]_$][[:alnum:]_$]*\\)(\\([[:alnum:].]+\\):\\([0-9]+\\))\\)"
            jdee-stacktrace-file 5 nil nil
            1
            (4 compilation-info-face)
@@ -61,16 +61,17 @@ qualified name of the class."
   )
 
 
-(defun jdee-stacktrace-buffer ( &optional buffer)
+(defun jdee-stacktrace-buffer ( clear &optional buffer)
   "Open a buffer to paste a stack trace.  Parses the stack trace
 to allow editting of the source."
-  (interactive)
+  (interactive "P")
   (let ((buffer (or buffer (current-buffer))))
     (with-current-buffer buffer
       (let* ((active (region-active-p))
 	     (beg (if active (region-beginning)))
 	     (end (if active (region-end))))
 	(with-current-buffer (pop-to-buffer  "*JDEE Stack Trace*")
+          (when clear (erase-buffer))
 	  (jdee-stacktrace-mode)
 	  (setq inhibit-read-only t)
 	  (when active
