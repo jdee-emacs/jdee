@@ -27,7 +27,8 @@
 
 
 (require 'jdee-open-source)
-(require 'cl)
+
+  (require 'cl)
 
 (defgroup jdee-maven nil
   "JDEE Maven Project Options"
@@ -168,7 +169,7 @@ CLASSIFIER - the maven the classifier, usually nil or \"sources\""
                              nil))))
           (erase-buffer)
           (pop-to-buffer (current-buffer))
-          (apply 'call-process "mvn" nil t t (remove-if-not 'identity args)))
+          (apply 'call-process "mvn" nil t t (cl-remove-if-not 'identity args)))
         (goto-char (point-min))
         (when (search-forward "BUILD SUCCESS" nil t)
           (kill-buffer (current-buffer))
@@ -189,24 +190,24 @@ DIR is the directory containing the pom.xml.  If nil, hunt for it."
       (let ((scope-info (jdee-maven-scope-file)))
         (when scope-info
           (jdee-maven-check-classpath-file (nth 0 scope-info) (nth 1 scope-info) (nth 4 scope-info) pom-dir)
-          (let ((sources-classpath (jdee-maven-classpath-from-file
-                                    (expand-file-name (nth 4 scope-info) pom-dir)))
-                (cp (jdee-maven-classpath-from-file
+          (let* ((sources-classpath (jdee-maven-classpath-from-file
+                                     (expand-file-name (nth 4 scope-info) pom-dir)))
+                 (classpath (jdee-maven-classpath-from-file
                      (expand-file-name (nth 1 scope-info) pom-dir)))
-                (sp (mapcar (lambda(p) (expand-file-name p pom-dir))
-                            (nth 2 scope-info)))
-                (rp (mapcar (lambda(p) (expand-file-name p pom-dir))
-                            (nth 3 scope-info))))
+                 (sp (mapcar (lambda(p) (expand-file-name p pom-dir))
+                             (nth 2 scope-info)))
+                 (rp (mapcar (lambda(p) (expand-file-name p pom-dir))
+                             (nth 3 scope-info))))
             
-            (jdee-set-variables '(jdee-global-classpath cp)
+            (jdee-set-variables (list 'jdee-global-classpath  (cons 'list classpath))
                                 '(jdee-build-function 'jdee-maven-build)
                                 '(jdee-test-function 'jdee-maven-unit-test)
-                                '(jdee-run-working-directory pom-dir)
-                                '(jdee-run-option-classpath (append rp cp))
-                                '(jdee-db-option-classpath (append rp sp cp))
-                                '(jdee-compile-option-directory (first rp))
-                                '(jdee-compile-option-classpath (append sp cp))
-                                '(jdee-sourcepath  (append sp sources-classpath)))
+                                (list 'jdee-run-working-directory pom-dir)
+                                (list 'jdee-run-option-classpath (cons 'list (append rp classpath)))
+                                (list 'jdee-db-option-classpath (cons 'list (append rp sp classpath)))
+                                (list 'jdee-compile-option-directory (first rp))
+                                (list 'jdee-compile-option-classpath (cons 'list (append sp classpath)))
+                                (list 'jdee-sourcepath  (cons 'list (append sp sources-classpath))))
             pom-dir))))))
 
 
@@ -291,20 +292,18 @@ It cheats and looks at the face property for c-annotation-face."
 
 (defun jdee-maven-unit-test-run-method-args ()
   "Return the arguments needed to pass to maven to run a single unit test method"
-
-  (when (string= (jdee-maven-annotations) "@Test")
+  
+  (when (and (not current-prefix-arg)
+             (string= (jdee-maven-annotations) "@Test"))
     (format "-Dtest=%s#%s test" (buffer-name) (semantic-tag-name (semantic-current-tag)))))
 
 
 (defun jdee-maven-unit-test-run-class-args ()
   "Return the arguments needed to pass to maven to run class of  unit test method"
 
-  (when (text-property-any (point-min) (point-max) 'face 'c-annotation-face)
+  (when (and (> 5 (prefix-numeric-value current-prefix-arg))
+             (text-property-any (point-min) (point-max) 'face 'c-annotation-face))
     (format "-Dtest=%s test" (buffer-name))))
-
-(defun jdee-maven-unit-test-line (arg)
-  ""
-  (message "%s" arg))
 
 (defun jdee-maven-file ()
   "A function for use in `compilation-error-regexp-alist' as the
@@ -312,13 +311,8 @@ file name.
 
 Expects (match-string 2) to return the fully qualified name of
 the class.  Also adds the name of the tag to search for as a property called
-'method-name for match-string 1"
+'method-name for match-string 1, 'fqn, 'class-name, and  'message"
   (let ((rtnval (jdee-stacktrace-file* (match-string 2))))
-    (message "HHH: %s %s %s %s"
-             (match-string 1)
-             (match-string 2)
-             (match-string 3)
-             (match-string 4))
     (put-text-property (match-beginning 0) (match-end 0) 'method-name (match-string-no-properties 1))
     (put-text-property (match-beginning 0) (match-end 0) 'fqn (match-string-no-properties 2))
     (put-text-property (match-beginning 0) (match-end 0) 'class-name (match-string-no-properties 3))
@@ -330,7 +324,8 @@ the class.  Also adds the name of the tag to search for as a property called
 
 Returns a function that accepts a list and checks the first two elements.
 
-Assumes the 1st element is a string and the second element is a type or at least is equal as per `eq'."
+Assumes the 1st element is a string and `string=' to CLASS-NAME and
+the second element is  `eq' to TAG-TYPE."
   
   (lambda (tag)
     (when (and  (eq tag-type (cadr tag))
@@ -374,7 +369,7 @@ Return the tag of the method if found, nil otherwise."
       (when method-tag
         (semantic-go-to-tag method-tag)
         (semantic-momentary-highlight-tag method-tag)
-        tag))))
+        method-tag))))
       
 
 
@@ -385,10 +380,12 @@ Return the tag of the method if found, nil otherwise."
 
 Tries to limit the scope of the unit test based on current point.  If in a class that 
 is a test class, just run that file.
+
+With a single prefix C-u, it will skip trying to run a single method.  With a double prefix C-u C-u it will skip trying to run a single class as well.
+
 "
   (interactive)
-  (let* ((tags (semantic-fetch-tags-fast))
-         (default-directory (jdee-maven-get-default-directory path))
+  (let* ((default-directory (jdee-maven-get-default-directory path))
          ;; FIXME: use a hook instead
          (args (or (jdee-maven-unit-test-run-method-args)
                    (jdee-maven-unit-test-run-class-args)
