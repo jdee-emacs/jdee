@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;;; jdee-maven.el -- Project maven integration
 
 ;; Author: Matthew O. Smith <matt@m0smith.com>
@@ -264,8 +265,9 @@ and this in src/main
 ;; Unit tests
 ;;
 
+
 (defvar jdee-maven-unit-test-error-regexp
-  "\\([[:alpha:]][[:alnum:].$_]*\\)(\\([[:alpha:]][[:alnum:].$_]*\\)):")
+  "\\([[:alpha:]][[:alnum:].$_]*\\)(\\([[:alpha:]][[:alnum:].$_]*[.]\\([[:alpha:]][[:alnum:]$_]*\\)\\)):\\(.*\\)")
 
 ;; FIXME: Does this belong here?  Seems more like a parsing function.
 (defun jdee-maven-annotations ()
@@ -300,6 +302,83 @@ It cheats and looks at the face property for c-annotation-face."
   (when (text-property-any (point-min) (point-max) 'face 'c-annotation-face)
     (format "-Dtest=%s test" (buffer-name))))
 
+(defun jdee-maven-unit-test-line (arg)
+  ""
+  (message "%s" arg))
+
+(defun jdee-maven-file ()
+  "A function for use in `compilation-error-regexp-alist' as the
+file name.  
+
+Expects (match-string 2) to return the fully qualified name of
+the class.  Also adds the name of the tag to search for as a property called
+'method-name for match-string 1"
+  (let ((rtnval (jdee-stacktrace-file* (match-string 2))))
+    (message "HHH: %s %s %s %s"
+             (match-string 1)
+             (match-string 2)
+             (match-string 3)
+             (match-string 4))
+    (put-text-property (match-beginning 0) (match-end 0) 'method-name (match-string-no-properties 1))
+    (put-text-property (match-beginning 0) (match-end 0) 'fqn (match-string-no-properties 2))
+    (put-text-property (match-beginning 0) (match-end 0) 'class-name (match-string-no-properties 3))
+    (put-text-property (match-beginning 0) (match-end 0) 'message (match-string-no-properties 4))
+    rtnval))
+
+(defun jdee-maven-class-tag-p (class-name tag-type)
+  "Create a predicate to check the first two elements of a list.
+
+Returns a function that accepts a list and checks the first two elements.
+
+Assumes the 1st element is a string and the second element is a type or at least is equal as per `eq'."
+  
+  (lambda (tag)
+    (when (and  (eq tag-type (cadr tag))
+                (string= (car tag) class-name))
+      tag)))
+
+;;
+;; There really should be a semantic function to do this but I cannot
+;; find it
+;;
+(defun jdee-maven-find-tag-by-name-and-type (name type tags)
+  "Recursively find a tag by name and type.
+
+Descend on the :members element"
+  (when (and name type tags)
+    (let ((rtnval (cl-find-if (jdee-maven-class-tag-p name type) tags)))
+      (if rtnval
+          rtnval
+        (dolist (tag tags)
+          (let ((members (plist-get (nth 2 tag) :members)))
+            (dolist (member members)
+              (jdee-maven-find-tag-by-name-and-type name type member))))))))
+  
+  
+(defun jdee-maven-unit-test-next-error-function (n &optional reset)
+  "This function is a value of `next-error-function' that supports
+the results of junit. 
+
+Return the tag of the method if found, nil otherwise."
+  (let ((next-fn 'compilation-next-error-function)
+        (compile-buffer (current-buffer)))
+    (funcall next-fn n reset)
+    (let* ((method-name   (with-current-buffer compile-buffer
+                            (get-text-property (point) 'method-name)))
+           (class-name   (with-current-buffer compile-buffer
+                           (get-text-property (point) 'class-name)))
+           (tags (semantic-something-to-tag-table (current-buffer)))
+           (class-tag (jdee-maven-find-tag-by-name-and-type class-name 'type tags))
+           (class-members (plist-get (nth 2 class-tag) :members))
+           (method-tag (jdee-maven-find-tag-by-name-and-type method-name 'function class-members)))
+      (when method-tag
+        (semantic-go-to-tag method-tag)
+        (semantic-momentary-highlight-tag method-tag)
+        tag))))
+      
+
+
+
 (defun jdee-maven-unit-test (&optional path)
   
   "Unit test using maven with project based in PATH (default to `default-directory')
@@ -316,9 +395,13 @@ is a test class, just run that file.
                    "test"))
          (compile-buffer (compilation-start (format "%s %s" jdee-maven-program args))))
     (with-current-buffer compile-buffer
+      (setq next-error-function 'jdee-maven-unit-test-next-error-function)
       (add-to-list 'compilation-error-regexp-alist
                    (list jdee-maven-unit-test-error-regexp
-                         'jdee-stacktrace-file 2)))))
+                         'jdee-maven-file nil nil nil 2
+                         '(1  compilation-info-face)
+                         '(2  compilation-error-face)
+                         '(4  compilation-message-face))))))
 
 ;;
 ;; Building
