@@ -1,4 +1,3 @@
-;;; -*- lexical-binding: t -*-
 ;;; jdee-flycheck.el -- Flycheck mode for jdee
 
 ;; Author: Matthew O. Smith <matt@m0smith.com>
