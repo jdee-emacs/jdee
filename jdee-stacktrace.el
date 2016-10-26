@@ -63,7 +63,11 @@ qualified name of the class."
 
 (defun jdee-stacktrace-buffer ( clear &optional buffer)
   "Open a buffer to paste a stack trace.  Parses the stack trace
-to allow editting of the source."
+to allow editting of the source.
+
+If called with a prefix, will clear the stake trace buffer.
+
+If a region is active, paste it into the stack trace buffer."
   (interactive "P")
   (let ((buffer (or buffer (current-buffer))))
     (with-current-buffer buffer
