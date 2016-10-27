@@ -107,7 +107,32 @@ the type of a class could not be found an it tried to import it")
 	  "."         ;;   - period
 	  (160 . 255) ;;   - accented characters
 	  )))
-"Regular expression that matches any Java symbol.")
+  "Regular expression that matches any Java symbol.")
+
+(defun jdee-parse-java-name-parts-re (&optional sep)
+  " Create a regular expression that will identify java name parts.
+
+Name parts are things like java.util.Map or Map or java/util/Map
+
+Create a match group.
+
+SEP defaults to ."
+  (format "\\([[:alpha:]_$][[:alnum:]_$%s]*\\)" (or sep ".")))
+
+(defun jdee-parse-java-name-part-re ()
+  "Set one match region on the name"
+  (jdee-parse-java-name-parts-re ""))
+
+(defun jdee-parse-java-fqn-re ()
+  "
+Set 3 match regions
+1 - FQN
+2 - package name
+3 - unqualified class name
+"
+  (format "\\(%s[.]%s\\)" (jdee-parse-java-name-parts-re) (jdee-parse-java-name-part-re)))
+
+          
 
 (defun jdee-parse-after-buffer-changed ()
   "Reparse the current buffer after any change.
