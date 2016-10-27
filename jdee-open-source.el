@@ -328,14 +328,33 @@ This function is designed as :before-until advice for
                (with-current-buffer buffer
                  jdee-open-source-archive))
       buffer)))
-      
+
+
 ;;
 ;; Add support for finding files in archives.
 ;;
 (advice-add 'compilation-find-file :before-until  #'jdee-open-source-find-file)
 
 
+(defun jdee-open-source-find-file-of-fqn (fn marker filename directory &rest formats)
+  "Check if FILENAME matches an FQN and load it.  Return that buffer or pass onto FN.
 
+This function is designed as :around advice for
+`compilation-find-file'.
+"
+
+  (when (string-match (format "^%s$" (jdee-parse-java-fqn-re)) filename)
+    (let ((path (jdee-find-class-source-file filename)))
+      (cond
+       ((bufferp path) path)
+       ((stringp path) (apply fn marker path directory formats))
+       (t (apply fn marker filename directory formats))))))
+
+
+(advice-add 'compilation-find-file :around  #'jdee-open-source-find-file-of-fqn)
+
+
+  
 (defun jdee-find-class-source-file (class)
   "Find the source file for a specified class.
 CLASS is the fully qualified name of the class. This function searchs
