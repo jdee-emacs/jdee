@@ -72,7 +72,8 @@ qualified name).  If not found, return FQN."
         (list
          (list
          (jdee-stacktrace-item-re)
-         'jdee-stacktrace-file 6 nil nil
+         1 ;'jdee-stacktrace-file
+         6 nil nil
          1
          '(4 compilation-info-face)
          '(2 compilation-error-face)))))
@@ -94,6 +95,7 @@ If a region is active, paste it into the stack trace buffer."
 	(with-current-buffer (pop-to-buffer  "*JDEE Stack Trace*")
           (when clear (erase-buffer))
 	  (jdee-stacktrace-mode)
+          (make-local-variable 'jdee-sourcepath)
 	  (setq inhibit-read-only t)
 	  (when active
 	    (let ((start (point-max)))
