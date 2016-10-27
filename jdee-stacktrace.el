@@ -1,6 +1,6 @@
 ;;; jdee-stacktrace.el --- Support for stacktraces
 
-;; Author: Paul Kinnucan <pkinnucan@attbi.com>
+;; Author: Matthew O. Smith <matt@m0smith.com>
 ;; Maintainer: Paul Landes
 ;; Keywords: java, tools
 ;; URL: http://github.com/jdee-emacs/jdee
@@ -34,31 +34,47 @@
 
 (defun jdee-stacktrace-file ()
   "A function for use in `compilation-error-regexp-alist' as the
-file name.  Expects (match-string 2) to return the fully
+file name.  Expects (match-string 1) to return the fully
 qualified name of the class."
-  (jdee-stacktrace-file* (match-string 2)))
+  (jdee-stacktrace-file* (match-string 1)))
 
 (defun jdee-stacktrace-file* (fqn)
-  "Return the full path to the source file for FQN (fully qualified name).  If not found, return FQN."
+  "Return the full path to the source file for FQN (fully
+qualified name).  If not found, return FQN."
   (let* ((path (save-match-data (jdee-find-class-source-file fqn))))
-    (or path fqn)))
+    (cond
+     ((bufferp path) (with-current-buffer path buffer-file-name))
+     ((stringp path) path)
+     (t fqn))))
+
+
+(defun jdee-stacktrace-item-re ()
+  "Match regions set:
+   1 - FQN
+   2 - package name
+   3 - class name
+   4 - method name
+   5 - file name
+   6 - line number
+    "
+  (format "at %s[.]%s(%s:\\([[:digit:]]+\\))"
+          (jdee-parse-java-fqn-re)   ; FQN
+          (jdee-parse-java-name-part-re)    ; Method
+          (jdee-parse-java-name-parts-re)))  ; file name
+
 
 (define-derived-mode jdee-stacktrace-mode compilation-mode "JVM Stack Trace"
   "Major mode for inspecting stack traces.  Expects
 `jdee-sourcepath' to be set appropriately"
   (make-local-variable 'compilation-error-regexp-alist)
   (setq compilation-error-regexp-alist
-        ;; 1 = all
-        ;; 2 = qualified class name
-        ;; 3 = method
-        ;; 4 = file
-        ;; 5 = line
-        '(("\t?at \\(\\([[:alpha:]_$][[:alnum:]._$]*\\)[.]\\([[:alpha:]_$][[:alnum:]_$]*\\)(\\([[:alnum:].]+\\):\\([0-9]+\\))\\)"
-           jdee-stacktrace-file 5 nil nil
-           1
-           (4 compilation-info-face)
-           (2 compilation-error-face))))
-  )
+        (list
+         (list
+         (jdee-stacktrace-item-re)
+         'jdee-stacktrace-file 6 nil nil
+         1
+         '(4 compilation-info-face)
+         '(2 compilation-error-face)))))
 
 
 (defun jdee-stacktrace-buffer ( clear &optional buffer)
