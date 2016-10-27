@@ -66,6 +66,7 @@ qualified name).  If not found, return FQN."
 (define-derived-mode jdee-stacktrace-mode compilation-mode "JVM Stack Trace"
   "Major mode for inspecting stack traces.  Expects
 `jdee-sourcepath' to be set appropriately"
+  ;; FIXME: Should be a minor mode 
   (make-local-variable 'compilation-error-regexp-alist)
   (setq compilation-error-regexp-alist
         (list
