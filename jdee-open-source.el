@@ -302,6 +302,17 @@ you to select one of the interfaces to show."
 	    (if interface
 		(jdee-show-class-source interface)))))))
 
+(defvar jdee-open-source-archive nil
+  "Will be set to the name of the archive (jar, zip, etc) that is
+  the real source of a buffer.  See `jdee-open-source-resource'
+  and `jdee-find-class-source-file'.")
+
+(defvar jdee-open-source-resource nil
+  "Will be set to the resource path within
+  `jdee-open-source-archive' that is the real source of the
+  buffer.")
+
+
 (defun jdee-find-class-source-file (class)
   "Find the source file for a specified class.
 CLASS is the fully qualified name of the class. This function searchs
@@ -310,7 +321,12 @@ specified by `jdee-sourcepath' for the source file corresponding to
 CLASS. If it finds the source file in a directory, it returns the
 file's path. If it finds the source file in an archive, it returns a
 buffer containing the contents of the file. If this function does not
-find the source for the class, it returns nil."
+find the source for the class, it returns nil.
+
+If CLASS is found in an archive, set both
+`jdee-open-source-archive' and `jdee-open-source-resource' buffer
+local.
+"
   (let* ((outer-class (car (split-string class "[$]")))
          (file (concat
 		(jdee-parse-get-unqualified-name outer-class)
@@ -337,11 +353,14 @@ find the source for the class, it returns nil."
 			    (if (and (numberp exit-status) (= exit-status 0))
 				(progn
 				  (jdee-mode)
+                                  (set (make-local-variable 'jdee-open-source-archive) path)
+                                  (set (make-local-variable 'jdee-open-source-resource) class-file-name)
+
 				  (goto-char (point-min))
 				  (setq buffer-undo-list nil)
 				  (setq buffer-saved-size (buffer-size))
 				  (set-buffer-modified-p nil)
-				  (setq buffer-read-only t)
+                          	  (setq buffer-read-only t)
 				  (throw 'found buffer))
 			      (progn
 				(set-buffer-modified-p nil)
