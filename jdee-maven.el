@@ -267,8 +267,6 @@ and this in src/main
 ;;
 
 
-(defvar jdee-maven-unit-test-error-regexp
-  "\\([[:alpha:]][[:alnum:].$_]*\\)(\\([[:alpha:]][[:alnum:].$_]*[.]\\([[:alpha:]][[:alnum:]$_]*\\)\\)):\\(.*\\)")
 
 ;; FIXME: Does this belong here?  Seems more like a parsing function.
 (defun jdee-maven-annotations ()
@@ -315,8 +313,8 @@ the class.  Also adds the name of the tag to search for as a property called
   (let ((rtnval (jdee-stacktrace-file* (match-string 2))))
     (put-text-property (match-beginning 0) (match-end 0) 'method-name (match-string-no-properties 1))
     (put-text-property (match-beginning 0) (match-end 0) 'fqn (match-string-no-properties 2))
-    (put-text-property (match-beginning 0) (match-end 0) 'class-name (match-string-no-properties 3))
-    (put-text-property (match-beginning 0) (match-end 0) 'message (match-string-no-properties 4))
+    (put-text-property (match-beginning 0) (match-end 0) 'class-name (match-string-no-properties 4))
+    (put-text-property (match-beginning 0) (match-end 0) 'message (match-string-no-properties 5))
     rtnval))
 
 (defun jdee-maven-class-tag-p (class-name tag-type)
@@ -372,6 +370,20 @@ Return the tag of the method if found, nil otherwise."
         method-tag))))
       
 
+(defvar jdee-maven-unit-test-error-regexp
+  
+  (format "%s(%s):\\(.*\\)" (jdee-parse-java-name-part-re) (jdee-parse-java-fqn-re))
+  " Looks for something like 
+
+  testConnectionProxy2CallJava2(jde.juci.ConnectionImplTest): expected:<hello worl[ ]d> but was:<hello worl[]d>
+
+  Match regions are
+1 - the test method name
+2 - FQN of the unit test
+3 - package name of the unit test
+4 - class name of the unit test
+5 - the error message
+")
 
 
 (defun jdee-maven-unit-test (&optional path)
@@ -395,10 +407,11 @@ With a single prefix C-u, it will skip trying to run a single method.  With a do
       (setq next-error-function 'jdee-maven-unit-test-next-error-function)
       (add-to-list 'compilation-error-regexp-alist
                    (list jdee-maven-unit-test-error-regexp
-                         'jdee-maven-file nil nil nil 2
-                         '(1  compilation-info-face)
-                         '(2  compilation-error-face)
-                         '(4  compilation-message-face))))))
+                         'jdee-maven-file nil nil nil
+                         2              ;Hyperlink = FQN
+                         '(1  compilation-info-face) ;test method name
+                         '(2  compilation-error-face) ;FQN
+                         '(5  compilation-message-face)))))) ; error message
 
 ;;
 ;; Building
