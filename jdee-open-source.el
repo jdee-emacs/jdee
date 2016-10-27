@@ -313,6 +313,29 @@ you to select one of the interfaces to show."
   buffer.")
 
 
+(defun jdee-open-source-find-file (marker filename directory &rest formats)
+  "See if there is a buffer matching FILENAME that was opened via
+`jdee-find-class-source-file'.  Return that buffer or nil.
+
+This function is designed as :before-until advice for
+`compilation-find-file'.
+"
+  ;; FIXME: If the FILENAME looks like <path to archive>:<path to source>,
+  ;; try and open it
+
+  (let ((buffer (get-file-buffer filename)))
+    (when (and buffer
+               (with-current-buffer buffer
+                 jdee-open-source-archive))
+      buffer)))
+      
+;;
+;; Add support for finding files in archives.
+;;
+(advice-add 'compilation-find-file :before-until  #'jdee-open-source-find-file)
+
+
+
 (defun jdee-find-class-source-file (class)
   "Find the source file for a specified class.
 CLASS is the fully qualified name of the class. This function searchs
