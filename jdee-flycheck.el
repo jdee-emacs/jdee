@@ -156,15 +156,18 @@ cleans up after the compilation."
         ;(message "ERRORS: %s" errors)
         (funcall cback 'finished errors)))))
 
-(defun jdee-flycheck-cleanup (dir)
+(defun jdee-flycheck-cleanup ()
   "Cleans up after flycheck.
 
-Deletes the temporary files."
-  (lambda ()
-    (when (and (file-directory-p dir)
-               (string-prefix-p temporary-file-directory dir))
-      (delete-directory dir t))))
+Deletes the temporary files listed in `jdee-flycheck-temp-files'"
+  (dolist (temp-file jdee-flycheck-temp-files)
+    (cond
+     ((file-directory-p temp-file) (delete-directory temp-file t))
+     ((file-exists-p temp-file) (delete-file temp-file)))))
      
+
+(defvar jdee-flycheck-temp-files nil
+  "Files to delete whean the buffer is killed.")
 
 (defun jdee-flycheck-compile-buffer (checker cback &optional buffer)
   "Compile the buffer without saving it.  Creates a temporary
@@ -177,10 +180,11 @@ file and buffer with the contents of the current buffer and compiles that one."
     (with-current-buffer orig-buffer
       (write-region (point-min) (point-max) temp-file nil :silent))
     (with-current-buffer (generate-new-buffer name)
+      (add-to-list (make-local-variable 'jdee-flycheck-temp-files) dir)
       (insert-file-contents-literally temp-file)
       (setq buffer-file-name temp-file)
-      (add-hook 'kill-buffer-hook
-                (jdee-flycheck-cleanup dir))
+      
+      (add-hook 'kill-buffer-hook 'jdee-flycheck-cleanup nil t)
       ;; Don't write the class file to the source directory
       (unless jdee-compile-option-directory
         (set (make-local-variable 'jdee-compile-option-directory)
