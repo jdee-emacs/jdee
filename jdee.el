@@ -1080,7 +1080,7 @@ Does nothing but return nil if `jdee-log-max' is nil."
 	(list "Browse"
 	      ["Source Files"          jdee-show-speedbar t]
 	      ["Class at Point"        jdee-browse-class-at-point t]
-	      ["Copy Fully Qualifiedf Class Name"        jdee-fqn-to-kill-ring t]
+	      ["Copy Fully Qualified Class Name"        jdee-fqn-to-kill-ring t]
               ["Stack Trace Buffer"        jdee-stacktrace-buffer t]
               )
 	["Check Style"  jdee-checkstyle]
