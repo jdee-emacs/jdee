@@ -128,7 +128,7 @@ for the caret and converts it to a column number.
 Looks for errors and converts then to flycheck errors.  Also
 cleans up after the compilation."
   ;;
-  ;; There are parts of this fiel that break if the entire file is lexically bound.
+  ;; There are parts of this file that break if the entire file is lexically bound.
   (lexical-let ((orig-file orig-file)
                 (orig-buffer orig-buffer)
                 (temp-file temp-file)
