@@ -29,6 +29,7 @@
 (require 'jdee-parse)
 (require 'jdee-util)
 (require 'semantic/senator)
+(require 'nadvice)
 
 ;; FIXME: refactor
 (declare-function jdee-expand-wildcards-and-normalize "jdee" (path &optional symbol))
