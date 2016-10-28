@@ -387,13 +387,6 @@ Return the tag of the method if found, nil otherwise."
 ")
 
 
-(defun jdee-maven-unit-test-finish (buf msg)
-  "Jump somewhere useful"
-  
-    (goto-char (point-min))
-    (when (re-search-forward "T E S T S" nil t)
-      (recenter-top-bottom )
-      (beginning-of-line)))
   
 (defvar jdee-maven-unit-test-finish-hook nil)
 
@@ -413,6 +406,7 @@ With a single prefix C-u, it will skip trying to run a single method.  With a do
          (args (or (jdee-maven-unit-test-run-method-args)
                    (jdee-maven-unit-test-run-class-args)
                    "test"))
+         (compilation-scroll-output 'first-error)
          (compile-buffer (compilation-start (format "%s %s" jdee-maven-program args))))
     (with-current-buffer compile-buffer
       (setq next-error-function 'jdee-maven-unit-test-next-error-function)
@@ -421,7 +415,6 @@ With a single prefix C-u, it will skip trying to run a single method.  With a do
             (run-hook-with-args 'jdee-maven-unit-test-finish-hook buf msg)
             (setq compilation-finish-functions nil)))
 
-      (add-hook 'jdee-maven-unit-test-finish-hook 'jdee-maven-unit-test-finish t)
       (add-to-list 'compilation-error-regexp-alist
                    (list jdee-maven-unit-test-error-regexp
                          'jdee-maven-file nil nil nil
