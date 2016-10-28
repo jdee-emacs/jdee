@@ -25,7 +25,7 @@ JDEE requires [JDEE Server](http://github.com/jdee-emacs/jdee-server) for some o
 
 The project is available in MELPA.
 
-For more information, see ```doc/install.html```
+For more information, see the [installation instructions](http://htmlpreview.github.com/?https://github.com/peterwvj/jdee/blob/master/doc/flat/install.html).
 
 ## Build from source options
 
