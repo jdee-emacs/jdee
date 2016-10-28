@@ -127,34 +127,41 @@ for the caret and converts it to a column number.
   "Callback function called when the compilation is complete.
 Looks for errors and converts then to flycheck errors.  Also
 cleans up after the compilation."
-  (lambda (buf msg)
-    (with-current-buffer buf
-      (goto-char (point-min))
-      (while (re-search-forward temp-file nil t)
-        (replace-match orig-file))
-      (let ((errors nil))
+  ;;
+  ;; There are parts of this fiel that break if the entire file is lexically bound.
+  (lexical-let ((orig-file orig-file)
+                (orig-buffer orig-buffer)
+                (temp-file temp-file)
+                (cback cback)
+                (temp-buffer temp-buffer))
+    (lambda (buf msg)
+      (with-current-buffer buf
         (goto-char (point-min))
-        (while (re-search-forward "^\\(.*\\):\\([0-9]+\\): *error:\\(.*\\)$" nil t)
-          (forward-line 2)
-          (let ((file (match-string 1))
-                (line (match-string 2))
-                (message (match-string 3))
-                ;; jdee-flymake-1get-col changes search data; do it last
+        (while (re-search-forward temp-file nil t)
+          (replace-match orig-file))
+        (let ((errors nil))
+          (goto-char (point-min))
+          (while (re-search-forward "^\\(.*\\):\\([0-9]+\\): *error:\\(.*\\)$" nil t)
+            (forward-line 2)
+            (let ((file (match-string 1))
+                  (line (match-string 2))
+                  (message (match-string 3))
+                  ;; jdee-flymake-1get-col changes search data; do it last
                 (col (jdee-flymake-get-col)))
-            (add-to-list 'errors
-                         (jdee-flycheck-compile-buffer-error checker
-                                                             file
-                                                             line
-                                                             col
-                                                             message
-                                                             orig-buffer))))
-                                                                   
-        (kill-buffer temp-buffer)
-        ;;(kill-buffer buf)
-        (set (make-local-variable 'jdee-compile-jump-to-first-error) nil)
-        (set 'jdee-compile-mute t)
-        ;(message "ERRORS: %s" errors)
-        (funcall cback 'finished errors)))))
+              (add-to-list 'errors
+                           (jdee-flycheck-compile-buffer-error checker
+                                                               file
+                                                               line
+                                                               col
+                                                               message
+                                                               orig-buffer))))
+          
+          (kill-buffer temp-buffer)
+          ;;(kill-buffer buf)
+          (set (make-local-variable 'jdee-compile-jump-to-first-error) nil)
+          (set 'jdee-compile-mute t)
+                                        ;(message "ERRORS: %s" errors)
+          (funcall cback 'finished errors))))))
 
 (defun jdee-flycheck-cleanup ()
   "Cleans up after flycheck.

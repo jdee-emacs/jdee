@@ -324,11 +324,12 @@ Returns a function that accepts a list and checks the first two elements.
 
 Assumes the 1st element is a string and `string=' to CLASS-NAME and
 the second element is  `eq' to TAG-TYPE."
-  
-  (lambda (tag)
-    (when (and  (eq tag-type (cadr tag))
-                (string= (car tag) class-name))
-      tag)))
+  (lexical-let ((class-name class-name)
+                (tag-type tag-type))
+    (lambda (tag)
+      (when (and  (eq tag-type (cadr tag))
+                  (string= (car tag) class-name))
+        tag))))
 
 ;;
 ;; There really should be a semantic function to do this but I cannot
@@ -350,7 +351,7 @@ Descend on the :members element"
   
 (defun jdee-maven-unit-test-next-error-function (n &optional reset)
   "This function is a value of `next-error-function' that supports
-the results of junit. 
+the results of mvn test. 
 
 Return the tag of the method if found, nil otherwise."
   (let ((next-fn 'compilation-next-error-function)
@@ -386,6 +387,16 @@ Return the tag of the method if found, nil otherwise."
 ")
 
 
+(defun jdee-maven-unit-test-finish (buf msg)
+  "Jump somewhere useful"
+  
+    (goto-char (point-min))
+    (when (re-search-forward "T E S T S" nil t)
+      (recenter-top-bottom )
+      (beginning-of-line)))
+  
+(defvar jdee-maven-unit-test-finish-hook nil)
+
 (defun jdee-maven-unit-test (&optional path)
   
   "Unit test using maven with project based in PATH (default to `default-directory')
@@ -405,6 +416,12 @@ With a single prefix C-u, it will skip trying to run a single method.  With a do
          (compile-buffer (compilation-start (format "%s %s" jdee-maven-program args))))
     (with-current-buffer compile-buffer
       (setq next-error-function 'jdee-maven-unit-test-next-error-function)
+      (setq compilation-finish-functions
+          (lambda (buf msg)
+            (run-hook-with-args 'jdee-maven-unit-test-finish-hook buf msg)
+            (setq compilation-finish-functions nil)))
+
+      (add-hook 'jdee-maven-unit-test-finish-hook 'jdee-maven-unit-test-finish t)
       (add-to-list 'compilation-error-regexp-alist
                    (list jdee-maven-unit-test-error-regexp
                          'jdee-maven-file nil nil nil

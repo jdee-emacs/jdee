@@ -343,12 +343,13 @@ This function is designed as :around advice for
 `compilation-find-file'.
 "
 
-  (when (string-match (format "^%s$" (jdee-parse-java-fqn-re)) filename)
-    (let ((path (jdee-find-class-source-file filename)))
-      (cond
-       ((bufferp path) path)
-       ((stringp path) (apply fn marker path directory formats))
-       (t (apply fn marker filename directory formats))))))
+  (if (string-match (format "^%s$" (jdee-parse-java-fqn-re)) filename)
+      (let ((path (jdee-find-class-source-file filename)))
+        (cond
+         ((bufferp path) path)
+         ((stringp path) (apply fn marker path directory formats))
+         (t (apply fn marker filename directory formats))))
+    (apply fn marker filename directory formats)))
 
 
 (advice-add 'compilation-find-file :around  #'jdee-open-source-find-file-of-fqn)
