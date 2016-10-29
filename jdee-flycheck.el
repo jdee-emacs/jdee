@@ -133,6 +133,7 @@ cleans up after the compilation."
                 (orig-buffer orig-buffer)
                 (temp-file temp-file)
                 (cback cback)
+                (checker checker)
                 (temp-buffer temp-buffer))
     (lambda (buf msg)
       (with-current-buffer buf
