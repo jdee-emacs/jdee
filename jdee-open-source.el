@@ -29,7 +29,7 @@
 (require 'jdee-parse)
 (require 'jdee-util)
 (require 'semantic/senator)
-(require 'nadvice)
+
 
 ;; FIXME: refactor
 (declare-function jdee-expand-wildcards-and-normalize "jdee" (path &optional symbol))
@@ -314,7 +314,30 @@ you to select one of the interfaces to show."
   buffer.")
 
 
-(defun jdee-open-source-find-file (marker filename directory &rest formats)
+;; (defun jdee-open-source-find-file (marker filename directory &rest formats)
+;;   "See if there is a buffer matching FILENAME that was opened via
+;; `jdee-find-class-source-file'.  Return that buffer or nil.
+
+;; This function is designed as :before-until advice for
+;; `compilation-find-file'.
+;; "
+;;   ;; FIXME: If the FILENAME looks like <path to archive>:<path to source>,
+;;   ;; try and open it
+
+;;   (let ((buffer (get-file-buffer filename)))
+;;     (when (and buffer
+;;                (with-current-buffer buffer
+;;                  jdee-open-source-archive))
+;;       buffer)))
+
+
+;;
+;; Add support for finding files in archives.
+;;
+;;(advice-add 'compilation-find-file :before-until  #'jdee-open-source-find-file)
+
+
+(defadvice compilation-find-file (around jdee-open-source-find-file activate)
   "See if there is a buffer matching FILENAME that was opened via
 `jdee-find-class-source-file'.  Return that buffer or nil.
 
@@ -325,35 +348,45 @@ This function is designed as :before-until advice for
   ;; try and open it
 
   (let ((buffer (get-file-buffer filename)))
-    (when (and buffer
-               (with-current-buffer buffer
-                 jdee-open-source-archive))
-      buffer)))
+    (if (and buffer (with-current-buffer buffer jdee-open-source-archive))
+        buffer
+      ad-do-it)))
 
 
-;;
-;; Add support for finding files in archives.
-;;
-(advice-add 'compilation-find-file :before-until  #'jdee-open-source-find-file)
+;; (defun jdee-open-source-find-file-of-fqn (fn marker filename directory &rest formats)
+;;   "Check if FILENAME matches an FQN and load it.  Return that buffer or pass onto FN.
+
+;; This function is designed as :around advice for
+;; `compilation-find-file'.
+;; "
+
+;;   (if (string-match (format "^%s$" (jdee-parse-java-fqn-re)) filename)
+;;       (let ((path (jdee-find-class-source-file filename)))
+;;         (cond
+;;          ((bufferp path) path)
+;;          ((stringp path) (apply fn marker path directory formats))
+;;          (t (apply fn marker filename directory formats))))
+;;     (apply fn marker filename directory formats)))
 
 
-(defun jdee-open-source-find-file-of-fqn (fn marker filename directory &rest formats)
+;;(advice-add 'compilation-find-file :around  #'jdee-open-source-find-file-of-fqn)
+
+(defadvice compilation-find-file (around jdee-open-source-find-file-of-fqn activate)
   "Check if FILENAME matches an FQN and load it.  Return that buffer or pass onto FN.
 
-This function is designed as :around advice for
-`compilation-find-file'.
-"
-
+ This function is designed as :around advice for
+ `compilation-find-file'."
+  
   (if (string-match (format "^%s$" (jdee-parse-java-fqn-re)) filename)
       (let ((path (jdee-find-class-source-file filename)))
         (cond
          ((bufferp path) path)
-         ((stringp path) (apply fn marker path directory formats))
-         (t (apply fn marker filename directory formats))))
-    (apply fn marker filename directory formats)))
-
-
-(advice-add 'compilation-find-file :around  #'jdee-open-source-find-file-of-fqn)
+         ((stringp path)
+          (progn
+            (ad-set-arg 1 path)
+            ad-do-it))
+         (t ad-do-it)))
+    ad-do-it))
 
 
   
