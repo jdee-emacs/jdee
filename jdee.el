@@ -63,6 +63,7 @@
 (require 'jdee-refactor)
 (require 'jdee-run)
 (require 'jdee-stacktrace)
+(require 'jdee-archive)
 (require 'jdee-test)
 (require 'jdee-util)
 (require 'jdee-which-method)
