@@ -1,6 +1,36 @@
-;; FIXME: rename
-(defun list-to-hash (coll)
-  "Convert the `archive-files' vector to a hashtable of string to 'indexed."
+;;; jdee-flycheck.el -- Flycheck mode for jdee
+
+;; Author: Matthew O. Smith <matt@m0smith.com>
+;; Maintainer: Paul Landes <landes <at> mailc dt net>
+;; Keywords: java, tools
+
+;; Copyright (C) 1997, 2000, 2001, 2002, 2003, 2004, 2005 Paul Kinnucan.
+;; Copyright (C) 2009 by Paul Landes
+
+;; GNU Emacs is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 2, or (at your option)
+;; any later version.
+
+;; GNU Emacs is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING.  If not, write to the
+;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+;; Boston, MA 02111-1307, US
+;;; Commentary:
+
+;; Code to manage archives like JAR files.
+
+;;; Code:
+
+
+(defun jdee-archive-files-hashtable (coll)
+  "Convert the COLL which looks like an `archive-files' vector to
+a hashtable of string to 'indexed."
   (let ((rtnval (make-hash-table :test 'equal)))
     (cl-loop for r across coll
              when r
@@ -14,7 +44,7 @@ RESOURCE."
   (when buf
     (with-current-buffer buf
       (let* ((files archive-files)
-             (r (list-to-hash files)))
+             (r (jdee-archive-files-hashtable files)))
         (if (eq 'missing (gethash resource r 'missing))
             nil
           (list archive resource))))))
@@ -48,12 +78,18 @@ lists of file names."
            when rtnval
               return rtnval))
 
-(defun jdee-archive-which (disp fqn &rest paths)
-  (interactive "p\nsFQN: ")
+;;;###autoload
+(defun jdee-archive-which (fqn &optional disp &rest paths)
+  "Finds which archive contains FQN.
+Search PATHS or `jdee-global-classpath' if nil.
+Return nil if not found or '(archive resource).
+"
+  (interactive "sFQN: \np")
   (let* ((resource (format "%s.class" (subst-char-in-string ?. ?/ fqn)))
          (rtnval (apply #'jdee-archive-find-resource resource (or paths (list jdee-global-classpath)))))
     (when (and disp rtnval)
-      (apply #'message "Adding %s:%s to kill ring" rtnval))
+      (kill-new (apply #'format "%s:%s" rtnval))
+      (apply #'message "%s:%s added to kill ring." rtnval))
     rtnval))
 
 
