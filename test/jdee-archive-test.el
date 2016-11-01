@@ -16,6 +16,20 @@
     (when makefile
       (file-name-directory makefile))))
 
+(defvar classpath-type-alist '((compile ("test/jars/compile"))
+                               (test ("test/jars/test" "test/jars/compile"))))
+                                        
+
+(defun build-classpath (type &optional dir)
+  "Build a classpath."
+  (let ((prj-dir (find-project-directory dir))
+        (dirs (cadr (assoc type classpath-type-alist)))
+        rtnval)
+    (dolist (d dirs rtnval)
+      (setq rtnval (append rtnval (directory-files (expand-file-name d prj-dir) t ".*[.]jar$"))))))  
+    
+    
+
 ;;
 ;; Testing: jdee-archive-files-hashtable
 ;;
