@@ -33,6 +33,24 @@
         (should (eq 'indexed (gethash "org/apache/commons/lang/ArrayUtils.class" ht 'missing)))
         (should (eq 'missing (gethash "org/junit/rules/DisableOnDebug.class" ht 'missing)))))))
 
+;;
+;; Testing: jdee-archive-resource-from-ht
+;;
+
+(ert-deftest test-jdee-archive-resource-from-ht-with-entries ()
+  "Check that `jdee-archive-resource-from-ht' finds the resource as expected."
+  (let* ((project-dir (find-project-directory))
+         (jar (expand-file-name "test/jars/compile/commons-lang-2.6.jar" project-dir)))
+    (should (file-exists-p jar))
+    (with-current-buffer (find-file-noselect jar)
+      (let* ((files archive-files)
+             (ht (jdee-archive-files-hashtable files)))
+        (should (equal
+                 (list jar "org/apache/commons/lang/ArrayUtils.class")
+                 (jdee-archive-resource-from-ht ht jar "org/apache/commons/lang/ArrayUtils.class")))
+        (should (equal
+                 nil
+                 (jdee-archive-resource-from-ht ht jar "hamster.class")))))))
 
 (provide 'jdee-archive-test)
 ;;; jdee-archive-test.el ends here

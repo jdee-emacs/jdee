@@ -36,6 +36,14 @@ a hashtable of string to 'indexed."
              when r
              do (puthash (elt r 1) 'indexed rtnval))
     rtnval))
+
+(defun jdee-archive-resource-from-ht (ht archive resource)
+  "For the buffer BUR, which needs to be in arc-mode, find
+RESOURCE."
+  (when ht
+    (if (eq 'missing (gethash resource ht 'missing))
+        nil
+      (list archive resource))))
   
 
 (defun jdee-archive-resource (buf archive resource)
@@ -45,9 +53,8 @@ RESOURCE."
     (with-current-buffer buf
       (let* ((files archive-files)
              (r (jdee-archive-files-hashtable files)))
-        (if (eq 'missing (gethash resource r 'missing))
-            nil
-          (list archive resource))))))
+        (jdee-archive-resource-from-ht r archive resource)))))
+
 
 (defun jdee-archive-has-resource-in-existing-buffer-p (archive resource)
   "See if ARCHIVE is in a buffer and if so, check it for
@@ -55,19 +62,47 @@ RESOURCE."
   (let* ((buf (get-file-buffer archive))
         (rtnval (jdee-archive-resource buf archive resource)))
     rtnval))
-      
-(defun jdee-archive-has-resource-p (archive resource)
-  "Using arc-mode, try to load the ARCHIVe and see if it contains
-RESOURCE.  Kills the buffer with the archive."
+
+
+(defun jdee-archive-extract-ht (archive)
+  "Load ARCHIVE into a buffer and return a hashtable of the `archive-files'.
+Delete the temp buffer. "
   (when (and (file-exists-p archive)
              (not (file-directory-p archive)))
-    (let* ((buffer (find-file-noselect archive))
-           (rtnval (jdee-archive-resource buffer archive resource)))
+    (let* ((buffer (find-file-noselect archive)))
       (when buffer
-        (kill-buffer buffer))
-      rtnval)))
-           
-  
+        (let ((rtnval (jdee-archive-files-hashtable archive-files)))
+          (kill-buffer buffer)
+          rtnval)))))
+
+(defvar jdee-archive-resource-index-cache (make-hash-table :test 'equal))
+
+(defadvice jdee-archive-extract-ht (around jdee-archive-extract-ht-cache activate)
+  "
+This function is designed as :around advice for
+`jdee-archive-extract-ht'.
+"
+  (let ((rtnval (gethash (ad-get-arg 0) jdee-archive-resource-index-cache nil)))
+    (if rtnval
+        (setq ad-return-value rtnval)
+      ad-do-it
+      (when ad-return-value
+        (puthash (ad-get-arg 0) ad-return-value jdee-archive-resource-index-cache)))))
+
+
+
+
+
+
+
+(defun jdee-archive-has-resource-p (archive resource)
+  "Using arc-mode, try to load the ARCHIVE and see if it contains
+RESOURCE.  Kills the buffer with the archive."
+  (let* ((ht (jdee-archive-extract-ht archive))
+         (rtnval (jdee-archive-resource-from-ht ht archive resource)))
+    rtnval))
+
+
 (defun jdee-archive-find-resource (resource &rest paths)
   "Return the archive that has RESOURCE.  PATHS is a list of
 lists of file names."
@@ -76,7 +111,9 @@ lists of file names."
            for rtnval = (or (jdee-archive-has-resource-in-existing-buffer-p p resource)
                             (jdee-archive-has-resource-p p resource))
            when rtnval
-              return rtnval))
+               return rtnval))
+
+  
 
 ;;;###autoload
 (defun jdee-archive-which (fqn &optional disp &rest paths)
@@ -94,3 +131,6 @@ Return nil if not found or '(archive resource).
 
 
 
+(provide 'jdee-archive)
+
+;;; jdee-archive.el ends here
