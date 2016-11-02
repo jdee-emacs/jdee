@@ -27,8 +27,6 @@
         rtnval)
     (dolist (d dirs rtnval)
       (setq rtnval (append rtnval (directory-files (expand-file-name d prj-dir) t ".*[.]jar$"))))))  
-    
-    
 
 ;;
 ;; Testing: jdee-archive-files-hashtable
@@ -65,6 +63,18 @@
         (should (equal
                  nil
                  (jdee-archive-resource-from-ht ht jar "hamster.class")))))))
+
+;;
+;; jdee-archive-which
+;;
+
+(ert-deftest test-jdee-archvie-which ()
+  "Validate the `jdee-archive-which' can find a class."
+  (let* ((paths (build-classpath 'test))
+         (project-dir (find-project-directory))
+         (jar (expand-file-name "test/jars/compile/commons-lang-2.6.jar" project-dir)))
+    (should (equal (list jar "org/apache/commons/lang/ArrayUtils.class")
+                   (jdee-archive-which "org.apache.commons.lang.ArrayUtils" nil paths)))))
 
 (provide 'jdee-archive-test)
 ;;; jdee-archive-test.el ends here
