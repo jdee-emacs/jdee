@@ -30,6 +30,7 @@
 (require 'jdee-util)
 (require 'semantic/senator)
 
+
 ;; FIXME: refactor
 (declare-function jdee-expand-wildcards-and-normalize "jdee" (path &optional symbol))
 (declare-function jdee-jeval-r "jdee-bsh" (java-statement))
@@ -302,6 +303,93 @@ you to select one of the interfaces to show."
 	    (if interface
 		(jdee-show-class-source interface)))))))
 
+(defvar jdee-open-source-archive nil
+  "Will be set to the name of the archive (jar, zip, etc) that is
+  the real source of a buffer.  See `jdee-open-source-resource'
+  and `jdee-find-class-source-file'.")
+
+(defvar jdee-open-source-resource nil
+  "Will be set to the resource path within
+  `jdee-open-source-archive' that is the real source of the
+  buffer.")
+
+
+;; (defun jdee-open-source-find-file (marker filename directory &rest formats)
+;;   "See if there is a buffer matching FILENAME that was opened via
+;; `jdee-find-class-source-file'.  Return that buffer or nil.
+
+;; This function is designed as :before-until advice for
+;; `compilation-find-file'.
+;; "
+;;   ;; FIXME: If the FILENAME looks like <path to archive>:<path to source>,
+;;   ;; try and open it
+
+;;   (let ((buffer (get-file-buffer filename)))
+;;     (when (and buffer
+;;                (with-current-buffer buffer
+;;                  jdee-open-source-archive))
+;;       buffer)))
+
+
+;;
+;; Add support for finding files in archives.
+;;
+;;(advice-add 'compilation-find-file :before-until  #'jdee-open-source-find-file)
+
+
+(defadvice compilation-find-file (around jdee-open-source-find-file activate)
+  "See if there is a buffer matching FILENAME that was opened via
+`jdee-find-class-source-file'.  Return that buffer or nil.
+
+This function is designed as :before-until advice for
+`compilation-find-file'.
+"
+  ;; FIXME: If the FILENAME looks like <path to archive>:<path to source>,
+  ;; try and open it
+
+  (let ((buffer (get-file-buffer filename)))
+    (if (and buffer (with-current-buffer buffer jdee-open-source-archive))
+        buffer
+      ad-do-it)))
+
+
+;; (defun jdee-open-source-find-file-of-fqn (fn marker filename directory &rest formats)
+;;   "Check if FILENAME matches an FQN and load it.  Return that buffer or pass onto FN.
+
+;; This function is designed as :around advice for
+;; `compilation-find-file'.
+;; "
+
+;;   (if (string-match (format "^%s$" (jdee-parse-java-fqn-re)) filename)
+;;       (let ((path (jdee-find-class-source-file filename)))
+;;         (cond
+;;          ((bufferp path) path)
+;;          ((stringp path) (apply fn marker path directory formats))
+;;          (t (apply fn marker filename directory formats))))
+;;     (apply fn marker filename directory formats)))
+
+
+;;(advice-add 'compilation-find-file :around  #'jdee-open-source-find-file-of-fqn)
+
+(defadvice compilation-find-file (around jdee-open-source-find-file-of-fqn activate)
+  "Check if FILENAME matches an FQN and load it.  Return that buffer or pass onto FN.
+
+ This function is designed as :around advice for
+ `compilation-find-file'."
+  
+  (if (string-match (format "^%s$" (jdee-parse-java-fqn-re)) filename)
+      (let ((path (jdee-find-class-source-file filename)))
+        (cond
+         ((bufferp path) path)
+         ((stringp path)
+          (progn
+            (ad-set-arg 1 path)
+            ad-do-it))
+         (t ad-do-it)))
+    ad-do-it))
+
+
+  
 (defun jdee-find-class-source-file (class)
   "Find the source file for a specified class.
 CLASS is the fully qualified name of the class. This function searchs
@@ -310,7 +398,12 @@ specified by `jdee-sourcepath' for the source file corresponding to
 CLASS. If it finds the source file in a directory, it returns the
 file's path. If it finds the source file in an archive, it returns a
 buffer containing the contents of the file. If this function does not
-find the source for the class, it returns nil."
+find the source for the class, it returns nil.
+
+If CLASS is found in an archive, set both
+`jdee-open-source-archive' and `jdee-open-source-resource' buffer
+local.
+"
   (let* ((outer-class (car (split-string class "[$]")))
          (file (concat
 		(jdee-parse-get-unqualified-name outer-class)
@@ -337,11 +430,14 @@ find the source for the class, it returns nil."
 			    (if (and (numberp exit-status) (= exit-status 0))
 				(progn
 				  (jdee-mode)
+                                  (set (make-local-variable 'jdee-open-source-archive) path)
+                                  (set (make-local-variable 'jdee-open-source-resource) class-file-name)
+
 				  (goto-char (point-min))
 				  (setq buffer-undo-list nil)
 				  (setq buffer-saved-size (buffer-size))
 				  (set-buffer-modified-p nil)
-				  (setq buffer-read-only t)
+                          	  (setq buffer-read-only t)
 				  (throw 'found buffer))
 			      (progn
 				(set-buffer-modified-p nil)
