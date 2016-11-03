@@ -199,7 +199,7 @@ DIR is the directory containing the pom.xml.  If nil, hunt for it."
                  (rp (mapcar (lambda(p) (expand-file-name p pom-dir))
                              (nth 3 scope-info))))
             
-            (jdee-set-variables (list 'jdee-global-classpath  (cons 'list classpath))
+            (jdee-set-variables (list 'jdee-global-classpath  (cons 'list (append rp classpath)))
                                 '(jdee-build-function 'jdee-maven-build)
                                 '(jdee-test-function 'jdee-maven-unit-test)
                                 (list 'jdee-run-working-directory pom-dir)
