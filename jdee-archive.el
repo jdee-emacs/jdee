@@ -71,9 +71,10 @@ Delete the temp buffer. "
              (not (file-directory-p archive)))
     (let* ((buffer (find-file-noselect archive)))
       (when buffer
-        (let ((rtnval (jdee-archive-files-hashtable archive-files)))
-          (kill-buffer buffer)
-          rtnval)))))
+        (with-current-buffer buffer
+          (let ((rtnval (jdee-archive-files-hashtable archive-files)))
+            (kill-buffer buffer)
+            rtnval))))))
 
 (defvar jdee-archive-resource-index-cache (make-hash-table :test 'equal))
 
@@ -89,12 +90,6 @@ This function is designed as :around advice for
       (when ad-return-value
         (puthash (ad-get-arg 0) ad-return-value jdee-archive-resource-index-cache)))))
 
-
-
-
-
-
-
 (defun jdee-archive-has-resource-p (archive resource)
   "Using arc-mode, try to load the ARCHIVE and see if it contains
 RESOURCE.  Kills the buffer with the archive."
@@ -102,31 +97,57 @@ RESOURCE.  Kills the buffer with the archive."
          (rtnval (jdee-archive-resource-from-ht ht archive resource)))
     rtnval))
 
+(defun jdee-archive-is-resource-on-disk-p (dir resource)
+  (let ((file (expand-file-name resource dir)))
+    (when (file-exists-p file)
+        file)))
 
 (defun jdee-archive-find-resource (resource &rest paths)
   "Return the archive that has RESOURCE.  PATHS is a list of
-lists of file names."
+lists of file names.
+
+Return:
+   nil if not found  
+   \"file\" if fqn is a class file on disk
+   '(archive resource) for a file contained in an archive (JAR file).
+"
   
   (cl-loop for p in (apply #'append paths)  
-           for rtnval = (or (jdee-archive-has-resource-in-existing-buffer-p p resource)
+           for rtnval = (or (jdee-archive-is-resource-on-disk-p p resource)
+                            (jdee-archive-has-resource-in-existing-buffer-p p resource)
                             (jdee-archive-has-resource-p p resource))
            when rtnval
                return rtnval))
-
+(defun jdee-archive-resource-to-string (resource)
+  "Convert the result of `jdee-archive-find-resource' to a string.
+"
+  (cond
+   ((null resource) nil)
+   ((listp resource) (apply #'format "%s:%s" resource))
+   (t resource)))
   
 
 ;;;###autoload
 (defun jdee-archive-which (fqn &optional disp &rest paths)
   "Finds which archive contains FQN.
 Search PATHS or `jdee-global-classpath' if nil.
-Return nil if not found or '(archive resource).
+
+Return:
+   nil if not found  
+   \"file\" if fqn is a class file on disk
+   '(archive resource) for a file contained in an archive (JAR file).
 "
   (interactive "sFQN: \np")
   (let* ((resource (format "%s.class" (subst-char-in-string ?. ?/ fqn)))
          (rtnval (apply #'jdee-archive-find-resource resource (or paths (list jdee-global-classpath)))))
-    (when (and disp rtnval)
-      (kill-new (apply #'format "%s:%s" rtnval))
-      (apply #'message "%s:%s added to kill ring." rtnval))
+    
+    (if rtnval
+        (let ((as-string (jdee-archive-resource-to-string rtnval)))
+          (kill-new as-string)
+          (when disp
+            (message "%s added to kill ring." as-string)))
+      (when disp
+        (message "%s not found." fqn)))
     rtnval))
 
 
