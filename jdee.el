@@ -112,6 +112,7 @@ See also the function `jdee-check-versions'."
    (cons "[?\C-c ?\C-v ?\C-g]" 'jdee-open-class-at-point)
    (cons "[?\C-c ?\C-v ?*]"    'jdee-fqn-to-kill-ring)
    (cons "[?\C-c ?\C-v ?#]"    'jdee-stacktrace-buffer)
+   (cons "[?\C-c ?\C-v ?w]"    'jdee-archive-which)
    (cons "[?\C-c ?\C-v ?\C-k]" 'jdee-bsh-run)
    (cons "[?\C-c ?\C-v ?\C-l]" 'jdee-gen-println)
    (cons "[?\C-c ?\C-v ?\C-n]" 'jdee-help-browse-jdk-doc)
@@ -1083,6 +1084,7 @@ Does nothing but return nil if `jdee-log-max' is nil."
 	      ["Class at Point"        jdee-browse-class-at-point t]
 	      ["Copy Fully Qualified Class Name"        jdee-fqn-to-kill-ring t]
               ["Stack Trace Buffer"        jdee-stacktrace-buffer t]
+              ["Location of Class"         jdee-archive-which t]
               )
 	["Check Style"  jdee-checkstyle]
 	(list "Project"
