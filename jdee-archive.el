@@ -1,4 +1,4 @@
-;;; jdee-flycheck.el -- Flycheck mode for jdee
+;;; jdee-archive.el -- Archive mode for jdee
 
 ;; Author: Matthew O. Smith <matt@m0smith.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -23,10 +23,13 @@
 ;; Boston, MA 02111-1307, US
 ;;; Commentary:
 
-;; Code to manage archives like JAR files.
+;; Code to manage archives like JAR files.  This code takes advantage
+;; of archive-mode which knows how to open and read various types of
+;; archive including JAR files.
 
 ;;; Code:
 
+(require 'memoize)
 
 (defun jdee-archive-files-hashtable (coll)
   "Convert the COLL which looks like an `archive-files' vector to
@@ -38,7 +41,7 @@ a hashtable of string to 'indexed."
     rtnval))
 
 (defun jdee-archive-resource-from-ht (ht archive resource)
-  "For the buffer BUR, which needs to be in arc-mode, find
+  "For the buffer BUR, which needs to be in `archive-mode', find
 RESOURCE."
   (when ht
     (if (eq 'missing (gethash resource ht 'missing))
@@ -47,7 +50,7 @@ RESOURCE."
   
 
 (defun jdee-archive-resource (buf archive resource)
-  "For the buffer BUR, which needs to be in arc-mode, find
+  "For the buffer BUR, which needs to be in `archive-mode', find
 RESOURCE."
   (when buf
     (with-current-buffer buf
@@ -64,7 +67,7 @@ RESOURCE."
     rtnval))
 
 
-(defun jdee-archive-extract-ht (archive)
+(defun jdee-archive-extract-ht-non-cached (archive)
   "Load ARCHIVE into a buffer and return a hashtable of the `archive-files'.
 Delete the temp buffer. "
   (when (and (file-exists-p archive)
@@ -76,22 +79,13 @@ Delete the temp buffer. "
             (kill-buffer buffer)
             rtnval))))))
 
-(defvar jdee-archive-resource-index-cache (make-hash-table :test 'equal))
 
-(defadvice jdee-archive-extract-ht (around jdee-archive-extract-ht-cache activate)
-  "
-This function is designed as :around advice for
-`jdee-archive-extract-ht'.
-"
-  (let ((rtnval (gethash (ad-get-arg 0) jdee-archive-resource-index-cache nil)))
-    (if rtnval
-        (setq ad-return-value rtnval)
-      ad-do-it
-      (when ad-return-value
-        (puthash (ad-get-arg 0) ad-return-value jdee-archive-resource-index-cache)))))
+;; Create a caching version of jdee-archive-extract-ht-non-cached
+(fset 'jdee-archive-extract-ht (memoize #'jdee-archive-extract-ht-non-cached))
+
 
 (defun jdee-archive-has-resource-p (archive resource)
-  "Using arc-mode, try to load the ARCHIVE and see if it contains
+  "Using `archive-mode', try to load the ARCHIVE and see if it contains
 RESOURCE.  Kills the buffer with the archive."
   (let* ((ht (jdee-archive-extract-ht archive))
          (rtnval (jdee-archive-resource-from-ht ht archive resource)))

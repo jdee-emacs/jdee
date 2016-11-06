@@ -26,6 +26,7 @@
 ;;; Code:
 
 
+(require 'dash)
 (require 'jdee-open-source)
 
   (require 'cl)

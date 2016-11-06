@@ -7,7 +7,7 @@
 
 (require 'ert)
 (require 'el-mock)
-(require 'jdee-maven)
+(require 'jdee)
 (require 'cl)
 
 
@@ -76,18 +76,6 @@
          (ht (jdee-archive-extract-ht jar)))
     (should (not (eq 'test-failed (gethash "org/apache/commons/lang/ArrayUtils.class" ht 'test-failed))))))
 
-(ert-deftest test-jdee-archive-extract-ht-check-cache ()
-  "Validate the caching is working by adding an entry and making
-sure it is found"
-
-  (let* ((project-dir (find-project-directory))
-         (jar (expand-file-name "test/jars/compile/commons-lang-2.6.jar" project-dir))
-         (ht (jdee-archive-extract-ht jar))
-         (key "test-jdee-archive-extract-ht-check-cache"))
-    (puthash key (gethash jar jdee-archive-resource-index-cache 'cache-not-found)
-             jdee-archive-resource-index-cache)
-    (let ((actual (jdee-archive-extract-ht key)))
-      (should (not (eq 'test-failed (gethash "org/apache/commons/lang/ArrayUtils.class" actual 'test-failed)))))))
 
 
 ;;
