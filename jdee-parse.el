@@ -771,9 +771,10 @@ Returns the character position in the buffer, or nil if no declaration
 could be found."
   (save-excursion
     (let ((symbol-list-entry-re
-	   (concat jdee-parse-java-symbol-re "[ \t\n\r]*,[ \t\n\r]*"))
-	  (orgpt (point))
-	   found pos resname foundpt lastpos)
+           (concat jdee-parse-java-symbol-re "[ \t\n\r]*,[ \t\n\r]*"))
+          (orgpt (point))
+          (case-fold-search nil)
+          found pos resname foundpt lastpos)
 
       ;; Search backward in the buffer.
       (while (and (not found)
