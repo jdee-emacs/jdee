@@ -5,7 +5,8 @@
 ;; Keywords: java, tools
 ;; URL: http://github.com/jdee-emacs/jdee
 ;; Version: 2.4.2
-;; Package-Requires: ((emacs "24.3") (dash "2.13.0"))
+;; Package-Requires: ((emacs "24.3") (memoize "1.0.1") (dash "2.13.0"))
+
 
 ;; Copyright (C) 1997-2008 Paul Kinnucan.
 ;; Copyright (C) 2009 by Paul Landes
