@@ -8,5 +8,4 @@
 
 (development
  (depends-on "ert-runner")
- (depends-on "memoize")
  (depends-on "el-mock"))
