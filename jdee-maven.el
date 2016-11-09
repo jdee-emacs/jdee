@@ -28,8 +28,7 @@
 
 (require 'dash)
 (require 'jdee-open-source)
-
-  (require 'cl)
+(require 'cl)
 
 (defgroup jdee-maven nil
   "JDEE Maven Project Options"
