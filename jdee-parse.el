@@ -107,7 +107,32 @@ the type of a class could not be found an it tried to import it")
 	  "."         ;;   - period
 	  (160 . 255) ;;   - accented characters
 	  )))
-"Regular expression that matches any Java symbol.")
+  "Regular expression that matches any Java symbol.")
+
+(defun jdee-parse-java-name-parts-re (&optional sep)
+  " Create a regular expression that will identify java name parts.
+
+Name parts are things like java.util.Map or Map or java/util/Map
+
+Create a match group.
+
+SEP defaults to ."
+  (format "\\([[:alpha:]_$][[:alnum:]_$%s]*\\)" (or sep ".")))
+
+(defun jdee-parse-java-name-part-re ()
+  "Set one match region on the name"
+  (jdee-parse-java-name-parts-re ""))
+
+(defun jdee-parse-java-fqn-re ()
+  "
+Set 3 match regions
+1 - FQN
+2 - package name
+3 - unqualified class name
+"
+  (format "\\(%s[.]%s\\)" (jdee-parse-java-name-parts-re) (jdee-parse-java-name-part-re)))
+
+          
 
 (defun jdee-parse-after-buffer-changed ()
   "Reparse the current buffer after any change.
@@ -746,9 +771,10 @@ Returns the character position in the buffer, or nil if no declaration
 could be found."
   (save-excursion
     (let ((symbol-list-entry-re
-	   (concat jdee-parse-java-symbol-re "[ \t\n\r]*,[ \t\n\r]*"))
-	  (orgpt (point))
-	   found pos resname foundpt lastpos)
+           (concat jdee-parse-java-symbol-re "[ \t\n\r]*,[ \t\n\r]*"))
+          (orgpt (point))
+          (case-fold-search nil)
+          found pos resname foundpt lastpos)
 
       ;; Search backward in the buffer.
       (while (and (not found)
@@ -1049,10 +1075,18 @@ method or field name at point. For example, suppose obj.f1.ge were the name
 at point. This function would return the list (\"obj.f1\" \"ge\")."
   (save-excursion
     (let (start middle-point varname curcar dot (dot-offset 0) found
-		(original-point (point))
-		intermediate-point beg-point first-part second-part
-		first-paren cast-type second-paren
-		args (offset 0) (bracket-count 0) (paren-count 0))
+                (original-point (point))
+                original-point-before-ws
+                intermediate-point beg-point first-part second-part
+                first-paren cast-type second-paren
+                args (offset 0) (bracket-count 0) (paren-count 0))
+
+      ;; Back up past any white space.  This lets completion work when
+      ;; continuing onto a new-line.  Skipping whitespace ( ) and end of comment
+      ;; style b (>), which is end of line
+      ;;
+      (skip-syntax-backward " >")
+      (setq original-point-before-ws (point))
 
       ;; Move cursor to the beginning of the partially
       ;; completed part of the expression, e.g., move point
@@ -1088,6 +1122,13 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
 		(setq found (point))))
 	      (setq curcar (char-before)))
 	    (setq intermediate-point found)
+
+        ;; Back up past any white space.  This lets completion work when
+        ;; continuing onto a new-line.
+        ;;
+        (skip-syntax-backward " >")
+
+
 	   ;; Now move point to the beginning of the expression, e.g.,
 	    ;; from
 	    ;;
@@ -1144,7 +1185,10 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
 
 	      (setq second-part
 		    (buffer-substring-no-properties
-		     intermediate-point original-point))
+		     intermediate-point original-point-before-ws))
+
+          (while (string-match "\\s-\\|\\s>" second-part)
+            (setq second-part (replace-match "" nil nil second-part)))
 
 	      ;;Checking for casting
 	      ;; ((Object) obj).ge
@@ -1160,13 +1204,20 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
 		    (setq cast-type (buffer-substring-no-properties
 				     (+ 1 first-paren) second-paren))))
 
+          ;; If the parsed region is just white-space, move the start of the
+          ;; region to the end of the region to preserve the whitespace
+          (when (string-match "^\\(\\s-\\|\\s>\\)+$"
+                              (buffer-substring-no-properties jdee-parse-current-beginning
+                                                              jdee-parse-current-end))
+            (setq jdee-parse-current-beginning jdee-parse-current-end))
+
 	      (if cast-type
-		  (progn
-		    (setq jdee-parse-casting t)
-		    (list cast-type second-part))
-		(progn
-		  (setq jdee-parse-casting nil)
-		  (list first-part second-part))))
+              (progn
+                (setq jdee-parse-casting t)
+                (list cast-type second-part))
+            (progn
+              (setq jdee-parse-casting nil)
+              (list first-part second-part))))
 	    )))))
 
 (defun jdee-parse-isolate-to-parse (s)

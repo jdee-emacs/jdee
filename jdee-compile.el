@@ -185,6 +185,10 @@ describing how the compilation finished."
   :group 'jdee-compile-options
   :type 'boolean)
 
+(defvar jdee-compile-mute nil
+  "Setting to non-nil will silence some of the message")
+
+
 (defun jdee-compile-update-class-list ()
   (let ((class-dir
 	 (if (string= jdee-compile-option-directory "")
@@ -192,12 +196,14 @@ describing how the compilation finished."
 	   (jdee-normalize-path
 	    jdee-compile-option-directory
 	    'jdee-compile-option-directory))))
-    (message (concat "Updating class list for " class-dir))
+    (unless jdee-compile-mute
+      (message (concat "Updating class list for " class-dir)))
     (jdee-jeval (concat
 		"jde.util.JdeUtilities.updateClassList(\""
 		class-dir
-	       "\");"))
-    (message "Updating class list...done.")))
+                "\");"))
+    (unless jdee-compile-mute
+      (message "Updating class list...done."))))
 
 (defun jdee-compile-finish-update-class-info (buf msg)
   "Flush the classinfo cache and update the class list used by
@@ -211,7 +217,8 @@ don't know which classes were recompiled."
 	    (progn
 	      (setq jdee-complete-last-compiled-class (jdee-parse-get-buffer-class))
 	      (jdee-complete-flush-classes-in-cache (list jdee-complete-last-compiled-class))
-	      (message "Flushed completion cache.")
+              (unless jdee-compile-mute
+                (message "Flushed completion cache."))
 	      (setq jdee-complete-last-compiled-class nil)
 	      (jdee-compile-update-class-list))))
     (error nil)))
@@ -1490,6 +1497,7 @@ uses the compiler executable specified by
 
 
 
+    
 (provide 'jdee-compile)
 
 ;;; jdee-compile.el ends here

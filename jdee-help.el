@@ -1,5 +1,4 @@
-;;; jdee-help.el
-;; $Id$
+;;; jdee-help.el --- Functions for showing docs
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;;         Phillip Lord <plord@hgmp.mrc.ac.uk>
@@ -23,6 +22,10 @@
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
+
+;;; Commentary:
+
+;;; Code:
 
 (require 'beanshell)
 (require 'cl-lib)
@@ -726,6 +729,12 @@ Return the member selected by the user."
     (setq urlstr (jdee-url-append-file-name url "index.html"))
     (browse-url urlstr)))
 
+;;;###autoload
+(defun jdee-help-show-jdee-doc ()
+  "Opens the JDEE User's Guide info pages."
+  (interactive)
+  (info "(jdee)User's Guide"))
+
 (provide 'jdee-help)
 
-;; End of jdee-help.el
+;;; jdee-help.el ends here

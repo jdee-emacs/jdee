@@ -5,7 +5,8 @@
 ;; Keywords: java, tools
 ;; URL: http://github.com/jdee-emacs/jdee
 ;; Version: 2.4.2
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "24.3") (memoize "1.0.1") (dash "2.13.0"))
+
 
 ;; Copyright (C) 1997-2008 Paul Kinnucan.
 ;; Copyright (C) 2009 by Paul Landes
@@ -62,6 +63,9 @@
 (require 'jdee-project-file)
 (require 'jdee-refactor)
 (require 'jdee-run)
+(require 'jdee-stacktrace)
+(require 'jdee-archive)
+(require 'jdee-test)
 (require 'jdee-util)
 (require 'jdee-which-method)
 (require 'jdee-wiz)
@@ -103,9 +107,13 @@ See also the function `jdee-check-versions'."
    (cons "[?\C-c ?\C-v ?\C-a]" 'jdee-run-menu-run-applet)
    (cons "[?\C-c ?\C-v ?\C-b]" 'jdee-build)
    (cons "[?\C-c ?\C-v ?\C-c]" 'jdee-compile)
+   (cons "[?\C-c ?\C-v ?\C-u]" 'jdee-test-unittest)
    (cons "[?\C-c ?\C-v ?\C-d]" 'jdee-debug)
    (cons "[?\C-c ?\C-v ?\C-f]" 'jdee-find)
    (cons "[?\C-c ?\C-v ?\C-g]" 'jdee-open-class-at-point)
+   (cons "[?\C-c ?\C-v ?*]"    'jdee-fqn-to-kill-ring)
+   (cons "[?\C-c ?\C-v ?#]"    'jdee-stacktrace-buffer)
+   (cons "[?\C-c ?\C-v ?w]"    'jdee-archive-which)
    (cons "[?\C-c ?\C-v ?\C-k]" 'jdee-bsh-run)
    (cons "[?\C-c ?\C-v ?\C-l]" 'jdee-gen-println)
    (cons "[?\C-c ?\C-v ?\C-n]" 'jdee-help-browse-jdk-doc)
@@ -505,6 +513,7 @@ be an interactive function that can be called by
   :type '(radio
 	  (const :tag "Make" jdee-make)
 	  (const :tag "Ant" jdee-ant-build)
+	  (const :tag "Maven" jdee-maven-build)
 	  (function :tag "Custom function" identity)))
 
 ;;(makunbound 'jdee-debugger)
@@ -865,6 +874,10 @@ idle moments.")
 	;; Set up indentation of Java annotations.
 	(jdee-annotations-setup)
 
+        ;; Setup flycheck mode
+        (when (featurep 'flycheck)
+          (require 'jdee-flycheck)
+          (jdee-flycheck-mode))
 
 	;; The next form must be the last executed
 	;; by jdee-mode.
@@ -975,6 +988,7 @@ Does nothing but return nil if `jdee-log-max' is nil."
 	["Compile"           jdee-compile t]
 	;; ["Run App"           jdee-run (not (jdee-run-application-running-p))]
 	["Run App"           jdee-run t]
+	["Run Unit Test"     jdee-test-unittest t]
 	["Debug App"         jdee-debug t]
 	"-"
 	;;["-"                 ignore nil]
@@ -1069,6 +1083,9 @@ Does nothing but return nil if `jdee-log-max' is nil."
 	(list "Browse"
 	      ["Source Files"          jdee-show-speedbar t]
 	      ["Class at Point"        jdee-browse-class-at-point t]
+	      ["Copy Fully Qualified Class Name"        jdee-fqn-to-kill-ring t]
+              ["Stack Trace Buffer"        jdee-stacktrace-buffer t]
+              ["Location of Class"         jdee-archive-which t]
               )
 	["Check Style"  jdee-checkstyle]
 	(list "Project"
@@ -1104,7 +1121,7 @@ Does nothing but return nil if `jdee-log-max' is nil."
 	      [ "Fully Qualify Class" jdee-replace-fully-qualified-class-at-point t]
 	      )
 	(list "Help"
-	      ["JDEE Users Guide"      jdee-show-help t]
+	      ["JDEE Users Guide"      jdee-help-show-jdee-doc t]
 	      ["JDK"                   jdee-help-browse-jdk-doc t]
 	      ["JDEE Key Bindings"     jdee-keys t]
 	      "-"
@@ -1641,21 +1658,6 @@ expects to find the documentation in a subdirectory
 named doc of the directory that contains the file
 jde.el."
   (jdee-find-jdee-data-directory))
-
-;;;###autoload
-(defun jdee-show-help ()
-  "Displays the JDEE User's Guide in a browser."
-  (interactive)
-  (let* ((jdee-dir (jdee-find-jdee-doc-directory))
-	 (jdee-help
-	  (if jdee-dir
-	      (expand-file-name "doc/html/jdee-ug/jdee-ug.html" jdee-dir))))
-    (if (and
-	 jdee-help
-	 (file-exists-p jdee-help))
-	(browse-url (concat "file://" (jdee-convert-cygwin-path jdee-help)))
-      (signal 'error '("Cannot find JDEE help file.")))))
-
 
 ;; Problem reporting functions contributed by
 ;; Phillip Lord <plord < at > hgmp.mrc.ac.uk>.
@@ -2220,6 +2222,28 @@ version of speedar is installed."
   (interactive)
   (require 'speedbar)
   (speedbar-frame-mode))
+
+(defun jdee-fqn ()
+  "Return the fully qualified class name at point.  If not in a
+class, use the buffer name."
+  (interactive)
+  (let* ((pkg (jdee-db-get-package))
+         (class (or (jdee-db-get-class)
+                    (car (nth 1 (semantic-fetch-tags-fast)))))
+         (rtnval  (if pkg
+                      (format "%s%s" pkg class)
+                    class)))
+    rtnval))
+
+(defun jdee-fqn-to-kill-ring ()
+  "Copy the qualified class name of class containing point to the kill ring.
+Return the fully qualified name."
+  (interactive)
+  (let* ((fqn (jdee-fqn)))
+    (kill-new fqn)
+    (when (called-interactively-p 'any)
+      (message "%s added to kill ring" fqn))
+    fqn))
 
 (defun jdee-browse-class-at-point ()
   "Displays the class of the object at point in the BeanShell Class
