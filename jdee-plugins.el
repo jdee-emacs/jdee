@@ -57,10 +57,12 @@ type `jdee-plugin'."
   (oset-default
    'jdee-plugin
    plugins
-   (cons plugin (cl-mapcan (lambda (p) (if (not (equal (eieio-object-name-string p)
-                                                       (eieio-object-name-string plugin)))
-                                           (list p)))
-                           (oref-default 'jdee-plugin plugins)))))
+   (cons plugin
+         ;; Remove any old version of the plugin
+         (cl-delete plugin (oref-default 'jdee-plugin plugins) 
+                    :test (lambda (a b)
+                            (string= (eieio-object-name-string a)
+                                     (eieio-object-name-string b)))))))
 
 
 (defun jdee-pi-get-plugin-dir (plugin)
