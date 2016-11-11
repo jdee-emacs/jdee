@@ -244,8 +244,8 @@ don't know which classes were recompiled."
 (defun jdee-compile-finish-kill-buffer (buf msg)
   "Removes the jdee-compile window after a few seconds if no errors."
   (with-current-buffer buf
-    (if (null (or (string-match ".*exited abnormally.*" msg)
-		  (string-match ".*BUILD FAILED.*" (buffer-string))))
+    (if (null (or (string-match "exited abnormally" msg)
+		  (string-match "BUILD FAILED" (buffer-string))))
 	;;no errors, make the compilation window go away in a few seconds
 	(if (if (numberp jdee-compile-enable-kill-buffer)
 		(not (minusp jdee-compile-enable-kill-buffer))
