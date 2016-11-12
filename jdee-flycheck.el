@@ -28,16 +28,13 @@
 
 ;;; Code:
 
-
 (require 'flycheck)
-
 
 (defclass jdee-flycheck-compiler (jdee-compile-compiler)
   ((post-fn         :initarg :post-fn
                     :type function
                     :documentation
-                    "Function to run after compilation is complete.")
-   )
+                    "Function to run after compilation is complete."))
   "Compiler used by flycheck mode to compile in the background.
   Hides the output buffer so the user can continue to edit the
   file.")
@@ -64,7 +61,7 @@
 
 (defun jdee-flycheck-unmute (&rest _)
   (set 'jdee-compile-mute nil))
-    
+
 (defmethod jdee-compile-compile ((this jdee-flycheck-compiler))
 
   (if (oref this :use-server-p)
@@ -75,14 +72,12 @@
               (oref this post-fn)
               nil t)
     (add-hook 'jdee-compile-finish-hook 'jdee-flycheck-unmute t))
-  
-
 
   ;; Pop to compilation buffer.
   (let* ((outbuf (oref (oref this buffer) buffer)))
-;;    (outwin (display-buffer outbuf)))
-;;    (compilation-set-window-height outwin)
-;;    (oset this :window outwin)
+    ;;    (outwin (display-buffer outbuf)))
+    ;;    (compilation-set-window-height outwin)
+    ;;    (oset this :window outwin)
 
     (if compilation-process-setup-function
         (funcall compilation-process-setup-function))
@@ -91,9 +86,8 @@
 
     (setq compilation-last-buffer outbuf)))
 
-
-(defun jdee-flycheck-javac-command ( checker cback )
-  ;(message "Calling jdee-flycheck-javac-command")
+(defun jdee-flycheck-javac-command (checker cback)
+  ;;(message "Calling jdee-flycheck-javac-command")
   (jdee-flycheck-compile-buffer checker cback))
 
 (defun jdee-flycheck-compile-buffer-error (checker file line col message buffer)
@@ -117,10 +111,9 @@ An error looks like:
                                ^
 
 The caret indicates the column of the error.  This function looks
-for the caret and converts it to a column number.
-"
-  (when (looking-at "\\( *\\)^") 
-     (length (match-string 1))))
+for the caret and converts it to a column number."
+  (when (looking-at "\\( *\\)^")
+    (length (match-string 1))))
 
 (defun jdee-flycheck-compile-buffer-after (checker cback orig-file orig-buffer
                                                    temp-file temp-buffer)
@@ -148,7 +141,7 @@ cleans up after the compilation."
                   (line (match-string 2))
                   (message (match-string 3))
                   ;; jdee-flymake-1get-col changes search data; do it last
-                (col (jdee-flymake-get-col)))
+                  (col (jdee-flymake-get-col)))
               (add-to-list 'errors
                            (jdee-flycheck-compile-buffer-error checker
                                                                file
@@ -156,22 +149,24 @@ cleans up after the compilation."
                                                                col
                                                                message
                                                                orig-buffer))))
-          
+
           (kill-buffer temp-buffer)
           ;;(kill-buffer buf)
           (set (make-local-variable 'jdee-compile-jump-to-first-error) nil)
           (set 'jdee-compile-mute t)
-                                        ;(message "ERRORS: %s" errors)
+          ;;(message "ERRORS: %s" errors)
           (funcall cback 'finished errors))))))
 
 (defun jdee-flycheck-find-next-error ()
-  ;; To avoid stack overflow while executing regex search over possibly long lines, 
+  ;; To avoid stack overflow while executing regex search over possibly long lines,
   ;; hone in on only those lines that contain the magic string "error:"
   (if (search-forward "error:" nil t)
       (progn
         (beginning-of-line)
-        (or (re-search-forward "^\\(.*\\):\\([0-9]+\\): *error:\\(.*\\)$" (save-excursion (end-of-line) (point)) t)
-                        (progn (forward-line) (jdee-flycheck-find-next-error))))))
+        (or (re-search-forward "^\\(.*\\):\\([0-9]+\\): *error:\\(.*\\)$"
+                               (save-excursion (end-of-line) (point))
+                               t)
+            (progn (forward-line) (jdee-flycheck-find-next-error))))))
 
 (defun jdee-flycheck-cleanup ()
   "Cleans up after flycheck.
@@ -181,7 +176,6 @@ Deletes the temporary files listed in `jdee-flycheck-temp-files'"
     (cond
      ((file-directory-p temp-file) (delete-directory temp-file t))
      ((file-exists-p temp-file) (delete-file temp-file)))))
-     
 
 (defvar jdee-flycheck-temp-files nil
   "Files to delete whean the buffer is killed.")
@@ -200,7 +194,7 @@ file and buffer with the contents of the current buffer and compiles that one."
       (add-to-list (make-local-variable 'jdee-flycheck-temp-files) dir)
       (insert-file-contents-literally temp-file)
       (setq buffer-file-name temp-file)
-      
+
       (add-hook 'kill-buffer-hook 'jdee-flycheck-cleanup nil t)
       ;; Don't write the class file to the source directory
       (unless jdee-compile-option-directory
@@ -213,7 +207,7 @@ file and buffer with the contents of the current buffer and compiles that one."
               (setq compilation-finish-functions nil)))
 
       (let ((compiler (jdee-flycheck-compiler "flycheck")))
-        (oset compiler post-fn 
+        (oset compiler post-fn
               (jdee-flycheck-compile-buffer-after checker cback
                                                   orig-file orig-buffer
                                                   temp-file (current-buffer)))
@@ -226,27 +220,27 @@ file and buffer with the contents of the current buffer and compiles that one."
 ;;   (if (not (comint-check-proc "*groovy*"))
 ;;       (funcall cback 'finished nil)
 ;;     (let* ((pom-path malabar-mode-project-file)
-;; 	   (pm  malabar-mode-project-manager)
-;; 	   (buffer (current-buffer))
-;; 	   (func (if (buffer-modified-p) 'malabar-parse-scriptbody-raw 'malabar-parse-script-raw))
-;; 	   (script (if (buffer-modified-p) (buffer-string) (buffer-file-name))))
-      
-;;       ;;(message "flycheck with func:%s" func) 
+;;         (pm  malabar-mode-project-manager)
+;;         (buffer (current-buffer))
+;;         (func (if (buffer-modified-p) 'malabar-parse-scriptbody-raw 'malabar-parse-script-raw))
+;;         (script (if (buffer-modified-p) (buffer-string) (buffer-file-name))))
+
+;;       ;;(message "flycheck with func:%s" func)
 ;;       (funcall func
 ;;        (lambda (_status)
-;; 	 ;(message "%s %s %s" status (current-buffer) url-http-end-of-headers)
-;; 	 (condition-case err
-;; 	     (progn
-;; 	       (goto-char url-http-end-of-headers)
-;; 	       (let ((error-list (jdee-flycheck-error-parser (json-read) checker buffer)))
-;; 		 (kill-buffer (current-buffer))
-;; 		 ;(message "ERROR LIST:%s" error-list)
-;; 		 (with-current-buffer buffer
-;; 		   (funcall cback 'finished error-list))))
-;; 	   (error (let ((msg (error-message-string err)))
-;; 		    (message "flycheck error: %s" msg)
-;; 		    (pop-to-buffer (current-buffer))
-;; 		    (funcall cback 'errored msg)))))
+;;       ;(message "%s %s %s" status (current-buffer) url-http-end-of-headers)
+;;       (condition-case err
+;;           (progn
+;;             (goto-char url-http-end-of-headers)
+;;             (let ((error-list (jdee-flycheck-error-parser (json-read) checker buffer)))
+;;               (kill-buffer (current-buffer))
+;;               ;(message "ERROR LIST:%s" error-list)
+;;               (with-current-buffer buffer
+;;                 (funcall cback 'finished error-list))))
+;;         (error (let ((msg (error-message-string err)))
+;;                  (message "flycheck error: %s" msg)
+;;                  (pop-to-buffer (current-buffer))
+;;                  (funcall cback 'errored msg)))))
 ;;        pm pom-path script))))
 
 
@@ -263,26 +257,25 @@ file and buffer with the contents of the current buffer and compiles that one."
 ;;    :message (cdr (assq  'message error-info))
 ;;    :level 'error))
 
-   
+
 
 ;; (defun jdee-flycheck-error-parser (output checker buffer)
 ;;   "Parse errors in OUTPUT which is a JSON array"
 ;;   (let ((rtnval (mapcar (lambda (e)
-;; 			  (jdee-flycheck-error-new checker e buffer))
-;; 			output)))
+;;                        (jdee-flycheck-error-new checker e buffer))
+;;                      output)))
 ;;     rtnval))
-	
+
 ;;;###autoload
 (defun jdee-flycheck-mode ()
   (flycheck-define-generic-checker 'jdee-flycheck-javac-checker
     "Integrate flycheck with the jdee using javac."
     :start #'jdee-flycheck-javac-command
-    :modes '(jdee-mode)
-    )
-  
+    :modes '(jdee-mode))
+
   (add-to-list 'flycheck-checkers 'jdee-flycheck-javac-checker)
-  (flycheck-mode)
-)
+  (flycheck-mode))
+
 (provide 'jdee-flycheck)
 
 ;;; jdee-flycheck.el ends here
