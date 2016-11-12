@@ -29,17 +29,6 @@
 (require 'jdee-font-lock)
 (require 'ert)
 
-(defmacro jdee-test-with-temp-buffer (content &rest body)
-  "Evaluate BODY in a temporary buffer with CONTENTS."
-  (declare (debug t)
-           (indent 1))
-  `(with-temp-buffer
-     (insert ,content)
-     (jdee-mode)
-     (font-lock-fontify-buffer)
-     (goto-char (point-min))
-     ,@body))
-
 (defun jdee-test-face-at (pos &optional content)
   "Get the face at POS in CONTENT.
 If CONTENT is not given, return the face at POS in the current
