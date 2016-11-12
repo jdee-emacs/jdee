@@ -142,7 +142,7 @@ cleans up after the compilation."
           (replace-match orig-file))
         (let ((errors nil))
           (goto-char (point-min))
-          (while (re-search-forward "^\\(.*\\):\\([0-9]+\\): *error:\\(.*\\)$" nil t)
+          (while (jdee-flycheck-find-next-error)
             (forward-line 2)
             (let ((file (match-string 1))
                   (line (match-string 2))
@@ -163,6 +163,15 @@ cleans up after the compilation."
           (set 'jdee-compile-mute t)
                                         ;(message "ERRORS: %s" errors)
           (funcall cback 'finished errors))))))
+
+(defun jdee-flycheck-find-next-error ()
+  ;; To avoid stack overflow while executing regex search over possibly long lines, 
+  ;; hone in on only those lines that contain the magic string "error:"
+  (if (search-forward "error:" nil t)
+      (progn
+        (beginning-of-line)
+        (or (re-search-forward "^\\(.*\\):\\([0-9]+\\): *error:\\(.*\\)$" (save-excursion (end-of-line) (point)) t)
+                        (progn (forward-line) (jdee-flycheck-find-next-error))))))
 
 (defun jdee-flycheck-cleanup ()
   "Cleans up after flycheck.
