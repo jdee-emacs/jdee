@@ -2229,7 +2229,7 @@ class, use the buffer name."
   (interactive)
   (let* ((pkg (jdee-db-get-package))
          (class (or (jdee-db-get-class)
-                    (car (nth 1 (semantic-fetch-tags-fast)))))
+                    (caar (semantic-find-tags-by-type "class" (current-buffer)))))
          (rtnval  (if pkg
                       (format "%s%s" pkg class)
                     class)))
