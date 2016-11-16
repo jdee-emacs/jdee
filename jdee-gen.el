@@ -4131,6 +4131,36 @@ by rebinding the Return key to its original binding."
       (message "electric return mode on")
     (message "electric return mode off")))
 
+(defvar jdee-gen-test-path "src/main/test")
+
+(defvar jdee-gen-test-class-name-pattern "Test%s.java")
+
+(defun jdee-gen-test-class-name (class-name)
+  (format jdee-gen-test-class-name-pattern class-name))
+
+(defun jdee-gen-to-test-name (path)
+  (when path
+    (format "%s%s"
+            (file-name-directory path)
+            (jdee-gen-test-class-name (file-name-nondirectory path)))))
+
+(defun jdee-gen-jump-to-unit-test ()
+  "Find and load the unit test for this buffer"
+  (interactive)
+  (let* ((fqn (jdee-fqn))
+         (prj-dir (file-name-directory jdee-current-project))
+         (test-source-dir (expand-file-name jdee-gen-test-path prj-dir)))
+    (when (and prj-dir fqn)
+      (let* ((full-path (expand-file-name 
+                         (jdee-gen-to-test-name (jdee-package-to-slashes fqn))
+                         test-source-dir))
+             (dir (file-name-directory full-path)))
+        (when (not (file-directory-p dir))
+          (make-directory dir t))
+        (find-file-other-window full-path)))))
+
+
+
 (provide 'jdee-gen)
 
 ;;; jdee-gen.el ends here
