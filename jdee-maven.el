@@ -202,6 +202,7 @@ DIR is the directory containing the pom.xml.  If nil, hunt for it."
             (jdee-set-variables (list 'jdee-global-classpath  (cons 'list (append rp classpath)))
                                 '(jdee-build-function 'jdee-maven-build)
                                 '(jdee-test-function 'jdee-maven-unit-test)
+                                (list 'jdee-built-class-path (cons 'list rp))
                                 (list 'jdee-run-working-directory pom-dir)
                                 (list 'jdee-run-option-classpath (cons 'list (append rp classpath)))
                                 (list 'jdee-db-option-classpath (cons 'list (append rp sp classpath)))
