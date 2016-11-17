@@ -94,12 +94,11 @@ Note: According to the Java Code Convention [section 6.4], this value should
   :group 'jdee-gen
   :type  'boolean)
 
-(defcustom jdee-gen-test-path "src/main/test"
-  "The directory within a project where test code is stored.  For
-maven \"src/main/test\" is a good answer."
+(defcustom jdee-gen-test-path "src/test/java"
+  "The directory within a project where test code is stored.  For Maven
+and Gradle \"src/test/java\" is standard path."
   :group 'jdee-gen
   :type  'string)
-
 
 
 (defcustom jdee-gen-space-after-castings t
