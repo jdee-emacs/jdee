@@ -238,8 +238,8 @@ command `jdee-junit-test-class', as a side-effect."
    "'n"
    "(progn (require 'jdee-javadoc) (jdee-javadoc-insert-start-block))"
    "\" * \""
-   "\" Unit Test for class \""
-   "(jdee-junit-get-testee-name (file-name-sans-extension (file-name-nondirectory buffer-file-name))) '>'n"
+   "\" Unit Test for class {@link \""
+   "(jdee-junit-get-testee-name (file-name-sans-extension (file-name-nondirectory buffer-file-name))) \"}.\" '> 'n"
    "\" \" (jdee-javadoc-insert-empty-line)"
    "\" \" (jdee-javadoc-insert-empty-line)"
    "\" * Created: \" (current-time-string) '>'n"
@@ -278,10 +278,10 @@ command `jdee-junit-test-class', as a side-effect."
    "'>'n"
    "'n"
    "\"/**\" '>'n"
-   "\"* @return a <code>TestMethod</code>\" '>'n"
+   "\"* Sample unit test\" '>'n"
    "\"*/\" '>'n"
    "\"@Test\" '>'n"
-   "\"public void testMethod() \" '>"
+   "\"public void testMethod() throws Exception \" '>"
 
    "(if jdee-gen-k&r "
    "() "
@@ -380,7 +380,9 @@ more information, see http://www.junit.org."
           
           (set-auto-mode)
           (goto-char (point-min))
-          (search-forward "{")
+          (re-search-forward "@link")
+          (c-indent-line)
+          (re-search-forward "public class \\w+ {")
           (backward-char 1)
           (c-indent-exp)
           (tempo-forward-mark)
