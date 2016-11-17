@@ -40,8 +40,6 @@
 
 ;;; Code:
 
-(require 'jdee-junit)
-
 (defgroup jdee-test-options nil
   "JDE Unit Testing Options"
   :group 'jdee
