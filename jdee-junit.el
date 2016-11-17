@@ -339,8 +339,8 @@ command `jdee-junit4-test-class', as a side-effect."
   (interactive)
   (jdee-junit4-test-class-internal))
 
-(defvar jdee-junit-test-path "src/main/test")
-(defvar jdee-junit-test-extension ".javwa")
+(defvar jdee-junit-test-path "src/test/java")
+(defvar jdee-junit-test-extension ".java")
 
 (defun jdee-junit-test-class-dir ()
   (let*((prj-dir (file-name-directory jdee-current-project))
