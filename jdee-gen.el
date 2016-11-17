@@ -94,6 +94,14 @@ Note: According to the Java Code Convention [section 6.4], this value should
   :group 'jdee-gen
   :type  'boolean)
 
+(defcustom jdee-gen-test-path "src/main/test"
+  "The directory within a project where test code is stored.  For
+maven \"src/main/test\" is a good answer."
+  :group 'jdee-gen
+  :type  'string)
+
+
+
 (defcustom jdee-gen-space-after-castings t
   "*If non-nil, add space between a class casting and what comes after it."
   :group 'jdee-gen
@@ -356,21 +364,35 @@ by the car of `jdee-gen-interface-to-gen'."
 	  (goto-char ins-pos)
 	  (jdee-wiz-implement-interface-internal interface)))))
 
-(defun jdee-gen-get-package-statement ()
+(defvar jdee-gen-package-name nil)
+
+(defun jdee-gen-get-package-statement (&optional package)
+  "Return the formated package statement to insert into a java buffer.
+
+If PACKAGE is set, use it as a default.
+
+Ask the user for confirmation.  Also sets buffer local
+`jdee-gen-package-name'."
   (require 'jdee-package)
   (let* ((package-dir (jdee-package-get-package-directory))
 	 (suggested-package-name
-	  (if (or
-	       (string= package-dir jdee-package-unknown-package-name)
-	       (string= package-dir ""))
-	      nil
-	    (jdee-package-convert-directory-to-package package-dir)))
+          (or package
+              (if (or
+                   (string= package-dir jdee-package-unknown-package-name)
+                   (string= package-dir ""))
+                  nil
+                (jdee-package-convert-directory-to-package package-dir))))
 	 (package-name
-	  (read-from-minibuffer "Package: " suggested-package-name)))
+          (or jdee-gen-package-name
+              (read-from-minibuffer "Package: " suggested-package-name))))
     (if (and
 	 package-name
 	 (not (string= package-name "")))
-	(format "package %s;\n\n" package-name))))
+        (progn
+          (set (make-local-variable 'jdee-gen-package-name) package-name)
+          (format "package %s;\n\n" package-name)))))
+          
+      
 
 
 (defcustom jdee-gen-method-signature-padding-1 ""
@@ -4130,35 +4152,6 @@ by rebinding the Return key to its original binding."
   (if jdee-electric-return-mode
       (message "electric return mode on")
     (message "electric return mode off")))
-
-(defvar jdee-gen-test-path "src/main/test")
-
-(defvar jdee-gen-test-class-name-pattern "Test%s.java")
-
-(defun jdee-gen-test-class-name (class-name)
-  (format jdee-gen-test-class-name-pattern class-name))
-
-(defun jdee-gen-to-test-name (path)
-  (when path
-    (format "%s%s"
-            (file-name-directory path)
-            (jdee-gen-test-class-name (file-name-nondirectory path)))))
-
-(defun jdee-gen-jump-to-unit-test ()
-  "Find and load the unit test for this buffer"
-  (interactive)
-  (let* ((fqn (jdee-fqn))
-         (prj-dir (file-name-directory jdee-current-project))
-         (test-source-dir (expand-file-name jdee-gen-test-path prj-dir)))
-    (when (and prj-dir fqn)
-      (let* ((full-path (expand-file-name 
-                         (jdee-gen-to-test-name (jdee-package-to-slashes fqn))
-                         test-source-dir))
-             (dir (file-name-directory full-path)))
-        (when (not (file-directory-p dir))
-          (make-directory dir t))
-        (find-file-other-window full-path)))))
-
 
 
 (provide 'jdee-gen)

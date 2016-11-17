@@ -192,6 +192,9 @@ The best is the shortest one that could be found."
       jdee-package-unknown-package-name))
 
 
+(defun jdee-package-to-slashes (package)
+  (subst-char-in-string ?. ?/ package))
+
 (defun jdee-package-convert-directory-to-package (dir)
   "Convert directory path DIR to a valid Java package name.
 Replace ?/ by ?. and remove extra ?/ at end."
