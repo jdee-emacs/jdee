@@ -48,6 +48,16 @@
   :group 'jdee
   :prefix "jdee-junit-")
 
+;;
+
+(defcustom jdee-junit-test-class-generator 'jdee-junit4-test-class-internal
+  "Which template to use to fill in a new unit test.  This is a
+function that takes no arguments and inserts the contents in to
+the current buffer.  The tempo package makes a good template.
+See `jdee-junit4-test-class-internal' as an example."
+  :group 'jdee-junit
+  :type 'symbol)
+
 (defcustom jdee-junit-working-directory ""
   "*Path of the working directory for the test run.
 If you specify a path, the JDE launches the test run from the
@@ -70,10 +80,11 @@ edit field."
 	  (string :tag "Custom UI")))
 
 ;; (makunbound 'jdee-junit-tester-name-tag)
-(defcustom jdee-junit-tester-name-tag (cons "T" "prefix")
-  "Specifies a tag appended or prefixed to the name of a testee class to
-create the name of the corresponding tester class, e.g., T or Test, as
-in TFoo or FooTest."
+(defcustom jdee-junit-tester-name-tag (cons "Test" nil)
+  "Specifies a tag appended or prefixed to the name of a testee
+class to create the name of the corresponding tester class, e.g.,
+T or Test, as in TFoo or FooTest.  Having a test suffix plays
+nicely with `projectile-mode'."
   :group 'jdee-junit
   :tag "Test Class Name Tag"
   :type '(cons
@@ -219,15 +230,16 @@ command `jdee-junit-test-class', as a side-effect."
   (list
    "(funcall jdee-gen-boilerplate-function)"
    "(jdee-gen-get-package-statement)"
-   "\"import junit.framework.JUnit4TestAdapter;\" '>'n"
    "\"import org.junit.Assert;\" '>'n"
-   "\"import static org.junit.Assert.*;\" '>'n"
    "\"import org.junit.Test;\" '>'n"
+   "'n"
+   "\"import static org.junit.Assert.*;\" '>'n"
+   "\"import junit.framework.JUnit4TestAdapter;\" '>'n"
    "'n"
    "(progn (require 'jdee-javadoc) (jdee-javadoc-insert-start-block))"
    "\" * \""
-   "\" Unit Test for class \""
-   "(jdee-junit-get-testee-name (file-name-sans-extension (file-name-nondirectory buffer-file-name))) '>'n"
+   "\" Unit Test for class {@link \""
+   "(jdee-junit-get-testee-name (file-name-sans-extension (file-name-nondirectory buffer-file-name))) \"}.\" '> 'n"
    "\" \" (jdee-javadoc-insert-empty-line)"
    "\" \" (jdee-javadoc-insert-empty-line)"
    "\" * Created: \" (current-time-string) '>'n"
@@ -266,10 +278,10 @@ command `jdee-junit-test-class', as a side-effect."
    "'>'n"
    "'n"
    "\"/**\" '>'n"
-   "\"* @return a <code>TestMethod</code>\" '>'n"
+   "\"* Sample unit test\" '>'n"
    "\"*/\" '>'n"
    "\"@Test\" '>'n"
-   "\"public void testMethod() \" '>"
+   "\"public void testMethod() throws Exception \" '>"
 
    "(if jdee-gen-k&r "
    "() "
@@ -327,6 +339,14 @@ command `jdee-junit4-test-class', as a side-effect."
   (interactive)
   (jdee-junit4-test-class-internal))
 
+(defvar jdee-junit-test-path "src/test/java")
+(defvar jdee-junit-test-extension ".java")
+
+(defun jdee-junit-test-class-dir ()
+  (let*((prj-dir (file-name-directory jdee-current-project))
+        (test-source-dir (expand-file-name jdee-gen-test-path prj-dir)))
+    test-source-dir))
+
 ;;;###autoload
 (defun jdee-junit-test-class-buffer ()
   "Create a buffer containing a skeleton unit test class having the same name as the
@@ -337,17 +357,37 @@ where CLASS is the name of the class to be tested, e.g., MyAppTest.java. Use
 tests generated with this template requires the JUnit test framework. For
 more information, see http://www.junit.org."
   (interactive)
-  (let ((tester-name
-	 (jdee-junit-get-tester-name
-	  (file-name-sans-extension
-	   (file-name-nondirectory buffer-file-name)))))
-    (find-file (concat tester-name ".java"))
-    (jdee-junit-test-class-internal)
-    (goto-char (point-min))
-    (search-forward "{")
-    (backward-char 1)
-    (c-indent-exp)
-    (tempo-forward-mark)))
+  (let* ((tester-name
+          (jdee-junit-get-tester-name
+           (file-name-sans-extension
+            (file-name-nondirectory buffer-file-name))))
+         (test-class-name (format "%s%s" tester-name jdee-junit-test-extension))
+         (package (replace-regexp-in-string "[.]$" "" (jdee-db-get-package)))
+         (_ (jdee-gen-get-package-statement package)) ;; called to set jdee-gen-package-name
+         (dir (expand-file-name (jdee-package-to-slashes jdee-gen-package-name) (jdee-junit-test-class-dir)))
+         (full-path (expand-file-name test-class-name dir))
+         (buf (or (get-buffer test-class-name)
+                  (and (file-exists-p full-path) (find-file full-path)))))
+    (if (and buf (< 0 (buffer-size buf)))
+        (display-buffer buf)
+      (let ((buf (get-buffer-create test-class-name)))
+        (with-current-buffer buf
+          (jdee-gen-get-package-statement package) ;; called to set jdee-gen-package-name
+          (setq default-directory dir
+                buffer-file-name full-path)
+          (rename-buffer test-class-name)
+          (funcall jdee-junit-test-class-generator)      
+          
+          (set-auto-mode)
+          (goto-char (point-min))
+          (re-search-forward "@link")
+          (c-indent-line)
+          (re-search-forward "public class \\w+ {")
+          (backward-char 1)
+          (c-indent-exp)
+          (tempo-forward-mark)
+          (display-buffer (current-buffer))
+          )))))
 
 ;;;###autoload
 (defun jdee-junit4-test-class-buffer ()

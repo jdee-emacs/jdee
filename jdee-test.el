@@ -40,20 +40,13 @@
 
 ;;; Code:
 
-
 (defgroup jdee-test-options nil
   "JDE Unit Testing Options"
   :group 'jdee
   :prefix "jdee-test-option-")
 
-(defcustom jdee-test-function 'jdee-test-function-default
-    "Check if we have the new (21.3+) compile.el.
-Set this to t if you are running an Emacs with the new compile.el
-and want to get slightly better font-locking in the compile
-buffer.  A value of nil will force the use of older style
-compilation-error-regexp.  This variable tries to auto-detect the
-compile.el version by checking if
-`compilation-error-regexp-alist-alist' is defined."
+(defcustom jdee-test-function 'jdee-junit-run
+    "The function to run to do a unit test"
   :group 'jdee-compile-options
   :type 'function)
 

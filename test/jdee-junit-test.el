@@ -7,7 +7,7 @@
 
 (ert-deftest test-jdee-junit ()
   "Test jdee-junit-get-tester-name function"
-  (should (string= "TDynamicClassLoader"
+  (should (string= "DynamicClassLoaderTest"
                    (jdee-junit-get-tester-name "DynamicClassLoader"))))
 
 

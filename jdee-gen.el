@@ -94,6 +94,13 @@ Note: According to the Java Code Convention [section 6.4], this value should
   :group 'jdee-gen
   :type  'boolean)
 
+(defcustom jdee-gen-test-path "src/test/java"
+  "The directory within a project where test code is stored.  For Maven
+and Gradle \"src/test/java\" is standard path."
+  :group 'jdee-gen
+  :type  'string)
+
+
 (defcustom jdee-gen-space-after-castings t
   "*If non-nil, add space between a class casting and what comes after it."
   :group 'jdee-gen
@@ -356,21 +363,35 @@ by the car of `jdee-gen-interface-to-gen'."
 	  (goto-char ins-pos)
 	  (jdee-wiz-implement-interface-internal interface)))))
 
-(defun jdee-gen-get-package-statement ()
+(defvar jdee-gen-package-name nil)
+
+(defun jdee-gen-get-package-statement (&optional package)
+  "Return the formated package statement to insert into a java buffer.
+
+If PACKAGE is set, use it as a default.
+
+Ask the user for confirmation.  Also sets buffer local
+`jdee-gen-package-name'."
   (require 'jdee-package)
   (let* ((package-dir (jdee-package-get-package-directory))
 	 (suggested-package-name
-	  (if (or
-	       (string= package-dir jdee-package-unknown-package-name)
-	       (string= package-dir ""))
-	      nil
-	    (jdee-package-convert-directory-to-package package-dir)))
+          (or package
+              (if (or
+                   (string= package-dir jdee-package-unknown-package-name)
+                   (string= package-dir ""))
+                  nil
+                (jdee-package-convert-directory-to-package package-dir))))
 	 (package-name
-	  (read-from-minibuffer "Package: " suggested-package-name)))
+          (or jdee-gen-package-name
+              (read-from-minibuffer "Package: " suggested-package-name))))
     (if (and
 	 package-name
 	 (not (string= package-name "")))
-	(format "package %s;\n\n" package-name))))
+        (progn
+          (set (make-local-variable 'jdee-gen-package-name) package-name)
+          (format "package %s;\n\n" package-name)))))
+          
+      
 
 
 (defcustom jdee-gen-method-signature-padding-1 ""
@@ -4130,6 +4151,7 @@ by rebinding the Return key to its original binding."
   (if jdee-electric-return-mode
       (message "electric return mode on")
     (message "electric return mode off")))
+
 
 (provide 'jdee-gen)
 
