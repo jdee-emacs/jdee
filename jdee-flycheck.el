@@ -113,7 +113,7 @@ An error looks like:
 The caret indicates the column of the error.  This function looks
 for the caret and converts it to a column number."
   (when (looking-at "\\( *\\)^")
-    (length (match-string 1))))
+    (1+ (length (match-string 1)))))
 
 (defun jdee-flycheck-compile-buffer-after (checker cback orig-file orig-buffer
                                                    temp-file temp-buffer)
