@@ -64,7 +64,7 @@
 
 (defmethod jdee-compile-compile ((this jdee-flycheck-compiler))
 
-  (if (oref this :use-server-p)
+  (if (oref this use-server-p)
       (oset this buffer (jdee-compile-server-buffer "compilation buffer"))
     (oset this buffer (jdee-compile-exec-buffer "compilation buffer")))
   (with-current-buffer (oref (oref this buffer) buffer)
