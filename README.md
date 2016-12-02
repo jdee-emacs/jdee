@@ -80,5 +80,6 @@ Some of the features of JDEE include:
 ## Authors
 
 - Paul Kinnucan (original author and contributor)
-- Paul Landes (current maintainer)
-- Shyamal Prasad (current maintainer)
+- Przemysław Wojnowski (primary maintainer/owner)
+- Paul Landes (maintainer)
+- Shyamal Prasad (maintainer)
