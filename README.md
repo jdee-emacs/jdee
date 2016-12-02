@@ -83,3 +83,4 @@ Some of the features of JDEE include:
 - Przemysław Wojnowski (primary maintainer/owner)
 - Paul Landes (maintainer)
 - Shyamal Prasad (maintainer)
+- Phil Lord (maintainer)
