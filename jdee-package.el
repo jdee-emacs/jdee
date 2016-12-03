@@ -116,14 +116,14 @@
   :type 'hook)
 
 (defcustom jdee-package-package-comment
-  " // Generated package name"
+  ""
   "*Java line comment appended to the generated package statement.
 An empty string suppress the generation of this comment."
   :group 'jdee-package
   :type 'string)
 
 (defcustom jdee-package-default-package-comment
-  "// Default package used"
+  ""
   "*Java line comment generated when the default package is used.
 An empty string suppress the generation of this comment."
   :group 'jdee-package
