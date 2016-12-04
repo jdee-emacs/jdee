@@ -724,6 +724,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 		     :documentation
 		     "Window that displays the compilation buffer.")
    (interactive-args :initarg :interactive-args
+                     :initfom nil
 		     :type list
 		     :documentation
 		     "Arguments entered in the minibuffer.")
