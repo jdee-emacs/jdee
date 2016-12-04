@@ -28,11 +28,6 @@
 ;; possible, calling the completion function again will cycle through
 ;; all the possibilities (as dabbrev-mode does).
 
-;; To retrieve all the possible completions, it uses the java code in
-;; jde.util.Completion.getClassInfo(), called by beanshell.  That
-;; need the class to be compiled (but that's not worst than an etag
-;; call).
-
 ;; Known bugs/problems :
 
 ;; TODO

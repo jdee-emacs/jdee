@@ -1,4 +1,4 @@
-;;; jdee-javadoc.el --- JDE javadoc autodoc
+;;; jdee-javadoc.el --- JDEE javadoc autodoc
 
 ;; Author: David Ponce <david@dponce.com>
 ;; Maintainer: David Ponce

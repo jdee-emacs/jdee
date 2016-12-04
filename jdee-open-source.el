@@ -1,5 +1,4 @@
 ;; jdee-open-source.el -- Open class source files
-;; $Id$
 ;;
 ;; Author: Klaus Berndl
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -610,4 +609,4 @@ project's source path. See `jdee-sourcepath' for more information." class))))
 
 (provide 'jdee-open-source)
 
-;; End of jdee-open-source.el
+;;; jdee-open-source.el ends here

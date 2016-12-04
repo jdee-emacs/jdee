@@ -1,5 +1,4 @@
 ;;; jdee-bsh.el -- Beanshell JDEE integration.
-;; $Id: jde.el 127 2009-08-12 08:22:57Z paullandes $
 
 ;; Author: Paul Kinnucan <pkinnucan@attbi.com>
 ;; Maintainer: Paul Landes
@@ -25,9 +24,7 @@
 
 ;;; Commentary:
 
-;; This library has beanshell specific functionality.  Most of it was taken
-;; from jde.el and placed here in an attempt to make jde.el a little skinner
-;; and make a home for beanshell specific code.
+;; This library has beanshell specific functionality.
 
 ;;; Code:
 
@@ -381,4 +378,4 @@ NO-QUOTE-WRAP-P, if non-nil, don't add double quotes around the whole statement.
 
 (provide 'jdee-bsh)
 
-;; End of jdee-bsh.el
+;;; jdee-bsh.el ends here

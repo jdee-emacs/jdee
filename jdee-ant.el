@@ -1,11 +1,8 @@
-;; jdee-ant.el --- Use Apache Ant to build your JDE projects
-;; $Id$
+;;; jdee-ant.el --- Frontend to Apache Ant
 
 ;; Copyright (C) 2009 by Paul Landes
 ;; Author: Jason Stell | jason.stell@globalone.net
 ;; Author: Kevin A. Burton ( burton@openprivacy.org )
-;; Created: 19 Oct 2000
-;; Version 1.4.4
 
 ;; This file is not part of Emacs
 
@@ -24,21 +21,10 @@
 ;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
-;; Commentary:
+;;; Commentary:
 ;; This file defines jdee-ant-build and some helper functions.
 ;; jdee-ant-build uses the specified ant program/shell script to
 ;; execute a specified build file (in the project root).
-;;
-;;
-;; TODO:
-;;
-;; Notes:
-;; -- The JDEE (Java Development Environment for Emacs) can be
-;;    downloaded at http://jdee.sourceforge.net
-;;
-;; -- Apache Ant is a Java & XML build system that can be downloaded
-;;    at http://jakarta.apache.org/ant/
-;;
 ;;
 ;;; History:
 ;;

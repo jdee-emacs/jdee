@@ -1,5 +1,4 @@
 ;;; jdee-juci.el --- JDEE Universal Communication Interface
-;; $Id$
 
 ;; Copyright (C) 2002, 2003 by Nick Sieger
 ;; Copyright (C) 2009 by Paul Landes

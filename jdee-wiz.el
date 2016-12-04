@@ -1,5 +1,4 @@
-;; jdee-wiz.el - generate Java code by interactive input and Java reflection
-;; $Id$
+;;; jdee-wiz.el -- generate Java code by interactive input and Java reflection
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -1239,4 +1238,4 @@ If `jdee-wiz-tostring-postfix' is defined, it is appended to the string. "
 
 (provide 'jdee-wiz)
 
-;; End of jdee-wiz.el
+;;; jdee-wiz.el ends here

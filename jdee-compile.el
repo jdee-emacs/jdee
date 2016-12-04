@@ -26,10 +26,8 @@
 
 ;;; Commentary:
 
-;; This is one of a set of packages that make up the Java Development
-;; Environment (JDE) for Emacs. See the JDE User's Guide for more
-;; information. It includes code for using the Eclipse compiler
-;; originally written by Suraj Acharya.
+;; It includes code for using the Eclipse compiler originally written
+;; by Suraj Acharya.
 
 ;; When customizing the jdee-compiler variable to use the option for
 ;; "eclipse java compiler server" you will also need to specify the
@@ -1502,9 +1500,6 @@ uses the compiler executable specified by
           (jdee-compile-compile compiler))
       (error "Unknown compiler. Aborting compilation."))))
 
-
-
-    
 (provide 'jdee-compile)
 
 ;;; jdee-compile.el ends here

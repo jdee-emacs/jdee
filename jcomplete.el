@@ -1,8 +1,6 @@
 ;;; jdecompletion.el -- Smart completion for the JDEE
-;; $Id$
 
 ;; Author: Rodrigo Reyes <reyes@chez.com>
-;; Maintainer: Rodrigo Reyes
 ;; Keywords: java, intellisense, completion
 
 ;; Copyright (C) 1999 Rodrigo Reyes
@@ -12,36 +10,15 @@
 ;; COPYING file that comes along with GNU Emacs. This is free software,
 ;; you can redistribute it and/or modify it under the GNU GPL terms.
 ;;
-;; Java is a registered trademark of Sun Microsystem, Inc.
-;;
 ;;; Commentary:
-
-;; This is one of a set of packages that make up the
-;; Java Development Environment (JDEE) for Emacs. See the
-;; JDEE User's Guide for more information.
-
 ;;
-;; This package adds smart completion to the JDEE. How it works is
+;; This package adds smart completion to the JDEE.  How it works is
 ;; simple : put the cursor at the end of a statement "under
 ;; construction", eg. "myVariable.rem<CURSOR HERE> and call the
 ;; prf2-complete-at-point emacs-lisp function (this is by default
-;; C-.). A completion is then inserted. If multiple completions are
+;; C-.). A completion is then inserted.  If multiple completions are
 ;; possible, calling the completion function again will cycle through
 ;; all the possibilities (as dabbrev-mode does).
-
-;; To retrieve all the possible completions, it uses the java code in
-;; jde.util.Completion.getClassInfo(), called by beanshell. That
-;; need the class to be compiled (but that's not worst than an etag
-;; call).
-
-;; Known bugs/problems :
-
-;; - The first call to the bsh function is bugged, and part of the
-;; output is trashed. Starting the bsh before completing, or just
-;; ignoring the first error and call the completion again, work fine.
-;; - Due to the way the JVM works, it is not possible to explicitly
-;; unload a class. So, if major changes are done in a class, the
-;; beanshell must be restarted in order to reload the class.
 
 ;;
 ;; TODO :
