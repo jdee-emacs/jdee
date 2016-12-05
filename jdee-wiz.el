@@ -22,21 +22,20 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
-(require 'beanshell)
+;;; Commentary:
+
+;;; Code:
+
 (require 'cc-cmds)
 (require 'cl-lib)
 (require 'efc)
+(require 'jdee-backend)
 (require 'jdee-complete)
 (require 'jdee-gen)
 (require 'jdee-import)
 (require 'jdee-parse)
 (require 'semantic/idle)
 (require 'semantic/util)
-
-;; FIXME: refactor
-(declare-function jdee-jeval-r "jdee-bsh" (java-statement))
-(declare-function jdee-bsh-running-p "jdee-bsh" nil)
-(declare-function jdee-create-prj-values-str "jdee" nil)
 
 (defgroup jdee-wiz nil
   "JDE Wizards"
@@ -56,12 +55,7 @@ the classpath defined by jdee-global-classpath. Wizards use this list to resolve
 unqualified class names. If you add any classes to the classpath after invoking
 a wizard, you should update the class list."
   (interactive)
-  (if (jdee-bsh-running-p)
-      (progn
-	(message "Rescanning classes...")
-	(jdee-jeval (jdee-create-prj-values-str))
-	(jdee-jeval "jde.util.JdeUtilities.updateClassList();")
-	(message "Rescanning classes...Complete"))))
+  (jdee-backend-load-project-class-list))
 
 (defun jdee-wiz-set-bsh-project()
   "Update the beanshell's concept of the current project and the
@@ -73,8 +67,7 @@ projects does not necessarily force a rescan as the scan information
 is cached in the beanshell.  You can force a rescan for a project by
 calling `jdee-wiz-update-class-list'."
   (interactive)
-  (when (jdee-bsh-running-p)
-    (jdee-jeval (jdee-create-prj-values-str))))
+  (jdee-backend-load-project-class-list2))
 
 (defun jdee-wiz-get-package-name ()
   (let ((package-re "^[ \t]*package[ \t]+\\(.*\\)[ \t]*;"))
@@ -137,34 +130,12 @@ extends clause is updated"
   ;; change last '.' to '$'
   (jdee-replace-in-string name "[.]\\([^.]+$\\)" "$\\1"))
 
-(defun jdee-jeval-classname (fmt interface-name &optional eval-return)
-  "Try jdee-jeval on the command derived from (format FMT INTERFACE-NAME),
-if that fails (as it will when INTERFACE-NAME is an inner-class name),
-then try after replacing INTERFACE-NAME with (jdee-dollar-name INTERFACE-NAME).
-
-If EVAL-RETURN is t, then return (jdee-jeval ... t), else return (read (jdee-jeval ...))"
-  (cl-flet ((jeval (name) (if eval-return
-			      (jdee-jeval (format fmt name) t)
-			    (read (jdee-jeval (format fmt name))))))
-    (let ((code (jeval interface-name)) dollar-name)
-      (if (and code (eq (car code) 'error)
-	       (setq dollar-name (jdee-dollar-name interface-name))
-	       ;; recurse as long as '.'s are changing:
-	       (not (string-equal dollar-name interface-name)))
-	  (jdee-jeval-classname fmt dollar-name eval-return) ; try again with dollar-name
-	code)
-      )))
-
 (defun jdee-wiz-generate-interface (interface-name)
   "*Generate a skeleton implementation of a specified interface."
   (let* ((code
-	  (jdee-jeval-classname
-	   "jde.wizards.InterfaceFactory.makeInterfaceExpression(\"%s\",true);"
-	   interface-name)))
+          (jdee-backend-make-interface-expr interface-name)))
     (if code
-      (let ((required-imports
-	     (jdee-jeval-r
-		"jde.wizards.InterfaceFactory.getImportedClasses();")))
+        (let ((required-imports (jdee-backend-get-interface-imports)))
 	  (eval code)			;error may be thrown if bad intf name
 	  (if required-imports
 	      (jdee-import-insert-imports-into-buffer required-imports t))
@@ -191,10 +162,7 @@ This command works only for interfaces defined by `jdee-global-classpath', if
 set, otherwise the CLASSPATH environment variable."
   (interactive
    "sInterface name: ")
-  (let ((names
-	 (jdee-jeval-r
-	  (format "jde.util.JdeUtilities.getQualifiedName(\"%s\");"
-		  interface-name ))))
+  (let ((names (jdee-backend-get-qualified-name interface-name)))
     (if names
 	(if (> (length names) 1)
 	    (jdee-wiz-generate-interface
@@ -240,13 +208,11 @@ and fire every method of all listeners registered. It creates a data structure
 to store the listeners too."
   (condition-case err
       (let* ((pos (point))
-	     (code (jdee-jeval-classname
-		    "jde.wizards.EventSourceFactory.makeEventSourceSupportExpression(\"%s\", true);"
-		    event-listener-interface-name)))
+	     (code (jdee-backend-make-event-source-expr
+                    event-listener-interface-name)))
 	(if code
 	    (let ((required-imports
-		   (jdee-jeval-r
-		    "jde.wizards.EventSourceFactory.getImportedClasses();")))
+                   (jdee-backend-get-event-source-imports)))
 	      (message "%s" "evaluating")
 	      (eval code)
 	      (message "%s" "eval done")
@@ -305,9 +271,7 @@ set, otherwise the CLASSPATH environment variable."
   (interactive
    "sListener Interface name: ")
   (condition-case err
-      (let ((names
-	     (jdee-jeval-r
-	      (format "jde.util.JdeUtilities.getQualifiedName(\"%s\");" interface-name ))))
+      (let ((names (jdee-backend-get-qualified-name interface-name)))
 	(if names
 	    (if (> (length names) 1)
 		(jdee-wiz-generate-event-source
@@ -385,18 +349,17 @@ NOTE: this command works only if the overriding class
 		(cdr pair)))
 
 	(setq class-name
-	 (jdee-parse-get-super-class-at-point))
+              (jdee-parse-get-super-class-at-point))
 	(setq qualified-class-name
-	 (jdee-parse-get-qualified-name class-name t))
+              (jdee-parse-get-qualified-name class-name t))
 	(setq pos (string-match "(" method-name))
 
 	(if qualified-super-class
-	    (let* ((fmt (concat
-			 "jde.wizards.MethodOverrideFactory.getCandidateSignatures"
-			 "(\"%s\",\"" (substring method-name 0 pos) "\");"))
-		   (signatures (jdee-jeval-classname fmt qualified-class-name t)))
+	    (let ((signatures (jdee-backend-get-candidate-signatures
+                               qualified-class-name
+                               (substring method-name 0 pos))))
 	      (jdee-wiz-override-method-internal method-name
-						signatures))
+                                                 signatures))
 	  (error "Cannot find parent class %s" super-class)))
     (error
      (message "%s" (error-message-string err)))))
@@ -416,13 +379,8 @@ NOTE: this command works only if the overriding class
 	  (setq index (+ 1 index))
 	  (setq methods (cdr methods)))))
 
-    (jdee-jeval-r
-     (concat
-      "jde.wizards.MethodOverrideFactory.getMethodSkeletonExpression("
-      (int-to-string variant) ");"))
-    (setq required-imports
-	  (jdee-jeval-r
-	   "jde.wizards.MethodOverrideFactory.getImportedClasses();"))
+    (jdee-backend-make-method-skeleton-expr (int-to-string variant))
+    (setq required-imports (jdee-backend-get-method-override-imports))
     (if required-imports
 	(jdee-import-insert-imports-into-buffer required-imports t))))
 
@@ -496,14 +454,12 @@ the cursor"
   "Browse class in the beanshell class browser"
   (interactive)
   (let* ((class
-	 (or class-name
-	     (read-from-minibuffer "Class: " (thing-at-point 'symbol))))
+          (or class-name
+              (read-from-minibuffer "Class: " (thing-at-point 'symbol))))
 	 (fq-class-name
 	  (jdee-parse-select-qualified-class-name class)))
     (if fq-class-name
-	(bsh-eval
-	 (oref-default 'jdee-bsh the-bsh)
-	 (format "browseClass(\"%s\");" fq-class-name)))))
+        (jdee-backend-browse-class fq-class-name))))
 
 (defun jdee-wiz-delegate (delegee)
   "*Generate methods for the class in the current source buffer
@@ -535,13 +491,9 @@ function's documentation for more information."
 		   (car (jdee-parse-declared-type-of delegee)) t)
 		  (read-string (concat "Enter fully qualified class name of "
 				       delegee ": "))))
-             (fmt (concat "jde.wizards.DelegateFactory.makeDelegatorMethods(\""
-			  delegee "\", \"%s\", true);"))
-	     (code (jdee-jeval-classname fmt class-name)))
+	     (code (jdee-backend-make-delegator-methods delegee class-name)))
 	(if code
-	    (let ((required-imports
-		   (jdee-jeval-r
-		    "jde.wizards.DelegateFactory.getImportedClasses();")))
+	    (let ((required-imports (jdee-backend-get-delegate-imports)))
 	      (font-lock-mode -1)
 	      (setq start (point))
 	      (eval code)
@@ -561,13 +513,10 @@ function's documentation for more information."
 (defun jdee-wiz-generate-abstract-class (class-name)
   "*Generate a skeleton implementation of a specified abstract class."
   (condition-case err
-      (let* ((code (jdee-jeval-classname
-		    "jde.wizards.AbstractClassFactory.makeAbstractClassExpression(\"%s\", true);"
-		    class-name)))
+      (let* ((code (jdee-backend-maket-abstract-class-expr class-name)))
 	(if code
 	    (let ((required-imports
-		   (jdee-jeval-r
-		    "jde.wizards.AbstractClassFactory.getImportedClasses();")))
+                   (jdee-backend-get-abstract-class-imports)))
 	      (eval code)
 	      (if required-imports
 		  (jdee-import-insert-imports-into-buffer required-imports t))
@@ -581,10 +530,7 @@ set, otherwise the CLASSPATH environment variable."
   (interactive
    "sAbstract classname: ")
   (condition-case err
-      (let ((names
-	     (jdee-jeval-r
-	      (format "jde.util.JdeUtilities.getQualifiedName(\"%s\");"
-		      class-name ))))
+      (let ((names (jdee-backend-get-qualified-name class-name)))
 	(if names
 	    (if (> (length names) 1)
 		(jdee-wiz-generate-abstract-class

@@ -31,10 +31,10 @@
 
 ;;; Code:
 
-(require 'beanshell)
+(require 'jdee-backend)
 
 (defvar prf2-current-list nil
-"The list of all the completion. Each element of the list is a list
+  "The list of all the completion. Each element of the list is a list
 which car is the possible completion, and the cdr is an additional
 information about this completion.")
 
@@ -131,42 +131,18 @@ packages otherwise."
     result))
 
 (defun prf2-get-classinfo (name)
-"Return the class info list for the class NAME (possibly the short
+  "Return the class info list for the class NAME (possibly the short
 java name). This list contains lists of elements, which car is a
 possible completion, and the cdr gives additional informations on the
 car."
   (let ((guessed (prf2-guess-type-of name)) result)
     (if (stringp guessed)
-	(setq result (bsh-eval
-		      (oref-default 'jdee-bsh the-bsh)
-		      (concat "jde.util.Completion.getClassInfo(\"" guessed "\");")))
+	(setq result (jdee-backend-get-class-info guessed))
       (if (not (null name))
-	  (setq result (bsh-eval
-			(oref-default 'jdee-bsh the-bsh)
-			(prf2-get-classinfo-javacode name guessed)))))
+	  (setq result (jdee-backend-get-class-info-for-import name guessed))))
     (if (not (null result))
 	(eval (read result))
       nil)))
-
-
-(defun prf2-get-classinfo-javacode (name import)
-"Return the java code that calls the
-jde.util.Completion.getClassInfo function with the short java class
-name NAME and the package list IMPORT where to look at."
-  (interactive)
-  (save-excursion
-    (concat "{ "
-	      "String[] lst = new String[" (length import) "];\n"
-	      (let ((count -1))
-		(mapconcat (function (lambda (x)
-				       (setq count (+ 1 count))
-					   (concat "lst[" count "]=\""
-						   (car (nth count import)) "\";\n")))
-			   import
-			   " "))
-	      "jde.util.Completion.getClassInfo(\"" name "\",lst);\n"
-	      "}")))
-
 
 (defun prf2-java-variable-at-point ()
   "Return the current word, according to java syntax.
@@ -180,8 +156,8 @@ A '.' is  part of a name."
       (while (null found)
 	(cond
 	 ((or (and (>= curcar ?a) (<= curcar ?z))
-		    (and (>= curcar ?A) (<= curcar ?Z))
-		    (member curcar '(?_)))
+              (and (>= curcar ?A) (<= curcar ?Z))
+              (member curcar '(?_)))
 	  (forward-char -1))
 	 ((eq ?. curcar)
 	  (setq found (point)))
@@ -206,8 +182,8 @@ A '.' is  part of a name."
 	nil))))
 
 (defun prf2-build-completion-list (classinfo)
-"Build a completion list from the CLASSINFO list, as returned by the
-jde.util.Completion.getClassInfo function."
+  "Build a completion list from the CLASSINFO list, as returned by the
+jdee-backend-get-class-info function."
   (let ((result nil) (tmp nil))
     ;; get the variable fields
     (setq tmp (car classinfo))

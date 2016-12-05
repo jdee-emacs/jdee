@@ -37,11 +37,9 @@
 ;;; Code:
 
 (require 'eldoc)
+(require 'jdee-backend)
 (require 'jdee-parse)
 (require 'semantic/idle)
-
-;; FIXME: refactor
-(declare-function jdee-jeval-r "jdee-bsh" (java-statement))
 
 (defgroup jdee-complete nil
   "JDE Completion"
@@ -455,32 +453,8 @@ classes for the access level."
     answer))
 
 (defun jdee-complete-invoke-get-class-info (name access)
-  "Invoke the method jde.util.Completion.getClassInfo(String, int)"
-  (jdee-jeval-r
-   (format "jde.util.Completion.getClassInfo(\"%s\",%d);" name access)))
-
-
-(defun jdee-complete-get-classinfo-javacode (name import access-level)
-  "Return the java code that calls the
-jde.util.Completion.getClassInfo function with the short java class
-name NAME and the package list IMPORT where to look at."
-  (save-excursion
-    (concat
-     "{ "
-     "String[] lst = new String[" (number-to-string (length import)) "];\n"
-     (let ((count -1))
-       (mapconcat
-	(function
-	 (lambda (x)
-	   (setq count (+ 1 count))
-	   (concat "lst[" (int-to-string count) "]=\""
-		   (car (nth count import)) "\";\n")))
-	import
-	" "))
-     "jde.util.Completion.getClassInfo(\"" name "\",lst,"
-     (number-to-string access-level) ");\n"
-     "}")))
-
+  "Return class info for class NAME and ACCESS."
+  (jdee-backend-get-classinfo-access name access))
 
 (defun jdee-complete-sort-comparison (first second)
   (string< (car first) (car second)))
@@ -521,7 +495,7 @@ into (\"var\" \"java.lang.String\ var\")"
 
 (defun jdee-complete-build-completion-list (classinfo)
   "Build a completion list from the CLASSINFO list, as returned by the
-jde.util.Completion.getClassInfo function."
+jdee-backend-get-class-info function."
   (let (result tmp)
     ;; get the variable fields
     (setq tmp (nth jdee-complete-fields classinfo))

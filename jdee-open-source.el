@@ -15,14 +15,13 @@
 ;;
 ;;; Commentary:
 
-;; This is one of a set of packages that make up the
-;; Java Development Environment (JDE) for Emacs. See the
-;; JDE User's Guide for more information.
-
 ;; This package allows to open the class at point.
+
+;;; Code:
 
 (require 'cl-lib)
 (require 'etags);; find-tag-marker-ring
+(require 'jdee-backend)
 (require 'jdee-complete);; jdee-complete-private
 (require 'jdee-import);; jdee-import-get-import
 (require 'jdee-parse)
@@ -32,7 +31,6 @@
 
 ;; FIXME: refactor
 (declare-function jdee-expand-wildcards-and-normalize "jdee" (path &optional symbol))
-(declare-function jdee-jeval-r "jdee-bsh" (java-statement))
 (defvar jdee-sourcepath)
 
 (defcustom jdee-open-class-at-point-find-file-function 'find-file-other-window
@@ -241,11 +239,7 @@ not associated with any project."
 	      (or unqual-class
 		  (read-from-minibuffer "Class: " (thing-at-point 'symbol))))
 	     (class-names
-	      ;;expand the names into full names, or a list of names
-	      (jdee-jeval-r
-	       (concat
-		"jde.util.JdeUtilities.getQualifiedName(\""
-		unqualified-name "\");"))))
+              (jdee-backend-get-qualified-name unqualified-name)))
 	;;Check return value of QualifiedName
 	(if (or (eq class-names nil)
 		(not (listp class-names)))
@@ -260,10 +254,10 @@ not associated with any project."
 	      ;;then show it
 	      (progn(other-window 1)
 		    (jdee-find-class-source (car class-names)))
-		  ;;else let the user choose
+            ;;else let the user choose
 	    (let ((class (efc-query-options class-names "Which class?")))
-		  (if class
-		      (jdee-find-class-source class))))
+              (if class
+                  (jdee-find-class-source class))))
 	  (setq jdee-project-context-switching-enabled-p old-value)))
     (error
      (message "%s" (error-message-string err)))))
@@ -500,8 +494,8 @@ qualified classes).")
 
 ;;;###autoload
 (defun jdee-read-class (&optional prompt fq-prompt
-				 this-class-p confirm-fq-p no-confirm-nfq-p
-				 validate-fn)
+                                  this-class-p confirm-fq-p no-confirm-nfq-p
+                                  validate-fn)
   "Select a class interactively.  PROMPT is used to prompt the user for the
 first class name, FQ-PROMPT is used only if the class name expands into more
 than one fully qualified name.
@@ -565,13 +559,9 @@ When called interactively, select the class and copy it to the kill ring."
       (setq fqc (first ctup)
 	    uq-name (third ctup))
       (if fqc
-	  (if (not (jdee-jeval-r (concat "jde.util.JdeUtilities."
-					"classExists(\""
-					fqc "\");")))
+	  (if (not (jdee-backend-class-exists-p fqc))
 	      (error "No match for %s" uq-name))
-	(setq classes (jdee-jeval-r (concat "jde.util.JdeUtilities."
-					   "getQualifiedName(\""
-					   uq-name "\");")))
+	(setq classes (jdee-backend-get-qualified-name uq-name))
 	(if (= 0 (length classes))
 	    (error "Not match for %s" uq-name))
 	(setq fqc (jdee-choose-class classes fq-prompt uq-name confirm-fq-p))))

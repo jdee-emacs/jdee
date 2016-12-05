@@ -85,6 +85,7 @@
 
 (require 'cl-lib)
 (require 'compile)
+(require 'jdee-backend)
 
 ;; FIXME: refactor to avoid this
 (declare-function jdee-normalize-path "jdee" (path &optional sym))
@@ -539,8 +540,8 @@ and there are no more errors. "
         (set-process-filter proc 'jdee-ant-filter)
         ;;resets the jdee-ant-passed-security-exception flag
         (setq jdee-ant-passed-security-exception nil)
-        (process-send-string proc (concat "jde.util.AntServer.start(\""
-                                          command "\");" "\n")))
+        (process-send-string proc
+                             (jdee-backend-get-ant-start-server-command command)))
       (setq outwin (display-buffer outbuf))
       (save-excursion
         ;; (setq buffer-read-only t)  ;;; Non-ergonomic.
@@ -721,4 +722,4 @@ Returns nil if it cannot find a project file in DIR or an ascendant directory."
 
 (provide 'jdee-ant)
 
-;; End of jdee-ant.el
+;;; jdee-ant.el ends here

@@ -37,10 +37,11 @@
 (require 'semantic/sb)
 (require 'thingatpt)
 
+(require 'jdee-backend)
+
 ;; FIXME: refactor
 (defvar jdee-complete-private)
 (defvar jdee-complete-current-list)
-(declare-function jdee-jeval-r "jdee-bsh" (java-statement))
 (declare-function jdee-complete-find-completion-for-pair "jdee-complete" (pair &optional exact-completion access-level))
 (declare-function jdee-import-find-and-import "jdee-import" (class &optional no-errors no-exclude qualifiedp))
 
@@ -609,9 +610,7 @@ Returns nil, if point is not in a class."
   "PROMPT the user to select the fully qualified name for CLASS.
 Return the selection."
   (condition-case err
-      (let ((names
-	     (jdee-jeval-r
-	      (format "jde.util.JdeUtilities.getQualifiedName(\"%s\");" class))))
+      (let ((names (jdee-backend-get-qualified-name class)))
 	(if names
 	    (if (> (length names) 1)
 		(efc-query-options
@@ -887,7 +886,7 @@ fast."
   (interactive)
   (save-some-buffers (not compilation-ask-about-save) nil)
   (let ((parse-error
-	 (jdee-jeval-r (concat "jde.parser.ParserMain.parseFile(\"" (buffer-file-name) "\");"))))
+         (jdee-backend-parse-file (buffer-file-name))))
     (if parse-error
 	(jdee-display-parse-error parse-error)
       (message "Parsed %s successfully" (buffer-name)))))
@@ -1515,12 +1514,7 @@ Java type name, e.g., int."
 
 (defun jdee-parse-get-component-type-of-array-class (name)
   (if (string= "[" (substring name 0 1))
-      (let (result)
-	(setq result
-	      (jdee-jeval
-	       (concat "System.out.println( Class.forName(\""
-		       name
-		       "\").getComponentType().getName()) ;"))) ;;removed \n
+      (let ((result (jdee-backend-get-component-type-name name)))
 	(substring result 0 (- (length result) 1)))
     name))
 
@@ -1618,7 +1612,7 @@ try importing the class"
 	(while (string-match "\\\\" name)
 	  (setq name (replace-match "" nil nil name)))
 
-	(jdee-jeval-r (concat "jde.util.JdeUtilities.classExists(\"" name "\");")))))
+        (jdee-backend-class-exists-p name))))
 
 (defun jdee-parse-get-inner-class (expr)
   "Takes a single argument like B.A and split it up in a name

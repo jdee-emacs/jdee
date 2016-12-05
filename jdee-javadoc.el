@@ -34,6 +34,7 @@
 ;;; Code:
 
 (require 'semantic/java)
+(require 'jdee-backend)
 (require 'jdee-javadoc-gen)
 (require 'jdee-parse)
 (require 'regexp-opt)
@@ -368,10 +369,8 @@ are issued for (maybe) undeclared exceptions."
 That is if TYPE inherits from java.lang.RuntimeException or if Java
 reflection failed to process TYPE."
   (condition-case nil
-      (jdee-jeval-r
-       (format "jde.util.Completion.isAncestorOf(%S,%S);"
-	       "java.lang.RuntimeException"
-	       (jdee-parse-get-qualified-name type)))
+      (jdee-backend-is-ancestor-of "java.lang.RuntimeException"
+                                   (jdee-parse-get-qualified-name type))
     (error t)))
 
 ;;;; Text helpers

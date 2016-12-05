@@ -49,28 +49,20 @@
 ;; java -cp <path to jar> org.eclipse.jdt.internal.compiler.batch.Main
 ;; This should print out a usage message for the "Eclipse Java Compiler".
 
-;; The latest version of the JDE is available at
-;; <URL:http://jdee.sourceforge.net/>.
-
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Landes <landes <at> mailc dt net>
-
 ;;; Code:
 
 (require 'eieio)
 (require 'cl-lib)
 (require 'compile)
+(require 'jdee-backend)
 
 ;; FIXME: refactor to eliminate these
-(declare-function jdee-bsh-running-p "jdee-bsh" ())
 (declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
 (declare-function jdee-complete-flush-classes-in-cache "jdee-complete" (class-list))
-(declare-function jdee-create-prj-values-str "jdee" nil)
 (declare-function jdee-get-global-classpath "jdee" ())
 (declare-function jdee-get-jdk-prog "jdee" (progname))
 (declare-function jdee-java-version "jdee" ())
 (declare-function jdee-normalize-path "jdee" (path &optional symbol))
-(defvar jdee-classpath-separator)
 (defvar jdee-complete-last-compiled-class)
 
 (defgroup jdee-compile-options nil
@@ -196,10 +188,7 @@ describing how the compilation finished."
 	    'jdee-compile-option-directory))))
     (unless jdee-compile-mute
       (message (concat "Updating class list for " class-dir)))
-    (jdee-jeval (concat
-		"jde.util.JdeUtilities.updateClassList(\""
-		class-dir
-                "\");"))
+    (jdee-backend-update-class-list class-dir)
     (unless jdee-compile-mute
       (message "Updating class list...done."))))
 
@@ -221,13 +210,13 @@ don't know which classes were recompiled."
 	      (jdee-compile-update-class-list))))
     (error nil)))
 
+;;; TODO: remove from here and add observer
 (defun jdee-compile-finish-refresh-speedbar (buf msg)
   "Refresh speedbar at the end of a compilation."
   (if (and (boundp 'speedbar-frame)
 	   (frame-live-p speedbar-frame)
 	   (frame-visible-p speedbar-frame))
-       (speedbar-refresh)))
-
+      (speedbar-refresh)))
 
 (defcustom jdee-compile-jump-to-first-error t
   "*Automatically jump to the first error when a compilation process completes."
@@ -911,20 +900,20 @@ If t (or other non-nil non-number) then kill in 2 secs."
       (let ((inhibit-read-only t)) ; make compilation buffer temporarily writable
 	(insert (format "cd %s\n" default-directory))
 	(insert (concat
-	       compiler-path
-	       " "
-	       (mapconcat (lambda (x)
-			    (if (and flag
-				     jdee-compile-option-hide-classpath)
-				(progn
-				  (setq flag nil)
-				  "...")
-			      (if (not (string= x "-classpath"))
-				  x
-				(progn
-				  (setq flag t)
-				  x)))) args " ")
-	       "\n\n")))
+                 compiler-path
+                 " "
+                 (mapconcat (lambda (x)
+                              (if (and flag
+                                       jdee-compile-option-hide-classpath)
+                                  (progn
+                                    (setq flag nil)
+                                    "...")
+                                (if (not (string= x "-classpath"))
+                                    x
+                                  (progn
+                                    (setq flag t)
+                                    x)))) args " ")
+                 "\n\n")))
 
       (let* ((process-environment (cons "EMACS=t" process-environment))
 	     (w32-quote-process-args ?\")
@@ -940,14 +929,15 @@ If t (or other non-nil non-number) then kill in 2 secs."
 	(setq compilation-in-progress
 	      (cons proc compilation-in-progress))))))
 
+;;; TODO: extract code duplicated with EJC version
 (defmethod jdee-compile-run-server ((this jdee-compile-compiler))
   (let* ((directory-sep-char ?/)
-	   (args
-	    (append
-	    (jdee-compile-get-args this)))
-	   (source-path
-	    (jdee-normalize-path buffer-file-name))
-	   (arg-array (concat "new String[] {\"" source-path "\"")))
+         (args
+          (append
+           (jdee-compile-get-args this)))
+         (source-path
+          (jdee-normalize-path buffer-file-name))
+         (arg-array (concat "new String[] {\"" source-path "\"")))
 
     (if args
 	(setq arg-array
@@ -960,45 +950,32 @@ If t (or other non-nil non-number) then kill in 2 secs."
 		args
 		","))))
 
-      (setq arg-array (concat arg-array "}"))
+    (setq arg-array (concat arg-array "}"))
 
-      (with-current-buffer (oref (oref this buffer) buffer)
+    (with-current-buffer (oref (oref this buffer) buffer)
 
-	(insert "CompileServer output:\n\n")
+      (insert "CompileServer output:\n\n")
 
-	(let* ((inhibit-read-only t)
-	       flag
-	       (arg-string
-		(mapconcat
-		 (lambda (x)
-		   (if (and flag
-			    jdee-compile-option-hide-classpath)
-		       (progn
-			 (setq flag nil)
-			 "...")
-		     (if (not (string= x "-classpath"))
-			 x
-		       (progn
-			 (setq flag t)
-			 x))))
-		 args " ")))
+      (let* ((inhibit-read-only t)
+             flag
+             (arg-string
+              (mapconcat
+               (lambda (x)
+                 (if (and flag
+                          jdee-compile-option-hide-classpath)
+                     (progn
+                       (setq flag nil)
+                       "...")
+                   (if (not (string= x "-classpath"))
+                       x
+                     (progn
+                       (setq flag t)
+                       x))))
+               args " ")))
 
-	  (insert arg-string " " source-path "\n")))
+        (insert arg-string " " source-path "\n")))
 
-      (if (not (jdee-bsh-running-p))
-	  (progn
-	    (bsh-launch (oref-default 'jdee-bsh the-bsh))
-	    (bsh-eval (oref-default 'jdee-bsh the-bsh) (jdee-create-prj-values-str))))
-
-      (bsh-buffer-eval
-       (oref-default 'jdee-bsh the-bsh)
-       (concat
-	(format
-	 "jde.util.CompileServer.compile(%s);"
-	 arg-array)
-	"\n")
-       (oref this buffer))))
-
+    (jdee-backend-compile arg-array (oref this buffer))))
 
 (defmethod jdee-compile-launch ((this jdee-compile-compiler))
 
@@ -1291,72 +1268,56 @@ If t (or other non-nil non-number) then kill in 2 secs."
 )
 
 (defmethod jdee-compile-run-server ((this jdee-compile-ejc-server))
-    (let* ((directory-sep-char ?/)
-	   (args
-	    (append
-             (list
-              "-Xemacs"
-              "-noExit"
-;;               "-sourcepath"
-;;               (mapconcat 'identity (jdee-expand-wildcards-and-normalize jdee-sourcepath) ":")
-              )
-	    (jdee-compile-get-args this)))
-	   (source-path
-	    (jdee-normalize-path buffer-file-name))
-	   (arg-array (concat "new String[] {\"" source-path "\"")))
+  (let* ((directory-sep-char ?/)
+         (args
+          (append
+           (list
+            "-Xemacs"
+            "-noExit"
+            ;;               "-sourcepath"
+            ;;               (mapconcat 'identity (jdee-expand-wildcards-and-normalize jdee-sourcepath) ":")
+            )
+           (jdee-compile-get-args this)))
+         (source-path
+          (jdee-normalize-path buffer-file-name))
+         (arg-array (concat "new String[] {\"" source-path "\"")))
 
-      (if args
-	  (setq arg-array
-		(concat
-		 arg-array
-		 ","
-		 (mapconcat
-		  (lambda (arg)
-		    (concat "\"" arg "\""))
-		  args
-		  ","))))
+    (if args
+        (setq arg-array
+              (concat
+               arg-array
+               ","
+               (mapconcat
+                (lambda (arg)
+                  (concat "\"" arg "\""))
+                args
+                ","))))
 
-      (setq arg-array (concat arg-array "}"))
+    (setq arg-array (concat arg-array "}"))
 
-      (with-current-buffer (oref (oref this buffer) buffer)
+    (with-current-buffer (oref (oref this buffer) buffer)
 
-	(insert "CompileServer output:\n\n")
+      (insert "CompileServer output:\n\n")
 
-	(let (flag temp)
-	  (setq temp
-	    (mapconcat
-	     (lambda (x)
-	       (if (and flag
-			jdee-compile-option-hide-classpath)
-		   (progn
-		     (setq flag nil)
-		     "...")
-		 (if (not (string= x "-classpath"))
-		     x
-		   (progn
-		     (setq flag t)
-		     x)))) args " "))
+      (let (flag temp)
+        (setq temp
+              (mapconcat
+               (lambda (x)
+                 (if (and flag
+                          jdee-compile-option-hide-classpath)
+                     (progn
+                       (setq flag nil)
+                       "...")
+                   (if (not (string= x "-classpath"))
+                       x
+                     (progn
+                       (setq flag t)
+                       x)))) args " "))
 
-	  (insert temp " "))
-	(insert source-path "\n"))
+        (insert temp " "))
+      (insert source-path "\n"))
 
-      (if (not (jdee-bsh-running-p))
-	  (progn
-	    (bsh-launch (oref-default 'jdee-bsh the-bsh))
-	    (bsh-eval (oref-default 'jdee-bsh the-bsh) (jdee-create-prj-values-str))))
-      (bsh-eval (oref-default 'jdee-bsh the-bsh)
-                   (format "addClassPath(\"%s\");" (oref this :path)))
-      (bsh-buffer-eval
-       (oref-default 'jdee-bsh the-bsh)
-       (concat
-	(format
-         "if ((new org.eclipse.jdt.internal.compiler.batch.Main(new java.io.PrintWriter(System.out), new java.io.PrintWriter(System.out), true, null, null)).compile(%s)) { print (\"0\");} else {print (\"1\");};"
-         arg-array)
-	"\n")
-       (oref this buffer))))
-
-
-
+    (jdee-backend-compile-eclipse (oref this :path) arg-array (oref this buffer))))
 
 (defvar jdee-compile-javac-compilers
   (list

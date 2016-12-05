@@ -27,7 +27,6 @@
 
 ;;; Code:
 
-(require 'beanshell)
 (require 'cl-lib)
 (require 'eieio)
 (require 'jdee-widgets)
@@ -360,26 +359,7 @@ This defaults to false."
 (defclass jdee-jdurl-beanshell-resolver (jdee-jdurl-resolver) ())
 
 (defmethod jdee-jdurl-resolver-url-exists ((this jdee-jdurl-beanshell-resolver) url)
-  (require 'jdee-bsh)
-  (let ((cmd (format "\
-java.net.URLConnection conn = null;
-String urlStr = \"%s\";
-try {
-  URL url = new URL(urlStr);
-  conn = url.openConnection();
-  conn.getInputStream().close();
-  print(\"t\");
-} catch(java.net.MalformedURLException e) {
-  print(\"(error \\\"Bad URL: \" + urlStr + \"\\\")\");
-} catch(java.io.IOException e) {
-  String msg = e.toString().replace(\"\\\"\", \"\\\\\\\"\");
-  print(\"nil\");
-} finally {
-  if (conn instanceof HttpURLConnection) conn.disconnect();
-}"
-		     (jdee-url-name url))))
-    (eval (read (jdee-jeval cmd)))))
-
+  (jdee-backend-url-exists-p url))
 
 (defclass jdee-jdurl-stack-resolver (jdee-jdurl-resolver)
   ((resolvers :initarg :resolvers
