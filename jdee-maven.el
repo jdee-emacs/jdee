@@ -1,5 +1,4 @@
-;;; -*- lexical-binding: t -*-
-;;; jdee-maven.el -- Project maven integration
+;;; jdee-maven.el -- Project maven integration -*- lexical-binding: t -*-
 
 ;; Author: Matthew O. Smith <matt@m0smith.com>
 ;; Keywords: java, tools
@@ -25,7 +24,6 @@
 
 ;;; Code:
 
-
 (require 'dash)
 (require 'jdee-open-source)
 (require 'cl)
@@ -41,7 +39,9 @@
 in a maven project.")
 
 (defvar jdee-maven-project-dir nil
-  "When a buffer is in a maven project, the full path to the project directory, the one with the pom.xml.  It will be set buffer local by the `jdee-maven-hook'.")
+  "When a buffer is in a maven project, the full path to the project directory,
+the one with the pom.xml.  It will be set buffer local by
+the `jdee-maven-hook'.")
 
 (defcustom jdee-maven-disabled-p nil
   "When nil (default) add maven support to project startup."
@@ -75,7 +75,9 @@ to the prj.el with something like:
 
 
 (defcustom jdee-maven-init-hook '(jdee-maven-from-file-hook)
-  "A list of functions to call to try and initialize the maven integeration.  Each function will be passed the directory that contains the pom.xml.  Stop calling functions after the first non-nil return."
+  "A list of functions to call to try and initialize the maven integeration.
+Each function will be passed the directory that contains the pom.xml.  Stop
+calling functions after the first non-nil return."
   :group 'jdee-maven
   :type 'hook)
 
@@ -152,7 +154,7 @@ checked or created
 POM-DIR - directory contatining the pom.xml
 
 CLASSIFIER - the maven the classifier, usually nil or \"sources\""
-  
+
   (let ((classpath-file-path (expand-file-name output-file pom-dir)))
     (if (file-readable-p classpath-file-path)
         classpath-file-path
@@ -165,7 +167,7 @@ CLASSIFIER - the maven the classifier, usually nil or \"sources\""
                                (format "-Dclassifier=%s" classifier)
                              nil)
                            (if (and classifier jdee-maven-artifacts-excluded-from-sources)
-                               (format "-DexcludeArtifactIds=%s" (mapconcat 'identity jdee-maven-artifacts-excluded-from-sources ",")) 
+                               (format "-DexcludeArtifactIds=%s" (mapconcat 'identity jdee-maven-artifacts-excluded-from-sources ","))
                              nil))))
           (erase-buffer)
           (pop-to-buffer (current-buffer))
@@ -174,17 +176,15 @@ CLASSIFIER - the maven the classifier, usually nil or \"sources\""
         (when (search-forward "BUILD SUCCESS" nil t)
           (kill-buffer (current-buffer))
           classpath-file-path)))))
-          
-
 
 (defun jdee-maven-from-file-hook (&optional dir)
   "Run as a hook to setup the classpath based on having the
 classpath in a file on disk.  See
-`jdee-maven-dir-scope-map' for how the files are chosen. 
+`jdee-maven-dir-scope-map' for how the files are chosen.
 
 DIR is the directory containing the pom.xml.  If nil, hunt for it."
 
-  ;(message "jdee-maven-from-file-hook: %s" (pwd))
+  ;;(message "jdee-maven-from-file-hook: %s" (pwd))
   (let ((pom-dir (or dir (jdee-maven-get-default-directory))))
     (when pom-dir
       (let ((scope-info (jdee-maven-scope-file)))
@@ -193,12 +193,12 @@ DIR is the directory containing the pom.xml.  If nil, hunt for it."
           (let* ((sources-classpath (jdee-maven-classpath-from-file
                                      (expand-file-name (nth 4 scope-info) pom-dir)))
                  (classpath (jdee-maven-classpath-from-file
-                     (expand-file-name (nth 1 scope-info) pom-dir)))
+                             (expand-file-name (nth 1 scope-info) pom-dir)))
                  (sp (mapcar (lambda(p) (expand-file-name p pom-dir))
                              (nth 2 scope-info)))
                  (rp (mapcar (lambda(p) (expand-file-name p pom-dir))
                              (nth 3 scope-info))))
-            
+
             (jdee-set-variables (list 'jdee-global-classpath  (cons 'list (append rp classpath)))
                                 '(jdee-build-function 'jdee-maven-build)
                                 '(jdee-test-function 'jdee-maven-unit-test)
@@ -215,35 +215,35 @@ DIR is the directory containing the pom.xml.  If nil, hunt for it."
 (defun jdee-maven-classpath-from-file (file-name &optional sep)
   "Read a classpath from a file that contains a classpath.  Useful in conjunction with
 a maven plugin to create the classpath like:
-	    <plugin>
+            <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-dependency-plugin</artifactId>
               <version>2.10</version>
               <executions>
-		<execution>
-		  <id>test-classpath</id>
-		  <phase>generate-sources</phase>
-		  <goals>
-		    <goal>build-classpath</goal>
-		  </goals>
-		  <configuration>
-		    <outputFile>target/test.cp</outputFile>
-		    <includeScope>test</includeScope>
-		  </configuration>
-		</execution>
-		<execution>
-		  <id>compile-classpath</id>
-		  <phase>generate-sources</phase>
-		  <goals>
-		    <goal>build-classpath</goal>
-		  </goals>
-		  <configuration>
-		    <outputFile>target/compile.cp</outputFile>
-		    <includeScope>compile</includeScope>
-		  </configuration>
-		</execution>
+                <execution>
+                  <id>test-classpath</id>
+                  <phase>generate-sources</phase>
+                  <goals>
+                    <goal>build-classpath</goal>
+                  </goals>
+                  <configuration>
+                    <outputFile>target/test.cp</outputFile>
+                    <includeScope>test</includeScope>
+                  </configuration>
+                </execution>
+                <execution>
+                  <id>compile-classpath</id>
+                  <phase>generate-sources</phase>
+                  <goals>
+                    <goal>build-classpath</goal>
+                  </goals>
+                  <configuration>
+                    <outputFile>target/compile.cp</outputFile>
+                    <includeScope>compile</includeScope>
+                  </configuration>
+                </execution>
               </executions>
-	    </plugin>
+            </plugin>
 
 It can be used in a prj.el like this in src/test
 
@@ -282,16 +282,16 @@ It cheats and looks at the face property for c-annotation-face."
                             (semantic-find-tag-by-overlay-prev)))))
       (when (and current-tag prev-tag)
         (let* ((start (semantic-tag-end prev-tag))
-              (end (semantic-tag-start current-tag))
-              (annotation-start (text-property-any start end 'face 'c-annotation-face)))
+               (end (semantic-tag-start current-tag))
+               (annotation-start (text-property-any start end 'face 'c-annotation-face)))
           (when annotation-start
-            (let ((annotation-end (next-single-property-change  annotation-start 'face (current-buffer) end)))
+            (let ((annotation-end (next-single-property-change annotation-start 'face (current-buffer) end)))
               (buffer-substring-no-properties annotation-start annotation-end))))))))
 
 
 (defun jdee-maven-unit-test-run-method-args ()
   "Return the arguments needed to pass to maven to run a single unit test method"
-  
+
   (when (and (not current-prefix-arg)
              (string= (jdee-maven-annotations) "@Test"))
     (format "-Dtest=%s#%s test" (buffer-name) (semantic-tag-name (semantic-current-tag)))))
@@ -306,7 +306,7 @@ It cheats and looks at the face property for c-annotation-face."
 
 (defun jdee-maven-file ()
   "A function for use in `compilation-error-regexp-alist' as the
-file name.  
+file name.
 
 Expects (match-string 2) to return the fully qualified name of
 the class.  Also adds the name of the tag to search for as a property called
@@ -328,8 +328,8 @@ the second element is  `eq' to TAG-TYPE."
   (lexical-let ((class-name class-name)
                 (tag-type tag-type))
     (lambda (tag)
-      (when (and  (eq tag-type (cadr tag))
-                  (string= (car tag) class-name))
+      (when (and (eq tag-type (cadr tag))
+                 (string= (car tag) class-name))
         tag))))
 
 ;;
@@ -348,20 +348,20 @@ Descend on the :members element"
           (let ((members (plist-get (nth 2 tag) :members)))
             (dolist (member members)
               (jdee-maven-find-tag-by-name-and-type name type member))))))))
-  
-  
+
+
 (defun jdee-maven-unit-test-next-error-function (n &optional reset)
   "This function is a value of `next-error-function' that supports
-the results of mvn test. 
+the results of mvn test.
 
 Return the tag of the method if found, nil otherwise."
   (let ((next-fn 'compilation-next-error-function)
         (compile-buffer (current-buffer)))
     (funcall next-fn n reset)
-    (let* ((method-name   (with-current-buffer compile-buffer
-                            (get-text-property (point) 'method-name)))
-           (class-name   (with-current-buffer compile-buffer
-                           (get-text-property (point) 'class-name)))
+    (let* ((method-name (with-current-buffer compile-buffer
+                          (get-text-property (point) 'method-name)))
+           (class-name (with-current-buffer compile-buffer
+                         (get-text-property (point) 'class-name)))
            (tags (semantic-something-to-tag-table (current-buffer)))
            (class-tag (jdee-maven-find-tag-by-name-and-type class-name 'type tags))
            (class-members (plist-get (nth 2 class-tag) :members))
@@ -370,12 +370,10 @@ Return the tag of the method if found, nil otherwise."
         (semantic-go-to-tag method-tag)
         (semantic-momentary-highlight-tag method-tag)
         method-tag))))
-      
 
 (defvar jdee-maven-unit-test-error-regexp
-  
   (format "%s(%s):\\(.*\\)" (jdee-parse-java-name-part-re) (jdee-parse-java-fqn-re))
-  " Looks for something like 
+  " Looks for something like
 
   testConnectionProxy2CallJava2(jde.juci.ConnectionImplTest): expected:<hello worl[ ]d> but was:<hello worl[]d>
 
@@ -388,19 +386,17 @@ Return the tag of the method if found, nil otherwise."
 ")
 
 
-  
+
 (defvar jdee-maven-unit-test-finish-hook nil)
 
 (defun jdee-maven-unit-test (&optional path)
-  
   "Unit test using maven with project based in PATH (default to `default-directory')
 
-Tries to limit the scope of the unit test based on current point.  If in a class that 
+Tries to limit the scope of the unit test based on current point.  If in a class that
 is a test class, just run that file.
 
-With a single prefix C-u, it will skip trying to run a single method.  With a double prefix C-u C-u it will skip trying to run a single class as well.
-
-"
+With a single prefix C-u, it will skip trying to run a single method.  With
+a double prefix C-u C-u it will skip trying to run a single class as well."
   (interactive)
   (let* ((default-directory (jdee-maven-get-default-directory path))
          ;; FIXME: use a hook instead
@@ -412,9 +408,9 @@ With a single prefix C-u, it will skip trying to run a single method.  With a do
     (with-current-buffer compile-buffer
       (setq next-error-function 'jdee-maven-unit-test-next-error-function)
       (setq compilation-finish-functions
-          (lambda (buf msg)
-            (run-hook-with-args 'jdee-maven-unit-test-finish-hook buf msg)
-            (setq compilation-finish-functions nil)))
+            (lambda (buf msg)
+              (run-hook-with-args 'jdee-maven-unit-test-finish-hook buf msg)
+              (setq compilation-finish-functions nil)))
 
       (add-to-list 'compilation-error-regexp-alist
                    (list jdee-maven-unit-test-error-regexp
@@ -430,7 +426,6 @@ With a single prefix C-u, it will skip trying to run a single method.  With a do
 
 ;;;###autoload
 (defun jdee-maven-build (&optional path)
-  
   "Build using the maven command from PATH (default to `default-directory')"
   (interactive)
   (let ((default-directory (jdee-maven-get-default-directory path)))
