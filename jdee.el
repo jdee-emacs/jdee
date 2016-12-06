@@ -42,7 +42,8 @@
 (require 'cus-edit)
 (require 'easymenu)
 (require 'efc)
-(require 'executable)  ;; in XEmacs' sh-script package
+(require 'executable)
+(require 'jdee-log)
 (require 'jdee-annotations)
 (require 'jdee-bug)
 (require 'jdee-class)
@@ -933,47 +934,6 @@ this version of the JDEE."
 	  (setq ver1n (concat ver1n "zz"))))
     (string< ver1n ver2n)))
 
-
-(defcustom jdee-log-max 500
-  "*Maximum number of lines to keep in the JDEE log buffer.
-If nil, disable logging.  If t, don't truncate the buffer."
-  :group 'jdee-project
-  :type '(choice (integer :tag "Number of lines to keep")
-		 (boolean :tag "Disable/Unlimited")))
-
-(defun jdee-log-msg (msg &rest args)
-  "Log message MSG to the *jdee-log* buffer.
-Optional ARGS are used to `format' MSG.
-Does nothing if `jdee-log-max' is nil."
-  (if jdee-log-max
-      (save-match-data
-	(with-current-buffer (get-buffer-create "*jdee-log*")
-	  (goto-char (point-max))
-	  (insert (apply 'format msg args))
-	  (insert "\n")
-	  (if (integerp jdee-log-max)
-	      (let ((line-cnt 0))
-		(while (search-backward "\n" nil t)
-		  (setq line-cnt (1+ line-cnt)))
-		(goto-char (point-min))
-		(while (> line-cnt jdee-log-max)
-		  (delete-region (point) (search-forward "\n" nil t))
-		  (setq line-cnt (1- line-cnt)))))))))
-
-(defun jdee-log-msg-t (msg &rest args)
-  "Log message MSG to the *jdee-log* buffer, and return t.
-Optional ARGS are used to `format' MSG.
-Does nothing but return t if `jdee-log-max' is nil."
-  (jdee-log-msg msg args)
-  t)
-
-(defun jdee-log-msg-nil (msg &rest args)
-  "Log message MSG to the *jdee-log* buffer, and return nil.
-Optional ARGS are used to `format' MSG.
-Does nothing but return nil if `jdee-log-max' is nil."
-  (jdee-log-msg msg args)
-  nil)
-
 ;; Make jdee-mode the default mode for Java source code buffers.
 ;; Prepend the jdee-mode entry so that it shadows the java-mode
 ;; entry already in the list.
@@ -1691,7 +1651,7 @@ for insertion of the .emacs file"
 	   (messages-buffer
 	    (get-buffer "*Messages*"))
 	   (backtrace-buffer (get-buffer "*Backtrace*"))
-	   (jdee-log-buffer (get-buffer "*jdee-log*"))
+	   (jdee-log-buffer (jdee-log-get-log-buffer))
 	   (process
 	    (let ((proc (jdee-dbs-get-target-process)))
 	      (if (not proc)

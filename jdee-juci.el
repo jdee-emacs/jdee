@@ -40,6 +40,7 @@
 ;;; Code:
 
 (require 'jdee)
+(require 'jdee-log)
 
 ;;; These aren't really user-customizable variables, hence the
 ;;; defvar's.

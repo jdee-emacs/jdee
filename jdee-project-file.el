@@ -27,14 +27,13 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'jdee-log)
 (require 'jdee-maven)
 
 ;; FIXME: refactor
 (declare-function jdee-wiz-set-bsh-project "jdee-wiz" ())
 (declare-function jdee-root-dir-p "jdee" (dir))
-(declare-function jdee-log-msg "jdee" (msg &rest args))
 (declare-function jdee-maven-hook "jdee-maven" ())
-
 
 (defconst jdee-project-file-version "1.0"
   "*The current JDEE project file version number.")
