@@ -218,6 +218,7 @@ string describing how the compilation finished."
 		     :documentation
 		     "Window that displays the compilation buffer.")
    (interactive-args :initarg :interactive-args
+                     :initform: nil
 		     :type list
 		     :documentation
 		     "Arguments entered in the minibuffer."))
