@@ -1,4 +1,4 @@
-;;; jdee-flycheck.el -- Flycheck mode for jdee
+;;; jdee-flycheck.el -- Flycheck mode for JDEE  -*- lexical-binding: t -*-
 
 ;; Author: Matthew O. Smith <matt@m0smith.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -146,23 +146,15 @@ for the caret and converts it to a column number."
   "Callback function called when the compilation is complete.
 Looks for errors and converts then to flycheck errors.  Also
 cleans up after the compilation."
-  ;;
-  ;; There are parts of this file that break if the entire file is lexically bound.
-  (lexical-let ((orig-file orig-file)
-                (orig-buffer orig-buffer)
-                (temp-file temp-file)
-                (cback cback)
-                (checker checker)
-                (temp-buffer temp-buffer))
-    (lambda (buf msg)
-      (with-current-buffer buf
-        (jdee-flycheck--restore-original-filename temp-file orig-file)
-        (let ((errors (jdee-flycheck--collect-errors checker orig-buffer)))
-          (flycheck-display-error-messages errors)
-          (kill-buffer temp-buffer)
-          (set (make-local-variable 'jdee-compile-jump-to-first-error) nil)
-          (set 'jdee-compile-mute t)
-          (funcall cback 'finished errors))))))
+  (lambda (buf msg)
+    (with-current-buffer buf
+      (jdee-flycheck--restore-original-filename temp-file orig-file)
+      (let ((errors (jdee-flycheck--collect-errors checker orig-buffer)))
+        (flycheck-display-error-messages errors)
+        (kill-buffer temp-buffer)
+        (set (make-local-variable 'jdee-compile-jump-to-first-error) nil)
+        (set 'jdee-compile-mute t)
+        (funcall cback 'finished errors)))))
 
 (defun jdee-flycheck-find-next-error ()
   ;; To avoid stack overflow while executing regex search over possibly long lines,
@@ -275,6 +267,7 @@ file and buffer with the contents of the current buffer and compiles that one."
 
 ;;;###autoload
 (defun jdee-flycheck-mode ()
+  "Setup JDEE flycheck checker."
   (flycheck-define-generic-checker 'jdee-flycheck-javac-checker
     "Integrate flycheck with the jdee using javac."
     :start #'jdee-flycheck-javac-command
