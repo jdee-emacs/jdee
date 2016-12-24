@@ -1,7 +1,6 @@
-;;; jdee-gen.el -- Integrated Development Environment for Java.
+;;; jdee-gen.el -- JDEE code templates
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
-;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 1997, 1998, 2000, 2001, 2002, 2003, 2004 Paul Kinnucan.
@@ -22,6 +21,9 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 ;;
+;;; Commentary:
+
+;;; Code:
 
 (require 'tempo)
 
@@ -59,8 +61,6 @@
         (put template 'no-self-insert t)
         (goto-char tempo-initial-pos))
     (put template 'no-self-insert nil)))
-
-
 
 (defgroup jdee-gen nil
   "JDE Autocoder"
@@ -390,9 +390,6 @@ Ask the user for confirmation.  Also sets buffer local
         (progn
           (set (make-local-variable 'jdee-gen-package-name) package-name)
           (format "package %s;\n\n" package-name)))))
-          
-      
-
 
 (defcustom jdee-gen-method-signature-padding-1 ""
   "String that comes just after the function name and just before
