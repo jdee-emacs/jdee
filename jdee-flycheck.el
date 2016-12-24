@@ -115,6 +115,32 @@ for the caret and converts it to a column number."
   (when (looking-at "\\( *\\)^")
     (1+ (length (match-string 1)))))
 
+(defun jdee-flycheck--restore-original-filename (temp-name orig-name)
+  "Replace all occurances of `TEMP-NAME' with `ORIG-NAME' in current buffer."
+  (goto-char (point-min))
+  (while (re-search-forward temp-name nil t)
+    (replace-match orig-name)))
+
+(defun jdee-flycheck--collect-errors (checker orig-buffer)
+  "Collect flycheck errors from `CHECKER' run `ORIG-BUFFER'."
+  (goto-char (point-min))
+  (let ((errors nil))
+    (while (jdee-flycheck-find-next-error)
+      (forward-line 2)
+      (let ((file (match-string 1))
+            (line (match-string 2))
+            (message (match-string 3))
+            ;; jdee-flymake-get-col changes search data; do it last
+            (col (jdee-flymake-get-col)))
+        (add-to-list 'errors
+                     (jdee-flycheck-compile-buffer-error checker
+                                                         file
+                                                         line
+                                                         col
+                                                         message
+                                                         orig-buffer))))
+    errors))
+
 (defun jdee-flycheck-compile-buffer-after (checker cback orig-file orig-buffer
                                                    temp-file temp-buffer)
   "Callback function called when the compilation is complete.
@@ -130,31 +156,12 @@ cleans up after the compilation."
                 (temp-buffer temp-buffer))
     (lambda (buf msg)
       (with-current-buffer buf
-        (goto-char (point-min))
-        (while (re-search-forward temp-file nil t)
-          (replace-match orig-file))
-        (let ((errors nil))
-          (goto-char (point-min))
-          (while (jdee-flycheck-find-next-error)
-            (forward-line 2)
-            (let ((file (match-string 1))
-                  (line (match-string 2))
-                  (message (match-string 3))
-                  ;; jdee-flymake-1get-col changes search data; do it last
-                  (col (jdee-flymake-get-col)))
-              (add-to-list 'errors
-                           (jdee-flycheck-compile-buffer-error checker
-                                                               file
-                                                               line
-                                                               col
-                                                               message
-                                                               orig-buffer))))
-
+        (jdee-flycheck--restore-original-filename temp-file orig-file)
+        (let ((errors (jdee-flycheck--collect-errors checker orig-buffer)))
+          (flycheck-display-error-messages errors)
           (kill-buffer temp-buffer)
-          ;;(kill-buffer buf)
           (set (make-local-variable 'jdee-compile-jump-to-first-error) nil)
           (set 'jdee-compile-mute t)
-          ;;(message "ERRORS: %s" errors)
           (funcall cback 'finished errors))))))
 
 (defun jdee-flycheck-find-next-error ()
