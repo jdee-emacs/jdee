@@ -162,7 +162,7 @@ cleans up after the compilation."
   (if (search-forward "error:" nil t)
       (progn
         (beginning-of-line)
-        (or (re-search-forward "^\\(.*\\):\\([0-9]+\\): *error:\\(.*\\)$"
+        (or (re-search-forward "^\\(.*\\):\\([0-9]+\\): *error: \\(.*\\)$"
                                (save-excursion (end-of-line) (point))
                                t)
             (progn (forward-line) (jdee-flycheck-find-next-error))))))

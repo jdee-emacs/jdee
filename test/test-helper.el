@@ -25,7 +25,7 @@
 ;;; Code:
 
 (defmacro jdee-test-with-temp-buffer (content &rest body)
-  "Evaluate BODY in a temporary buffer with CONTENTS."
+  "Fill a temporary buffer with `CONTENT' and eval `BODY' in it."
   (declare (debug t)
            (indent 1))
   `(with-temp-buffer
