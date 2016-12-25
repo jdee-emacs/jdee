@@ -902,10 +902,6 @@ See `jdee-gen-get-set-var-template'."
     "(P \"Variable type: \" type t)"
     "(P \"Variable name: \" name t)"
     "'&'>"
-    "(when jdee-gen-create-javadoc "
-    " (progn (require 'jdee-javadoc) (jdee-javadoc-insert-start-block))"
-    " '(l \"* Describe \" (s name) \" here.\" '>'n"
-    "'> (jdee-javadoc-insert-end-block)))"
     "(jdee-gen-get-set-member-annotations"
     "  (tempo-lookup-named 'type)"
     "  (tempo-lookup-named 'name))"
@@ -915,15 +911,6 @@ See `jdee-gen-get-set-var-template'."
 
     "(jdee-gen-blank-lines 2 -1)"
     ;;we begin by the getter
-    "(when jdee-gen-create-javadoc "
-    "'(l '> (jdee-javadoc-insert-start-block)"
-    "\"* Get the <code>\" (jdee-gen-lookup-and-capitalize 'name) \"</code> value.\" '>'n"
-    "'> (jdee-javadoc-insert-empty-line)"
-    "'>"
-    "(let ((type (tempo-lookup-named 'type)))"
-    "  (jdee-gen-save-excursion (jdee-javadoc-insert 'tempo-template-jdee-javadoc-return-tag)))"
-    "'> (jdee-javadoc-insert-end-block)))"
-
     "(jdee-gen-method-signature"
     "  \"public\""
     "  (jdee-gen-lookup-named 'type)"
@@ -940,16 +927,6 @@ See `jdee-gen-get-set-var-template'."
     "'n"
 
     ;;we continue with the setter
-    "(when jdee-gen-create-javadoc "
-    "'(l '> (jdee-javadoc-insert-start-block)"
-    "\"* Set the <code>\" (jdee-gen-lookup-and-capitalize 'name) \"</code> value.\" '>'n"
-    "\"*\" '>'n"
-    ;; ToDo: use jdee-wiz-get-set-variable-prefix
-    "\"* @param \" (jdee-gen-lookup-named 'name)"
-    "\" The new \" (jdee-gen-lookup-and-capitalize 'name) \" value.\" '>'n"
-    "'> (jdee-javadoc-insert-end-block)))"
-
-    ;; name the method
     "(jdee-gen-method-signature "
     "  \"public\""
     "  \"void\""
@@ -958,7 +935,7 @@ See `jdee-gen-get-set-var-template'."
     "          (jdee-gen-lookup-named 'name))"
     " )"
 
-   "(jdee-gen-electric-brace)"
+    "(jdee-gen-electric-brace)"
 
     "'>\"this.\" (s name) \" = \" (jdee-gen-lookup-named 'name)"
     "\";\" '>'n \"}\" '>'n"
