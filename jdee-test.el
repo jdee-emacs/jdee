@@ -1,7 +1,6 @@
-;;; jdee-test.el -- Integrated Development Environment for Java.
+;;; jdee-test.el -- Unit testing support
 
 ;; Author: Matthew O. Smith <matt@m0smith.com>
-;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 1997, 1998, 2001, 2002, 2003, 2004, 2005, 2008 Paul Kinnucan.
@@ -25,33 +24,22 @@
 
 ;;; Commentary:
 
-;; This is one of a set of packages that make up the Java Development
-;; Environment (JDE) for Emacs. See the JDE User's Guide for more
-;; information. It includes code for using the Eclipse compiler
-;; originally written by Suraj Acharya.
-
-;; This provides access to unit testing support
-
-;; The latest version of the JDE is available at
-;; <URL:http://jdee.sourceforge.net/>.
-
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Landes <landes <at> mailc dt net>
+;; This provides access to unit testing support.
 
 ;;; Code:
 
 (defgroup jdee-test-options nil
-  "JDE Unit Testing Options"
+  "JDEE Unit Testing Options"
   :group 'jdee
   :prefix "jdee-test-option-")
 
 (defcustom jdee-test-function 'jdee-junit-run
-    "The function to run to do a unit test"
+  "The function to run to do a unit test."
   :group 'jdee-compile-options
   :type 'function)
 
 (defun jdee-test-function-default ()
-  "Default unit test function.  
+  "Default unit test function.
 Currently just tells the user unit testing is not supported"
   (message "Unit test support is not yet implemented"))
 

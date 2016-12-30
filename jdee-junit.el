@@ -1,9 +1,7 @@
 ;; jdee-junit.el --- runs the junit test in the current buffer.
-;; $Id$
 
 ;; Author: Paul Kinnucan
 ;; Author: Torsten Geise <torsten.geise@freenet.de>
-;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: tools, processes
 
 ;; Copyright (C) 2004, 2005, 2006 Paul Kinnucan, Torsten Geise
@@ -26,15 +24,13 @@
 ;;; Commentary:
 
 ;; This package is developed to perform junit test cases from within the
-;; current buffer. Most defuns are copied from jde sources and modified to
+;; current buffer.  Most defuns are copied from jde sources and modified to
 ;; do the right things to JUnit.
-;; This package should be best integrated to the JDEE. That means this
+;; This package should be best integrated to the JDEE.  That means this
 ;; package uses the jde project files to store junit specific settings and
 ;; so on.
 
-;; Please send any comments, bugs, or upgrade requests to
-;; Torsten Geise at torsten.geise@freenet.de.
-
+;;; Code:
 
 (require 'jdee)
 (require 'jdee-run);; jdee-run-get-vm jdee-run-vm-launch
@@ -44,33 +40,30 @@
 (declare-function c-indent-exp "cc-cmds" (&optional shutup-p))
 
 (defgroup jdee-junit nil
-  "JDE JUnit"
+  "JDEE JUnit"
   :group 'jdee
   :prefix "jdee-junit-")
 
-;;
-
 (defcustom jdee-junit-test-class-generator 'jdee-junit4-test-class-internal
-  "Which template to use to fill in a new unit test.  This is a
-function that takes no arguments and inserts the contents in to
+  "Which template to use to fill in a new unit test.
+This is a function that takes no arguments and inserts the contents in to
 the current buffer.  The tempo package makes a good template.
 See `jdee-junit4-test-class-internal' as an example."
   :group 'jdee-junit
   :type 'symbol)
 
 (defcustom jdee-junit-working-directory ""
-  "*Path of the working directory for the test run.
-If you specify a path, the JDE launches the test run from the
-directory specified by the path. Otherwise the test run will be launched
-from the current buffer's directory"
+  "Path of the working directory for the test run.
+If you specify a path, the JDEE launches the test run from the
+directory specified by the path.  Otherwise the test run will be
+launched from the current buffer's directory"
   :group 'jdee-junit
   :type 'file)
 
-;; (makunbound 'jdee-junit-testrunner-type)
 (defcustom jdee-junit-testrunner-type "junit.textui.TestRunner"
-  "Defines the test runner to be used. If you specify a custom
-test runner, enter the class name of the test runner in the
-edit field."
+  "Defines the test runner to be used.
+If you specify a custom test runner, enter the class name
+of the test runner in the edit field."
   :group 'jdee-junit
   :tag "Test Runner"
   :type '(choice
@@ -79,37 +72,32 @@ edit field."
 	  (const :tag "AWT GUI" :value "junit.awtui.TestRunner")
 	  (string :tag "Custom UI")))
 
-;; (makunbound 'jdee-junit-tester-name-tag)
 (defcustom jdee-junit-tester-name-tag (cons "Test" nil)
-  "Specifies a tag appended or prefixed to the name of a testee
-class to create the name of the corresponding tester class, e.g.,
-T or Test, as in TFoo or FooTest.  Having a test suffix plays
-nicely with `projectile-mode'."
+  "Specifies a prefix or suffix to use in test class name.
+It will be concatenated with tested class name, e.g.: T or Test, as in TFoo
+or FooTest.  Having a test suffix plays nicely with `projectile-mode'."
   :group 'jdee-junit
   :tag "Test Class Name Tag"
   :type '(cons
 	  (string :tag "Tag" :value "T")
 	  (choice :tag "Tag Type"
-	   (const :tag "Prefix" :value t)
-	   (const :tag "Suffix" :value nil))))
-
+                  (const :tag "Prefix" :value t)
+                  (const :tag "Suffix" :value nil))))
 
 ;;JUnit templates
 
 (defun jdee-junit-get-tester-name (testee-name)
-  "Gets the name of a tester class from the name
-of the testee class by appending or prefixing
-`jdee-junit-tester-name-tag'."
+  "Get the name of a tester class based on `TESTEE-NAME'.
+The `testee-name' is joined with `jdee-junit-tester-name-tag'."
   (let ((tag (car jdee-junit-tester-name-tag))
 	(prefixp (cdr jdee-junit-tester-name-tag)))
-  (if prefixp
-      (concat tag testee-name)
-    (concat testee-name tag))))
+    (if prefixp
+        (concat tag testee-name)
+      (concat testee-name tag))))
 
 (defun jdee-junit-get-testee-name (tester-name)
-  "Gets the name of a testee class from the name
-of the tester class by removing prefixed or
-affixed `jdee-junit-tester-name-tag'."
+  "Get the name of a testee class from the `TESTER-NAME'.
+The result comes from removing prefixed or affixed `jdee-junit-tester-name-tag'."
   (let ((tag (car jdee-junit-tester-name-tag))
 	(prefixp (cdr jdee-junit-tester-name-tag)))
     (if prefixp
@@ -122,7 +110,6 @@ affixed `jdee-junit-tester-name-tag'."
 	 (concat "\\(.*\\)" tag "$")
 	 tester-name)))
     (substring tester-name (match-beginning 1) (match-end 1))))
-
 
 (defcustom jdee-junit-test-class-template
   (list
@@ -205,7 +192,7 @@ affixed `jdee-junit-tester-name-tag'."
    "\"// \""
    "(file-name-sans-extension (file-name-nondirectory buffer-file-name))"
    "'>'n")
-  "*Template for new Java class.
+  "Template for new Java class.
 Setting this variable defines a template instantiation
 command `jdee-junit-test-class', as a side-effect."
   :group 'jdee-junit
@@ -343,19 +330,20 @@ command `jdee-junit4-test-class', as a side-effect."
 (defvar jdee-junit-test-extension ".java")
 
 (defun jdee-junit-test-class-dir ()
+  "Return directory where test sources are located."
   (let*((prj-dir (file-name-directory jdee-current-project))
         (test-source-dir (expand-file-name jdee-gen-test-path prj-dir)))
     test-source-dir))
 
 ;;;###autoload
 (defun jdee-junit-test-class-buffer ()
-  "Create a buffer containing a skeleton unit test class having the same name as the
-root name of the buffer. This command prompts you to enter the file name
-of the test class. It assumes that the file name has the form CLASSTest.java
-where CLASS is the name of the class to be tested, e.g., MyAppTest.java. Use
-`jdee-gen-junit-add-test-to-suite' to add tests to the test suite. Use of
-tests generated with this template requires the JUnit test framework. For
-more information, see http://www.junit.org."
+  "Create a buffer containing a skeleton unit test class.
+The buffer name will have the same name as the root name of the buffer.
+This command prompts you to enter the file name of the test class.  It assumes
+that the file name has the form CLASSTest.java where CLASS is the name of the
+class to be tested, e.g., MyAppTest.java.
+Use `jdee-gen-junit-add-test-to-suite' to add tests to the test suite.  Use of
+tests generated with this template requires the JUnit test framework."
   (interactive)
   (let* ((tester-name
           (jdee-junit-get-tester-name
@@ -376,8 +364,7 @@ more information, see http://www.junit.org."
           (setq default-directory dir
                 buffer-file-name full-path)
           (rename-buffer test-class-name)
-          (funcall jdee-junit-test-class-generator)      
-          
+          (funcall jdee-junit-test-class-generator)
           (set-auto-mode)
           (goto-char (point-min))
           (re-search-forward "@link")
@@ -386,18 +373,11 @@ more information, see http://www.junit.org."
           (backward-char 1)
           (c-indent-exp)
           (tempo-forward-mark)
-          (display-buffer (current-buffer))
-          )))))
+          (display-buffer (current-buffer)))))))
 
 ;;;###autoload
 (defun jdee-junit4-test-class-buffer ()
-  "Create a buffer containing a skeleton unit test class having
-the same name as the root name of the buffer. This command
-prompts you to enter the file name of the test class. It assumes
-that the file name has the form CLASSTest.java where CLASS is the
-name of the class to be tested, e.g., MyAppTest.java. Use of
-tests generated with this template requires the JUnit test
-framework. For more information, see http://www.junit.org."
+  "Create a buffer containing a JUnit4 test skeleton."
   (interactive)
   (let ((tester-name
 	 (jdee-junit-get-tester-name
@@ -432,8 +412,8 @@ framework. For more information, see http://www.junit.org."
     "(P \"Method to call: \") \"();\"'>'n"
     "\"}\"'>'n"
     "\"});\"'>'n"
-   )
-  "*Template for generating a test case for suite."
+    )
+  "Template for generating a test case for suite."
   :group 'jdee-junit
   :type '(repeat string)
   :set '(lambda (sym val)
@@ -458,28 +438,27 @@ framework. For more information, see http://www.junit.org."
   (interactive)
   (jdee-junit-add-test-to-suite-internal))
 
-
 ;;;###autoload
 (defun jdee-junit-run ()
-  "Starts junit testrunner with buffer corresponding class name."
+  "Start JUnit testrunner with buffer corresponding class name."
   (interactive)
-   (if (equal major-mode 'jdee-mode)
-       (let ((vm (jdee-run-get-vm))
-	     (working-directory
-	      (if (string= jdee-junit-working-directory "")
-		  default-directory
-		(jdee-normalize-path 'jdee-junit-working-directory))))
-	 (oset vm :main-class jdee-junit-testrunner-type )
-	 (jdee-run-set-app-args (concat (jdee-db-get-package)
+  (if (equal major-mode 'jdee-mode)
+      (let ((vm (jdee-run-get-vm))
+            (working-directory
+             (if (string= jdee-junit-working-directory "")
+                 default-directory
+               (jdee-normalize-path 'jdee-junit-working-directory))))
+        (oset vm :main-class jdee-junit-testrunner-type )
+        (jdee-run-set-app-args (concat (jdee-db-get-package)
 				       (file-name-sans-extension
 					(file-name-nondirectory (buffer-file-name)))))
-	 (cd working-directory)
-	 (jdee-run-vm-launch vm))
-     (error "The jdee-junit-run command works only in a Java source buffer.")))
+        (cd working-directory)
+        (jdee-run-vm-launch vm))
+    (error "The jdee-junit-run command works only in a Java source buffer")))
 
 ;;;###autoload
 (defun jdee-junit-show-options ()
-  "Show the JDE JUnit Options panel."
+  "Show the JDEE JUnit Options panel."
   (interactive)
   (customize-apropos "jdee-junit" 'groups))
 
@@ -489,4 +468,4 @@ framework. For more information, see http://www.junit.org."
 
 (provide 'jdee-junit)
 
-;; End of jdee-junit.el
+;;; jdee-junit.el ends here
