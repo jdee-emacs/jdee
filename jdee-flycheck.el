@@ -1,4 +1,4 @@
-;;; jdee-flycheck.el -- Flycheck mode for JDEE  -*- lexical-binding: t -*-
+;;; jdee-flycheck.el -- Flycheck mode for JDEE  -*- lexical-binding: t; -*-
 
 ;; Author: Matthew O. Smith <matt@m0smith.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -132,13 +132,14 @@ for the caret and converts it to a column number."
             (message (match-string 3))
             ;; jdee-flymake-get-col changes search data; do it last
             (col (jdee-flymake-get-col)))
-        (add-to-list 'errors
-                     (jdee-flycheck-compile-buffer-error checker
-                                                         file
-                                                         line
-                                                         col
-                                                         message
-                                                         orig-buffer))))
+        (push
+         (jdee-flycheck-compile-buffer-error checker
+                                             file
+                                             line
+                                             col
+                                             message
+                                             orig-buffer)
+         errors)))
     errors))
 
 (defun jdee-flycheck-compile-buffer-after (checker cback orig-file orig-buffer
