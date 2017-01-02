@@ -708,7 +708,9 @@ method is to invoke a Java application whose output is compiler-like,
 e.g., javac, ant, or checkstyle. In this case, BUFFER would be
 an instance of a subclass of `bsh-compiler-buffer'."
   (cl-assert (cl-typep expr 'string))
-  (cl-assert (cl-typep buffer 'bsh-buffer))
+  ;; TODO for some reason this assert doesn't work in Emacs 25:
+  (when (/= 25 emacs-major-version)
+    (cl-assert (cl-typep buffer 'bsh-buffer)))
   (unless (bsh-running-p this)
     (bsh-launch this))
   (let* ((comint-buffer (oref this buffer))
