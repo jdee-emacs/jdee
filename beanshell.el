@@ -1,4 +1,4 @@
-;;; beanshell.el
+;;; beanshell.el -- Interactions with BeanShell
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -30,10 +30,10 @@
 
 ;; This package is intended to serve both interactive users and Emacs
 ;; applications that want to use Java as an extension language for
-;; Emacs. To facilitate this dual usage, this package implements the
-;; BeanShell interface as an eieio class named bsh. This class is
+;; Emacs.  To facilitate this dual usage, this package implements the
+;; BeanShell interface as an eieio class named bsh.  This class is
 ;; intended to serve as a base class for classes tailored to specific
-;; applications. This class defines the following methods:
+;; applications.  This class defines the following methods:
 ;;
 ;; bsh               Constructs an instance of the bsh class.
 ;; bsh-launch        Launches the BeanShell and creates an Emacs buffer
@@ -47,9 +47,9 @@
 ;;                   and sets a listener to evaluate the response as a Lisp
 ;;                   expression
 ;;
-;; bsh-eval and bsh-eval-r synchronous functions. After sending a Java
+;; bsh-eval and bsh-eval-r synchronous functions.  After sending a Java
 ;; expression to the BeanShell, they suspend Emacs until the BeanShell
-;; responds. bsh-async-eval does not suspend Emacs. It does, however,
+;; responds.  bsh-async-eval does not suspend Emacs.  It does, however,
 ;; set a listener that evaluates any responses from the BeanShell as
 ;; Lisp expressions.
 ;;
@@ -59,7 +59,7 @@
 ;;
 ;; The bsh class also defines fields that specify the path of the
 ;; BeanShell jar file, the Java vm used to run the BeanShell, a
-;; startup classpath and directory, vm arguments, etc. Emacs package
+;; startup classpath and directory, vm arguments, etc.  Emacs package
 ;; developers can easily extend this base class to tailor the BeanShell
 ;; to specific applications.
 ;; This package provides one such derived class named
@@ -68,12 +68,13 @@
 
 ;; To use the standalone BeanShell, download the BeanShell jar file
 ;; from http://www.beanshell.org/ and install it on your system.
-;; Set bsh-jar to the path of the BeanShell jar. Set bsh-vm to
+;; Set bsh-jar to the path of the BeanShell jar.  Set bsh-vm to
 ;; the path of a Java vm on your system (this is necessary only
 ;; if the java vm is not on your system's command path). Execute
-;; M-x bsh to start the BeanShell. To terminate the BeanShell,
+;; M-x bsh to start the BeanShell.  To terminate the BeanShell,
 ;; execute M-x bsh-exit.
-;;
+
+;;; Code:
 
 (require 'eieio)
 (require 'comint)
