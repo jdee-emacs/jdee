@@ -1,5 +1,4 @@
-;;; jdee-project.el -- Integrated Development Environment for Java.
-;; $Id$
+;;; jdee-project.el -- Project creation dialogs.
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -24,6 +23,7 @@
 ;; Boston, MA 02111-1307, USA.
 
 ;;; Commentary:
+;; This file provides basic project creation wizard.
 
 ;;; Code:
 
@@ -34,34 +34,31 @@
 (defvar jdee-global-classpath);; jde
 
 (defgroup jdee-project nil
-  "JDE Project Options"
+  "JDEE Project Options"
   :group 'jdee
   :prefix "jdee-project-")
 
 
 (defvar jdee-project-menu-definition
-  (list "JDEPrj"
-	["New"   jdee-project-create-project t]
-	)
-  "Defines the JDE project menu")
+  (list "JDEEPrj"
+	["New"   jdee-project-create-project t])
+  "Defines the JDEE project menu.")
 
 (defvar jdee-project-keymap (make-sparse-keymap)
-  "JDE Project keymap.")
+  "JDEE Project keymap.")
 
 (easy-menu-define
- jdee-project-menu jdee-project-keymap
- "JDE Project menu" jdee-project-menu-definition)
-
+  jdee-project-menu jdee-project-keymap
+  "JDEE Project menu" jdee-project-menu-definition)
 
 (defcustom jdee-project-key-bindings nil
-  "Specifies key bindings for JDE's project-related commands."
+  "Specifies key bindings for JDEE's project-related commands."
   :group 'jdee-project)
 
 (if (featurep 'infodock)
     (define-key-after (cdr (assq 'menu-bar global-map))
       [jdee-project]
       (cons (car jdee-project-menu-definition) jdee-project-menu) 'mule))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                           ;;
@@ -71,57 +68,57 @@
 
 (defclass jdee-project ()
   ((name     :initarg :name
-	     :type string
-	     :documentation
-	     "Name of project")
+             :type string
+             :documentation
+             "Name of project")
    (dir      :initarg :dir
-	     :type string
-	     :documentation
-	     "Path of directory that contains this project.")
+             :type string
+             :documentation
+             "Path of directory that contains this project.")
    (prj-file :initarg :prj-file
-	     :type string
-	     :documentation
-	     "Project file for this project.")
+             :type string
+             :documentation
+             "Project file for this project.")
    (src      :initarg :src
-	     :type string
-	     :documentation
-	     "Path of directory that contains the source for this project"))
+             :type string
+             :documentation
+             "Path of directory that contains the source for this project"))
   (:allow-nil-initform t)
-  "Class of JDE projects.")
+  "Class of JDEE projects.")
 
 
 (defclass jdee-project-create-dialog (efc-dialog)
   ((project    :initarg :project
-	      :documentation
-	      "Project that this dialog creates.")
+               :documentation
+               "Project that this dialog creates.")
    (name-field :initarg :name-field
-	      :documentation
-	      "Field for entering project name.")
-   (dir-field :initarg :dir-field
-	      :documentation
-	      "Field for entering project root directory."))
- "Dialog for entering information required to create a project.")
+               :documentation
+               "Field for entering project name.")
+   (dir-field  :initarg :dir-field
+               :documentation
+               "Field for entering project root directory."))
+  "Dialog for entering information required to create a project.")
 
 (defmethod efc-dialog-create ((this jdee-project-create-dialog))
 
   (widget-insert "Create Project\n\n")
 
-    (oset this name-field
-	(widget-create
-	 'editable-field
-	 :format "  %t:  %v\n  %h \n\n"
-	 :size 40
-	 :tag "Project Name"
-	 :doc "Name of project."))
+  (oset this name-field
+        (widget-create
+         'editable-field
+         :format "  %t:  %v\n  %h \n\n"
+         :size 40
+         :tag "Project Name"
+         :doc "Name of project."))
 
-    (oset this dir-field
-	(widget-create
-	 'directory
-	 :format "  %t:  %v\n  %h \n\n"
-	 :size 40
-	 :tag "Project Directory"
-	 :value default-directory
-	 :doc "Root directory for project. Use M-tab to complete.")))
+  (oset this dir-field
+        (widget-create
+         'directory
+         :format "  %t:  %v\n  %h \n\n"
+         :size 40
+         :tag "Project Directory"
+         :value default-directory
+         :doc "Root directory for project. Use M-tab to complete.")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                           ;;
@@ -137,9 +134,9 @@
   "Callback function executed when the user presses the OK button in
 the Application Project Creation dialog."
   (let* ((project (oref this :project))
-	 (name (widget-value (oref this name-field)))
-	 (dir (widget-value (oref this dir-field)))
-	 (proj-dir (expand-file-name name dir)))
+         (name (widget-value (oref this name-field)))
+         (dir (widget-value (oref this dir-field)))
+         (proj-dir (expand-file-name name dir)))
     (oset project :name name)
     (oset project :dir proj-dir)
     (jdee-project-create project)
@@ -154,33 +151,30 @@ the Application Project Creation dialog."
 
 (defclass jdee-project-application (jdee-project)
   ()
-  "Class of JDE application projects")
-
+  "Class of JDEE application projects")
 
 (defmethod jdee-project-create ((this jdee-project-application))
-    (if (not (file-exists-p (oref this dir)))
-	(if (yes-or-no-p
-	      (format "%s does not exist. Should I create it?" (oref this dir)))
-	    (make-directory (oref this dir))
-	  (error "Cannot create project.")))
+  (if (not (file-exists-p (oref this dir)))
+      (if (yes-or-no-p
+           (format "%s does not exist. Should I create it?" (oref this dir)))
+          (make-directory (oref this dir))
+        (error "Cannot create project")))
 
-    ;; Make source directory
-    (let ((dir (expand-file-name "src" (oref this dir))))
-      (if (not (file-exists-p dir)) (make-directory dir)))
+  ;; Make source directory
+  (let ((dir (expand-file-name "src" (oref this dir))))
+    (if (not (file-exists-p dir)) (make-directory dir)))
 
-    ;; Make classes directory
-    (let ((dir (expand-file-name "classes" (oref this dir))))
-      (when (not (file-exists-p dir))
-	(make-directory dir)))
-)
-
+  ;; Make classes directory
+  (let ((dir (expand-file-name "classes" (oref this dir))))
+    (when (not (file-exists-p dir))
+      (make-directory dir))))
 
 (defmethod jdee-project-show-creation-dialog ((this jdee-project-application))
   "Shows the dialog for creating a Java application project."
   (let ((dialog
-	 (jdee-project-application-create-dialog
-	  "project create dialog"
-	  :project this)))
+         (jdee-project-application-create-dialog
+          "project create dialog"
+          :project this)))
     (efc-dialog-show dialog)))
 
 
@@ -188,14 +182,14 @@ the Application Project Creation dialog."
 
 ;;;###autoload
 (defun jdee-project-create-project ()
-  "Creates a JDE project."
+  "Create a JDEE project."
   (interactive)
   (let ((project (jdee-project-application "Application")))
     (jdee-project-show-creation-dialog project)))
 
 ;;;###autoload
 (defun jdee-describe-path (path-type &optional buf)
-  "Prints and gives file existance for each path.
+  "Print and give file existance for each path.
 PATH-TYPE is either `global classpath' for `jdee-global-classpath' or
 `source path' for `jdee-sourcepath'."
   (interactive
@@ -204,9 +198,9 @@ PATH-TYPE is either `global classpath' for `jdee-global-classpath' or
 	path-name path desc)
     (if (equal "source path" path-type)
 	(setq path-name "Source Path"
-	    path jdee-sourcepath)
+              path jdee-sourcepath)
       (setq path-name "Global Classpath"
-	      path jdee-global-classpath))
+            path jdee-global-classpath))
     (with-current-buffer
 	(or buf (get-buffer-create (format "*JDEE %s*" path-name)))
       (setq truncate-lines t)
@@ -227,4 +221,4 @@ blank:  path doesn't exist
 
 (provide 'jdee-project)
 
-;; End of jdee-project.el
+;;; jdee-project.el ends here
