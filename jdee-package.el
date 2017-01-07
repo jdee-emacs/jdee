@@ -90,6 +90,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'jdee-project-file)
 
 ;; FIXME: refactor
 (defvar jdee-resolve-relative-paths-p);; jde

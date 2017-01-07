@@ -32,7 +32,9 @@
 
 ;;; Code:
 
-(require 'jdee)
+(require 'jdee) ;; FIXME: removing this line breaks tests!
+(require 'jdee-gen)
+(require 'jdee-project-file)
 (require 'jdee-run);; jdee-run-get-vm jdee-run-vm-launch
 (require 'jdee-db);; jdee-db-get-package
 

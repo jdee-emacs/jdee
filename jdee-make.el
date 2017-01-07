@@ -22,15 +22,19 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
+;;; Commentary:
+
+;;; Code:
+
 (require 'cl-lib)
 (require 'compile)
+(require 'jdee-project-file)
 
 ;; FIXME: refactor
-(declare-function jdee-root-dir-p "jdee" (dir))
 (declare-function jdee-normalize-path "jdee" (path &optional symbol))
 
 (defgroup jdee-make nil
-  "JDE Make Interface"
+  "JDEE Make Interface"
   :group 'jdee
   :prefix "jdee-make-")
 

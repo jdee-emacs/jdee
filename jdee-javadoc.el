@@ -37,6 +37,7 @@
 (require 'jdee-backend)
 (require 'jdee-javadoc-gen)
 (require 'jdee-parse)
+(require 'jdee-project-file)
 (require 'regexp-opt)
 (require 'tempo)
 

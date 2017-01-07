@@ -83,19 +83,18 @@
 ;;    Initial Version
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;; Code:
+
 (require 'cl-lib)
 (require 'compile)
 (require 'jdee-backend)
+(require 'jdee-project-file)
+(require 'jdee-jdk-manager)
 
 ;; FIXME: refactor to avoid this
 (declare-function jdee-normalize-path "jdee" (path &optional sym))
-(declare-function jdee-get-jdk-prog "jdee" (progname))
-(declare-function jdee-get-tools-jar "jdee" nil)
 (declare-function jdee-build-classpath "jdee" (path &optional sym quote-path-p))
 (declare-function jdee-create-prj-values-str "jdee" nil)
-(declare-function jdee-root-dir-p "jdee" (dir))
-(declare-function jdee-update-autoloaded-symbols "jdee-project-file" nil)
-(declare-function jdee-bsh-running-p "jdee-bsh" nil)
 
 (defgroup jdee-ant nil
   "JDEE Ant"
@@ -521,7 +520,7 @@ and there are no more errors. "
     (let* (proc (thisdir (jdee-ant-get-default-directory)) outwin)
       (save-excursion
         ;; Clear out the compilation buffer and make it writable.
-        (if (not (jdee-bsh-running-p))
+        (if (not (jdee-backend-running-p))
             (progn
               (bsh-launch (oref-default 'jdee-bsh the-bsh))
               (bsh-eval (oref-default 'jdee-bsh the-bsh) (jdee-create-prj-values-str))))

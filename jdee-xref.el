@@ -74,6 +74,7 @@
 (require 'etags) ; find-tag-marker-ring
 (require 'jdee-class)
 (require 'jdee-parse)
+(require 'jdee-project-file)
 (require 'jdee-bytecode)
 (require 'tree-widget)
 

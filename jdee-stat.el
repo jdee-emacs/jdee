@@ -28,6 +28,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'jdee-project-file)
 
 ;;;###autoload
 (defun jdee-stat-loc-report (&optional count &optional total-files)

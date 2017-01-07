@@ -33,5 +33,42 @@
         (delete-directory dir))
     (delete-file dir)))
 
+(defun jdee-root-dir-p (dir)
+  "Return nonnil if DIR is a root directory."
+  (let ((parent (expand-file-name  ".." dir)))
+    (cond
+     ((and
+       (fboundp 'ange-ftp-ftp-name)
+       (fboundp 'ange-ftp-get-file-entry)
+       (ange-ftp-ftp-name dir))
+      (ange-ftp-get-file-entry parent))
+     ((eq system-type 'windows-nt)
+      ;; If the current directory tree is on a
+      ;; virtual drive created by the subst command
+      ;;
+      ;;  (not (file-exists-p parent))
+      ;;
+      ;; fails. Hence, the following hack contributed
+      ;; by Nat Goodspeed.
+      (or
+       (string= parent "//") ; for paths like //host/d/prj/src
+       (string= parent "\\\\") ; for paths like \\host\d\prj\src
+       (string= (substring parent -3) "/..") ; for paths like d:/prj/src
+       (save-match-data
+         (and (string-match "^[a-zA-Z]:/$" parent) t)))) ; for paths like d:/
+     ((member system-type '(cygwin32 cygwin))
+      (or (string= (file-truename dir) (file-truename "/"))
+          (string= parent "//") ; for paths like //host/d/prj/src
+          (string= parent "\\\\") ; for paths like \\host\d\prj\src
+          (and (> (length parent) 3) ; for paths like d:/prj/src
+               (string= (substring parent -3) "/.."))
+          (not (file-exists-p (file-truename dir)))))
+     (t
+      (or (or (not (file-readable-p dir))
+              (not (file-readable-p parent)))
+          (and
+           (string= (file-truename dir) "/")
+           (string= (file-truename parent) "/")))))))
+
 (provide 'jdee-file-util)
 ;;; jdee-file-util.el ends here
