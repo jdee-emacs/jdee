@@ -39,6 +39,14 @@
 (declare-function jdee-complete-find-all-completions "jdee-complete" (pair lst &optional exact-match))
 (declare-function jdee-cursor-posn-as-event "jdee-complete" ())
 
+(defcustom jdee-jdk-doc-url ""
+  "URL of JDK documentation.
+This can point to a remote or local copy of the documentation.  If the value
+of this variable is the null string, the JDEE looks for the JDK documentation
+in the docs subdirectory of the directory returned by `jdee-get-jdk-dir'."
+  :group 'jdee-project
+  :type 'file)
+
 (defgroup jdee-help nil
   "Java Development Environment"
   :group 'jdee-project
