@@ -1,5 +1,5 @@
 EMACS ?= emacs
-EMACSFLAGS = -L .
+EMACSFLAGS = -L . --debug
 CASK ?= cask
 #VERSION = $(shell git describe --tags --abbrev=0 | sed 's/^v//')
 VERSION = 2.4.2
@@ -18,7 +18,7 @@ build : elpa $(OBJECTS)
 
 .PHONY: test
 test : clean
-	$(CASK) exec ert-runner -L .
+	$(CASK) exec ert-runner $(EMACSFLAGS)
 
 .PHONY: clean
 clean :
@@ -36,8 +36,6 @@ elpaclean : clean
 %.elc : %.el
 	$(CASK) build
 
-.PHONY: run-jdee run-jde
+.PHONY: run-jdee
 run-jdee: elpa
 	cask exec emacs -Q -L . --eval "(require 'jdee)"
-
-run-jde: run-jdee
