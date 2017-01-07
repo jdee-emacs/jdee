@@ -1,4 +1,4 @@
-;;; jdee-util.el -- JDE utilities.
+;;; jdee-util.el -- JDEE utilities.
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -25,19 +25,8 @@
 ;;; Commentary:
 
 ;; This package provides useful macros, functions, and classes
-;; required by multiple JDE packages. You should not put any macros,
-;; functions, or classes in this package that require other
-;; JDE packages.
-;;
-;; This is one of a set of packages that make up the
-;; Java Development Environment (JDE) for Emacs. See the
-;; JDE User's Guide for more information.
-
-;; The latest version of the JDE is available at
-;; <URL:http://jdee.sourceforge.net>.
-
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Kinnucan at pkinnucan@comcast.net.
+;; required by multiple JDEE packages.  You should not put any macros,
+;; functions, or classes in this package that require other JDEE packages.
 
 ;;; Code:
 
@@ -59,9 +48,9 @@
 ;;;###autoload
 (defun jdee-require (feature)
   "Require FEATURE, either pre-installed or from the distribution.
- That is, first try to load the FEATURE library. Then try to load the
- jdee-FEATURE library from the JDEE's distribution.
- Signal an error if FEATURE can't be found."
+That is, first try to load the FEATURE library.  Then try to load the
+jdee-FEATURE library from the JDEE's distribution.
+Signal an error if FEATURE can't be found."
   (condition-case nil
       ;; If the library if available, use it.
       (require feature)
@@ -70,10 +59,9 @@
      (require feature (format "jdee-%s" feature)))))
 
 (defmacro jdee-assert-source-buffer ()
-  "Asserts that the current buffer is a
-Java source or a debug buffer."
-  '(assert  (eq major-mode 'jdee-mode) nil
-            "This command works only in a Java source or debug buffer."))
+  "Asserts that the current buffer is a Java source or a debug buffer."
+  '(assert (eq major-mode 'jdee-mode) nil
+           "This command works only in a Java source or debug buffer."))
 
 
 ;; Provided for XEmacs compatibility.
@@ -133,7 +121,7 @@ that contains the JDEE lisp directory."
   "Get the location used by the host system to store temporary files."
   (or (if (boundp 'temporary-file-directory) temporary-file-directory)
       (if (fboundp 'temp-directory) (temp-directory)
-	(error "no temp-directory function found"))))
+	(error "No temp-directory function found"))))
 
 ;; FIXME: this checks that temp-directory is unbound, then calls it anyway!?
 ;; (if (member system-type '(cygwin32 cygwin))
@@ -210,7 +198,7 @@ stack trace.")
     (goto-char (point-min))
     (forward-line (1- line))))
 
-;;;###autolaod
+;;;###autoload
 (defalias 'jdee-goto-exception 'jdee-exception-goto)
 
 (defcustom jdee-htmlize-code-destinations '("~/Desktop" "~/tmp")
@@ -234,7 +222,7 @@ See `jdee-htmlize-code-destinations'."
 	     (list (point-min) (point-max)))
 	   (list (not current-prefix-arg))))
   (unless (require 'htmlize nil t)
-    (error "Requires ELPA package `htmlize'."))
+    (error "Requires ELPA package `htmlize'"))
   (save-restriction
     (narrow-to-region start end)
     (let ((code-buf (current-buffer))
@@ -267,7 +255,7 @@ See `jdee-htmlize-code-destinations'."
 		(kill-buffer buf))))))))
 
 (defun jdee-create-default-prompt (prompt default)
-  "Format a prompt with optional default formatting."
+  "Format a `PROMPT' with optional `DEFAULT' formatting."
   (format "%s%s"
 	  prompt (if default
 		     (format " (default %s): " default) ": ")))

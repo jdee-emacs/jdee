@@ -1,5 +1,4 @@
-;;; jdee-make.el -- Integrated Development Environment for Java.
-;; $Id$
+;;; jdee-make.el -- make support for JDEE
 
 ;; Author: Paul Kinnucan <pkinnucan@attbi.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -166,7 +165,7 @@ enter to the make program along with the arguments specified by
 
 ;;;###autoload
 (defun jdee-make-show-options ()
-  "Show the JDE Make Options panel."
+  "Show the JDEE Make Options panel."
   (interactive)
   (customize-apropos "jdee-make" 'groups))
 
@@ -176,4 +175,4 @@ enter to the make program along with the arguments specified by
 
 (provide 'jdee-make)
 
-;; End of jdee-make.el
+;;; jdee-make.el ends here

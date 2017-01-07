@@ -29,11 +29,11 @@
 
 (require 'cl-lib)
 (require 'eieio)
+(require 'jdee-jdk-manager)
 (require 'jdee-widgets)
 (require 'jdee-util)
 
 ;; FIXME: refactor
-(defvar jdee-jdk)
 (defvar jdee-complete-function)
 (declare-function jdee-complete-get-classinfo "jdee-complete" (name &optional access-level))
 (declare-function jdee-complete-find-all-completions "jdee-complete" (pair lst &optional exact-match))
@@ -59,7 +59,7 @@ in the docs subdirectory of the directory returned by `jdee-get-jdk-dir'."
     (nil "http://docs.oracle.com/j2se/1.5.0/docs/api" "1.5"))
   "*Lists collections of HTML files documenting Java classes.
 This list is used by the `jdee-help-class' command to find help for
-a class. You can specify the following information for each docset:
+a class.  You can specify the following information for each docset:
 
 Description: the description of the Javadoc (i.e. `Hibernate
 3.4').  If you leave this as `Derived', the JDEE will try to

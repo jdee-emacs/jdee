@@ -30,6 +30,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'efc)
 (require 'jdee-compile)
 (require 'jdee-help)
 

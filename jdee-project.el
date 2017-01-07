@@ -27,6 +27,7 @@
 
 ;;; Code:
 
+(require 'efc)
 (require 'eieio)
 
 ;; FIXME: refactor
