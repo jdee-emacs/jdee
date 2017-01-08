@@ -55,6 +55,7 @@
 (require 'cl-lib)
 (require 'compile)
 (require 'jdee-backend)
+(require 'jdee-files)
 
 ;; FIXME: refactor to eliminate these
 (declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
@@ -62,11 +63,11 @@
 (declare-function jdee-get-global-classpath "jdee" ())
 (declare-function jdee-get-jdk-prog "jdee" (progname))
 (declare-function jdee-java-version "jdee" ())
-(declare-function jdee-normalize-path "jdee" (path &optional symbol))
+
 (defvar jdee-complete-last-compiled-class)
 
 (defgroup jdee-compile-options nil
-  "JDE Compiler Options"
+  "JDEE Compiler Options"
   :group 'jdee
   :prefix "jdee-compile-option-")
 

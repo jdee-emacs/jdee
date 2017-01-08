@@ -1,4 +1,4 @@
-;;; jdee-checkstyle.el --- Checkstyle interface for JDE
+;;; jdee-checkstyle.el --- Checkstyle interface for JDEE
 
 ;; Copyright (C) 2001, 2002, 2003, 2004 Markus Mohnen and Paul Kinnucan
 ;; Copyright (C) 2009 by Paul Landes
@@ -32,10 +32,9 @@
 
 ;;; Commentary:
 
-;;; This package provides an interface from JDE (see
-;;; http://jdee.sourceforge.net/) to Oliver Burn's CheckStyle (see
-;;; http://checkstyle.sourceforge.net/) a development tool
-;;; to help programmers write Java code that adheres to a coding
+;;; This package provides an interface from JDEE to Oliver Burn's
+;;; CheckStyle (see http://checkstyle.sourceforge.net/) a development
+;;; tool to help programmers write Java code that adheres to a coding
 ;;; standard.
 
 ;;; Usage:
@@ -50,13 +49,13 @@
 ;;; Code:
 
 (require 'jdee-compile)
+(require 'jdee-files)
 (require 'jdee-project-file)
 (require 'jdee-run)
 (require 'jdee-util)
 
 ;; FIXME: refactor
 (declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
-(declare-function jdee-normalize-path "jdee" (path &optional symbol))
 
 (defconst jdee-checkstyle-version "3.1")
 

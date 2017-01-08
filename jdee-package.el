@@ -1,5 +1,4 @@
 ;; jdee-package.el -- Java package statement generator
-;; $Id$
 
 ;; Copyright (C) 1998, 2000, 2001, 2002 by David Ponce
 ;; Copyright (C) 2009 by Paul Landes
@@ -30,21 +29,21 @@
 ;;
 ;; This package automatically generates a Java package statement.  The
 ;; package name is deducted from the current classpath setting of
-;; JDE.  When a directory found in classpath is a root of the current
+;; JDEE.  When a directory found in classpath is a root of the current
 ;; buffer default directory, the relative path of the default
 ;; directory from the classpath one becomes the package name by
 ;; substituting directory separators by '.'.
 ;;
 ;; For example:
 ;;
-;;   The JDE classpath setting is:
+;;   The JDEE classpath setting is:
 ;;
 ;;    ("~/java")
 ;;
 ;;   For the file "~/java/FR/test/MyClass.java", the package name
 ;;   generated will be "FR.test".
 ;;
-;;   The JDE classpath setting is:
+;;   The JDEE classpath setting is:
 ;;
 ;;    ("~/java" "~/java/test")
 ;;
@@ -52,7 +51,7 @@
 ;;   `jdee-package-default-package-comment' will be generated because
 ;;   the default package can be used.
 ;;
-;;   The JDE classpath setting is:
+;;   The JDEE classpath setting is:
 ;;
 ;;    ("~/java")
 ;;
@@ -90,13 +89,11 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'jdee-files)
 (require 'jdee-project-file)
 
 ;; FIXME: refactor
-(defvar jdee-resolve-relative-paths-p);; jde
 (defvar jdee-sourcepath);; jde
-(declare-function jdee-normalize-path "jdee" (path &optional symbol))
-(declare-function jdee-expand-wildcards-and-normalize "jdee" (path &optional symbol))
 
 (defconst jdee-package-unknown-package-name
   "*unknown*"
@@ -255,4 +252,4 @@ this command does nothing. This command signals an error if the
 (provide 'jdee-package)
 (run-hooks 'jdee-package-load-hook)
 
-;; End of jdee-package.el
+;;; jdee-package.el neds here

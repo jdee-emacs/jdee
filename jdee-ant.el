@@ -88,11 +88,11 @@
 (require 'cl-lib)
 (require 'compile)
 (require 'jdee-backend)
+(require 'jdee-files)
 (require 'jdee-project-file)
 (require 'jdee-jdk-manager)
 
 ;; FIXME: refactor to avoid this
-(declare-function jdee-normalize-path "jdee" (path &optional sym))
 (declare-function jdee-build-classpath "jdee" (path &optional sym quote-path-p))
 (declare-function jdee-create-prj-values-str "jdee" nil)
 

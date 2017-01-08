@@ -28,10 +28,8 @@
 
 (require 'cl-lib)
 (require 'compile)
+(require 'jdee-files)
 (require 'jdee-project-file)
-
-;; FIXME: refactor
-(declare-function jdee-normalize-path "jdee" (path &optional symbol))
 
 (defgroup jdee-make nil
   "JDEE Make Interface"

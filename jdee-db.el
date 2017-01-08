@@ -22,16 +22,16 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, US
 
-;; Commentary:
+;;; Commentary:
 
-;; This package interfaces emacs to jdb, the debugger
-;; distributed as part of JavaSoft's Java
-;; Development Kit (JDK).
+;; This package interfaces Emacs to jdb, the debugger
+;; distributed as part of JDK.
 
 ;;; Code:
 
 (require 'cl-lib)
 (require 'eieio)
+(require 'jdee-files)
 (require 'jdee-open-source)
 (require 'jdee-parse)
 (require 'jdee-util)
@@ -44,9 +44,8 @@
 (declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
 (declare-function jdee-dbs-debugger-running-p "jdee-dbs" ())
 (declare-function jdee-dbs-get-target-process "jdee-dbs" ())
-(declare-function jdee-expand-wildcards-and-normalize "jdee" (path &optional symbol))
 (declare-function jdee-jdb-get-jdb "jdee-jdb" ())
-(declare-function jdee-normalize-path "jdee" (path &optional symbol))
+
 (defvar jdee-dbs-the-debugger)
 (defvar jdee-debugger);; jde
 (defvar jdee-global-classpath)

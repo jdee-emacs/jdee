@@ -43,7 +43,6 @@
 (require 'jdee-files)
 
 ;; FIXME: refactor
-(declare-function jdee-normalize-path "jdee" (path &optional symbol))
 (declare-function jdee-get-jdk-prog "jdee" (progname))
 
 (defcustom jdee-built-class-path nil

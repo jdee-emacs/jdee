@@ -19,6 +19,7 @@
 
 ;;; Code:
 
+(require 'jdee-files)
 (require 'efc)
 
 ;; Hack required by faulty XEmacs implementation of executable-find.

@@ -73,6 +73,7 @@
 (require 'cl-lib)
 (require 'etags) ; find-tag-marker-ring
 (require 'jdee-class)
+(require 'jdee-files)
 (require 'jdee-parse)
 (require 'jdee-project-file)
 (require 'jdee-bytecode)
@@ -80,8 +81,6 @@
 
 ;; FIXME: refactor
 (defvar jdee-sourcepath);; jde
-(declare-function jdee-normalize-path "jdee" (path &optional symbol))
-(declare-function jdee-expand-wildcards-and-normalize "jdee" (path &optional symbol))
 (declare-function jdee-get-jdk-prog "jdee" (progname))
 
 (defconst jdee-xref-version "1.5")

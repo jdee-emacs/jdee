@@ -23,15 +23,14 @@
 (require 'etags);; find-tag-marker-ring
 (require 'efc)
 (require 'jdee-backend)
+(require 'jdee-files)
 (require 'jdee-complete);; jdee-complete-private
 (require 'jdee-import);; jdee-import-get-import
 (require 'jdee-parse)
 (require 'jdee-util)
 (require 'semantic/senator)
 
-
 ;; FIXME: refactor
-(declare-function jdee-expand-wildcards-and-normalize "jdee" (path &optional symbol))
 (defvar jdee-sourcepath)
 
 (defcustom jdee-open-class-at-point-find-file-function 'find-file-other-window
