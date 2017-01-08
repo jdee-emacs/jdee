@@ -490,24 +490,6 @@ This command invokes the function defined by `jdee-build-function'."
               (cons menu-name menu)
               'open-file))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                                                                            ;;
-;; Classpaths                                                                 ;;
-;;                                                                            ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun jdee-build-path-arg (arg path-list &optional quote symbol)
-  "Build a command-line path argument from a list of paths."
-  (let ((path (jdee-build-classpath path-list symbol)))
-    (if quote
-	(setq path (concat "\"" path "\"")))
-    (setq path (concat arg " " path))))
-
-
-(defun jdee-build-classpath-arg (path-list &optional quote symbol)
-  "Build a classpath from a list of paths."
-  (jdee-build-path-arg "-classpath" path-list quote symbol))
-
 (defun jdee-show-speedbar ()
   "Show the speedbar after first checking whether the correct
 version of speedar is installed."

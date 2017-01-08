@@ -11,8 +11,6 @@
 (require 'beanshell)
 (require 'jdee-bsh)
 
-(declare-function jdee-build-path-arg "jdee" (arg path-list &optional quote symbol))
-
 (defun jdee-backend-browse-class (fqn)
   "Browse class FQN in backend's buffer."
   (bsh-eval
@@ -132,6 +130,17 @@ informations on the car."
                "jde.util.JdeUtilities.updateClassList(\""
                class-dir
                "\");")))
+
+(defun jdee-build-path-arg (arg path-list &optional quote symbol)
+  "Build a command-line path argument from a list of paths."
+  (let ((path (jdee-build-classpath path-list symbol)))
+    (if quote
+        (setq path (concat "\"" path "\"")))
+    (setq path (concat arg " " path))))
+
+(defun jdee-build-classpath-arg (path-list &optional quote symbol)
+  "Build a classpath from a list of paths."
+  (jdee-build-path-arg "-classpath" path-list quote symbol))
 
 (defun jdee-backend-create-prj-values-str ()
   "Create Java expression that updates the JDEE's class list
