@@ -41,7 +41,6 @@
   '(require 'cl))
 
 ;; FIXME: refactor to eliminate these
-(defvar jdee-devel-debug);; jde.el
 (defvar jdee-current-project);; jdee-project-file.el
 (declare-function jdee-get-project "jdee-project-file" (symbol project));;
 (declare-function jdee-run-get-vm "jdee-run" ())
@@ -64,6 +63,13 @@
 See https://github.com/jdee-emacs/jdee-server"
   :group 'jdee
   :type 'directory)
+
+(defcustom jdee-devel-debug nil
+  "If true, use the JDEE Java classes in the jde/java/classes
+directory instead of the jde.jar. This variable is intended for
+use in testing the JDEE's java classes."
+  :group 'jdee-project
+  :type 'boolean)
 
 (defclass jdee-bsh-buffer (bsh-comint-buffer) ()
   "JDEE's beanshell buffer")

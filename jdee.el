@@ -204,8 +204,8 @@ version of jdb instead of the new (JPDA-based) version of jdb."
   :group 'jdee-project
   :type '(list
 	  (radio-button-choice
-	  (item "jdb")
-	  (item "old jdb")))
+           (item "jdb")
+           (item "old jdb")))
   :set '(lambda (sym val)
 	  (mapc
 	   (lambda (buff)
@@ -220,13 +220,6 @@ version of jdb instead of the new (JPDA-based) version of jdb."
 		   (jdee-bug-minor-mode -1)))))
 	   (jdee-get-java-source-buffers))
 	  (set-default sym val)))
-
-(defcustom jdee-devel-debug nil
-  "If true, use the JDEE Java classes in the jde/java/classes
-directory instead of the jde.jar. This variable is intended for
-use in testing the JDEE's java classes."
-  :group 'jdee-project
-  :type 'boolean)
 
 (defvar jdee-classpath-separator (if (member system-type '(cygwin32 cygwin))
                                      ";" path-separator)
