@@ -416,16 +416,12 @@ This command invokes the function defined by `jdee-build-function'."
 	(list "Find"
 	      ["Expression"    jdee-find
                (and
-                (executable-find
-                 (if (eq system-type 'windows-nt) "find.exe" "find"))
-                (executable-find
-                 (if (eq system-type 'windows-nt) "grep.exe" "grep")))]
+                (jdee-find-get-find-exec)
+                (jdee-find-get-grep-exec))]
 	      ["Expression..."  jdee-find-dlg
                (and
-                (executable-find
-                 (if (eq system-type 'windows-nt) "find.exe" "find"))
-                (executable-find
-                 (if (eq system-type 'windows-nt) "grep.exe" "grep")))]
+                (jdee-find-get-find-exec)
+                (jdee-find-get-grep-exec))]
               ["Symbol Definition" jdee-open-class-at-point t]
               ["Class"  jdee-show-class-source t]
               ["Super Class"  jdee-show-superclass-source t]

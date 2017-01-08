@@ -21,6 +21,17 @@
 
 (require 'efc)
 
+;; Hack required by faulty XEmacs implementation of executable-find.
+(defun jdee-find-get-find-exec ()
+  "Return path to `find' command or nil."
+  (executable-find
+   (if (eq system-type 'windows-nt) "find.exe" "find")))
+
+(defun jdee-find-get-grep-exec ()
+  "Return path to `grep' command or nil."
+  (executable-find
+   (if (eq system-type 'windows-nt) "grep.exe" "grep")))
+
 (defcustom jdee-find-case-sensitive nil
   "*Specifies whether the jdee-find command performs a case-sensitive search.
 If non-nil, the search is case-sensitive; otherwise, the search ignores case."
@@ -221,12 +232,9 @@ directories to search recursively. If NO-CASE is nonnil, ignore
 case. GRAIN is a string that indicates the granularity of the search,
 i.e., match any \"Character\" string, a \"Word\" only, or a \"Line\"
 only."
-  (if (not (executable-find
-            ;; Hack required by faulty XEmacs implementation of executable-find.
-            (if (eq system-type 'windows-nt) "grep.exe" "grep")))
+  (if (not (jdee-find-get-grep-exec))
       (error "This command requires the Unix grep utility"))
-  (if (not (executable-find
-            (if (eq system-type 'windows-nt) "find.exe" "find")))
+  (if (not (jdee-find-get-find-exec))
       (error (list "This command requires the Unix find utility.")))
   (let* ((directories-option
           (if dirs dirs "."))
