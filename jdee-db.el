@@ -42,7 +42,6 @@
   (require 'wid-edit))
 
 ;; FIXME: refactor
-(declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
 (declare-function jdee-dbs-debugger-running-p "jdee-dbs" ())
 (declare-function jdee-dbs-get-target-process "jdee-dbs" ())
 (declare-function jdee-jdb-get-jdb "jdee-jdb" ())

@@ -88,6 +88,25 @@ existing paths are already normalized."
         paths)
     classpath))
 
+(defun jdee-build-classpath (paths &optional symbol quote-path-p)
+  "Builds a classpath from PATHS.  PATHS is a either list of paths or
+a symbol whose value is a list of paths, in which case the optional
+arg SYMBOL is unnecessary. If QUOTE-PATH-P is nonnil, quote paths
+that contain spaces."
+  (if (symbolp paths)
+      (setq symbol paths
+            paths (symbol-value symbol)))
+  (mapconcat
+   (lambda (path)
+     path)
+   (jdee-expand-classpath
+    (mapcar
+     (lambda (path)
+       (jdee-normalize-path path symbol))
+     paths)
+    symbol)
+   jdee-classpath-separator))
+
 (defcustom jdee-global-classpath nil
   "Specify a common classpath for compile, run, and debug commands.
 Use this variable if you want to the JDEE to use the same classpath for

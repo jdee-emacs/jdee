@@ -31,6 +31,7 @@
 
 (require 'cl-lib)
 (require 'eieio)
+(require 'jdee-classpath)
 (require 'jdee-db)
 (require 'jdee-dbo)
 (require 'jdee-files)
@@ -41,7 +42,6 @@
 (defvar jdee-bug-debugger-command-timeout)
 (defvar jdee-bug-debugger-host-address)
 (declare-function jdee-bug-vm-includes-jpda-p "jdee-bug" ())
-(declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
 (declare-function jdee-get-tools-jar "jdee" nil)
 
 ;; Need jdee-run only to get the definition for

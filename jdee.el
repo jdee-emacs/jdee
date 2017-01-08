@@ -496,26 +496,6 @@ This command invokes the function defined by `jdee-build-function'."
 ;;                                                                            ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun jdee-build-classpath (paths &optional symbol quote-path-p)
-  "Builds a classpath from PATHS.  PATHS is a either list of paths or
-a symbol whose value is a list of paths, in which case the optional
-arg SYMBOL is unnecessary. If QUOTE-PATH-P is nonnil, quote paths
-that contain spaces."
-  (if (symbolp paths)
-      (setq symbol paths
-	    paths (symbol-value symbol)))
-  (mapconcat
-   (lambda (path)
-     path)
-   (jdee-expand-classpath
-    (mapcar
-     (lambda (path)
-       (jdee-normalize-path path symbol))
-     paths)
-    symbol)
-   jdee-classpath-separator))
-
-
 (defun jdee-build-path-arg (arg path-list &optional quote symbol)
   "Build a command-line path argument from a list of paths."
   (let ((path (jdee-build-classpath path-list symbol)))

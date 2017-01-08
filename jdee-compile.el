@@ -59,7 +59,6 @@
 (require 'jdee-files)
 
 ;; FIXME: refactor to eliminate these
-(declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
 (declare-function jdee-complete-flush-classes-in-cache "jdee-complete" (class-list))
 (declare-function jdee-get-jdk-prog "jdee" (progname))
 (declare-function jdee-java-version "jdee" ())

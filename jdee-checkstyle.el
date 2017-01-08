@@ -49,13 +49,11 @@
 ;;; Code:
 
 (require 'jdee-compile)
+(require 'jdee-classpath)
 (require 'jdee-files)
 (require 'jdee-project-file)
 (require 'jdee-run)
 (require 'jdee-util)
-
-;; FIXME: refactor
-(declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
 
 (defconst jdee-checkstyle-version "3.1")
 

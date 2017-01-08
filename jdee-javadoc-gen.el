@@ -37,9 +37,8 @@
 
 ;; FIXME: refactor
 (defvar jdee-sourcepath)
-(declare-function jdee-cygpath "jdee" (path &optional direction))
-(declare-function jdee-get-jdk-dir "jdee" ())
-(declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
+(declare-function jdee-cygpath "jdee-cygwin" (path &optional direction))
+(declare-function jdee-get-jdk-dir "jdee-jdk-manager" ())
 
 (defgroup jdee-javadoc nil
   "Javadoc template generator"

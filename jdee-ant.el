@@ -94,7 +94,6 @@
 (require 'jdee-jdk-manager)
 
 ;; FIXME: refactor to avoid this
-(declare-function jdee-build-classpath "jdee" (path &optional sym quote-path-p))
 (declare-function jdee-create-prj-values-str "jdee" nil)
 
 (defgroup jdee-ant nil

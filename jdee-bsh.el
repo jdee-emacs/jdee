@@ -45,7 +45,6 @@
 (defvar jdee-current-project);; jdee-project-file.el
 (declare-function jdee-get-project "jdee-project-file" (symbol project));;
 (declare-function jdee-run-get-vm "jdee-run" ())
-(declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
 (declare-function jdee-get-tools-jar "jdee" ())
 (declare-function jdee-create-prj-values-str "jdee" ())
 

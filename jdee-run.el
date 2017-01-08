@@ -24,16 +24,14 @@
 
 ;;; Commentary:
 
+;;; Code:
+
 (require 'cl-lib)
 (require 'eieio)
 (require 'jdee-classpath)
 (require 'jdee-files)
+(require 'jdee-jdk-manager)
 (require 'jdee-open-source);; jdee-find-class-source-file
-
-;; FIXME: refactor
-(declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
-(declare-function jdee-java-version "jdee" ())
-(declare-function jdee-get-jdk-prog "jdee" (progname))
 
 (defcustom jdee-run-mode-hook nil
   "*List of hook functions run by `jdee-run-mode' (see `run-hooks')."
