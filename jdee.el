@@ -459,7 +459,7 @@ This command invokes the function defined by `jdee-build-function'."
 		    ["Other..."        jdee-gen-code t]
 		    )
 	      (list "Import"
-		    ["Class..."                jdee-import-\find-and-import t]
+		    ["Class..."                jdee-import-find-and-import t]
 		    ["All"                     jdee-import-all t]
 		    ["All Unique"              jdee-import-all-unique t]
 		    "-"
@@ -547,7 +547,7 @@ This command invokes the function defined by `jdee-build-function'."
 	      (concat "JDEE " jdee-version)
 	      )
 	)
-  "*The JDEE main menu"
+  "The JDEE main menu."
   :group 'jdee-project
   :type 'sexp
   :set '(lambda (sym val)
@@ -576,7 +576,7 @@ This command invokes the function defined by `jdee-build-function'."
     ["Ant buildfile"   jdee-gen-ant-buildfile-buffer t])
    ["Other..."         jdee-gen-buffer t]
    )
-  "*The JDEE New buffer menu"
+  "The JDEE New buffer menu."
   :group 'jdee-project
   :type 'sexp
   :set '(lambda (sym val)
