@@ -1856,8 +1856,7 @@ type `jdee-db-breakpoint'."
      :id   jdee-db-breakpoint-id-counter
      :file file
      :class (concat (jdee-parse-get-package)
-		    (jdee-db-get-class)))))
-
+		    (jdee-parse-get-class)))))
 
 (defun jdee-debug-set-breakpoint ()
   "Ask debugger to set a breakpoint at the current line
@@ -1954,21 +1953,6 @@ in the current buffer."
 	(car jdee-db-interactive-app-arg-history)
 	nil nil
 	'jdee-db-interactive-app-arg-history))))
-
-
-(defun jdee-db-get-class ()
-  "Lookups and return fully qualified class name, e.g. A$B if point
-is in inner class B of A."
-  (interactive)
-  (let ((class-info (jdee-parse-get-innermost-class-at-point)))
-    (if class-info
-        (save-excursion
-          (goto-char (cdr class-info))
-          (let ((parent (jdee-db-get-class)))
-            (if (not parent)
-                (car class-info)
-              (concat parent "$" (car class-info))))))))
-
 
 (defun jdee-db-src-dir-matches-file-p (file)
   "Return non-nill if one of `jdee-sourcepath' matches `FILE'."

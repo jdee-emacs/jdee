@@ -614,6 +614,19 @@ Returns nil, if point is not in a class."
   ;; (goto-char (aref (c-search-uplist-for-classkey (c-parse-state)) 0))
   )
 
+;;TODO: check if it duplicates something in this file
+(defun jdee-parse-get-class ()
+  "Lookups and return fully qualified class name, e.g. A$B if point
+is in inner class B of A."
+  (interactive)
+  (let ((class-info (jdee-parse-get-innermost-class-at-point)))
+    (if class-info
+        (save-excursion
+          (goto-char (cdr class-info))
+          (let ((parent (jdee-parse-get-class)))
+            (if (not parent)
+                (car class-info)
+              (concat parent "$" (car class-info))))))))
 
 (defun jdee-parse-select-qualified-class-name (class &optional prompt)
   "PROMPT the user to select the fully qualified name for CLASS.

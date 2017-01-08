@@ -502,7 +502,7 @@ version of speedar is installed."
 If not in a class, use the buffer name."
   (interactive)
   (let* ((pkg (jdee-parse-get-package))
-         (class (or (jdee-db-get-class)
+         (class (or (jdee-parse-get-class)
                     (caar (semantic-find-tags-by-type "class" (current-buffer)))))
          (rtnval  (if pkg
                       (format "%s%s" pkg class)
