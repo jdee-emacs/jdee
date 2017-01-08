@@ -1,4 +1,4 @@
-;;; jdee-file-util.el --- General functions for working with files
+;;; jdee-files.el --- General functions for working with files
 
 ;; Maintainer: jdee-devel
 
@@ -24,11 +24,11 @@
 
 ;;; Code:
 
-(defun jdee-file-util-remove-all-matching (dir &optional match-re)
+(defun jdee-files-remove-all-matching (dir &optional match-re)
   "Remove from directory DIR all dirs and files matching MATCH-RE."
   (if (file-directory-p dir)
       (progn
-        (mapc 'jdee-file-util-remove-all-matching
+        (mapc 'jdee-files-remove-all-matching
               (directory-files dir t match-re))
         (delete-directory dir))
     (delete-file dir)))
@@ -70,5 +70,5 @@
            (string= (file-truename dir) "/")
            (string= (file-truename parent) "/")))))))
 
-(provide 'jdee-file-util)
-;;; jdee-file-util.el ends here
+(provide 'jdee-files)
+;;; jdee-files.el ends here

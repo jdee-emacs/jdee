@@ -40,7 +40,7 @@
 
 (require 'cl-lib)
 (require 'jdee-bytecode)
-(require 'jdee-file-util)
+(require 'jdee-files)
 
 ;; FIXME: refactor
 (declare-function jdee-normalize-path "jdee" (path &optional symbol))
@@ -123,7 +123,7 @@ argument in the SPEC is the package to restrict processing to.
                                (,process-files
                                 (concat ,dir-sym "/" (subst-char-in-string ?. ?/ ,package)))
                              (,rec-descend ,dir-sym))
-                         (jdee-file-util-remove-all-matching ,dir-sym "[^\\.]$")))))))
+                         (jdee-files-remove-all-matching ,dir-sym "[^\\.]$")))))))
            (cd ,old-dir-sym)))
        ;; return val
        ,(nth 1 spec))))

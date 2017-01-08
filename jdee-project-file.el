@@ -28,7 +28,7 @@
 
 (require 'cl-lib)
 (require 'jdee-custom)
-(require 'jdee-file-util)
+(require 'jdee-files)
 (require 'jdee-log)
 (require 'jdee-maven)
 
