@@ -45,6 +45,14 @@
 (defsubst jdee-line-end-position (&optional n)
   (line-end-position))
 
+(defun jdee-assert-mode (&optional no-raise-p)
+  "Maybe raise an error if the current buffer isn't a JDEE mode buffer.
+`NO-RAISE-P', if non-nil, don't raise an error if this isn't a JDEE mode
+buffer, otherwise, return whether or not it is a legitimate buffer."
+  (if (and (not no-raise-p) (not (eq major-mode 'jdee-mode)))
+      (error "Not visiting a Java source file")
+    (eq major-mode 'jdee-mode)))
+
 ;;;###autoload
 (defun jdee-require (feature)
   "Require FEATURE, either pre-installed or from the distribution.

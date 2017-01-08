@@ -903,14 +903,6 @@ feature in JDEE (see `jdee-complete-at-point')."
           (error "Can not parse the thing at point!")))
     (message "You need JDEE >= 2.2.6 and Senator for using this feature!")))
 
-(defun jdee-assert-mode (&optional no-raise-p)
-  "Maybe raise an error if the current buffer isn't a JDEE mode buffer.
-NO-RAISE-P, if non-`nil', don't raise an error if this insn't a JDEE mode
-buffer, otherwise, return whether or not it is a legitimate buffer."
-  (if (and (not no-raise-p) (not (eq major-mode 'jdee-mode)))
-      (error "Not visiting a Java source file.")
-    (eq major-mode 'jdee-mode)))
-
 (eval-when-compile
   ;; This code will not appear in the compiled (.elc) file
   ;; FIXME: move these to the test directory, with other tests
@@ -920,7 +912,6 @@ buffer, otherwise, return whether or not it is a legitimate buffer."
     (require 'jdee-junit)
     (jdee-junit-self-test)
     (jdee-dbs-self-test)))
-
 
 ;; This must come after all JDEE customization variables have been
 ;; defined.
