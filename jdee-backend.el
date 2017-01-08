@@ -133,7 +133,6 @@ informations on the car."
                class-dir
                "\");")))
 
-;; copied jdee-create-prj-values-str from jdee.el
 (defun jdee-backend-create-prj-values-str ()
   "Create Java expression that updates the JDEE's class list
 to include all the classes on `jdee-global-classpath', if

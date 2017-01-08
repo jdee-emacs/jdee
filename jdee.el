@@ -508,18 +508,6 @@ This command invokes the function defined by `jdee-build-function'."
   "Build a classpath from a list of paths."
   (jdee-build-path-arg "-classpath" path-list quote symbol))
 
-(defun jdee-create-prj-values-str ()
-  "Create Java expression that updates the JDEE's class list
-to include all the classes on `jdee-global-classpath', if
-defined, otherwise the classpath specified by the CLASSPATH
-environment variable."
-  (let* ((directory-sep-char ?/)  ;; Override NT/XEmacs setting
-	 (classpath
-          (jdee-build-path-arg nil (jdee-get-global-classpath) t 'jdee-global-classpath)))
-    (format "jde.util.JdeUtilities.setProjectValues(\"%s\", %s);"
-	    jdee-current-project
-	    classpath)))
-
 (defun jdee-show-speedbar ()
   "Show the speedbar after first checking whether the correct
 version of speedar is installed."

@@ -45,8 +45,9 @@
 (defvar jdee-current-project);; jdee-project-file.el
 (declare-function jdee-get-project "jdee-project-file" (symbol project));;
 (declare-function jdee-run-get-vm "jdee-run" ())
-(declare-function jdee-get-tools-jar "jdee" ())
-(declare-function jdee-create-prj-values-str "jdee" ())
+(declare-function jdee-get-tools-jar "jdee-jdk-manager" ())
+;; FIXME: remove this ugly dep:
+(declare-function jdee-backend-create-prj-values-str "jdee-backend" ())
 
 ;; Avoid recursive requires, where a plugin might require this file
 (autoload 'jdee-pi-get-bsh-classpath "jdee-plugins")
@@ -210,7 +211,7 @@ prints out, Emacs has nothing to evaluate or report."
     (let ((the-bsh (oref-default 'jdee-bsh the-bsh)))
       (when (not (bsh-running-p the-bsh))
 	(bsh-launch the-bsh)
-	(bsh-eval the-bsh (jdee-create-prj-values-str)))
+	(bsh-eval the-bsh (jdee-backend-create-prj-values-str)))
       (when (not no-print-p)
 	(if (string= (substring java-statement -1) ";")
 	    (setq java-statement (substring java-statement 0 -1)))
@@ -306,8 +307,8 @@ a file in the current directory:
       (if (not (jdee-bsh-running-p))
 	  (progn
 	    (bsh-launch (oref-default 'jdee-bsh the-bsh))
-	    (bsh-eval (oref-default 'jdee-bsh the-bsh) (jdee-create-prj-values-str))))
-
+	    (bsh-eval (oref-default 'jdee-bsh the-bsh)
+                      (jdee-backend-create-prj-values-str))))
 
       (bsh-buffer-eval
        (oref-default 'jdee-bsh the-bsh)

@@ -93,9 +93,6 @@
 (require 'jdee-project-file)
 (require 'jdee-jdk-manager)
 
-;; FIXME: refactor to avoid this
-(declare-function jdee-create-prj-values-str "jdee" nil)
-
 (defgroup jdee-ant nil
   "JDEE Ant"
   :group 'jdee
@@ -523,7 +520,7 @@ and there are no more errors. "
         (if (not (jdee-backend-running-p))
             (progn
               (bsh-launch (oref-default 'jdee-bsh the-bsh))
-              (bsh-eval (oref-default 'jdee-bsh the-bsh) (jdee-create-prj-values-str))))
+              (bsh-eval (oref-default 'jdee-bsh the-bsh) (jdee-backend-create-prj-values-str))))
         (setq proc (bsh-get-process (oref-default 'jdee-bsh the-bsh)))
         (set-buffer outbuf)
         (compilation-mode)

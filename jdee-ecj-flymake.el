@@ -106,16 +106,21 @@
 ;;(eval-when-compile
 ;;  (require 'jdee-loader))
 
+;;; Code:
+
 (require 'flymake)
 (require 'jdee)
 (require 'jdee-compile)
 (require 'jdee-bsh)
 
+;; FIXME: remove this ugly dep:
+(declare-function jdee-backend-create-prj-values-str "jdee-backend" ())
+
 ;; pattern for matching eclipse compiler error/warning output
 (defconst jdee-ecj-compiler-error-regexps
   '(
     ("\\([a-z0-9_./]+\\):\\([0-9]+\\): \\(\\([eE]rror\\|[wW]arning\\): \\(.+\\)\\)"
-      1 2 nil 3)
+     1 2 nil 3)
     ))
 
 (defcustom jdee-ecj-command-line-args '("-d" "none" "-source" "1.6" "-target" "1.6" "-warn:-serial")
@@ -229,7 +234,7 @@ To use this funtion set the java line in `flymake-allowed-file-name-masks' to
 
       (unless (jdee-ecj-bsh-running-p)
         (bsh-launch (jdee-ecj-get-bsh))
-        (bsh-eval (jdee-ecj-get-bsh) (jdee-create-prj-values-str)))
+        (bsh-eval (jdee-ecj-get-bsh) (jdee-backend-create-prj-values-str)))
 
       (if args (setq arg-array (concat arg-array
                                        (mapconcat
