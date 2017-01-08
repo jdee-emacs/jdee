@@ -625,12 +625,12 @@ that contain spaces."
   (mapconcat
    (lambda (path)
      path)
-    (jdee-expand-classpath
-     (mapcar
-      (lambda (path)
-	(jdee-normalize-path path symbol))
-      paths)
-     symbol)
+   (jdee-expand-classpath
+    (mapcar
+     (lambda (path)
+       (jdee-normalize-path path symbol))
+     paths)
+    symbol)
    jdee-classpath-separator))
 
 (defun jdee-global-classpath ()
@@ -702,8 +702,8 @@ version of speedar is installed."
   (speedbar-frame-mode))
 
 (defun jdee-fqn ()
-  "Return the fully qualified class name at point.  If not in a
-class, use the buffer name."
+  "Return the fully qualified class name at point.
+If not in a class, use the buffer name."
   (interactive)
   (let* ((pkg (jdee-db-get-package))
          (class (or (jdee-db-get-class)
@@ -722,23 +722,6 @@ Return the fully qualified name."
     (when (called-interactively-p 'any)
       (message "%s added to kill ring" fqn))
     fqn))
-
-(defun jdee-browse-class-at-point ()
-  "Displays the class of the object at point in the BeanShell Class
-Browser. Point can be in a variable name, class name, method name, or field name).
-This command has the  same requirements to work as the field/method-completion
-feature in JDEE (see `jdee-complete-at-point')."
-  (interactive)
-  (if (jdee-open-functions-exist)
-      (let* ((thing-of-interest (thing-at-point 'symbol))
-	     (pair (save-excursion (end-of-thing 'symbol)
-				   (jdee-parse-java-variable-at-point)))
-	     (class-to-open (jdee-open-get-class-to-open
-			     pair thing-of-interest)))
-	(if (and class-to-open (stringp class-to-open))
-	    (jdee-backend-explore-class class-to-open)
-          (error "Can not parse the thing at point!")))
-    (message "You need JDEE >= 2.2.6 and Senator for using this feature!")))
 
 (eval-when-compile
   ;; This code will not appear in the compiled (.elc) file

@@ -34,7 +34,6 @@
 
 ;; FIXME: refactor
 (declare-function jdee-wiz-set-bsh-project "jdee-wiz" ())
-(declare-function jdee-maven-hook "jdee-maven" ())
 
 (defconst jdee-project-file-version "1.0"
   "*The current JDEE project file version number.")

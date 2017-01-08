@@ -581,7 +581,7 @@ If it finds the source file, it opens the file in a buffer."
 	(progn
 	  (if (typep source 'buffer)
 	      (switch-to-buffer source)
-	      ;; (pop-to-buffer source other-window)
+            ;; (pop-to-buffer source other-window)
 	    (if (not (string-equal (buffer-file-name)  source))
 		(if other-window
 		    (find-file-other-window source)
@@ -596,6 +596,23 @@ If it finds the source file, it opens the file in a buffer."
 			 (concat "\\b" inner-class "\\b") nil t)))))))
       (message "JDE error: Could not find source for \"%s\" in this
 project's source path. See `jdee-sourcepath' for more information." class))))
+
+(defun jdee-browse-class-at-point ()
+  "Displays the class of the object at point in the BeanShell Class
+Browser. Point can be in a variable name, class name, method name, or field name).
+This command has the  same requirements to work as the field/method-completion
+feature in JDEE (see `jdee-complete-at-point')."
+  (interactive)
+  (if (jdee-open-functions-exist)
+      (let* ((thing-of-interest (thing-at-point 'symbol))
+	     (pair (save-excursion (end-of-thing 'symbol)
+				   (jdee-parse-java-variable-at-point)))
+	     (class-to-open (jdee-open-get-class-to-open
+			     pair thing-of-interest)))
+	(if (and class-to-open (stringp class-to-open))
+	    (jdee-backend-explore-class class-to-open)
+          (error "Can not parse the thing at point!")))
+    (message "You need JDEE >= 2.2.6 and Senator for using this feature!")))
 
 (provide 'jdee-open-source)
 
