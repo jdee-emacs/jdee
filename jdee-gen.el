@@ -26,6 +26,7 @@
 ;;; Code:
 
 (require 'tempo)
+(require 'jdee-classpath)
 
 ;; FIXME: (require 'cc-cmds) doesn't work
 (declare-function c-indent-line "cc-cmds" (&optional syntax quiet ignore-point-pos))

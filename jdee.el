@@ -43,6 +43,7 @@
 (require 'executable)
 (require 'jdee-log)
 (require 'jdee-activator)
+(require 'jdee-classpath)
 (require 'jdee-abbrev)
 (require 'jdee-annotations)
 (require 'jdee-bug)
@@ -101,44 +102,6 @@ whenever you open a Java source file."
   "Get the version of JDEE."
   (interactive)
   (message "JDEE %s" jdee-version))
-
-;;(makunbound 'jdee-global-classpath)
-(defcustom jdee-global-classpath nil
-  "Specify a common classpath for compile, run, and debug commands.
-Use this variable if you want to the JDEE to use the same classpath for
-compiling, running,and debugging an application. Note that the value
-of this variable is a list of strings, each of which specifies a
-path. The JDEE converts this list to a colon- or semicolon-separated
-list before inserting in the compiler or vm command line.
-
-The path may start with a tilde (~) or period (.) and may include
-environment variables. The JDEE replaces a ~ with your home directory.
-If `jdee-resolve-relative-paths-p' is nonnil, the JDEE replaces the
-. with the path of the current project file. The JDEE replaces each
-instance of an environment variable with its value before inserting it
-into the command line.
-
-You can specify different classpaths for compiling, running and
-debugging applicaitons. Use `jdee-compile-option-classpath' to specify
-the compilation classpath, `jdee-run-option-classpath' to specify the
-run classpath, and/or `jdee-db-option-classpath' to specify the debug
-classpath. You can use these variables together. For example, suppose
-that you need to use one classpath for compilation and other for
-running and debugging. You could do this by setting
-`jdee-compile-option-classpath' to the compile classpath and
-`jdee-global-classpath' to the run and debug classpath. If you set
-`jdee-global-classpath', the JDEE uses it to construct the classpath for
-any operation for which you do not set the operation-specific
-classpath variable (e.g., `jdee-compile-option-classpath').
-
-If you do not set `jdee-global-classpath', the JDEE uses the operation-specific
-classpath if it is set. If neither the global nor the
-operation-specific classpath is set, the JDEE does not generate a
--classpath argument for the operation, e.g., compile or run a Java
-class. In this case, the operation uses the value of the CLASSPATH variable
-if specified."
-  :group 'jdee-project
-  :type '(repeat (file :tag "Path")))
 
 (defcustom jdee-quote-classpath t
   "*Quote the classpath argument.
@@ -221,22 +184,6 @@ version of jdb instead of the new (JPDA-based) version of jdb."
 		   (jdee-bug-minor-mode -1)))))
 	   (jdee-get-java-source-buffers))
 	  (set-default sym val)))
-
-(defvar jdee-classpath-separator (if (member system-type '(cygwin32 cygwin))
-                                     ";" path-separator)
-  "The separator to use in a classpath.
-This is usually the same as `path-separator'")
-
-
-;;;###autoload
-(defun jdee-set-global-classpath (classpath)
-  "Set the value of `jdee-global-classpath'.
-It specifies the -classpath argument for the Java compiler and
-interpreter."
-  (interactive
-   "sEnter classpath: ")
-  (custom-set-variables
-   '(jdee-global-classpath (split-string classpath jdee-classpath-separator) t)))
 
 (defun jdee-show-run-options ()
   "Show the JDEE Run Options panel."
@@ -633,14 +580,9 @@ that contain spaces."
     symbol)
    jdee-classpath-separator))
 
-(defun jdee-global-classpath ()
-  "Builds a classpath string from the path entries in
-`jdee-global-classpath'."
-  (jdee-build-classpath 'jdee-global-classpath))
-
 
 (defun jdee-build-path-arg (arg path-list &optional quote symbol)
-"Build a command-line path argument from a list of paths."
+  "Build a command-line path argument from a list of paths."
   (let ((path (jdee-build-classpath path-list symbol)))
     (if quote
 	(setq path (concat "\"" path "\"")))
@@ -650,21 +592,6 @@ that contain spaces."
 (defun jdee-build-classpath-arg (path-list &optional quote symbol)
   "Build a classpath from a list of paths."
   (jdee-build-path-arg "-classpath" path-list quote symbol))
-
-(defun jdee-get-global-classpath ()
-  "Return the value of `jdee-global-classpath', if defined, otherwise
-the value of the CLASSPATH environment variable converted to a list,
-of normalized paths, i.e., with . and ~ characters expanded and backslashes
-replaces with slashes."
-  (if jdee-global-classpath
-      jdee-global-classpath
-    (let ((cp (getenv "CLASSPATH")))
-      (if (stringp cp)
-	  (mapcar
-	   (lambda (path)
-	     (let ((directory-sep-char ?/))
-               (expand-file-name path)))
-	   (split-string cp jdee-classpath-separator))))))
 
 ;; Contributed by John Ciolfi, jciolfi@mathworks.com.
 (defun jdee-compile-file-if-necessary (file)

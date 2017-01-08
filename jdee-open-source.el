@@ -23,6 +23,7 @@
 (require 'etags);; find-tag-marker-ring
 (require 'efc)
 (require 'jdee-backend)
+(require 'jdee-classpath)
 (require 'jdee-files)
 (require 'jdee-complete);; jdee-complete-private
 (require 'jdee-import);; jdee-import-get-import

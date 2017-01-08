@@ -30,17 +30,16 @@
 
 (require 'cl-lib)
 (require 'efc)
+(require 'jdee-classpath)
 (require 'jdee-compile)
 (require 'jdee-files)
 (require 'jdee-help)
 
 ;; FIXME: refactor
-(defvar jdee-global-classpath)
 (defvar jdee-sourcepath)
 (declare-function jdee-cygpath "jdee" (path &optional direction))
 (declare-function jdee-get-jdk-dir "jdee" ())
 (declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
-(declare-function jdee-get-global-classpath "jdee" ())
 
 (defgroup jdee-javadoc nil
   "Javadoc template generator"

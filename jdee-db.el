@@ -31,6 +31,7 @@
 
 (require 'cl-lib)
 (require 'eieio)
+(require 'jdee-classpath)
 (require 'jdee-files)
 (require 'jdee-open-source)
 (require 'jdee-parse)
@@ -48,7 +49,6 @@
 
 (defvar jdee-dbs-the-debugger)
 (defvar jdee-debugger);; jde
-(defvar jdee-global-classpath)
 (defvar jdee-sourcepath)
 
 ;; ======================================================================
@@ -1980,15 +1980,14 @@ name, e.g. A$B if point is in inner class B of A."
 
 
 (defun jdee-db-src-dir-matches-file-p (file)
-  "Return true if one of `jdee-sourcepath'
-matches FILE."
+  "Return non-nill if one of `jdee-sourcepath' matches `FILE'."
   (let* ((directory-sep-char ?/)
-		 (filename (jdee-normalize-path file)))
+         (filename (jdee-normalize-path file)))
     (cl-find-if
      (lambda (dir-x)
        (string-match
-		(concat "^" dir-x)
-		filename))
+        (concat "^" dir-x)
+        filename))
      (jdee-expand-wildcards-and-normalize jdee-sourcepath 'jdee-sourcepath))))
 
 

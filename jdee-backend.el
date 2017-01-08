@@ -7,11 +7,11 @@
 
 ;;; Code:
 
+(require 'jdee-classpath)
 (require 'beanshell)
 (require 'jdee-bsh)
 
 (declare-function jdee-build-path-arg "jdee" (arg path-list &optional quote symbol))
-(declare-function jdee-get-global-classpath "jdee" ())
 
 (defun jdee-backend-browse-class (fqn)
   "Browse class FQN in backend's buffer."

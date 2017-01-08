@@ -89,6 +89,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'jdee-classpath)
 (require 'jdee-files)
 (require 'jdee-project-file)
 

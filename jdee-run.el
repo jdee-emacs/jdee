@@ -26,11 +26,11 @@
 
 (require 'cl-lib)
 (require 'eieio)
+(require 'jdee-classpath)
 (require 'jdee-files)
 (require 'jdee-open-source);; jdee-find-class-source-file
 
 ;; FIXME: refactor
-(defvar jdee-global-classpath);; jde
 (declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
 (declare-function jdee-java-version "jdee" ())
 (declare-function jdee-get-jdk-prog "jdee" (progname))

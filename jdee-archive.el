@@ -29,6 +29,7 @@
 
 ;;; Code:
 
+(require 'jdee-classpath)
 (require 'memoize)
 
 (defun jdee-archive-files-hashtable (coll)

@@ -87,6 +87,7 @@
 
 (require 'cl-lib)
 (require 'compile)
+(require 'jdee-classpath)
 (require 'jdee-backend)
 (require 'jdee-files)
 (require 'jdee-project-file)

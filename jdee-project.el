@@ -29,10 +29,10 @@
 
 (require 'efc)
 (require 'eieio)
+(require 'jdee-classpath)
 
 ;; FIXME: refactor
 (defvar jdee-sourcepath);; jde
-(defvar jdee-global-classpath);; jde
 
 (defgroup jdee-project nil
   "JDEE Project Options"

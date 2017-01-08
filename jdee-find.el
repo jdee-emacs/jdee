@@ -19,6 +19,7 @@
 
 ;;; Code:
 
+(require 'jdee-classpath)
 (require 'jdee-files)
 (require 'efc)
 
