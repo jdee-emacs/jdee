@@ -253,4 +253,4 @@ this command does nothing. This command signals an error if the
 (provide 'jdee-package)
 (run-hooks 'jdee-package-load-hook)
 
-;;; jdee-package.el neds here
+;;; jdee-package.el ends here

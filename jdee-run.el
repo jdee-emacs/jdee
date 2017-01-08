@@ -32,6 +32,7 @@
 (require 'jdee-files)
 (require 'jdee-jdk-manager)
 (require 'jdee-open-source);; jdee-find-class-source-file
+(require 'jdee-parse)
 
 (defcustom jdee-run-mode-hook nil
   "*List of hook functions run by `jdee-run-mode' (see `run-hooks')."
@@ -1240,16 +1241,16 @@ interact with the program."
 		 (or jdee-run-read-app-args
 		     (not (= prefix 1))))
 		(read-main-class
-		  (= prefix -1)))
+                 (= prefix -1)))
 	    (oset
 	     vm
 	     :main-class
 	     (if read-main-class
 		 (read-from-minibuffer
 		  "Main class: "
-		  (concat (jdee-db-get-package)
-		      (file-name-sans-extension
-		       (file-name-nondirectory (buffer-file-name)))))
+		  (concat (jdee-parse-get-package)
+                          (file-name-sans-extension
+                           (file-name-nondirectory (buffer-file-name)))))
 	       (jdee-run-get-main-class)))
 	    (let ((jdee-run-read-app-args read-app-args))
 	      (jdee-run-vm-launch vm)))
@@ -1262,12 +1263,12 @@ source buffer belongs."
   (let ((main-class
 	 (if jdee-run-option-jar
 	     (jdee-normalize-path 'jdee-run-application-class)
-	 jdee-run-application-class)))
+           jdee-run-application-class)))
     (if (or
 	 (not main-class)
 	 (string= main-class ""))
 	(setq main-class
-	      (concat (jdee-db-get-package)
+	      (concat (jdee-parse-get-package)
 		      (file-name-sans-extension
 		       (file-name-nondirectory (buffer-file-name))))))
     main-class))

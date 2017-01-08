@@ -501,7 +501,7 @@ version of speedar is installed."
   "Return the fully qualified class name at point.
 If not in a class, use the buffer name."
   (interactive)
-  (let* ((pkg (jdee-db-get-package))
+  (let* ((pkg (jdee-parse-get-package))
          (class (or (jdee-db-get-class)
                     (caar (semantic-find-tags-by-type "class" (current-buffer)))))
          (rtnval  (if pkg

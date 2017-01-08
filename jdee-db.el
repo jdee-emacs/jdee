@@ -1581,7 +1581,7 @@ buffer. This command creates a command buffer for the debug session."
 		   (string= main-class ""))
 		  (setq main-class
 			(if (buffer-file-name)
-			    (concat (jdee-db-get-package)
+			    (concat (jdee-parse-get-package)
 				    (file-name-sans-extension
 				     (file-name-nondirectory (buffer-file-name))))
 			  (read-string "Java class to debug: "))))
@@ -1658,7 +1658,7 @@ buffer. This command creates a command buffer for the debug session."
 	 (not applet-class)
 	 (string= applet-class ""))
 	(setq applet-class
-	      (concat (jdee-db-get-package)
+	      (concat (jdee-parse-get-package)
 		      (file-name-sans-extension
 		       (file-name-nondirectory (buffer-file-name))))))
     (jdee-debug-applet-init applet-class  applet-doc)))
@@ -1855,7 +1855,7 @@ type `jdee-db-breakpoint'."
 	     jdee-db-breakpoint-id-counter)
      :id   jdee-db-breakpoint-id-counter
      :file file
-     :class (concat (jdee-db-get-package)
+     :class (concat (jdee-parse-get-package)
 		    (jdee-db-get-class)))))
 
 
@@ -1956,26 +1956,18 @@ in the current buffer."
 	'jdee-db-interactive-app-arg-history))))
 
 
-(defun jdee-db-get-package ()
-  "Return the package of the class whose source file resides in the current
-buffer."
-  (save-excursion
-    (goto-char (point-min))
-    (if (re-search-forward "^[ \t]*\\<\\(package\\) +\\([^ \t\n]*\\) *;" (point-max) t)
-	(concat (buffer-substring-no-properties (match-beginning 2) (match-end 2))
-		"."))))
-
-(defun jdee-db-get-class () "Lookups and return fully qualified class
-name, e.g. A$B if point is in inner class B of A."
+(defun jdee-db-get-class ()
+  "Lookups and return fully qualified class name, e.g. A$B if point
+is in inner class B of A."
   (interactive)
   (let ((class-info (jdee-parse-get-innermost-class-at-point)))
     (if class-info
-      (save-excursion
-	(goto-char (cdr class-info))
-	(let ((parent (jdee-db-get-class)))
-	(if (not parent)
-	    (car class-info)
-	    (concat parent "$" (car class-info))))))))
+        (save-excursion
+          (goto-char (cdr class-info))
+          (let ((parent (jdee-db-get-class)))
+            (if (not parent)
+                (car class-info)
+              (concat parent "$" (car class-info))))))))
 
 
 (defun jdee-db-src-dir-matches-file-p (file)

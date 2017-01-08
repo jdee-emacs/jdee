@@ -469,6 +469,15 @@ current buffer resides."
 	 pos
        0))))
 
+;;FIXME: remove in favor of jdee-parse-get-package-name
+(defun jdee-parse-get-package ()
+  "Return the package of the class whose source file resides in the current buffer."
+  (save-excursion
+    (goto-char (point-min))
+    (if (re-search-forward "^[ \t]*\\<\\(package\\) +\\([^ \t\n]*\\) *;" (point-max) t)
+	(concat (buffer-substring-no-properties (match-beginning 2) (match-end 2))
+		"."))))
+
 (defun jdee-parse-get-unqualified-name (name)
   "Gets the last name in a qualified name."
   (let ((unqualified-name (substring name (string-match "[^.]+$" name))))

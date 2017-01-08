@@ -35,9 +35,9 @@
 (require 'jdee) ;; FIXME: removing this line breaks tests!
 (require 'jdee-files)
 (require 'jdee-gen)
+(require 'jdee-parse);; jdee-parse-get-package
 (require 'jdee-project-file)
 (require 'jdee-run);; jdee-run-get-vm jdee-run-vm-launch
-(require 'jdee-db);; jdee-db-get-package
 
 ;; FIXME: (require 'cc-cmds) doesn't work
 (declare-function c-indent-exp "cc-cmds" (&optional shutup-p))
@@ -353,7 +353,7 @@ tests generated with this template requires the JUnit test framework."
            (file-name-sans-extension
             (file-name-nondirectory buffer-file-name))))
          (test-class-name (format "%s%s" tester-name jdee-junit-test-extension))
-         (package (replace-regexp-in-string "[.]$" "" (jdee-db-get-package)))
+         (package (replace-regexp-in-string "[.]$" "" (jdee-parse-get-package)))
          (_ (jdee-gen-get-package-statement package)) ;; called to set jdee-gen-package-name
          (dir (expand-file-name (jdee-package-to-slashes jdee-gen-package-name) (jdee-junit-test-class-dir)))
          (full-path (expand-file-name test-class-name dir))
@@ -452,7 +452,7 @@ tests generated with this template requires the JUnit test framework."
                  default-directory
                (jdee-normalize-path 'jdee-junit-working-directory))))
         (oset vm :main-class jdee-junit-testrunner-type )
-        (jdee-run-set-app-args (concat (jdee-db-get-package)
+        (jdee-run-set-app-args (concat (jdee-parse-get-package)
 				       (file-name-sans-extension
 					(file-name-nondirectory (buffer-file-name)))))
         (cd working-directory)
