@@ -33,6 +33,61 @@
   "The separator to use in a classpath.
 This is usually the same as `path-separator'")
 
+(defcustom jdee-expand-classpath-p t
+  "Replace each occurence of a directory named `jdee-lib-directory-names'
+ in the classpath with paths to the jar and zip files in that directory."
+  :group 'jdee-project
+  :type 'boolean)
+
+(defcustom jdee-lib-directory-names (list "/lib$" "/jar$")
+  "Regular expressions that matches names of jar/zip directories for
+the current project. See `jdee-expand-classpath-p' and
+`jdee-expand-classpath' for more information"
+  :group 'jdee-project
+  :type '(repeat (string :tag "Name")))
+
+(defcustom jdee-lib-excluded-file-names nil
+  "Regular expressions that matches names of jar or zip files that should
+ be excluded when expanding a library specified by `jdee-lib-directory-names'."
+  :group 'jdee-project
+  :type '(repeat (string :tag "Name")))
+
+(defun jdee-expand-classpath (classpath &optional symbol)
+  "If `jdee-expand-classpath-p' is nonnil, replaces paths to
+directories that match `jdee-lib-directory-names' with paths to jar or
+zip files in those directories, excepting those specified by
+`jdee-lib-excluded-file-names'. This function assumes that the
+existing paths are already normalized."
+  (if jdee-expand-classpath-p
+      (let (paths)
+        (loop for path in classpath do
+              (if (and
+                   (file-exists-p path)
+                   (file-directory-p path)
+                   (cl-member-if
+                    (lambda (lib-name) (string-match lib-name path))
+                    jdee-lib-directory-names))
+                  (progn
+                    (setq paths
+                          (append
+                           paths
+                           (jdee-expand-directory
+                            path
+                            "\\.jar$"
+                            jdee-lib-excluded-file-names
+                            symbol)))
+                    (setq paths
+                          (append
+                           paths
+                           (jdee-expand-directory
+                            path
+                            "\\.zip$"
+                            jdee-lib-excluded-file-names
+                            symbol))))
+                (setq paths (append paths (list path)))))
+        paths)
+    classpath))
+
 (defcustom jdee-global-classpath nil
   "Specify a common classpath for compile, run, and debug commands.
 Use this variable if you want to the JDEE to use the same classpath for

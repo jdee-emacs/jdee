@@ -47,7 +47,6 @@
 (declare-function jdee-run-get-vm "jdee-run" ())
 (declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
 (declare-function jdee-get-tools-jar "jdee" ())
-(declare-function jdee-expand-classpath "jdee" (classpath &optional symbol))
 (declare-function jdee-create-prj-values-str "jdee" ())
 
 ;; Avoid recursive requires, where a plugin might require this file
