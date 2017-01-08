@@ -31,9 +31,6 @@
 (require 'eieio)
 (require 'jdee-classpath)
 
-;; FIXME: refactor
-(defvar jdee-sourcepath);; jde
-
 (defgroup jdee-project nil
   "JDEE Project Options"
   :group 'jdee

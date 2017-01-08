@@ -36,7 +36,6 @@
 (require 'jdee-help)
 
 ;; FIXME: refactor
-(defvar jdee-sourcepath)
 (declare-function jdee-cygpath "jdee-cygwin" (path &optional direction))
 (declare-function jdee-get-jdk-dir "jdee-jdk-manager" ())
 

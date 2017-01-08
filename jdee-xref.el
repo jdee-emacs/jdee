@@ -73,15 +73,14 @@
 (require 'cl-lib)
 (require 'etags) ; find-tag-marker-ring
 (require 'jdee-class)
+(require 'jdee-classpath)
 (require 'jdee-files)
 (require 'jdee-parse)
 (require 'jdee-project-file)
 (require 'jdee-bytecode)
 (require 'tree-widget)
 
-;; FIXME: refactor
-(defvar jdee-sourcepath);; jde
-(declare-function jdee-get-jdk-prog "jdee" (progname))
+(declare-function jdee-get-jdk-prog "jdee-jdk-manager" (progname))
 
 (defconst jdee-xref-version "1.5")
 

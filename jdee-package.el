@@ -93,9 +93,6 @@
 (require 'jdee-files)
 (require 'jdee-project-file)
 
-;; FIXME: refactor
-(defvar jdee-sourcepath);; jde
-
 (defconst jdee-package-unknown-package-name
   "*unknown*"
   "The string returned when a package name can't be generated.")

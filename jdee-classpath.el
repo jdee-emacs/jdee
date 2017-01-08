@@ -171,5 +171,16 @@ It specifies the -classpath argument for the Java compiler and interpreter."
   (custom-set-variables
    '(jdee-global-classpath (split-string classpath jdee-classpath-separator) t)))
 
+;; (makunbound 'jdee-sourcepath)
+;; FIXME: use compilation-search-path instead?
+(defcustom jdee-sourcepath nil
+  "List of source directory paths.
+The JDEE uses this list to locate source files corresponding to class files.
+When entering paths in the custom buffer, enter each path as a separate item
+in a separate edit field.  Do NOT put more than one path in the same edit field.
+You'll only confuse JDEE.  Paths may contain environment variables or wildcards."
+  :group 'jdee-project
+  :type '(repeat (file :tag "Path")))
+
 (provide 'jdee-classpath)
 ;;; jdee-classpath.el ends here

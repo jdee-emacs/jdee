@@ -31,9 +31,6 @@
 (require 'jdee-util)
 (require 'semantic/senator)
 
-;; FIXME: refactor
-(defvar jdee-sourcepath)
-
 (defcustom jdee-open-class-at-point-find-file-function 'find-file-other-window
   "Define the function for opening the class at point. See
 `jdee-open-class-at-point'`. Default is `find-file-other-window'. A function

@@ -48,7 +48,6 @@
 
 (defvar jdee-dbs-the-debugger)
 (defvar jdee-debugger);; jde
-(defvar jdee-sourcepath)
 
 ;; ======================================================================
 ;; jdee-db variables
