@@ -700,12 +700,35 @@ If called interactively, add the name in the mini-buffer."
   (file-name-sans-extension (file-name-nondirectory
 			     (or (buffer-file-name) "Object.java"))))
 
+;;;TODO: is the same as jdee-parse-get-buffer-class?
+(defun jdee-parse-fqn ()
+  "Return the fully qualified class name at point.
+If not in a class, use the buffer name."
+  (interactive)
+  (let* ((pkg (jdee-parse-get-package))
+         (class (or (jdee-parse-get-class)
+                    (caar (semantic-find-tags-by-type "class" (current-buffer)))))
+         (rtnval  (if pkg
+                      (format "%s%s" pkg class)
+                    class)))
+    rtnval))
+
+;;;TODO: move to UI package
+(defun jdee-parse-fqn-to-kill-ring ()
+  "Copy the qualified class name of class containing point to the kill ring.
+Return the fully qualified name."
+  (interactive)
+  (let* ((fqn (jdee-parse-fqn)))
+    (kill-new fqn)
+    (when (called-interactively-p 'any)
+      (message "%s added to kill ring" fqn))
+    fqn))
 
 (defun jdee-parse-double-backslashes (name)
-  (mapconcat (lambda (x) (if (eq x ?\\)
-			     "\\\\"
-			   (string x)))
-	     name ""))
+  (mapconcat  (lambda (x) (if (eq x ?\\)
+                         "\\\\"
+                       (string x)))
+              name ""))
 
 (defvar jdee-parse-java-symbol-declare-re
   (rx

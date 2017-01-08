@@ -28,7 +28,7 @@
    (cons "[?\C-c ?\C-v ?\C-d]" 'jdee-debug)
    (cons "[?\C-c ?\C-v ?\C-f]" 'jdee-find)
    (cons "[?\C-c ?\C-v ?\C-g]" 'jdee-open-class-at-point)
-   (cons "[?\C-c ?\C-v ?*]"    'jdee-fqn-to-kill-ring)
+   (cons "[?\C-c ?\C-v ?*]"    'jdee-parse-fqn-to-kill-ring)
    (cons "[?\C-c ?\C-v ?#]"    'jdee-stacktrace-buffer)
    (cons "[?\C-c ?\C-v ?w]"    'jdee-archive-which)
    (cons "[?\C-c ?\C-v ?\C-k]" 'jdee-backend-run)

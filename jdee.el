@@ -397,7 +397,7 @@ This command invokes the function defined by `jdee-build-function'."
 	(list "Browse"
 	      ["Source Files"          jdee-show-speedbar t]
 	      ["Class at Point"        jdee-browse-class-at-point t]
-	      ["Copy Fully Qualified Class Name"        jdee-fqn-to-kill-ring t]
+	      ["Copy Fully Qualified Class Name"        jdee-parse-fqn-to-kill-ring t]
               ["Stack Trace Buffer"        jdee-stacktrace-buffer t]
               ["Location of Class"         jdee-archive-which t]
               )
@@ -496,28 +496,6 @@ version of speedar is installed."
   (interactive)
   (require 'speedbar)
   (speedbar-frame-mode))
-
-(defun jdee-fqn ()
-  "Return the fully qualified class name at point.
-If not in a class, use the buffer name."
-  (interactive)
-  (let* ((pkg (jdee-parse-get-package))
-         (class (or (jdee-parse-get-class)
-                    (caar (semantic-find-tags-by-type "class" (current-buffer)))))
-         (rtnval  (if pkg
-                      (format "%s%s" pkg class)
-                    class)))
-    rtnval))
-
-(defun jdee-fqn-to-kill-ring ()
-  "Copy the qualified class name of class containing point to the kill ring.
-Return the fully qualified name."
-  (interactive)
-  (let* ((fqn (jdee-fqn)))
-    (kill-new fqn)
-    (when (called-interactively-p 'any)
-      (message "%s added to kill ring" fqn))
-    fqn))
 
 (eval-when-compile
   ;; This code will not appear in the compiled (.elc) file
