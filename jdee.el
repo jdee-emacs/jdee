@@ -103,13 +103,6 @@ whenever you open a Java source file."
   (interactive)
   (message "JDEE %s" jdee-version))
 
-(defcustom jdee-quote-classpath t
-  "*Quote the classpath argument.
-Set this option on when using the bash shell with Windows 95 or NT.
-The semicolons in the classpath confuse the shell."
-  :group 'jdee-project
-  :type 'boolean)
-
 ;; (makunbound 'jdee-sourcepath)
 ;; FIXME: use compilation-search-path instead?
 (defcustom jdee-sourcepath nil
