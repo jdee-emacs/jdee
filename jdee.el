@@ -508,22 +508,6 @@ This command invokes the function defined by `jdee-build-function'."
   "Build a classpath from a list of paths."
   (jdee-build-path-arg "-classpath" path-list quote symbol))
 
-;; Contributed by John Ciolfi, jciolfi@mathworks.com.
-(defun jdee-compile-file-if-necessary (file)
-  "Compile the JDEE file FILE if necessary.
-This is done if FILE.el is newer than FILE.elc or if FILE.elc doesn't exist."
-  (if (and (string= (file-name-extension file) "el")
-           (not (string= ".dir-locals.el" file)))
-      (let* ((root (file-name-sans-extension file))
-	     (elc-file (concat root ".elc")))
-	(if (and
-	     (or (not (file-exists-p elc-file))
-                 (file-newer-than-file-p file  elc-file)))
-	    (progn
-	      (message (format "Byte-compiling %s..."
-			       (file-name-nondirectory file)))
-	      (byte-compile-file file))))))
-
 (defun jdee-create-prj-values-str ()
   "Create Java expression that updates the JDEE's class list
 to include all the classes on `jdee-global-classpath', if
