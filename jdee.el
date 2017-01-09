@@ -97,6 +97,11 @@ whenever you open a Java source file."
   :group 'jdee-project
   :type 'boolean)
 
+(defcustom jdee-flycheck-enable-p t
+  "If non-nil, JDEE will start Flycheck in every Java buffer."
+  :group 'jdee-project
+  :type 'boolean)
+
 ;;;###autoload
 (defun jdee-version ()
   "Get the version of JDEE."
@@ -274,7 +279,10 @@ This command invokes the function defined by `jdee-build-function'."
 	(jdee-annotations-setup)
 
         ;; Setup flycheck mode
-        (when (featurep 'flycheck)
+        (when (and (featurep 'flycheck)
+                   jdee-flycheck-enable-p)
+          (jdee-log-msg "jdee-flycheck-enable-p is %s, so enabling Flycheck"
+                        jdee-flycheck-enable-p)
           (require 'jdee-flycheck)
           (jdee-flycheck-mode))
 
