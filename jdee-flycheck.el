@@ -157,16 +157,23 @@ cleans up after the compilation."
         (set 'jdee-compile-mute t)
         (funcall cback 'finished errors)))))
 
+(defconst jdee-javac-error-line-regexp
+  "^\\(.*\\):\\([0-9]+\\): *error: \\(.*\\)$"
+  "Regexp matches compiler error messages and remembers file, line, and message.
+Example line:
+/src/Poligon.java:12: error: incompatible types: int cannot be converted to Another")
+
 (defun jdee-flycheck-find-next-error ()
   ;; To avoid stack overflow while executing regex search over possibly long lines,
   ;; hone in on only those lines that contain the magic string "error:"
-  (if (search-forward "error:" nil t)
-      (progn
-        (beginning-of-line)
-        (or (re-search-forward "^\\(.*\\):\\([0-9]+\\): *error: \\(.*\\)$"
-                               (save-excursion (end-of-line) (point))
-                               t)
-            (progn (forward-line) (jdee-flycheck-find-next-error))))))
+  (when (search-forward "error:" nil t)
+    (beginning-of-line)
+    (or (re-search-forward jdee-javac-error-line-regexp
+                           (save-excursion (end-of-line) (point))
+                           t)
+        (progn
+          (forward-line)
+          (jdee-flycheck-find-next-error)))))
 
 (defun jdee-flycheck-cleanup ()
   "Cleans up after flycheck.
