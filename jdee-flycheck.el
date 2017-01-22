@@ -87,9 +87,12 @@
 
     (setq compilation-last-buffer outbuf)))
 
-(defun jdee-flycheck-javac-command (checker cback)
-  ;;(message "Calling jdee-flycheck-javac-command")
-  (jdee-flycheck-compile-buffer checker cback))
+(defun jdee-flycheck-javac-command (checker callback)
+  "Start JDEE syntax `CHECKER' with callback `CALLBACK' for reporting errors."
+  (condition-case err
+      (jdee-flycheck-compile-buffer checker callback)
+    (error
+     (funcall callback 'errored (error-message-string err)))))
 
 (defun jdee-flycheck-compile-buffer-error (checker file line col message buffer)
   "Expects a match with file line message"
