@@ -29,6 +29,7 @@
 ;;; Code:
 
 (require 'flycheck)
+(require 'cl-lib)
 
 (defclass jdee-flycheck-compiler (jdee-compile-compiler)
   ((post-fn         :initarg :post-fn
@@ -132,7 +133,7 @@ for the caret and converts it to a column number."
             (message (match-string 3))
             ;; jdee-flymake-get-col changes search data; do it last
             (col (jdee-flymake-get-col)))
-        (push
+        (cl-pushnew
          (jdee-flycheck-compile-buffer-error checker
                                              file
                                              line
@@ -198,7 +199,8 @@ file and buffer with the contents of the current buffer and compiles that one."
     (with-current-buffer orig-buffer
       (write-region (point-min) (point-max) temp-file nil :silent))
     (with-current-buffer (generate-new-buffer name)
-      (add-to-list (make-local-variable 'jdee-flycheck-temp-files) dir)
+      (make-local-variable 'jdee-flycheck-temp-files)
+      (cl-pushnew dir jdee-flycheck-temp-files)
       (insert-file-contents-literally temp-file)
       (setq buffer-file-name temp-file)
 
@@ -219,7 +221,6 @@ file and buffer with the contents of the current buffer and compiles that one."
                                                   orig-file orig-buffer
                                                   temp-file (current-buffer)))
         (jdee-compile-compile compiler)))))
-
 
 
 ;; (defun jdee-flycheck-command-using-server ( checker cback )
@@ -281,7 +282,7 @@ file and buffer with the contents of the current buffer and compiles that one."
     :start #'jdee-flycheck-javac-command
     :modes '(jdee-mode))
 
-  (add-to-list 'flycheck-checkers 'jdee-flycheck-javac-checker)
+  (cl-pushnew 'jdee-flycheck-javac-checker flycheck-checkers)
   (flycheck-mode))
 
 (provide 'jdee-flycheck)
