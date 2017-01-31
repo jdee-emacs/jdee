@@ -29,6 +29,7 @@
 ;;; Code:
 
 (require 'flycheck)
+(require 'cl-lib)
 
 (defclass jdee-flycheck-compiler (jdee-compile-compiler)
   ((post-fn         :initarg :post-fn
@@ -86,9 +87,12 @@
 
     (setq compilation-last-buffer outbuf)))
 
-(defun jdee-flycheck-javac-command (checker cback)
-  ;;(message "Calling jdee-flycheck-javac-command")
-  (jdee-flycheck-compile-buffer checker cback))
+(defun jdee-flycheck-javac-command (checker callback)
+  "Start JDEE syntax `CHECKER' with callback `CALLBACK' for reporting errors."
+  (condition-case err
+      (jdee-flycheck-compile-buffer checker callback)
+    (error
+     (funcall callback 'errored (error-message-string err)))))
 
 (defun jdee-flycheck-compile-buffer-error (checker file line col message buffer)
   "Expects a match with file line message"
@@ -132,7 +136,7 @@ for the caret and converts it to a column number."
             (message (match-string 3))
             ;; jdee-flymake-get-col changes search data; do it last
             (col (jdee-flymake-get-col)))
-        (push
+        (cl-pushnew
          (jdee-flycheck-compile-buffer-error checker
                                              file
                                              line
@@ -157,16 +161,23 @@ cleans up after the compilation."
         (set 'jdee-compile-mute t)
         (funcall cback 'finished errors)))))
 
+(defconst jdee-javac-error-line-regexp
+  "^\\(.*\\):\\([0-9]+\\): *error: \\(.*\\)$"
+  "Regexp matches compiler error messages and remembers file, line, and message.
+Example line:
+/src/Poligon.java:12: error: incompatible types: int cannot be converted to Another")
+
 (defun jdee-flycheck-find-next-error ()
   ;; To avoid stack overflow while executing regex search over possibly long lines,
   ;; hone in on only those lines that contain the magic string "error:"
-  (if (search-forward "error:" nil t)
-      (progn
-        (beginning-of-line)
-        (or (re-search-forward "^\\(.*\\):\\([0-9]+\\): *error: \\(.*\\)$"
-                               (save-excursion (end-of-line) (point))
-                               t)
-            (progn (forward-line) (jdee-flycheck-find-next-error))))))
+  (when (search-forward "error:" nil t)
+    (beginning-of-line)
+    (or (re-search-forward jdee-javac-error-line-regexp
+                           (save-excursion (end-of-line) (point))
+                           t)
+        (progn
+          (forward-line)
+          (jdee-flycheck-find-next-error)))))
 
 (defun jdee-flycheck-cleanup ()
   "Cleans up after flycheck.
@@ -191,7 +202,8 @@ file and buffer with the contents of the current buffer and compiles that one."
     (with-current-buffer orig-buffer
       (write-region (point-min) (point-max) temp-file nil :silent))
     (with-current-buffer (generate-new-buffer name)
-      (add-to-list (make-local-variable 'jdee-flycheck-temp-files) dir)
+      (make-local-variable 'jdee-flycheck-temp-files)
+      (cl-pushnew dir jdee-flycheck-temp-files)
       (insert-file-contents-literally temp-file)
       (setq buffer-file-name temp-file)
 
@@ -212,7 +224,6 @@ file and buffer with the contents of the current buffer and compiles that one."
                                                   orig-file orig-buffer
                                                   temp-file (current-buffer)))
         (jdee-compile-compile compiler)))))
-
 
 
 ;; (defun jdee-flycheck-command-using-server ( checker cback )
@@ -274,7 +285,7 @@ file and buffer with the contents of the current buffer and compiles that one."
     :start #'jdee-flycheck-javac-command
     :modes '(jdee-mode))
 
-  (add-to-list 'flycheck-checkers 'jdee-flycheck-javac-checker)
+  (cl-pushnew 'jdee-flycheck-javac-checker flycheck-checkers)
   (flycheck-mode))
 
 (provide 'jdee-flycheck)

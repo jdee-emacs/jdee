@@ -281,8 +281,6 @@ This command invokes the function defined by `jdee-build-function'."
         ;; Setup flycheck mode
         (when (and (featurep 'flycheck)
                    jdee-flycheck-enable-p)
-          (jdee-log-msg "jdee-flycheck-enable-p is %s, so enabling Flycheck"
-                        jdee-flycheck-enable-p)
           (require 'jdee-flycheck)
           (jdee-flycheck-mode))
 

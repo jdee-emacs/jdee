@@ -77,5 +77,23 @@ Compilation exited abnormally with code 1 at Sun Dec 25 16:11:52
         (should (string= "cannot find symbol" (flycheck-error-message se)))
         (should (eq 'error (flycheck-error-level se)))))))
 
+(ert-deftest jdee-flycheck--javac-command-should-call-flycheck ()
+  "Flycheck callback has to be called at least once, even in case of failure."
+  (jdee-test-with-temp-buffer
+      "class C {}"
+    (cl-letf* (((symbol-function 'jdee-flycheck-compile-buffer)
+                (lambda (checker callback)
+                  (error "TheClass.java")))
+               (checker (lambda (x) nil))
+               (callback-called nil)
+               (callback
+                (lambda (status error-msg)
+                  (setq callback-called t)
+                  (should (eq status 'errored))
+                  (should (string= error-msg "TheClass.java")))))
+      (unwind-protect
+          (jdee-flycheck-javac-command checker callback)
+        (should callback-called)))))
+
 (provide 'jdee-flycheck-test)
 ;;; jdee-flycheck-test.el ends here
