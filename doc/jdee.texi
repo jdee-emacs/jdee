@@ -326,21 +326,21 @@ comparable in power to many commercial Java IDEs. Features include:
 
 @item generates class and method skeletons automatically
 
-@item run Java application in an interactive (comint) Emacs buffer
+@item run Java applications in an interactive (comint) Emacs buffer
 
 @item integrated debugging with interactive debug command buffer and automatic display of current source file/line when stepping through code
 
-@item browse JDK doc, using the browser of your choice
+@item browse JDK documentation, using the browser of your choice
 
 @item browse your source code, using the Emacs etags facility or a tree-structured speedbar.
 
-@item supports latest version of JDK
+@item supports the latest version of the JDK
 
-@item runs on any platform supported by Emacs and JDK (e.g., Linux, Windows and Solaris)
+@item runs on any platform supported by Emacs and the JDK (e.g., Linux, Windows and Solaris)
 
 @item easily and infinitely customizable
 
-@item works with FSF Emacs and XEmacs
+@item works with GNU Emacs and XEmacs
 @end itemize
 
 @node JDEE Requirements, Latest Version, About, Introduction
@@ -349,32 +349,35 @@ The JDEE requires the following software:
 @itemize
 
 @item
-FSF Emacs or XEmacs on Unix platforms; the 23.4 or later version
+GNU Emacs or XEmacs on Unix platforms; the 23.4 or later version
 of Emacs on Windows platforms, for general source file editing
 and tool integration functions
 
 @item
-Java Development Kit (@abbr{JDK}) or compatible set of Java development tools
-(compiler, virtual machine, debugger, class libraries, etc.)
+A Java Development Kit (@abbr{JDK}) or a compatible set of Java
+development tools (compiler, virtual machine, debugger, class
+libraries, etc.)
 
 @item
-Web browser for viewing documentation
+A web browser for viewing documentation
 
 @item
-Bash or another Unix-style shell highly recommended for Windows
-environments. The cygwin Unix emulation package for Windows from Red
-Hat includes Bash
+A Unix-style shell such as Bash is highly recommended for Windows
+environments. For example, the Cygwin Unix emulation package for
+Windows includes Bash.
 @end itemize
 
 @node Latest Version, Installing the JDEE, JDEE Requirements, Introduction
 @subsection Latest Version
-See @uref{Downloading the JDEE} on the JDEE website for instructions
-on downloading the most recent version of the JDEE.
+See @cite{Downloading the JDEE} on
+@url{https://github.com/jdee-emacs/jdee, the JDEE website} for
+instructions on downloading the most recent version of the JDEE.
 
 @node Installing the JDEE, Reporting bugs, Latest Version, Introduction
 @subsection Installing the JDEE
-See the JDEE Installation Guide on the JDEE website for information on
-installing the JDEE on your system.
+See @cite{the JDEE Installation Guide} on
+@url{https://github.com/jdee-emacs/jdee, the JDEE website} for
+information on installing the JDEE on your system.
 
 @node Reporting bugs,  , Installing the JDEE, Introduction
 @subsection Reporting bugs, enhancement suggestions
