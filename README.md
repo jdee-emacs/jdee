@@ -21,17 +21,27 @@ Emacs 24.3 is the oldest version that JDEE can be expected to run in.
 
 JDEE requires [JDEE Server](http://github.com/jdee-emacs/jdee-server) for some operations.
 
-## Install from distribution
+## Installing with the Emacs package system
 
 The project is available in MELPA.
 
 For more information, see the [installation instructions](http://htmlpreview.github.com/?https://github.com/peterwvj/jdee/blob/master/doc/flat/install.html).
 
-## Build from source options
+## Installing from source
 
-1. Run tests: ```make test```
+First, clone [the github repository](https://github.com/jdee-emacs/jdee/).
+
+Before using it, we advise that you run the tests:
+
+1. Install [Cask](http://cask.readthedocs.io/en/latest/index.html).
+
+2. Run ```cask install``` from the jdee directory (make sure that the
+   ```cask``` command is in your PATH).
+
+3. Run the tests: ```make test```
 
 To use this built distribution without installation, in your .emacs add:
+
 ```emacs-lisp
   (add-to-list 'load-path "/path/to/jdee")
   (require 'jdee)
