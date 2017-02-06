@@ -420,12 +420,12 @@ To register a version of the JDK with the JDEE:
 
 @enumerate
 @item
-Type M-x customize-variable RET jdee-jdk-registry RET.
+Type @kbd{M-x customize-variable RET jdee-jdk-registry RET}.
 
 The jdee-jdk-registry customization buffer appears.
 
 @item
-Click the INS button.
+Click the @kbd{INS} button.
 
 Enter the version number of the JDK and the path of the directory in
 which the JDK is installed.
@@ -447,7 +447,7 @@ To select a JDK:
 @enumerate
 
 @item
-Type M-x customize-variable RET jdee-jdk RET.
+Type @kbd{M-x customize-variable RET jdee-jdk RET}.
 
 The jdee-jdk customization buffer appears.
 
@@ -513,8 +513,8 @@ generation facility.
 @subsection Generating the Documentation
 
 To generate documentation for the current project, open any source
-file in the project and select Make Doc from the JDEE menu or enter M-x
-jdee-javadoc-make.
+file in the project and select Make Doc from the JDEE menu or enter
+@kbd{M-x jdee-javadoc-make}.
 
 The jdee-javadoc-make command runs the JDK's javadoc program to
 generate the documentation. The javadoc command must be on your
@@ -555,7 +555,7 @@ keyword. For example, when the abbreviation mode is enabled, you need
 only type fa followed by a space to enter the Java keyword false.
 
 To enable or disable abbreviation mode by default for a project,
-select JDEE->Project->Options ->General and toggle the boolean variable
+select JDEE->Project->Options->General and toggle the boolean variable
 jdee-enable-abbrev-mode.
 
 To toggle abbreviation mode on or off during a session, select
@@ -635,7 +635,8 @@ brace placement: placement on the first line of the template
 (Kerningham & Ritchie Style, the default) and placement on a separate
 line.
 
-Type M-x customize-variable jdee-gen-k&r to specify the style you prefer.
+Type @kbd{M-x customize-variable jdee-gen-k&r} to specify the style
+you prefer.
 
 @node Customizing the Control Flow Templates, Adding Your Own Control Flow Templates, Left Brace Placement, Control Flow Abbreviations
 @subsubsection Customizing the Control Flow Templates
@@ -761,7 +762,7 @@ use completion facilities supplied by the JDEE and by Emacs itself.
 @node Completing Method and Field Names, Selecting a Completion Method, Completing Expressions, Completing Expressions
 @subsection Completing Method and Field Names
 
-The JDEE provides comamnds that can complete an incomplete field or
+The JDEE provides commands that can complete an incomplete field or
 method name. All the methods determine the set of possible completions
 for an incomplete field or method name at point. They differ in how
 they present the completions to you for selection. The commands
@@ -772,18 +773,18 @@ include:
 This command uses the first completion that it finds to complete the
 method or field name at point. If multiple completions exist, it
 allows you to cycle through the completions, each completion replacing
-the previous in the source buffer. See Using In-Line Completion for
+the previous in the source buffer. @xref{Using In-Line Completion} for
 more information.
 
 @item jdee-complete-menu
 This command displays a menu of possible completions for the
 incomplete method or field name at point. It enters the completion
-that you select in the source buffer. See Using Menu-Based Completion
-for more information.
+that you select in the source buffer. @xref{Using Menu-Based
+Completion} for more information.
 
 @item jdee-complete-minibuf
 This command uses the minibuffer to display possible completions for
-the incomplete method or field name at point. The comamnd enters the
+the incomplete method or field name at point. The command enters the
 completion that you select in the source buffer. See Using
 Minibuffer-Based Completion for more information.
 
@@ -792,7 +793,7 @@ This is the JDEE's user-definable "standard" completion command. It
 delegates completion to one of the JDEE's other completion commands
 (jdee-complete-menu by default) or to a custom completion function that
 you specify (@ref{Selecting a Completion Method} for more
-information.) The @code{jdee-complete command} is bound by default to
+information.) The @code{jdee-complete} command is bound by default to
 the key combination @kbd{C-c C-v C-.}. If you prefer another binding,
 use the customization variable @code{jdee-key-bindings} to change the
 binding.
@@ -820,6 +821,7 @@ and exists on the classpath defined by @code{jdee-global-classpath}, if
 set, otherwise by the @env{CLASSPATH} environment variable.
 
 The JDEE completion commands work for all of the following cases:
+
 @itemize
 @item
 objects referenced by variables declared in the current buffer
@@ -837,7 +839,9 @@ the current class must start with super.
 
 For example, this command completes:
 @example
-. ^ this. ^ super. ^
+. ^
+this. ^
+super. ^
 @end example
 
 @item
@@ -852,6 +856,8 @@ System.out.prin ^
 @item
 objects returned by methods of objects referenced by variables defined
 in the current
+
+@c TODO: complete the above sentence.
 
 For example, this command completes:
 @example
