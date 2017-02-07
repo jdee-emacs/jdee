@@ -1281,21 +1281,22 @@ in the current buffer.
 The JDEE provides a set of procedural code generators called code
 wizards. They include:
 
-
-Method Override Wizard
+@table @dfn
+@item Method Override Wizard
 A method that overrides a method inherited by the class containing point.
 
-Interface Wizard
+@item Interface Wizard
 Implementation of an interface in the class containing point.
 
-Delegate Wizard
+@item Delegate Wizard
 Methods that delegate tasks to a specified class.
 
-Abstract Class Wizard
+@item Abstract Class Wizard
 Implementations of the abstract methods inherited by the class containing point.
 
-Get/Set Wizard
+@item Get/Set Wizard
 Get and set methods for the private fields of the class containing point.
+@end table
 
 @indentedblock
 Note: Some of the wizards use the BeanShell to run Java code. A wizard
