@@ -8,6 +8,7 @@ elpa
 build.properties
 build
 *.info
+/doc/jdee
 
 #EMACS
 *~
