@@ -7,7 +7,7 @@ dist
 elpa
 build.properties
 build
-
+*.info
 
 #EMACS
 *~
