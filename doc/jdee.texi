@@ -1327,7 +1327,7 @@ The point must be within the class that is overriding the method.
 
 @item
 Select Wizards->Override Method from the JDEE menu or enter M-x
-jdee-wiz-overrided-method.
+jdee-wiz-override-method.
 
 The JDEE prompts you to enter the name of the method to be overridden
 in the minibuffer.
