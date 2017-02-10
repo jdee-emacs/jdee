@@ -382,8 +382,9 @@ information on installing the JDEE on your system.
 
 @node Reporting bugs,  , Installing the JDEE, Introduction
 @subsection Reporting bugs, enhancement suggestions
-Please send bug reports and enhancement suggestions to
-@email{jdee-users@@lists.sourceforge.net}.
+Please send bug reports and enhancement suggestions to:
+
+@email{jdee-users@@lists.sourceforge.net}
 
 @node Registering and Selecting a JDK, Editing Java Source Files, Introduction, User's Guide
 @section Registering and Selecting a JDK
@@ -1401,8 +1402,8 @@ The JDEE prompts you to enter the name of the interface to be
 implemented.
 
 @item
-Enter the fully qualified name of the interface, for example,
-java.awt.Event.MouseListener.
+Enter the fully qualified name of the interface, e.g.
+@code{java.awt.Event.MouseListener}.
 
 The wizard inserts skeleton implementations of the methods declared by
 the interface at the current point in the current buffer. It inserts
@@ -1493,19 +1494,29 @@ same as the class you want to create and whose extension is .java.
 @unnumberedsubsubsec Specifying Boilerplate Text
 
 You can specify boilerplate text (for example, a copyright notice) to
-be inserted at the head of class source files created by the JDE. The
-JDEE provides two ways to specify the boilerplate text. The simplest
-way is to enter the lines of boilerplate text as the value of the
-customization variable jdee-gen-buffer-boilerplate. Another way to
-specify the text is to set the value of the customization variable
-jdee-gen-boilerplate-functionto a function that generates the
-boilerplate text. (The default value of this variable is
-jdee-gen-create-buffer-boilerplate, which returns the value of the
-boilerplate variable, jdee-gen-buffer-boilerplate). The functional
-approach allows you to generate boilerplate text dynamically by
-evaluating the appropriate Lisp code. By saving the values of
-boilerplate variables in project files, you can specify different
-boilerplate text for each project.
+be inserted at the head of class source files created by the JDEE. The
+JDEE provides two ways to specify the boilerplate text.
+
+@itemize @bullet
+@item
+The simplest way is to enter the lines of boilerplate text as the
+value of the customization variable
+@code{jdee-gen-buffer-boilerplate}.
+
+@item
+Another way to specify the text is to set the value of the
+customization variable @code{jdee-gen-boilerplate-function} to a
+function that generates the boilerplate text.  
+
+The default value of this variable is
+@code{jdee-gen-create-buffer-boilerplate}, which returns the value of
+the boilerplate variable, @code{jdee-gen-buffer-boilerplate}.
+
+The functional approach allows you to generate boilerplate text
+dynamically by evaluating the appropriate Lisp code. By saving the
+values of boilerplate variables in project files, you can specify
+different boilerplate text for each project.
+@end itemize
 
 @node Code Templates Customization Variables, Point Templates, Specifying Boilerplate Text, Code Templates
 @unnumberedsubsubsec Customization Variables Code Templates
@@ -1513,15 +1524,36 @@ boilerplate text for each project.
 The following JDEE customization variables control creation of
 autocoded Java source buffers:
 
-@multitable @columnfractions .45 .15 .40
+@multitable @columnfractions .45 .15 .4
 @headitem Variable @tab Group @tab Usage
-@item jdee-gen-class-buffer-template @tab Autocode @tab Template for a generic public class buffer.
-@item jdee-gen-console-buffer-template @tab Autocode @tab Template for a console application buffer.
-@item jdee-gen-jfc-app-buffer-template @tab Autocode @tab Template for a JFC (Swing) application.
-@item jdee-gen-junit-test-class-buffer-template @tab Autocode @tab Template for a JUnit test case class. This template requires the JUnit test framework.
-@item jdee-gen-buffer-templates @tab Autocode @tab Specifies templates available to create Java buffers.
-@item jdee-gen-buffer-boilerplate @tab Autocode @tab Specifies lines of text to be inserted at the head of class files.
-@item jdee-gen-boilerplate-function @tab Autocode @tab Specifies a function that returns a string of boilerplate text. The default value is jdee-gen-create-buffer-boilerplate, which returns the value of jdee-gen-buffer-boilerplate.
+
+@item @code{jdee-gen-class-buffer-template}
+@tab Autocode
+@tab Template for a generic public class buffer.
+
+@item @code{jdee-gen-console-buffer-template}
+@tab Autocode
+@tab Template for a console application buffer.
+
+@item @code{jdee-gen-jfc-app-buffer-template}
+@tab Autocode
+@tab Template for a JFC (Swing) application.
+
+@item @code{jdee-gen-junit-test-class-buffer-template}
+@tab Autocode
+@tab Template for a JUnit test case class. This template requires the JUnit test framework.
+
+@item @code{jdee-gen-buffer-templates}
+@tab Autocode
+@tab Specifies templates available to create Java buffers.
+
+@item @code{jdee-gen-buffer-boilerplate}
+@tab Autocode
+@tab Specifies lines of text to be inserted at the head of class files.
+
+@item @code{jdee-gen-boilerplate-function}
+@tab Autocode
+@tab Specifies a function that returns a string of boilerplate text. The default value is @code{jdee-gen-create-buffer-boilerplate}, which returns the value of @code{jdee-gen-buffer-boilerplate}.
 @end multitable
 
 See Customizing Templates for information on how to customize the
