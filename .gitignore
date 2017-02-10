@@ -12,3 +12,11 @@ build
 
 #EMACS
 *~
+
+# texinfo
+*.aux
+*.cp
+*.cps
+*.log
+*.pdf
+*.toc
