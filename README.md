@@ -47,6 +47,19 @@ To use this built distribution without installation, in your .emacs add:
   (require 'jdee)
 ```
 
+## Building the documentation
+
+There is a texinfo documentation: doc/jdee.texi.
+
+To generate Info, HTML and PDF documentation:
+
+- Install texinfo.
+
+- For PDF generation, you also need texi2dvi, texinfo-tex, texlive-ec
+  and texlive-cm-super.
+
+- In the doc/ subdirectory, run: ```makeinfo --info --html --pdf```
+
 ## Features
 
 Some of the features of JDEE include:
