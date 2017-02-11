@@ -1789,11 +1789,9 @@ The JDEE displays the prompt @code{Enter template:} in the
 minibuffer.
 
 @item
-Enter the template's name and press Enter or press the Tab key to
-display a list of templates in a completion buffer:
-
-@item
-Select the template you want by double-clicking its name.
+Enter the template's name and press @kbd{@key{RET}}.  Or, press
+@kbd{@key{TAB}} to display a list of templates in a completion buffer,
+and select the template you want by double-clicking its name.
 @end enumerate
 
 @node Assigning Keys to Templates,  , Registering Custom Templates, Code Templates
@@ -1812,25 +1810,27 @@ template that generates a skeleton toString method.
 @node Checking Coding Style, Compiling Java Programs, Generating Code, User's Guide
 @section Checking Coding Style
 
-The JDEE->Check Style command (M-x jdee-checkstyle) command checks the
-current buffer for conformity to a Java coding standard. The default
-standard is that specified by Oracle. Execute jdee-checkstyle-customize
-to customize the command to support your own coding standard.
+The JDEE->Check Style command (@kbd{M-x jdee-checkstyle}) checks the
+current buffer for conformity to a Java coding standard.  The default
+standard is that specified by Oracle.  Execute
+@code{jdee-checkstyle-customize} to customize the command to support
+your own coding standard.
 
-The command displays a list of stylistic faults in a popup
-buffer. Click the error message to display the line that violates the
+The command displays a list of stylistic faults in a popup buffer.
+Click the error message to display the line that violates the
 standard.
 
 @node Compiling Java Programs, Building Java Applications, Checking Coding Style, User's Guide
 @section Compiling Java Programs
 
-To compile the source file in the current buffer, select JDEE->Compile,
-type @kbd{C-c-C-v-C-c}, or execute @kbd{M-x jdee-compile}. The compiler
-uses the version of javac included in the currently selected JDK or on
-your system command path by default. However, you can configure the
-JDEE to use another compiler for the current project or all projects
-(see Specifying a Compiler). The JDEE also allows you to configure the
-JDEE to invoke the compiler with various compilation options.
+To compile the source file in the current buffer, select
+JDEE->Compile, type @kbd{C-c C-v C-c}, or execute @kbd{M-x
+jdee-compile}.  The compiler uses the version of javac included in the
+currently selected @acronym{JDK} or on your system command path by
+default. However, you can configure the JDEE to use another compiler
+for the current project or all projects (see Specifying a Compiler).
+The JDEE also allows you to configure the JDEE to invoke the compiler
+with various compilation options.
 
 @menu
 * Compilation Buffer::
@@ -1859,37 +1859,37 @@ The JDEE supports the following Java compilers:
 
 @table @asis
 @item javac
-This is the compiler that comes with Oracle's JDK and the JDK's
-clones. Note that javac compiler is itself implemented in Java. The
-javac executable that comes with the JDK simply starts a VM to run
-javac. The executable passes its command-line arguments to javac's
-main method.
+This is the compiler that comes with Oracle's @acronym{JDK} and the
+@acronym{JDK}'s clones.  Note that javac compiler is itself
+implemented in Java. The @command{javac} executable that comes with
+the @acronym{JDK} simply starts a @acronym{VM} to run javac.  The
+executable passes its command-line arguments to javac's main method.
 
 @item javac compile server
 This is a JDEE feature that uses the BeanShell to invoke the javac
-compiler on a source file, thus avoiding the need to start a VM
-everytime you want to compile a file. This option greatly reduces the
-time required to compile individual files by eliminating the VM
-startup time, which is usually much longer than the time required to
-compile a file.
+compiler on a source file, thus avoiding the need to start a
+@acronym{VM} everytime you want to compile a file.  This option
+greatly reduces the time required to compile individual files by
+eliminating the @acronym{VM} startup time, which is usually much
+longer than the time required to compile a file.
 
 @item jikes
 Developed by IBM, this compiler is implemented in C++ and hence avoids
-the vm startup time that slows down javac.
+the @acronym{VM} startup time that slows down javac.
 @end table
 
 To specify one of these compilers for the current project or all
 projects:
 @enumerate
 @item
-Type M-x customize-variable RET
+Type @kbd{M-x customize-variable @key{RET}}
 
 Emacs prompts you to enter the name of a variable to customize.
 
 @item
-Enter jdee-compiler and press Enter.
+Enter @samp{jdee-compiler} and press @key{RET}.
 
-The jdee-compiler customization buffer appears.
+The @samp{jdee-compiler} customization buffer appears.
 
 @item
 Select the compiler that you want to use for the current project or
@@ -1897,20 +1897,20 @@ all projects.
 
 You can skip the next step if you selected the compile server or if
 you selected javac and you want to use the version of javac that comes
-with the currently selected JDK, or you have selected the javac
-executable or jikes and the executable for the selected compiler is in
-your system's command path.
+with the currently selected @acronym{JDK}, or you have selected the
+javac executable or jikes and the executable for the selected compiler
+is in your system's command path.
 
 @item
 Enter the path to the executable for the selected compiler.
 
 @item
 If you want your selection to apply only to the current project,
-select Save for Current Session from the State menu. Otherwise select
-Save for Future Sessions.
+select @command{Save for Current Session} from the @samp{State} menu.
+Otherwise, select @command{Save for Future Sessions}.
 
 @item
-Select Finish to dismiss the customization buffer.
+Select @command{Finish} to dismiss the customization buffer.
 
 @item
 If you want the selection to apply to the current project, select
@@ -1921,12 +1921,12 @@ Project->Project File->Save from the JDEE menu.
 @subsection Compilation Options
 
 The JDEE allows you to specify compilation options by setting
-compilation variables. You must use the Emacs customization
-feature. To use the customization feature, select
-JDEE->Options->Compile. (See Configuring the JDEE for more information
-on using the customization feature). To save the compilation settings
-in the project file (see Using Project Files) for the current source
-buffer, select JDEE->Options->Update Project.
+compilation variables.  You must use the Emacs customization feature.
+To use the customization feature, select JDEE->Options->Compile.  (See
+Configuring the JDEE for more information on using the customization
+feature). To save the compilation settings in the project file
+(@xref{Using Project Files}) for the current source buffer, select
+@command{JDEE->Options->Update Project}.
 
 @menu
 * Setting Compile Options Interactively::
@@ -1936,23 +1936,24 @@ buffer, select JDEE->Options->Update Project.
 @node Setting Compile Options Interactively, Compiler Customization Variables, Compilation Options, Compilation Options
 @subsubsection Setting Compile Options Interactively
 
-If you set the customization variable jdee-read-compile-args to a
-non-nil value, the JDEE compile command prompts you to enter
-compilation options in the minibuffer. It appends the options that you
-enter to the options specified via customization variables. The JDEE
-saves the arguments that you enter in a minibuffer history list. You
-can recall previously entered options by pressing the up or down
+If you set the customization variable @samp{jdee-read-compile-args} to
+a non-nil value, the JDEE compile command prompts you to enter
+compilation options in the minibuffer.  It appends the options that
+you enter to the options specified via customization variables.  The
+JDEE saves the arguments that you enter in a minibuffer history list.
+You can recall previously entered options by pressing the up or down
 arrows on your keyboard.
 
 @indentedblock
 Note: The JDEE uses the values of the JDEE customization variables to
-set the compiler's command-line option switches. The JDEE assumes that
-the compiler you are using (specified by the customization variable
-jdee-compiler) has the same set of command-line switches as the version
-of javac or jikes that you have selected. If the command-line switch
-for a particular option supported by the compiler your are using is
-not the same as that specified by javac or jikes, you must use the
-variable jdee-compile-option-command-line-args to select the option.
+set the compiler's command-line option switches.  The JDEE assumes
+that the compiler you are using (specified by the customization
+variable @samp{jdee-compiler}) has the same set of command-line
+switches as the version of javac or jikes that you have selected.  If
+the command-line switch for a particular option supported by the
+compiler your are using is not the same as that specified by javac or
+jikes, you must use the variable
+@samp{jdee-compile-option-command-line-args} to select the option.
 @end indentedblock
 
 @node Compiler Customization Variables,  , Setting Compile Options Interactively, Compilation Options
@@ -1961,7 +1962,7 @@ variable jdee-compile-option-command-line-args to select the option.
 The following table lists the JDEE compilation variables and the
 functions used to set them.
 
-@multitable @columnfractions .50 .10 .40
+@multitable @columnfractions .40 .10 .50
 @headitem Name @tab Group @tab Usage
 @item jdee-compiler @tab Project @tab Specifies the compiler (javac server, by default) to use to compile the code in the current source buffer.
 @item jdee-compile-option-command-line-args @tab Compile @tab Specifies a string of command-line arguments to be passed to the compiler.
@@ -1981,18 +1982,18 @@ functions used to set them.
 @item jdee-compile-option-verbose @tab Compile @tab List directories searched to compile current class.
 @item jdee-compile-option-nowarn @tab Compile @tab Turn off warnings.
 @item jdee-compile-option-encoding @tab Compile @tab Specify the source file encoding name, such as EUCJIS\SJIS.
-@item jdee-compile-option-target @tab Compile @tab Generate code compatible with a specified vm version.
-@item jdee-compile-option-bootclasspath @tab Compile @tab Specify classpath of standard libraries for target vm.
-@item jdee-compile-option-bootclasspath @tab Compile @tab Specify path of directories containing extensions for target vm.
+@item jdee-compile-option-target @tab Compile @tab Generate code compatible with a specified @acronym{VM} version.
+@item jdee-compile-option-bootclasspath @tab Compile @tab Specify classpath of standard libraries for target @acronym{VM}.
+@item jdee-compile-option-bootclasspath @tab Compile @tab Specify path of directories containing extensions for target @acronym{VM}.
 @end multitable
 
 @node Building Java Applications, Running Java Applications, Compiling Java Programs, User's Guide
 @section Building Java Applications
 
-The JDEE->Build command builds an application. By default this command
-invokes the Unix-style make utility to build the application. You can
-configure the build command to invoke the Ant build system or a custom
-build function.
+The command @command{JDEE->Build} builds an application.  By default,
+this command invokes the Unix-style make utility to build the
+application.  You can configure the build command to invoke the Ant
+build system or a custom build function.
 
 @menu
 * Selecting a Build Method::
@@ -2006,38 +2007,40 @@ build function.
 To select a build method:
 @enumerate
 @item
-Type M-x customize-variable RET jdee-build-function RET
+Type @kbd{M-x customize-variable @key{RET} jdee-build-function @key{RET}}
 
-The jdee-build-function customization buffer appears.
+The @samp{jdee-build-function} customization buffer appears.
 
 @item
 Select the build function that you want to use.
 
 @item
 If you want your selection to apply only to the current project,
-select Save for Current Session from the State menu. Otherwise select
-Save for Future Sessions.
+select @command{Save for Current Session} from the State
+menu.  Otherwise select @command{Save for Future Sessions}.
 
 @item
-Select Finish to dismiss the customization buffer.
+Select @command{Finish} to dismiss the customization buffer.
 
 @item
 If you want the selection to apply to the current project, select
-Project->Project File->Save from the JDEE menu.
+@command{Project->Project File->Save} from the JDEE menu.
 @end enumerate
 
 @node Building with Make, Building with Ant, Selecting a Build Method, Building Java Applications
 @subsection Building with Make
 
-The jdee-make command uses a make utility, such as GNU make, to rebuild
-a project. You must supply the makefiles used to build your
-projects. See Sample Makefile for an example of a makefile for
-building a Java project. David Ponce's JMaker package generates
-makefiles automatically for JDEE projects. It uses JDEE variables to
-determine classpaths, compiler options, and other information needed
-to create projects. JMaker recursively creates makefiles for all the
-Java packages in a project plus a toplevel makefile that invokes the
-other makefiles to build the entire project.
+The @command{jdee-make} command uses a make utility, such as GNU make,
+to rebuild a project.  You must supply the makefiles used to build
+your projects.  @xref{Sample Makefile} for an example of a makefile
+for building a Java project.  
+
+David Ponce's JMaker package generates makefiles automatically for
+JDEE projects.  It uses JDEE variables to determine classpaths,
+compiler options, and other information needed to create projects.
+JMaker recursively creates makefiles for all the Java packages in a
+project plus a toplevel makefile that invokes the other makefiles to
+build the entire project.
 
 @menu
 * Make Options::
@@ -2053,7 +2056,7 @@ jdee-make options in Project group:
 @multitable @columnfractions .50 .10 .40
 @headitem Name @tab Default @tab Usage
 @item jdee-make-program @tab make @tab Specifies the pathname on your system of the make utility that the jdee-make uses to build your project.
-@item jdee-make-args @tab @tab Specifies a string of command-line arguments (for example, "-f mymakefile all") to be passed to the make utility.
+@item jdee-make-args @tab @tab Specifies a string of command-line arguments (for example, @option{-f mymakefile all}) to be passed to the make utility.
 @item jdee-read-make-args @tab nil @tab If non-nil, this variable causes the jdee-make command to prompt you to enter command-line arguments in the minibuffer. jdee-make passes these arguments along with the arguments specified by jdee-make-args to the make utility.
 @item jdee-make-working-directory @tab @tab Specifies the directory from which jdee-make runs the make utility.
 @end multitable
@@ -2065,10 +2068,11 @@ The following is a sample Makefile that you can use as a model for
 creating makefiles to build Java projects.
 
 @example
-JDK = d:/jdk1.2/lib/classes.zip
-JMATH = d:/jmath/src
-CLASSPATH = $(JMATH);$(JDK)
-COMPILER = javac VM = java
+JDK = /path/to/jdk1.2/lib/classes.zip
+JMATH = /path/to/jmath/src
+CLASSPATH = $(JMATH):$(JDK)
+COMPILER = javac
+VM = java
 COPTIONS = -g -deprecation
 ROPTIONS =
 CLASSES = Test.class \
@@ -2092,8 +2096,8 @@ clean: rm *.class
 @node Building with Ant,  , Building with Make, Building Java Applications
 @subsection Building with Ant
 
-The jdee-ant-build command uses the Apache Ant build tool to build a
-Java project.
+The @command{jdee-ant-build} command uses the Apache Ant build tool to
+build a Java project.
 
 The following variables allow you to control the build process.
 
@@ -2119,13 +2123,13 @@ The following variables allow you to control the build process.
 @node Running Java Applications, Working with Applets, Building Java Applications, User's Guide
 @section Running Java Applications
 
-The JDEE allows you to run a Java application as an Emacs
-subprocess. You can run multiple applications concurrently, but only
-one instance of each application at a time. The JDEE displays each
-application's standard and error output in an Emacs command interface
-(comint) buffer. You can interact with applications that accept
-command line input via the comint buffer. When interacting with an
-application, you can use any of comint-mode's extensive set of
+The JDEE allows you to run a Java application as an Emacs subprocess.
+You can run multiple applications concurrently, but only one instance
+of each application at a time.  The JDEE displays each application's
+standard and error output in an Emacs command interface
+(@code{comint}) buffer.  You can interact with applications that
+accept command line input via the comint buffer.  When interacting with
+an application, you can use any of comint-mode's extensive set of
 command-line history commands to speed interaction.
 
 To run an application, enter @kbd{M-x jdee-run} or select Java->Run App
@@ -2144,13 +2148,13 @@ from the Emacs menubar or type @kbd{C-c C-v C-r}.
 @subsection Specifying the Application's Main Class
 
 The term main class refers to the class that contains the
-application's main method. The JDEE's Run App command assumes by
+application's main method.  The JDEE's Run App command assumes by
 default that the class in the current buffer is the application's main
-class. This can be inconvenient if you have an application that has
-multiple classes. You may want to be able to run the application from
-any buffer containing one of the application's classes. To do this,
-set the variable jdee-run-application-class to the fully qualified name
-of the application's main class.
+class.  This can be inconvenient if you have an application that has
+multiple classes.  You may want to be able to run the application from
+any buffer containing one of the application's classes.  To do this,
+set the variable @samp{jdee-run-application-class} to the fully
+qualified name of the application's main class.
 
 You can temporarily override the setting of jdee-run-application-class
 by typing C-u - before executing the jdee-run command, for example, by
