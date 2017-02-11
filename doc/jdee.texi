@@ -2148,40 +2148,42 @@ from the Emacs menubar or type @kbd{C-c C-v C-r}.
 @subsection Specifying the Application's Main Class
 
 The term main class refers to the class that contains the
-application's main method.  The JDEE's Run App command assumes by
-default that the class in the current buffer is the application's main
-class.  This can be inconvenient if you have an application that has
-multiple classes.  You may want to be able to run the application from
-any buffer containing one of the application's classes.  To do this,
-set the variable @samp{jdee-run-application-class} to the fully
-qualified name of the application's main class.
+application's main method.  The JDEE's @command{Run App} command
+assumes by default that the class in the current buffer is the
+application's main class.  This can be inconvenient if you have an
+application that has multiple classes.  You may want to be able to run
+the application from any buffer containing one of the application's
+classes.  To do this, set the variable
+@samp{jdee-run-application-class} to the fully qualified name of the
+application's main class.
 
-You can temporarily override the setting of jdee-run-application-class
-by typing C-u - before executing the jdee-run command, for example, by
-typing C-u - C-c C-r. This causes the JDEE to prompt you to enter the
-fully qualified name of the application's main class (as well
+You can temporarily override the setting of
+@samp{jdee-run-application-class} by typing @kbd{C-u -} before
+executing the @command{jdee-run} command, for example, by typing
+@kbd{C-u - C-c C-r}.  This causes the JDEE to prompt you to enter the
+fully qualified name of the application's main class (as well as
 application arguments if any).
 
 @node Specifying a Startup Directory, Setting VM Command-Line Arguments, Specifying the Application's Main Class, Running Java Applications
 @subsection Specifying a Startup Directory
 
-The JDEE can start an application from any directory that you
-specify. By default, the JDEE starts an application from the default
-directory of the current source buffer. The default directory of the
-current source buffer is the directory containing the source file
-displayed in the buffer. You can specify another directory as the
-startup directory by setting the JDEE customization variable
-jdee-run-working-directory.
+The JDEE can start an application from any directory that you specify.
+By default, the JDEE starts an application from the default directory
+of the current source buffer.  The default directory of the current
+source buffer is the directory containing the source file displayed in
+the buffer.  You can specify another directory as the startup
+directory by setting the JDEE customization variable
+@samp{jdee-run-working-directory}.
 
 To set this variable,
 @enumerate
 @item
 Display its customization panel.
 
-You can do this by typing @kbd{M-x customize-variable
-jdee-run-working-directory} or selecting JDEE->Options->Project to
-display the project customization panel and searching this panel for
-jdee-run-working-directory.
+You can do this by typing @kbd{M-x customize-variable @key{RET}
+jdee-run-working-directory @key{RET}} or selecting
+JDEE->Options->Project to display the project customization panel and
+searching this panel for @samp{jdee-run-working-directory}.
 
 @item
 Enter the working directory in the variable's edit field.
@@ -2189,42 +2191,44 @@ Enter the working directory in the variable's edit field.
 @item
 Save the new setting.
 
-To save the edited bindings, right click the [State] button and choose
-Set for current session if you want the settings to apply only to the
-current project or Save for future sessions if you want the settings
-to apply to all projects. In either case, you should save the new
-settings in you project file if your project has a project file. To
-save the new settings in your project file, switch to a source buffer
-and choose JDEE->Options->Save Project.
+To save the edited bindings, right click the @command{State} button
+and choose @command{Set for current session} if you want the settings
+to apply only to the current project or @command{Save for future
+sessions} if you want the settings to apply to all projects.  In
+either case, you should save the new settings in you project file if
+your project has a project file.  To save the new settings in your
+project file, switch to a source buffer and choose JDEE->Options->Save
+Project.
 
 @end enumerate
 
 @node Setting VM Command-Line Arguments, Setting Command-Line Application Arguments, Specifying a Startup Directory, Running Java Applications
 @subsection Setting VM Command-Line Arguments
 
-If you set the customization variable jdee-run-read-vm-args to a
-non-nil value, the JDEE compile command prompts you to enter virtual
-machine options in the minibuffer. It appends the options that you
-enter to the options specified via customization variables. The JDEE
-saves the arguments that you enter in a minibuffer history list. You
+If you set the customization variable @samp{jdee-run-read-vm-args} to
+a non-nil value, the JDEE compile command prompts you to enter virtual
+machine options in the minibuffer.  It appends the options that you
+enter to the options specified via customization variables.  The JDEE
+saves the arguments that you enter in a minibuffer history list.  You
 can recall previously entered options by pressing the up or down
 arrows on your keyboard.
 
 @node Setting Command-Line Application Arguments, Navigating Exception Traces, Setting VM Command-Line Arguments, Running Java Applications
 @subsection Setting Command-Line Application Arguments
 
-Specifying a prefix argument before the jdee-run, e.g., C-u C-c C-v C-r
-causes the command to prompt you to enter arguments to be passed to
-the application's main method. The command appends the options that
-you enter to the arguments specified via the customization variable
-jdee-run-option-application-args. The JDEE saves the arguments that you
-enter in a minibuffer history list. You can recall previously entered
-options by pressing the up or down arrows on your keyboard.
+Specifying a prefix argument before the jdee-run, i.e. @kbd{C-u C-c
+C-v C-r}, causes the command to prompt you to enter arguments to be
+passed to the application's main method.  The command appends the
+options that you enter to the arguments specified via the
+customization variable @samp{jdee-run-option-application-args}.  The
+JDEE saves the arguments that you enter in a minibuffer history list.
+You can recall previously entered options by pressing the up or down
+arrows on your keyboard.
 
-If you set the customization variable jdee-run-read-app-args to a
-non-nil value, the JDEE run command prompts you to enter command-line
-application arguments by default, i.e., you do not have to specify a
-prefix argument each time you execute the command.
+If you set the customization variable @samp{jdee-run-read-app-args} to
+a non-nil value, the @samp{JDEE run} command prompts you to enter
+command-line application arguments by default, i.e. you do not have to
+specify a prefix argument each time you execute the command.
 
 @node Navigating Exception Traces, Run Customization Variables, Setting Command-Line Application Arguments, Running Java Applications
 @subsection Navigating Exception Traces
