@@ -1556,7 +1556,7 @@ autocoded Java source buffers:
 @tab Specifies a function that returns a string of boilerplate text. The default value is @code{jdee-gen-create-buffer-boilerplate}, which returns the value of @code{jdee-gen-buffer-boilerplate}.
 @end multitable
 
-See Customizing Templates for information on how to customize the
+@xref{Customizing Templates} for information on how to customize the
 class creation templates.
 
 @node Point Templates, Customizing Templates, Code Templates Customization Variables, Code Templates
@@ -1650,30 +1650,36 @@ project's project file.
 @subsubsection Creating Templates
 
 The JDEE considers any command (interactive function) that inserts
-code into a buffer at point to be a template. The JDEE uses the Emacs
-tempo library to create built-in templates. You can use tempo to
-create your own, add-on templates (see below and the doc for the
-tempo-define-template for more information) or create templates from
-scratch. In either case, once you have created a template, you can add
-it to the JDE's lists of available code and/or buffer templates, using
-the JDEE's jdee-gen-code-templates and/or jdee-gen-buffer-templates
+code into a buffer at point to be a template.
+
+The JDEE uses the Emacs tempo library to create built-in
+templates. You can use tempo to create your own, add-on templates (see
+below and the doc for the tempo-define-template for more information)
+or create templates from scratch.
+
+In either case, once you have created a template, you can add
+it to the JDEE's lists of available code and/or buffer templates, using
+the JDEE's @code{jdee-gen-code-templates} and/or @code{jdee-gen-buffer-templates}
 variables, respectively. Adding a template to these lists enables you
-to invoke the templates from the JDEE menus. When adding a template,
-you need to specify a unique title for the template. These titles
-enable you to specify the templates when invoking them, using the
-JDE's custom code template commands (Files->JDE New->Custom and
-JDEE->Generate->Custom). You can use auto completion to enter a
-template title when invoking a custom code generation command. Note
-that you can specify different sets of templates for different
+to invoke the templates from the JDEE menus. 
+
+When adding a template, you need to specify a unique title for the
+template. These titles enable you to specify the templates when
+invoking them, using the JDE's custom code template commands
+(Files->JDE New->Custom and JDEE->Generate->Custom). You can use auto
+completion to enter a template title when invoking a custom code
+generation command. 
+
+Note that you can specify different sets of templates for different
 projects, by setting and saving the template list variables in project
-files. See the following sections for more information:
+files. See the following sections for more information.
 
 @node Defining a Template and Template Insertion Function, Registering Custom Templates, Creating Templates, Code Templates
 @unnumberedsubsubsec Defining a Template and Template Insertion Function
 
 The tempo-define-template macro enables you to define a template and a
 function that inserts that template at the current point in the
-current buffer. You specify the template as a list oftemplate elements
+current buffer. You specify the template as a list of template elements
 where each element is text, a special symbol, or a Lisp
 expression. The function inserts each text element exactly as
 specified in the buffer; it replaces special symbols with some text
@@ -1683,12 +1689,11 @@ that results from evaluating them.
 For example, the following Lisp code:
 
 @example
-(tempo-define-template "foo"
-;; template name
-'("System.out.println(\"foo\");")
-;;template definition "f"
-;; abbreviation "Inserts a print foo message")
-;; template documentation
+(tempo-define-template
+ "foo"                             ;; template name
+ '("System.out.println(\"foo\");") ;; template definition
+ "f"                               ;; abbreviation
+ "Inserts a print foo message")    ;; template documentation
 @end example
 
 defines a template for Java code that always prints "foo" to standard
@@ -1703,9 +1708,9 @@ character to specify the string "foo". This is necessary when you want
 to include quoted strings in a template definition.
 
 The sample Lisp form also defines an interactive template function
-tempo-template-foo. Now suppose you insert the sample code in your
-.emacs file. After Emacs starts up, whenever you enter the command M-x
-tempo-template-foo, Emacs inserts:
+@code{tempo-template-foo}. Now suppose you insert the sample code in
+your .emacs file. After Emacs starts up, whenever you enter the
+command @kbd{M-x tempo-template-foo}, Emacs inserts:
 
 @example
 System.out.println("foo");
@@ -1721,13 +1726,15 @@ example, allows you to create a template that can print any
 user-defined text to standard out:
 
 @example
-(tempo-define-template "debug"
-;; template name '("if (debug)" n>
-;; insert new line plus indent
-"System.out.println(" (p "Enter debug message:")       ;; Prompts for debug message
-");") "d"
-;; abbreviation "Inserts a print debug message")
-;; template documentation
+(tempo-define-template
+ "debug" ;; template name
+ '("if (debug)" 
+   n> ;; insert new line plus indent
+   "System.out.println("
+   (p "Enter debug message:") ;; Prompts for debug message
+   ");")
+ "d"				  ;; abbreviation
+ "Inserts a print debug message") ;; template documentation
 @end example
 
 The template function produced by this example prompts you to enter
@@ -1735,7 +1742,8 @@ the text to be printed when inserting the function into a buffer. In
 particular, it inserts:
 
 @example
-if (debug) System.out.println(DEBUG-MESSAGE);
+if (debug)
+   System.out.println(DEBUG-MESSAGE);
 @end example
 
 where DEBUG-MESSAGE is any text that you enter. For example, suppose
@@ -1753,8 +1761,8 @@ if (debug) System.out.println("Selected color = " + color);
 
 at the current point in the buffer.
 
-See the documentation for tempo-define-template (type c-h f
-tempo-define-template) for more information on creating templates.
+See the documentation for @code{tempo-define-template} (type @kbd{C-h
+f tempo-define-template}) for more information on creating templates.
 
 @node Registering Custom Templates, Assigning Keys to Templates, Defining a Template and Template Insertion Function, Code Templates
 @unnumberedsubsubsec Registering Custom Templates
