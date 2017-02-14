@@ -21,7 +21,9 @@
 @menu
 * User's Guide::
 * Developer's Guide::
-* Index::
+* Concept index::
+* Function index::
+* Variable index::
 * Acknowledgements::
 
 @detailmenu
@@ -263,6 +265,10 @@ Creating Plugins
 * Running Java Code from a Plugin::
 * Bootstrap File Example::
 
+Appendices
+
+* Acknowledgements::
+
 @end detailmenu
 @end menu
 
@@ -346,6 +352,7 @@ comparable in power to many commercial Java IDEs. Features include:
 @end itemize
 
 @node JDEE Requirements, Latest Version, About, Introduction
+@cindex Requirements
 @subsection JDEE Requirements
 The JDEE requires the following software:
 @itemize
@@ -376,12 +383,15 @@ See @cite{Downloading the JDEE} on
 instructions on downloading the most recent version of the JDEE.
 
 @node Installing the JDEE, Reporting bugs, Latest Version, Introduction
+@cindex Installing the JDEE
 @subsection Installing the JDEE
 See @cite{the JDEE Installation Guide} on
 @url{https://github.com/jdee-emacs/jdee, the JDEE website} for
 information on installing the JDEE on your system.
 
 @node Reporting bugs,  , Installing the JDEE, Introduction
+@cindex Reporting bugs
+@cindex Bugs, reporting
 @subsection Reporting bugs, enhancement suggestions
 Please send bug reports and enhancement suggestions to:
 
@@ -391,24 +401,24 @@ Please send bug reports and enhancement suggestions to:
 @section Registering and Selecting a JDK
 
 The JDEE relies on command-line Java development tools, such as those
-supplied by Oracle as part of its Java Development Kit (JDK). Before
+supplied by Oracle as part of its Java Development Kit (JDK).  Before
 you can use the JDEE to compile, debug, or run an application, you
 must tell it where the Java compiler, debugger, and virtual machine
-are located on your system. The JDEE assumes that the compiler,
+are located on your system.  The JDEE assumes that the compiler,
 debugger, and vm are named javac, jdb, and java, respectively, and
-that they are located on your system's command path. If these tools
+that they are located on your system's command path.  If these tools
 are not located on the system command path or have different names,
-you must tell the JDEE where they are located. The JDEE provides
+you must tell the JDEE where they are located.  The JDEE provides
 customization variables for specifying the locations of individual
 tools.
 
 However, if you are using one or more versions of Oracle's JDK or a
 clone of the JDK, the easiest way to specify the location of the
 external development tools is to register the version of the JDK that
-you intend to use. It is especially advantageous to register a JDK, if
-you intend to use multiple versions of the JDK. The reason?
+you intend to use.  It is especially advantageous to register a JDK,
+if you intend to use multiple versions of the JDK.  The reason?
 Registering each version of the JDK allows you to change JDKs by
-changing a single customization variable. The following sections
+changing a single customization variable.  The following sections
 explain how to register and select JDKs.
 
 @menu
@@ -417,6 +427,8 @@ explain how to register and select JDKs.
 @end menu
 
 @node Registering a JDK, Selecting a JDK, Registering and Selecting a JDK, Registering and Selecting a JDK
+@cindex Registering a JDK
+@cindex JDK, registering
 @subsection Registering a JDK
 
 To register a version of the JDK with the JDEE:
@@ -439,11 +451,13 @@ paths of all versions of the JDK that you wish to use with the JDEE.
 
 @item
 Click the @samp{Save for Future Sessions} from the State menu.
-This saves the setting of jdee-jdk-registry in your init file.
+This saves the setting of @code{jdee-jdk-registry} in your init file.
 
 @end enumerate
 
 @node Selecting a JDK,  , Registering a JDK, Registering and Selecting a JDK
+@cindex Selecting a JDK
+@cindex JDK, selecting
 @subsection Selecting a JDK
 To select a JDK:
 
@@ -452,7 +466,7 @@ To select a JDK:
 @item
 Type @kbd{M-x customize-variable RET jdee-jdk RET}.
 
-The jdee-jdk customization buffer appears.
+The @code{jdee-jdk} customization buffer appears.
 
 @item
 The buffer lists the JDKs that you have previously registered
@@ -463,12 +477,12 @@ Click the radio button next to the version of the JDK you want to use.
 
 @item
 Click the @samp{Save for Future Sessions} from the State menu.
-This saves the setting of jdee-jdk-registry in your init file.
+This saves the setting of @code{jdee-jdk} in your init file.
 
 Note: This procedure saves your JDK selection in your init file so
-that it applies to all projects. You can configure the JDEE to use different
-JDKs for different projects by saving your customization in a project
-file. (see Using Project Files) for more information.
+that it applies to all projects.  You can configure the JDEE to use
+different JDKs for different projects by saving your customization in
+a project file.  @xref{Using Project Files} for more information.
 
 @end enumerate
 
@@ -500,6 +514,8 @@ classes.
 @end menu
 
 @node Inserting Javadoc Comments, Generating the Documentation, Documenting Code, Documenting Code
+@cindex Inserting Javadoc comments
+@cindex Javadoc, inserting
 @subsection Inserting Javadoc Comments
 
 To insert a skeleton javadoc comment for a class or method, position
@@ -510,27 +526,32 @@ To customize the javadoc skeletons, select
 JDEE->Options->Project->Javadoc from the Emacs menubar.
 
 @node Generating the Documentation,  , Inserting Javadoc Comments, Documenting Code
+@cindex Generating documentation
+@cindex Documentation, generating
+@cindex Javadoc, processing
 @subsection Generating the Documentation
 
 To generate documentation for the current project, open any source
 file in the project and select Make Doc from the JDEE menu or enter
 @kbd{M-x jdee-javadoc-make}.
 
-The jdee-javadoc-make command runs the JDK's javadoc program to
-generate the documentation. The javadoc command must be on your
-system's command path.
+The @command{jdee-javadoc-make} command runs the JDK's javadoc program
+to generate the documentation.  The @command{javadoc} command must be
+on your system's command path.
 
-The jdee-javadoc-make command uses jdee-global-classpath as the
--classpath and jdee-sourcepath as the -sourcepath option for generating
-the doc. You can specify all other javadoc options via JDEE
-customization variables. To specify the options, select
-Project->Options->Javadoc from the JDEE menu. Use
-jdee-javadoc-gen-packages to specify the packages, classes, or source
-files for which you want to generate javadoc. If this variable is nil,
-the jdee-javadoc-make generates javadoc for the Java source file in the
-current buffer.
+The @command{jdee-javadoc-make} command uses
+@code{jdee-global-classpath} as the @option{-classpath} and
+@code{jdee-sourcepath} as the @option{-sourcepath} options for
+fgenerating the doc.  You can specify all other javadoc options via
+JDEE customization variables.  To specify the options, select
+Project->Options->Javadoc from the JDEE menu.  Use
+@code{jdee-javadoc-gen-packages} to specify the packages, classes, or
+source files for which you want to generate javadoc.  If this variable
+is nil, @command{jdee-javadoc-make} generates javadoc for the Java
+source file in the current buffer.
 
 @node Abbreviations, Completing Expressions, Documenting Code, User's Guide
+@cindex Abbreviations
 @section Abbreviations
 
 The JDEE allows you to use abbreviations for Java keywords and control
@@ -545,21 +566,21 @@ abbreviations.
 @node Keyword Abbreviations, Control Flow Abbreviations, Abbreviations, Abbreviations
 @subsection Keyword Abbreviations
 
-The JDEE defines a set of abbreviations for Java keywords. When you
+The JDEE defines a set of abbreviations for Java keywords.  When you
 type one of these abbreviations followed by a space in a Java source
-buffer, the JDEE optionally expands the abbreviation into the
-keyword. For example, when the abbreviation mode is enabled, you need
-only type fa followed by a space to enter the Java keyword false.
+buffer, the JDEE optionally expands the abbreviation into the keyword.
+For example, when the abbreviation mode is enabled, you need only type
+@samp{fa} followed by a space to enter the Java keyword false.
 
 To enable or disable abbreviation mode by default for a project,
 select JDEE->Project->Options->General and toggle the boolean variable
-jdee-enable-abbrev-mode.
+@code{jdee-enable-abbrev-mode}.
 
 To toggle abbreviation mode on or off during a session, select
 JDEE->Code Generation->Modes->Abbrev.
 
 To change, remove, or add an abbreviation, edit the variable
-jdee-mode-abbreviations in the project customization buffer.
+@samp{jdee-mode-abbreviations} in the project customization buffer.
 
 @indentedblock
 Note: The JDEE's Java keyword expansion facility is based on the Emacs
@@ -584,7 +605,10 @@ ife
 expands to the control flow structure:
 
 @example
-if ( ) @{ @} // end of if () else @} // end of if () else
+if ( ) @{
+@}
+else @{
+@}
 @end example
 
 The JDEE defines the following abbreviations for control structures:
@@ -624,6 +648,8 @@ information.
 @end menu
 
 @node Left Brace Placement, Customizing the Control Flow Templates, Control Flow Abbreviations, Control Flow Abbreviations
+@cindex Brace placement
+@cindex Style, brace placement
 @subsubsection Left Brace Placement
 The JDEE's Java control flow templates support two options for opening
 brace placement: placement on the first line of the template
@@ -635,7 +661,7 @@ you prefer.
 
 @node Customizing the Control Flow Templates, Adding Your Own Control Flow Templates, Left Brace Placement, Control Flow Abbreviations
 @subsubsection Customizing the Control Flow Templates
-You can customize the templates to suit any indentation style. To
+You can customize the templates to suit any indentation style.  To
 customize the templates, select Project->Options->Autocode from the
 JDEE menu.
 
@@ -661,90 +687,92 @@ Template Elements and their usage:
 @item A string.
 The string is inserted into the buffer at point.
 
-@item The symbol 'p.
+@item The symbol @code{'p}.
 This position is saved in tempo-marks.
 
-@item The symbol 'r.
+@item The symbol @code{'r}.
 If tempo-insert is called with ON-REGION non-nil the current region is
-placed here. Otherwise it works like 'p.
+placed here.  Otherwise it works like @code{'p}.
 
-@item (p PROMPT <NAME> <NOINSERT>)
-If tempo-interactive is non-nil, the user is prompted in the minbuffer
-with PROMPT for a string to be inserted. If the optional parameter
-NAME is non-nil, the text is saved for later insertion with the s
-tag. If there already is something saved under NAME that value is used
-instead and no prompting is made. If NOINSERT is provided and non-nil,
-nothing is inserted, but text is still saved when a NAME is
-provided. For clarity, the symbol 'noinsert should be used as
-argument.
+@item @code{(p PROMPT <NAME> <NOINSERT>)}
+If @code{tempo-interactive} is non-nil, the user is prompted in the
+minibuffer with PROMPT for a string to be inserted.  If the optional
+parameter NAME is non-nil, the text is saved for later insertion with
+the @samp{s} tag.  If there already is something saved under NAME that
+value is used instead and no prompting is made.  If NOINSERT is
+provided and non-nil, nothing is inserted, but text is still saved
+when a NAME is provided.  For clarity, the symbol @code{'noinsert}
+should be used as argument.
 
-@item (P PROMPT <NAME> <NOINSERT>)
+@item @code{(P PROMPT <NAME> <NOINSERT>)}
 Works just like the previous element, but forces tempo-interactive to
 be true.
 
-@item (r PROMPT <NAME> <NOINSERT>)
+@item @code{(r PROMPT <NAME> <NOINSERT>)}
 Like the previous, but if tempo-interactive is nil and tempo-insert is
-called with ON-REGION non-nil, the current region is placed here. This
-usually happens when you call the template function with a prefix
+called with ON-REGION non-nil, the current region is placed here.
+This usually happens when you call the template function with a prefix
 argument.
 
-@item (s NAME)
-Inserts text previously read with the (p ..) construct. Finds the
-insertion saved under NAME and inserts it. Acts like 'p if
+@item @code{(s NAME)}
+Inserts text previously read with the @samp{(p ..)} construct.  Finds the
+insertion saved under NAME and inserts it.  Acts like @code{'p} if
 tempo-interactive is nil.
 
-@item '&
+@item @code{'&}
 If there is only whitespace between the line start and point, nothing
-happens. Otherwise a newline is inserted.
+happens.  Otherwise a newline is inserted.
 
-@item '%
-If there is only whitespace between point and end-of-line nothing
-happens. Otherwise a newline is inserted.
+@item @code{'%}
+If there is only whitespace between point and end-of-line, nothing
+happens.  Otherwise a newline is inserted.
 
-@item 'n
+@item @code{'n}
 Inserts a newline.
 
-@item '>
-The line is indented using indent-according-to-mode. Note that you
+@item @code{'>}
+The line is indented using indent-according-to-mode.  Note that you
 often should place this item after the text you want on the line.
 
-@item 'n>
+@item @code{'n>}
 Inserts a newline and indents line.
 
-@item 'r>
-Like r, but it also indents the region.
+@item @code{'r>}
+Like @samp{r}, but it also indents the region.
 
-@item 'o
-Like '% but leaves the point before the new line.
+@item @code{'o}
+Like @code{'%} but leaves the point before the new line.
 
 @item Anything else.
 It is evaluated and the result is treated as an element to be
-inserted. One additional tag is useful for these cases. If an
-expression returns a list '(l foo bar), the elements after 'l will be
-inserted according to the usual rules. This makes it possible to
-return several elements from one expression.
+inserted. One additional tag is useful for these cases.  If an
+expression returns a list @code{'(l foo bar)}, the elements after
+@code{'l} will be inserted according to the usual rules.  This makes
+it possible to return several elements from one expression.
 @end table
 
 @node Enabling Variable Content, Disabling the Control Flow Abbreviations, Adding Your Own Control Flow Templates, Control Flow Abbreviations
 @subsubsection Enabling Variable Content
 Some templates optionally prompt you for items to insert into the
-template. To enable prompting, set the variable tempo-interactive to a
-non-nil value in your .emacs file.
+template.  To enable prompting, set the variable
+@code{tempo-interactive} to a non-nil value in your @file{.emacs}
+file.
 
 @node Disabling the Control Flow Abbreviations,  , Enabling Variable Content, Control Flow Abbreviations
 @subsubsection Disabling the Control Flow Abbreviations
 To disable the control flow abbreviations, set the variable
-jdee-gen-cflow-enable off.
+@code{jdee-gen-cflow-enable} off.
 
 @node Completing Expressions, Dynamic Keyword Completion, Abbreviations, User's Guide
 @section Completing Expressions
 
 Both Emacs and the JDEE provide commands for completing incomplete
-expressions. Emacs provides commands that work for any expression but
-only if the completions exist in an open buffer. The JDEE provides
+expressions.  Emacs provides commands that work for any expression but
+only if the completions exist in an open buffer.  The JDEE provides
 completion commands that work for any Java method or field name that
-exists on jdee-global-classpath. The following sections explain how to
-use completion facilities supplied by the JDEE and by Emacs itself.
+exists on @code{jdee-global-classpath}.  The following sections
+explain how to use completion facilities supplied by the JDEE and by
+Emacs itself.
 
 @menu
 * Completing Method and Field Names::
@@ -3615,7 +3643,7 @@ JDEpi), you should now be able to see the items on the plugins menu.
 @c JDEE User's Guide ends here
 
 @c JDEE Developer's Guide starts here
-@node Developer's Guide, Index, User's Guide, Top
+@node Developer's Guide, Concept index, User's Guide, Top
 @chapter Developer's Guide
 
 @menu
@@ -3806,12 +3834,8 @@ The following is an example of the bootstrap file for a plugin named
 
 @c JDEE Developer's Guide ends here
 
-@node Index,  , Developer's Guide, Top
-@unnumbered Index
-
-@printindex cp
-
-@node Acknowledgements
+@node Acknowledgements, Concept index, Developer's Guide, Top
+@unnumbered Acknowledgements
 
 Thanks to David Ponce for developing the JDEE's javadoc comment
 generation facility.
@@ -3842,5 +3866,20 @@ facility.
 
 Finally, thanks to the many other people who have contributed to this
 project in various ways.
+
+@node Concept index, Function index, Acknowledgements, Top
+@unnumbered Concept index
+
+@printindex cp
+
+@node Function index, Variable index, Concept index, Top
+@unnumbered Function index
+
+@printindex fn
+
+@node Variable index, , Function index, Top
+@unnumbered Variable index
+
+@printindex vr
 
 @bye
