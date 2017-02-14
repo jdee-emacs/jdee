@@ -491,7 +491,7 @@ The JDEE provides complete support for generating HTML documentation
 for Java classes from comments inserted into the source code for those
 classes.
 
-See also Displaying Java Documentation.
+@xref{Displaying Java Documentation} for more information.
 
 @menu
 * Inserting Javadoc Comments::
@@ -2233,26 +2233,26 @@ specify a prefix argument each time you execute the command.
 @node Navigating Exception Traces, Run Customization Variables, Setting Command-Line Application Arguments, Running Java Applications
 @subsection Navigating Exception Traces
 
-If an exception occurs while your program is running, the JVM outputs
-an exception trace. This trace appears in the run buffer for the
-application.
+If an exception occurs while your program is running, the
+@acronym{JVM} outputs an exception trace.  This trace appears in the
+run buffer for the application.
 
 To view the source line corresponding to a point in the exception
 stack trace, right-click the corresponding stack trace line in the run
-buffer. You can move up and down the stack trace by typing the key
+buffer.  You can move up and down the stack trace by typing the key
 combinations @kbd{C-c C-v C-[} or @kbd{C-c C-v C-]}.
 
 @node Run Customization Variables,  , Navigating Exception Traces, Running Java Applications
 @subsection Run Customization Variables
 
 The JDEE allows you to specify run-time options by setting run
-variables. You can use the Emacs customization feature to set run-time
-variables interactively. To use the customization feature, select
-JDEE->Project->Options->Run. (See Configuring the JDEE for more
-information on using the customization feature). To save the
-compilation settings in the project file (see Using Project Files) for
-the current source buffer, select JDEE-> Project->Project File->Save
-Project.
+variables.  You can use the Emacs customization feature to set
+run-time variables interactively.  To use the customization feature,
+select JDEE->Project->Options->Run. (See Configuring the JDEE for more
+information on using the customization feature).  To save the
+compilation settings in the project file (@xref{Using Project Files})
+for the current source buffer, select JDEE-> Project->Project
+File->Save Project.
 
 The following table lists the JDEE run variables and the functions
 used to set them.
@@ -2305,28 +2305,29 @@ Choose JDEE->Run Applet.
 
 The JDEE searches for an html file in the directory containing the
 applet source file and displays the first file it finds, using your
-system's default browser. If the JDEE cannot find an html page in the
+system's default browser.  If the JDEE cannot find an html page in the
 applet's source file directory, it signals an error by default.
 @end enumerate
 
 The JDEE->Run Applet command assumes by default that the directory
 containing the applet's source also contains an html page for testing
-that applet. If this is not true in your case, you have two
-options. You can either specify the path of the applet file via the
-JDEE customization variable jdee-run-applet-doc or you can use the
-jdee-run-applet command to run your applet. If the jdee-run-applet-doc
-variable is not a null string, JDEE->Run Applet displays the document
-that the variable specifies instead of searching the source file
-directory for a document to display. The jdee-run-applet command
-prompts you to enter in the minibuffer the path of an html file to
-display. If you enter nothing, the command defaults to the behavior of
-JDEE->Run Applet.
+that applet.  If this is not true in your case, you have two options.
+You can either specify the path of the applet file via the JDEE
+customization variable @samp{jdee-run-applet-doc} or you can use the
+@command{jdee-run-applet} command to run your applet.  If the
+@samp{jdee-run-applet-doc} variable is not a null string, JDEE->Run
+Applet displays the document that the variable specifies instead of
+searching the source file directory for a document to display.  The
+@command{jdee-run-applet} command prompts you to enter in the
+minibuffer the path of an html file to display.  If you enter nothing,
+the command defaults to the behavior of JDEE->Run Applet.
 
 The run commands chooses the viewer as follows. If
-jdee-run-applet-viewer is a null string (the default) or browse-url,
-the JDEE uses browse-url to launch the applet doc in your system's
-default browser. Otherwise, the menu command uses comint to launch the
-viewer (e.g., appletviewer) specified by jdee-run-applet-viewer.
+@samp{jdee-run-applet-viewer} is a null string (the default) or
+@samp{browse-url}, the JDEE uses @code{browse-url} to launch the
+applet doc in your system's default browser.  Otherwise, the menu
+command uses comint to launch the viewer (e.g., appletviewer)
+specified by @samp{jdee-run-applet-viewer}.
 
 @node Debugging Applets, Applet Customization Variables, Running Applets, Working with Applets
 @subsection Debugging Applets
@@ -2340,35 +2341,35 @@ Open the applet's source file in a buffer.
 Choose JDEE->Debug Applet.
 
 The JDEE searches for an html file in the directory containing the
-applet source file. If the JDEE cannot find an html page in the
-applet's source file directory, it signals an error by
-default. Otherwise, it runs appletviewer in debug mode on the first
-file that it finds.
+applet source file.  If the JDEE cannot find an html page in the
+applet's source file directory, it signals an error by default.
+Otherwise, it runs appletviewer in debug mode on the first file that
+it finds.
 
 The Emacs window splits into two panes.
 @end enumerate
 
 The top pane shows the applet's source file with the debug cursor
-pointing to the first line of the applet's init file. The bottom pane
-displays the debugger's command line interface. You can now set
-breakpoints, single-step, or continue running the applet. See
-Debugging Applications for more information.
+pointing to the first line of the applet's init file.  The bottom pane
+displays the debugger's command line interface.  You can now set
+breakpoints, single-step, or continue running the applet.  See
+@xref{Debugging Applications} for more information.
 
 If you want to specify the document to be used to test the applet,
-customize the variable jdee-run-applet-doc or execute M-x
-jdee-db-applet. This command prompts you to enter the test document's
-name.
+customize the variable @samp{fjdee-run-applet-doc} or execute @kbd{M-x
+jdee-db-applet @key{RET}}.  This command prompts you to enter the test
+document's name.
 
 @node Applet Customization Variables,  , Debugging Applets, Working with Applets
 @subsection Applet Customization Variables
 
 The JDEE allows you to specify run-time options for applets by setting
-JDEE configuration variables.You must use the Emacs customization
-feature to set applet run-time variables . To use the customization
-feature, select JDEE->Options->Run. (See Configuring the JDEE for more
-information on using the customization feature). In some cases, the
-JDEE also provides functions for setting the buffer-local values of
-the compilation variables. To save the compilation settings in the
+JDEE configuration variables.  You must use the Emacs customization
+feature to set applet run-time variables.  To use the customization
+feature, select JDEE->Options->Run.  (See Configuring the JDEE for
+more information on using the customization feature).  In some cases,
+the JDEE also provides functions for setting the buffer-local values
+of the compilation variables.  To save the compilation settings in the
 project file (see Using Project Files) for the current source buffer,
 select JDEE->Options->Update Project.
 
@@ -2389,23 +2390,23 @@ The JDEE provides two options for debugging Java applications.
 
 @item
 An Emacs interface to jdb, the command-line debugger that comes with
-the JDK. See Debugging with jdb for more information.
+the JDK.  See Debugging with jdb for more information.
 
 @item
-JDEbug, a Java debugger developed specifically for use with the
-    JDE. See JDEbug User's Guide for more information.
+JDEbug, a Java debugger developed specifically for use with the JDE.
+See JDEbug User's Guide for more information.
 @end itemize
 
 JDEbug provides more debugging features but requires a JDK 1.2 or
-higher vm. You must use jdb to debug applications running on earlier
-VMs.
+higher @acronym{VM}.  You must use jdb to debug applications running
+on earlier VMs.
 
 @node Specifying Classpaths, Using Project Files, Debugging Applications, User's Guide
 @section Specifying Classpaths
 
 The JDEE provides customization variables that permit you to specify a
 classpath for the JDE's compile, run, debug, Beanshell, and other
-commands. The following table lists these variables.
+commands.  The following table lists these variables.
 
 @multitable @columnfractions .40 .60
 @headitem Variable @tab Applies to
@@ -2415,10 +2416,11 @@ commands. The following table lists these variables.
 @item jdee-db-option-classpath @tab Debug App command
 @end multitable
 
-The jdee-global-classpath variable is so named because it specifies a
-classpath that is used by all JDEE commands unless overridden by a
-classpath variable specific to a particular command. For example, the
-JDE's Compile command uses jdee-global-classpath unless the value of
+The @samp{jdee-global-classpath} variable is so named because it
+specifies a classpath that is used by all JDEE commands unless
+overridden by a classpath variable specific to a particular
+command. For example, the JDE's Compile command uses
+jdee-global-classpath unless the value of
 jdee-compile-option-classpath is set. Typically you want to use the
 same classpath to compile, run, and debug an application. So typically
 jdee-global-classpath is the only variable you need to set.
