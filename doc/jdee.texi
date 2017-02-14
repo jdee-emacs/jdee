@@ -22,6 +22,7 @@
 * User's Guide::
 * Developer's Guide::
 * Index::
+* Acknowledgements::
 
 @detailmenu
  --- The Detailed Node Listing ---
@@ -508,9 +509,6 @@ JDEE->Document from the Emacs menubar or type @kbd{C-c C-v j}.
 To customize the javadoc skeletons, select
 JDEE->Options->Project->Javadoc from the Emacs menubar.
 
-Thanks to David Ponce for developing the JDEE's javadoc comment
-generation facility.
-
 @node Generating the Documentation,  , Inserting Javadoc Comments, Documenting Code
 @subsection Generating the Documentation
 
@@ -531,9 +529,6 @@ jdee-javadoc-gen-packages to specify the packages, classes, or source
 files for which you want to generate javadoc. If this variable is nil,
 the jdee-javadoc-make generates javadoc for the Java source file in the
 current buffer.
-
-Thanks to Sergey A Klibanov for developing the JDEE's javadoc
-generation facility.
 
 @node Abbreviations, Completing Expressions, Documenting Code, User's Guide
 @section Abbreviations
@@ -619,8 +614,6 @@ Note: You must enable the JDEE's Java keyword abbreviation mode to use
 the control flow abbreviations. See Java Keyword Completion for more
 information.
 @end indentedblock
-
-Thanks to Eric D. Friedman for contributing the control flow templates.
 
 @menu
 * Left Brace Placement::
@@ -1123,10 +1116,6 @@ included in some commonly used class libraries and intended for
 internal use. See the docstring for jdee-import-excluded-classes for
 more information.
 
-Thanks to Len Trigg for contributing the initial implementation of the
-import wizard and to Martin Schwarmberger for significantly enhancing
-the import wizard.
-
 @node Importing All Classes, Expanding Package Imports, Importing Classes, Generating Import Statements
 @subsubsection Importing All Classes
 
@@ -1163,9 +1152,6 @@ Note: You can use the JDEE->Code Generation->Import->Import All Unique
 imports all classes whose unqualified names appear only once on the
 classpath.
 @end indentedblock
-
-Thanks to Phillip Lord for contributing the initial implementation of
-the Import All Wizard.
 
 @node Expanding Package Imports, Collapsing Class Imports, Importing All Classes, Generating Import Statements
 @subsubsection Expanding Package Imports
@@ -1420,10 +1406,6 @@ the BeanShell. Thus, if the BeanShell is not already running, you may
 experience a short pause the first time you use the wizard.
 @end indentedblock
 
-Thanks to Eric Friedman for creating the framework for the interface,
-method override, and abstract class wizards and for contributing the
-initial implementation of the interface wizard.
-
 @node Delegate Wizard, Get/Set Wizard, Interface Wizard, Code Wizards
 @subsubsection Delegate Wizard
 
@@ -1434,8 +1416,6 @@ contains class A and A has an attribute, A.b, that is an instance of
 class B, this wizard generates all the public methods of class B in A
 and delegates handling of those methods to b.
 
-Thanks to Charles Hart for contributing this wizard.
-
 @node Get/Set Wizard,  , Delegate Wizard, Code Wizards
 @subsubsection Get/Set Wizard
 
@@ -1445,9 +1425,6 @@ set methods. To generate the methods, move point to the point in the
 class where you want the get and set methods to appear. Then select
 JDEE->Code Generation->Wizards->Generate Get/Set Methods... or enter
 M-x jdee-wiz-get-set-methods
-
-Thanks to Javier Lopez and Sandip Chitale for contributing this
-wizard.
 
 @node Code Templates,  , Code Wizards, Generating Code
 @subsection Code Templates
@@ -3172,9 +3149,6 @@ project code, however the database generation is generally quick. The
 remainder of this section explains how to configure and use the
 cross-referencer.
 
-Thanks to Andrew Hyatt for developing the JDEE's cross-referencing
-facility.
-
 @menu
 * Configuring the Cross-Referencer::
 * Building the Cross-Reference Database::
@@ -3836,5 +3810,37 @@ The following is an example of the bootstrap file for a plugin named
 @unnumbered Index
 
 @printindex cp
+
+@node Acknowledgements
+
+Thanks to David Ponce for developing the JDEE's javadoc comment
+generation facility.
+
+Thanks to Sergey A Klibanov for developing the JDEE's javadoc
+generation facility.
+
+Thanks to Eric D. Friedman for contributing the control flow templates.
+
+Thanks to Len Trigg for contributing the initial implementation of the
+import wizard and to Martin Schwarmberger for significantly enhancing
+the import wizard.
+
+Thanks to Phillip Lord for contributing the initial implementation of
+the Import All Wizard.
+
+Thanks to Eric Friedman for creating the framework for the interface,
+method override, and abstract class wizards and for contributing the
+initial implementation of the interface wizard.
+
+Thanks to Charles Hart for contributing the Delegate wizard.
+
+Thanks to Javier Lopez and Sandip Chitale for contributing the Get/Set
+wizard.
+
+Thanks to Andrew Hyatt for developing the JDEE's cross-referencing
+facility.
+
+Finally, thanks to the many other people who have contributed to this
+project in various ways.
 
 @bye
