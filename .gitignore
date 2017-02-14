@@ -7,7 +7,16 @@ dist
 elpa
 build.properties
 build
-
+*.info
+/doc/jdee
 
 #EMACS
 *~
+
+# texinfo
+*.aux
+*.cp
+*.cps
+*.log
+*.pdf
+*.toc
