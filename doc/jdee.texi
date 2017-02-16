@@ -2409,8 +2409,8 @@ on earlier VMs.
 @node Specifying Classpaths, Using Project Files, Debugging Applications, User's Guide
 @section Specifying Classpaths
 
-The JDEE provides customization variables that permit you to specify a
-classpath for the JDE's compile, run, debug, Beanshell, and other
+The JDEE provides customization variables that allow you to specify a
+classpath for the JDEE's compile, run, debug, Beanshell, and other
 commands.  The following table lists these variables.
 
 @multitable @columnfractions .40 .60
@@ -2439,14 +2439,14 @@ jdee-global-classpath is the only variable you need to set.
 @subsection Setting a Classpath Variable
 
 As with other JDEE customization variables, you must use Emacs'
-customize-variable command to set the JDE's classpath variables. You
-can use relative paths, cygwin paths, and paths with tilde notation
-and environment variables as values of JDEE classpath variables. See
-Specifying Paths for more information.
+@command{customize-variable} command to set the JDEE's classpath
+variables.  You can use relative paths, cygwin paths, and paths with
+tilde notation and environment variables as values of JDEE classpath
+variables.  @xref{Specifying Paths} for more information.
 
 When setting a classpath variable, you must enter each path as a
-separate entry in the customization buffer. Do not enter the paths as
-semicolon or colon-separated lists of paths. The following examples
+separate entry in the customization buffer.  Do not enter the paths as
+semicolon or colon-separated lists of paths.  The following examples
 show the right and wrong way to specify a classpath.
 
 Example 1. Wrong Way to Specify a Classpath
