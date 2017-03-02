@@ -97,11 +97,11 @@ JDK Version: The version of the JDK (i.e. 1.5)."
 	      (jdee-jdhelper-reload-docsets jdee-jdhelper-singleton))))
 
 (defcustom jdee-help-use-frames t
-   "A non-nil value makes the functions:`jdee-help-symbol',
+  "A non-nil value makes the functions:`jdee-help-symbol',
  `jdee-help-class-member' and `jdee-help-class' use frames when displaying
  the html javadocs."
-   :group 'jdee-help
-   :type 'boolean)
+  :group 'jdee-help
+  :type 'boolean)
 
 ;; FIXME: this default avoids errors from jdee-jdhelper-singleton initialization at byte-compile time.
 (defcustom jdee-help-remote-file-exists-function (list "url-http-file-exists-p")
@@ -121,7 +121,7 @@ which is included in the Emacs w3 package."
 	  (if (and
 	       (string= (car val) "url-http-file-exists-p")
 	       (locate-library "url-http"))
-	       (autoload 'url-http-file-exists-p "url-http" nil nil nil))
+	      (autoload 'url-http-file-exists-p "url-http" nil nil nil))
 	  (set-default sym val)
 	  (if (boundp 'jdee-jdhelper-singleton)
 	      (jdee-jdhelper-reload-resolvers jdee-jdhelper-singleton))))
@@ -374,7 +374,7 @@ This defaults to false."
 	      :type list)))
 
 (defmethod jdee-jdurl-resolver-urls ((this jdee-jdurl-stack-resolver)
-				    class docset)
+				     class docset)
   ;; we inherit from a class we know always gets only one url
   (let* ((url (car (call-next-method this class docset)))
 	 (resolvers (jdee-jdurl-resolver-matching-resolvers this url))
@@ -421,8 +421,8 @@ This defaults to false."
 		     (t (error "No such remote function: %S" func)))))
     (oset this :resolver
 	  (jdee-jdurl-stack-resolver nil :resolvers
-				    (list (jdee-jdurl-fs-resolver nil)
-					  (funcall resolver nil))))))
+				     (list (jdee-jdurl-fs-resolver nil)
+					   (funcall resolver nil))))))
 
 (defmethod jdee-jdhelper-reload-docsets ((this jdee-jdhelper))
   (oset this :docsets
@@ -678,7 +678,7 @@ field or method referenced by the name if qualified."
   "Popup a menu of the fields and methods defined by CLASS.
 Return the member selected by the user."
   (let ((classinfo
-	  (jdee-complete-get-classinfo class)))
+	 (jdee-complete-get-classinfo class)))
     (if classinfo
 	(let (pos
 	      (pair
