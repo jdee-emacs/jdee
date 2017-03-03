@@ -168,29 +168,30 @@ HTML pages."
 
 
 (defclass jdee-url ()
-  ((protocol :initarg :protocol
+  ((name :initarg :name
+         :initform "http://something.com"
+         :protection protected)
+   (protocol :initarg :protocol
 	     :initform nil
-	     :protection protected
-	     )
+	     :protection protected)
    (host :initarg :host
 	 :initform nil
-	 :protection protected
-	 )
+	 :protection protected)
    (file :initarg file
 	 :initform nil
-	 :protection protected)
-   ))
+	 :protection protected)))
 
 (defmethod jdee-url-parse ((this jdee-url) &optional field)
-  (with-slots (protocol host file) this
-    (let ((name (object-name-string this)))
-      (if (null name) (error "No URL given in `jdee-url' instance"))
-      (when (null protocol)
-	(if (string-match "^\\(.+\\)://\\(.*?\\)\\(\\/.*\\)?$" name)
-	    (setq protocol (match-string 1 name)
-		  host (match-string 2 name)
-		  file (match-string 3 name))))))
+  (with-slots (name protocol host file) this
+    (when (null name)
+      (error "No URL given in `jdee-url' instance"))
+    (when (null protocol)
+      (if (string-match "^\\(.+\\)://\\(.*?\\)\\(\\/.*\\)?$" name)
+          (setq protocol (match-string 1 name)
+                host (match-string 2 name)
+                file (match-string 3 name)))))
   (if field (slot-value this field)))
+
 
 (defmethod object-print ((this jdee-url) &optional strings)
   (jdee-url-parse this)
@@ -201,7 +202,7 @@ HTML pages."
 				      " "))
 	       strings)))
 
-(defmethod jdee-url-name ((this jdee-url)) (object-name-string this))
+(defmethod jdee-url-name ((this jdee-url)) (oref this name))
 (defmethod jdee-url-protocol ((this jdee-url)) (jdee-url-parse this 'protocol))
 (defmethod jdee-url-host ((this jdee-url)) (jdee-url-parse this 'host))
 (defmethod jdee-url-file ((this jdee-url)) (jdee-url-parse this 'file))
@@ -269,7 +270,7 @@ This defaults to false."
 	    (concat (cl-substitute ?/ ?. (oref this :class)) ".html"))))
 
 (defmethod jdee-url-docset-url-name ((this jdee-jdurl))
-  (object-name-string this))
+  (oref this name))
 
 (defmethod jdee-url-append-file-name ((this jdee-jdurl) filename)
   (let ((urlname (jdee-url-docset-url-name this)))
@@ -296,9 +297,9 @@ This defaults to false."
 
 (defmethod jdee-jdurl-resolver-urls ((this jdee-jdurl-resolver) class docset)
   (let ((urlname (jdee-url-name (oref docset :url))))
-    (list (jdee-jdurl urlname
-		     :class class
-		     :docset docset))))
+    (list (jdee-jdurl :name urlname
+		      :class class
+		      :docset docset))))
 
 (defmethod jdee-jdurl-resolver-exists ((this jdee-jdurl-resolver) class docset)
   (let ((urls (jdee-jdurl-resolver-urls this class docset)))
@@ -434,10 +435,10 @@ This defaults to false."
 			  (error "No url for docset in `jdee-help-docs': %S"
 				 jdee-help-docsets))
 		      (jdee-jddocset nil
-				    :description (first elt)
-				    :url (jdee-url urlstr)
-				    :version version
-				    :jdkp jdkp)))
+				     :description (first elt)
+				     :url (jdee-url :name urlstr)
+				     :version version
+				     :jdkp jdkp)))
 		jdee-help-docsets)))
 
 (defmethod jdee-jdhelper-urls-for-class ((this jdee-jdhelper) class)
