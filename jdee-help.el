@@ -28,7 +28,6 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'eieio)
 (require 'jdee-jdk-manager)
 (require 'jdee-widgets)
 (require 'jdee-util)
@@ -168,7 +167,7 @@ one of the the sites in `jdee-help-docsets' is not always reachable."
 
 (defclass jdee-url ()
   ((name :initarg :name
-         :initform "http://something.com"
+         :initform nil
          :protection protected)
    (protocol :initarg :protocol
              :initform nil
@@ -418,7 +417,7 @@ This defaults to false.")
                                  jdee-help-docsets))
                       (jdee-jddocset nil
                                      :description (first elt)
-                                     :url (jdee-url :name urlstr)
+                                     :url (jdee-url urlstr :name urlstr)
                                      :version version
                                      :jdkp jdkp)))
                 jdee-help-docsets)))
