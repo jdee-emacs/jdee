@@ -6,6 +6,12 @@
 
 @documentencoding UTF-8
 
+@dircategory Emacs
+@direntry
+* JDEE: (jdee).         Java Development Environment for Emacs.
+@end direntry
+
+
 @titlepage
 @title JDEE Manual
 @page JDEE Manual
