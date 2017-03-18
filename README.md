@@ -19,7 +19,14 @@ Additional information can be found at http://jdee.sourceforge.net/rootpage.html
 
 Emacs 24.3 is the oldest version that JDEE can be expected to run in.
 
-JDEE requires [JDEE Server](http://github.com/jdee-emacs/jdee-server) for some operations.
+If you install JDEE through the Emacs package system, it will take
+care of installing the prerequisites for you:
+* flycheck
+* memoize
+* dash
+These packages can be found on ELPA and/or MELPA.
+
+JDEE also requires [JDEE Server](http://github.com/jdee-emacs/jdee-server) for some operations.
 
 ## Installing with the Emacs package system
 
