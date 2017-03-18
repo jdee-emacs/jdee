@@ -12,6 +12,7 @@ build
 
 #EMACS
 *~
+TAGS
 
 # texinfo
 *.aux
