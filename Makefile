@@ -16,6 +16,9 @@ package : test
 	$(CASK) package
 
 
+jdee-sbt-nrepl:
+	cd jdee-sbt-nrepl && sbt package
+
 jdee-maven-nrepl:
 	$(MAKE) -C jdee-maven-nrepl install
 

@@ -177,6 +177,18 @@ private static String hello() { return \"Hello\"; }
       (should (string-equal (car pair) "foo().bar"))
       (should (string-equal (cadr pair) "b")))))
 
+(ert-deftest jdee-parse-modifiers ()
+  "Parsing of single line expression declaring a variable"
+  (message "Running jdee-parse-modifiers")
+
+  (jdee-test-with-jdee-buffer
+   "class Testing {
+       private final String foo;
+    }"
+
+
+   (message "Figure out how this fails and write the test")))
+
 
 (provide 'jdee-parse-test)
 ;;; jdee-parse-test.el ends here
