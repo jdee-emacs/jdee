@@ -175,7 +175,7 @@ That is to say the first non-nil value found in the variables given by
 	     (mapcar
 	      (lambda (p)
 		(file-name-as-directory p))
-	      (jdee-get-sourcepath))))))
+	      (jdee-get-local-sourcepath))))))
 
 (defun jdee-package-best-package-candidate (candidates)
   "Return the best package directory candidate from CANDIDATES.

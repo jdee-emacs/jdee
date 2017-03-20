@@ -1578,9 +1578,9 @@ replaces with slashes."
              (split-string cp jdee-classpath-separator)))))))
 
 
-(defun jdee-get-sourcepath-nrepl-1 (dir already-checked)
+(defun jdee-get-sourcepath-nrepl-1 (dir local already-checked)
   "Get the the sourcepath based on DIR, using the nREPL.
-It also asks the parent and child nREPLs.  ALREADY-CHECKED is a
+If LOCAL is nil, it also asks the parent and child nREPLs.  ALREADY-CHECKED is a
 list of directories that have already been checked.  Directories
 that do not exist are filtered from the result."
   ;; Ensure directory name ends with /
@@ -1593,37 +1593,44 @@ that do not exist are filtered from the result."
     ;; that can be removed.
     (let ((buffer-file-name (expand-file-name "SomeFile.java" dir))
           (default-directory dir)
-          (also-checked (append (list dir) already-checked)))
+          (also-checked (append (list dir) already-checked))
+          (local-path (cl-delete-if-not #'file-exists-p (jdee-live-sync-request:sourcepath))))
       ;; Build up the source path from this directory
-      (append (cl-delete-if-not #'file-exists-p (jdee-live-sync-request:sourcepath))
-              ;; and the children.  This returns a list of lists, so we need to
-              ;; flatten it.
-              (apply #'append
-                     (mapcar (lambda (child)
-                        (jdee-get-sourcepath-nrepl-1
-                         (expand-file-name child dir) also-checked))
-                      (jdee-live-sync-request:child-paths)))
-              ;; and the parent.
-              (-when-let (parent (jdee-live-sync-request:parent-path))
-                (jdee-get-sourcepath-nrepl-1 parent also-checked)))))
-)
+      (if local
+          local-path
+        (append local-path
+                ;; and the children.  This returns a list of lists, so we need to
+                ;; flatten it.
+                (apply #'append
+                       (mapcar (lambda (child)
+                                 (jdee-get-sourcepath-nrepl-1
+                                  (expand-file-name child dir) nil also-checked))
+                               (jdee-live-sync-request:child-paths)))
+                ;; and the parent.
+                (-when-let (parent (jdee-live-sync-request:parent-path))
+                  (when (jdee-find-project-file parent)
+                    (jdee-get-sourcepath-nrepl-1 parent nil also-checked))))))))
 
 
-(defun jdee-get-sourcepath-nrepl ()
+
+(defun jdee-get-sourcepath-nrepl (&optional local)
   "Provider to the the sourcepath using the nREPL.
-It also asks the parent and child nREPLs."
+It also asks the parent and child nREPLs if LOCAL is nil."
   (let ((project-dir (jdee-live-project-directory-for buffer-file-name)))
     ;; If we cannot find the project directory, then this won't work
     (when project-dir
       (jdee-get-sourcepath-nrepl-1
-       (expand-file-name project-dir) nil))))
+       (expand-file-name project-dir) local nil))))
 
 
 
-(defun jdee-get-sourcepath-var ()
+(defun jdee-get-sourcepath-var (&optional local)
   "Provider to get the sourcepath using the `jdee-sourcepath' variable.
-This is intended as a fallback when there is no build file associated with the project, or the build file is not recognized by jdee.
-Used as a value of `jdee-sourcepath-providers'"
+This is intended as a fallback when there is no build file
+associated with the project, or the build file is not recognized
+by jdee.  Used as a value of `jdee-sourcepath-providers'
+
+It returns the same value regardless of whether LOCAL is set."
   (jdee-expand-wildcards-and-normalize
    jdee-sourcepath
    'jdee-sourcepath))
@@ -1649,15 +1656,23 @@ If a method returns non-nil, the remaining methods are not called."
     (dolist (provider jdee-sourcepath-providers sourcepath)
             (setq sourcepath (append sourcepath (funcall provider))))))
 
+(defun jdee-get-local-sourcepath ()
+  "Return the sourcepath the likely contain the file for the current buffer.
+Providers that are aware of multiple builder files should not
+ look for other directories to bild the path, which can be slow."
+  (let (sourcepath)
+    (dolist (provider jdee-sourcepath-providers sourcepath)
+            (setq sourcepath (or sourcepath (funcall provider 'local))))))
+
 
 (defvar jdee-entering-java-buffer-hook
   '(jdee-reload-project-file
     jdee-which-method-update-on-entering-buffer)
    "*Lists functions to run when entering a jdee-mode source buffer from another
-jdee-mode buffer. Note that these functions do not run when reentering the same
-jdee-mode buffer from a non-jdee-mode buffer. You should use this hook only for
+jdee-mode buffer.  Note that these functions do not run when reentering the same
+jdee-mode buffer from a non-jdee-mode buffer.  You should use this hook only for
 functions that need to be run when you switch from one jdee-mode buffer to
-a different jdee-mode buffer. Use `jdee-mode-hook' if the function needs to run
+a different jdee-mode buffer.  Use `jdee-mode-hook' if the function needs to run
 only once, when the buffer is created.")
 
 (defvar jdee-current-buffer (current-buffer)
@@ -2321,16 +2336,6 @@ buffer, otherwise, return whether or not it is a legitimate buffer."
   (if (and (not no-raise-p) (not (eq major-mode 'jdee-mode)))
       (error "Not visiting a Java source file.")
     (eq major-mode 'jdee-mode)))
-
-(eval-when-compile
-  ;; This code will not appear in the compiled (.elc) file
-  ;; FIXME: move these to the test directory, with other tests
-  (defun jdee-self-test ()
-    "Runs jde self tests."
-    (interactive)
-    (require 'jdee-junit)
-    (jdee-junit-self-test)
-    (jdee-dbs-self-test)))
 
 
 ;; This must come after all JDEE customization variables have been
