@@ -6,6 +6,12 @@
 
 @documentencoding UTF-8
 
+@dircategory Emacs
+@direntry
+* JDEE: (jdee).         Java Development Environment for Emacs.
+@end direntry
+
+
 @titlepage
 @title JDEE Manual
 @page JDEE Manual
@@ -3559,7 +3565,7 @@ is an example of how to do this:
 @example
 (defun my-jdee-mode-hook ()
   (message "my-jdee-mode-hook function executed"))
-    (add-hook 'jdee-mode-hook 'my-jdee-mode-hook)
+(add-hook 'jdee-mode-hook 'my-jdee-mode-hook)
 @end example
 
 The preceding example defines a JDEE mode hook function named
