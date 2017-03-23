@@ -5,7 +5,7 @@
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
-;; Copyright (C) 1999, 2001, 2002, 2003, 2004 Paul Kinnucan.
+;; Copyright (C) 1999, 2001, 2002, 2003, 2004, 2017 Paul Kinnucan.
 ;; Copyright (C) 2009 by Paul Landes
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
@@ -236,7 +236,10 @@ This defaults to false.")
 
 
 (defclass jdee-jdurl (jdee-url)
-  ((class :initarg :class
+  ((name :initarg :name
+         :initform nil
+         :protection protected)
+   (class :initarg :class
           :initform nil
           :type (or null string)
           :documentation "Java class name.")
@@ -286,7 +289,8 @@ This defaults to false.")
 
 (defmethod jdee-jdurl-resolver-urls ((this jdee-jdurl-resolver) class docset)
   (let ((urlname (jdee-url-name (oref docset :url))))
-    (list (jdee-jdurl :name urlname
+    (list (jdee-jdurl urlname
+                      :name urlname
                       :class class
                       :docset docset))))
 
