@@ -286,7 +286,8 @@ This defaults to false.")
 
 (defmethod jdee-jdurl-resolver-urls ((this jdee-jdurl-resolver) class docset)
   (let ((urlname (jdee-url-name (oref docset :url))))
-    (list (jdee-jdurl :name urlname
+    (list (jdee-jdurl urlname
+                      :name urlname
                       :class class
                       :docset docset))))
 
