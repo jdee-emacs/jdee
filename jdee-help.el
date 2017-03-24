@@ -236,10 +236,7 @@ This defaults to false.")
 
 
 (defclass jdee-jdurl (jdee-url)
-  ((name :initarg :name
-         :initform nil
-         :protection protected)
-   (class :initarg :class
+  ((class :initarg :class
           :initform nil
           :type (or null string)
           :documentation "Java class name.")
