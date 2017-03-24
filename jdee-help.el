@@ -696,7 +696,7 @@ Return the member selected by the user."
   (interactive)
   (let ((url (jdee-jdhelper-jdk-url jdee-jdhelper-singleton))
         urlstr)
-    (setq url (jdee-jdurl (jdee-url-name url)))
+    (setq url (jdee-jdurl :name (jdee-url-name url)))
     (setq urlstr (jdee-url-append-file-name url "index.html"))
     (browse-url urlstr)))
 
