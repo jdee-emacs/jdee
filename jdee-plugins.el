@@ -24,6 +24,8 @@
 
 ;;; Commentary:
 
+;;; Code:
+
 (require 'cl-lib)
 (require 'eieio)
 (require 'executable)
@@ -52,29 +54,29 @@
 
 
 (defun jdee-pi-register (plugin)
-  "Register PLUGIN, which must be an object of
-type `jdee-plugin'."
+  "Register PLUGIN, which must be an object of type `jdee-plugin'."
   (oset-default
    'jdee-plugin
    plugins
    (cons plugin
          ;; Remove any old version of the plugin
-         (cl-delete plugin (oref-default 'jdee-plugin plugins) 
+         (cl-delete plugin (oref-default 'jdee-plugin plugins)
                     :test (lambda (a b)
                             (string= (eieio-object-name-string a)
                                      (eieio-object-name-string b)))))))
 
 
 (defun jdee-pi-get-plugin-dir (plugin)
-  "Returns the path of the directory containing PLUGIN."
+  "Return the path of the directory containing PLUGIN."
   (expand-file-name plugin jdee-plugins-directory))
 
 
 (defun jdee-pi-load-plugin (plugin)
-  "Loads the plugin named PLUGIN. This function assumes that the plugin resides
-in a subdirectory of the JDEE's plugins directory named PLUGIN and that this
-subdirectory contains a subdirectory name lisp that contains
-a file named jdee-PLUGIN.el. This function loads jdee-PLUGIN.el."
+  "Load the plugin named PLUGIN.
+This function assumes that the plugin resides in a subdirectory of the JDEE's
+plugins directory named PLUGIN and that this subdirectory contains
+a subdirectory name LISP that contains a file named jdee-plugin.el.
+This function loads jdee-PLUGIN.el."
   (let* ((plugin-dir (expand-file-name plugin jdee-plugins-directory))
 	 (plugin-lisp-dir (expand-file-name "lisp" plugin-dir))
 	 (plugin-lisp-package-name (concat "jdee-" plugin))
@@ -91,11 +93,12 @@ a file named jdee-PLUGIN.el. This function loads jdee-PLUGIN.el."
 
 
 (defun jdee-pi-load-plugins ()
-  "Loads the plugins in the JDEE's plugins directory."
+  "Load the plugins in the JDEE's plugins directory."
   (interactive)
   (if (and jdee-plugins-directory (file-directory-p jdee-plugins-directory))
       (mapc (lambda (f)
-              (if (and (not (member (file-name-nondirectory f) '("." ".." ".git" "CVS" "RCS")))
+              (if (and (not (member (file-name-nondirectory f)
+                                    '("." ".." ".git" "CVS" "RCS")))
                        (file-directory-p f))
                   (jdee-pi-load-plugin (file-name-nondirectory f))))
             (directory-files jdee-plugins-directory t)))
@@ -120,34 +123,34 @@ a file named jdee-PLUGIN.el. This function loads jdee-PLUGIN.el."
 
 (defun jdee-pi-install-plugins ()
   "This command installs any plugin distributables that it
-finds in the JDEE's plugins directory. It assumes that
+finds in the JDEE's plugins directory.  It assumes that
 the distributables are in jar or zip format and that the
 jar program is on the system path."
   (interactive)
 
   (assert (executable-find "jar") nil
-    "Cannot find the jar program on the system path.")
+          "Cannot find the jar program on the system path.")
 
   (let ((zip-files
 	 (directory-files jdee-plugins-directory nil ".*[.]\\(zip\\|jar\\)")))
 
     (when zip-files
       (let ((buf (get-buffer-create "*plugins*")))
-	  (with-current-buffer buf
-	    (erase-buffer)
-	    (insert "JDEE Plugin Installation Log")
-	    (pop-to-buffer buf)
-	    (cd jdee-plugins-directory)
-	    (loop for zip-file in zip-files do
-		  (let ((result
-			 (shell-command-to-string
+        (with-current-buffer buf
+          (erase-buffer)
+          (insert "JDEE Plugin Installation Log")
+          (pop-to-buffer buf)
+          (cd jdee-plugins-directory)
+          (loop for zip-file in zip-files do
+                (let ((result
+                       (shell-command-to-string
 			(concat "jar xvf " zip-file))))
-		    (insert "\n\n")
-		    (insert (format "Installing %s ..."
-				    (file-name-sans-extension zip-file)))
-		    (insert "\n\n")
-		    (insert result)))
-	    (insert "\n\nInstallation complete"))))))
+                  (insert "\n\n")
+                  (insert (format "Installing %s ..."
+                                  (file-name-sans-extension zip-file)))
+                  (insert "\n\n")
+                  (insert result)))
+          (insert "\n\nInstallation complete"))))))
 
 
 (defun jdee-pi-make-menu-spec ()
