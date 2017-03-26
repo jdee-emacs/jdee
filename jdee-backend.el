@@ -284,28 +284,6 @@ environment variable."
               delegee "\", \"%s\", true);")))
     (jdee-backend-jeval-classname fmt class-name)))
 
-;;TODO rewrite to elisp
-(defun jdee-backend-url-exists-p (url)
-  "Return t if URL exists."
-  (let ((cmd (format "\
-java.net.URLConnection conn = null;
-String urlStr = \"%s\";
-try {
-  URL url = new URL(urlStr);
-  conn = url.openConnection();
-  conn.getInputStream().close();
-  print(\"t\");
-} catch(java.net.MalformedURLException e) {
-  print(\"(error \\\"Bad URL: \" + urlStr + \"\\\")\");
-} catch(java.io.IOException e) {
-  String msg = e.toString().replace(\"\\\"\", \"\\\\\\\"\");
-  print(\"nil\");
-} finally {
-  if (conn instanceof HttpURLConnection) conn.disconnect();
-}"
-                     (jdee-url-name url))))
-    (eval (read (jdee-jeval cmd)))))
-
 (defun jdee-backend-running-p ()
   "Return t if JDEE backend is running."
   (jdee-bsh-running-p))

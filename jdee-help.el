@@ -353,7 +353,13 @@ This defaults to false.")
 (defclass jdee-jdurl-beanshell-resolver (jdee-jdurl-resolver) ())
 
 (defmethod jdee-jdurl-resolver-url-exists ((this jdee-jdurl-beanshell-resolver) url)
-  (jdee-backend-url-exists-p url))
+  (condition-case err
+      (progn
+        ;;TODO Check in which Emacs version timeout has been added:
+        (url-retrieve-synchronously (jdee-url-name url) t t)
+        t)
+    (error
+     (error (concat "Bad URL: \"" (jdee-url-name url) "\"")))))
 
 (defclass jdee-jdurl-stack-resolver (jdee-jdurl-resolver)
   ((resolvers :initarg :resolvers
