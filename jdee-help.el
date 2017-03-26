@@ -473,7 +473,7 @@ This defaults to false.")
              (package-file (substring class-url 0 pos))
              buf standard-output)
         (if (null metafile)
-            (error "Unable to create a temporary file in %s directory."
+            (error "Unable to create a temporary file in %s directory"
                    temporary-file-directory))
         (setq buf (find-file-noselect metafile nil t)
               standard-output buf)
@@ -581,9 +581,9 @@ This defaults to false.")
 
 (defun jdee-help-class-member (class member)
   "Pop up a menu of the fields and methods of CLASS.
-Then search `jdee-help-docsets' for javadoc for CLASS. If found,
+Then search `jdee-help-docsets' for javadoc for CLASS.  If found,
 point the browser to the doc for the selected method or
-field. Note: this command does not check whether the doc
+field.  Note: this command does not check whether the doc
 for CLASS actually documents the selected class member."
   (interactive
    (let* ((class (jdee-read-class))
@@ -592,14 +592,13 @@ for CLASS actually documents the selected class member."
   (jdee-jdhelper-show-class jdee-jdhelper-singleton class member))
 
 (defun jdee-help-symbol ()
-  "Displays help for a symbol. The symbol may reference an object, a
-class, or a method or field. If the symbol references a class, this
-function displays the javadoc for the class. If the symbol references
-an object, this method displays the javadoc for the class of the
-object. If the symbol references a field or a method, this function
-displays the javadoc for the class of the object of which the field or
-method is a member at the point where the method of field is
-documented."
+  "Displays help for a symbol.
+The symbol may reference an object, a class, or a method or field.  If the
+symbol references a class, this function displays the javadoc for the class.
+If the symbol references an object, this method displays the javadoc for
+the class of the object.  If the symbol references a field or a method, this
+function displays the javadoc for the class of the object of which the field or
+method is a member at the point where the method of field is documented."
   (interactive)
   (cl-flet ((show-symbol
              (class method-name)
