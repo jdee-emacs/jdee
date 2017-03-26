@@ -684,12 +684,6 @@ Return the member selected by the user."
       (message "Class %s has no members." class))))
 
 ;;;###autoload
-(defun jdee-help-beanshell ()
-  "Displays the BeanShell documentation."
-  (interactive)
-  (browse-url "http://www.beanshell.org/manual/contents.html"))
-
-;;;###autoload
 (defun jdee-help-browse-jdk-doc ()
   "Displays the JDK doc in a web browser."
   (interactive)
