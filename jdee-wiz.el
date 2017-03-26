@@ -38,7 +38,7 @@
 (require 'semantic/util)
 
 (defgroup jdee-wiz nil
-  "JDE Wizards"
+  "JDEE Wizards"
   :group 'jdee
   :prefix "jdee-wiz-")
 
@@ -47,27 +47,6 @@
    (lambda (char)
      (if (eq char ?\\) "\\\\" (char-to-string char)))
    path ""))
-
-(defun jdee-wiz-update-class-list()
-  "Update the class list used to resolve class names.
-The first time you invoke a JDE wizard, the JDE builds a list of all classes on
-the classpath defined by jdee-global-classpath. Wizards use this list to resolve
-unqualified class names. If you add any classes to the classpath after invoking
-a wizard, you should update the class list."
-  (interactive)
-  (jdee-backend-load-project-class-list))
-
-(defun jdee-wiz-set-bsh-project()
-  "Update the beanshell's concept of the current project and the
-classpath associated with it.  This may cause an update scan of the
-class list the next time a wizard uses the class list for a lookup.
-The scanning only occurs if the project is newly opened or its
-classpath has been changed since the last scan, and switching between
-projects does not necessarily force a rescan as the scan information
-is cached in the beanshell.  You can force a rescan for a project by
-calling `jdee-wiz-update-class-list'."
-  (interactive)
-  (jdee-backend-load-project-class-list2))
 
 (defun jdee-wiz-get-package-name ()
   (let ((package-re "^[ \t]*package[ \t]+\\(.*\\)[ \t]*;"))

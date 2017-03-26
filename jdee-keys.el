@@ -35,7 +35,7 @@
    (cons "[?\C-c ?\C-v ?\C-l]" 'jdee-gen-println)
    (cons "[?\C-c ?\C-v ?\C-n]" 'jdee-help-browse-jdk-doc)
    (cons "[?\C-c ?\C-v ?\C-p]" 'jdee-save-project)
-   (cons "[?\C-c ?\C-v ?\C-q]" 'jdee-wiz-update-class-list)
+   (cons "[?\C-c ?\C-v ?\C-q]" 'jdee-project-update-class-list)
    (cons "[?\C-c ?\C-v ?\C-r]" 'jdee-run)
    (cons "[?\C-c ?\C-v ?\C-s]" 'speedbar-frame-mode)
    (cons "[?\C-c ?\C-v ?\C-t]" 'jdee-jdb-menu-debug-applet)

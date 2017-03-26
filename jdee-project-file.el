@@ -27,13 +27,11 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'jdee-backend)
 (require 'jdee-custom)
 (require 'jdee-files)
 (require 'jdee-log)
 (require 'jdee-maven)
-
-;; FIXME: refactor
-(declare-function jdee-wiz-set-bsh-project "jdee-wiz" ())
 
 (defconst jdee-project-file-version "1.0"
   "*The current JDEE project file version number.")
@@ -484,6 +482,27 @@ have been loaded)."
        'jdee-set-variable-init-value
        jdee-dirty-variables)))
 
+(defun jdee-project-update-class-list()
+  "Update the class list used to resolve class names.
+The first time you invoke a JDEE wizard, the JDEE builds a list of all classes on
+the classpath defined by jdee-global-classpath. Wizards use this list to resolve
+unqualified class names. If you add any classes to the classpath after invoking
+a wizard, you should update the class list."
+  (interactive)
+  (jdee-backend-load-project-class-list))
+
+(defun jdee-project-update-backend()
+  "Update the JVM's concept of the current project and the
+classpath associated with it.  This may cause an update scan of the
+class list the next time a wizard uses the class list for a lookup.
+The scanning only occurs if the project is newly opened or its
+classpath has been changed since the last scan, and switching between
+projects does not necessarily force a rescan as the scan information
+is cached in the beanshell.  You can force a rescan for a project by
+calling `jdee-project-update-class-list'."
+  (interactive)
+  (jdee-backend-load-project-class-list2))
+
 ;; Code to update JDEE customization variables when a user switches
 ;; from a Java source buffer belonging to one project to a buffer
 ;; belonging to another.
@@ -506,7 +525,7 @@ differs from the old buffer's."
 	    (progn
 	      (setq jdee-current-project project-file-path)
 	      (jdee-load-project-file)
-	      (jdee-wiz-set-bsh-project))))
+	      (jdee-project-update-backend))))
     (error (message
 	    "Project file reload error: %s"
 	    (error-message-string err)))))
@@ -521,8 +540,8 @@ defined by the current project's project file."
   (jdee-custom-adjust-groups)
   (jdee-load-project-file))
 
-(when  (or (not (boundp 'jdee-maven-disabled-p))
-           (not jdee-maven-disabled-p))
+(when (or (not (boundp 'jdee-maven-disabled-p))
+          (not jdee-maven-disabled-p))
   (add-hook 'jdee-mode-hook 'jdee-maven-hook))
 
 (provide 'jdee-project-file)

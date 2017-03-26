@@ -260,7 +260,7 @@ This command invokes the function defined by `jdee-build-function'."
 	(when (not jdee-launch-beanshell-on-demand-p)
           (jdee-backend-launch))
 
-	(jdee-wiz-set-bsh-project)
+	(jdee-project-update-backend)
 
 	(wisent-java-default-setup)
 	(semantic-mode 1)
@@ -375,7 +375,7 @@ This command invokes the function defined by `jdee-build-function'."
 		    ["Extend Abstract Class..."    jdee-wiz-extend-abstract-class t]
 		    ["Delegate Methods..."         jdee-wiz-delegate t]
 		    "-"
-		    ["Update Class List"   jdee-wiz-update-class-list t]
+		    ["Update Class List"   jdee-project-update-class-list t]
 		    )
 	      (list "Modes"
 		    (vector "Abbrev"
