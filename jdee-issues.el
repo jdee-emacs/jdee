@@ -181,11 +181,12 @@ for insertion of the .emacs file"
       (kill-buffer buf))))
 
 (defun jdee-problem-report-list-all-variables()
-  "List all variables starting with `jde' or `bsh'."
+  "List all JDEE variables.
+See `jdee-symbol-p'."
   (let (vars)
     (mapatoms
      (lambda (symbol)
-       (if  (jdee-symbol-p symbol)
+       (if (jdee-symbol-p symbol)
            (setq vars (cons symbol vars)))))
     vars))
 

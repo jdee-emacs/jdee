@@ -72,14 +72,11 @@
 
 	(put 'working-status-forms 'lisp-indent-function 2))))
 
-;; FIXME: refactor
-(declare-function jdee-jeval-r "jdee-bsh" (java-statement))
-
 ;;;; Customization
 ;;;; -------------
 
 (defgroup jdee-javadoc nil
-  "JDE javadoc utilities"
+  "JDEE javadoc utilities"
   :group 'jdee
   :prefix "jdee-javadoc-")
 

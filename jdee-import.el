@@ -46,7 +46,6 @@
 
 ;; FIXME: refactor
 (declare-function jdee-choose-class "jdee-open-source" (classes &optional prompt uq-name confirm-fq-p))
-(declare-function jdee-jeval-r "jdee-bsh" (java-statement))
 
 ;;;;
 ;;;; Customization
