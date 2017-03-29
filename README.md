@@ -17,7 +17,7 @@ Additional information can be found at http://jdee.sourceforge.net/rootpage.html
 
 ## Requirements
 
-Emacs 24.3 is the oldest version that JDEE can be expected to run in.
+Emacs 24.4 is the oldest version that JDEE can be expected to run in.
 
 If you install JDEE through the Emacs package system, it will take
 care of installing the prerequisites for you:
@@ -65,7 +65,7 @@ To generate Info, HTML and PDF documentation:
 - For PDF generation, you also need texi2dvi, texinfo-tex, texlive-ec
   and texlive-cm-super.
 
-- In the doc/ subdirectory, run: ```makeinfo --info --html --pdf```
+- In the doc/ subdirectory, run: ```makeinfo --info --html --pdf jdee.texi```
 
 ## Features
 
