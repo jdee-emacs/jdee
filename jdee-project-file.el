@@ -64,8 +64,8 @@ temporarily when stepping through code."
 (defcustom jdee-project-file-name "prj.el"
   "*Specify name of JDEE project file.
 When it loads a Java source file, the JDEE looks for a lisp file of
-this name (the default is prj.el in the source file hierarchy. If it
-finds such a file, it loads the file. You can use this file to set the
+this name (the default is prj.el) in the source file hierarchy.  If it
+finds such a file, it loads the file.  You can use this file to set the
 classpath, compile options, and other JDEE options on a
 project-by-project basis."
   :group 'jdee-project
@@ -92,7 +92,7 @@ being loaded.")
 (defun jdee-find-project-file (dir &optional file-name)
   "Finds the next project file named FILE-NAME (defaults to
 `jdee-project-file-name') upwards in the directory tree from
-DIR. Returns nil if it cannot find a project file in DIR or an
+DIR.  Returns nil if it cannot find a project file in DIR or an
 ascendant directory."
   (let* ((directory-sep-char ?/) ;; Override NT/XEmacs setting
 	 (file (cl-find (or file-name jdee-project-file-name)
@@ -208,7 +208,7 @@ Leave point at the location of the call, or after the last expression."
 	   (string-match "^jdee-" (symbol-name symbol)))))
 
 (defvar jdee-symbol-list nil
-  "*A list of jde variables which are processed by `jdee-save-project'.")
+  "*A list of JDEE variables to process by `jdee-save-project'.")
 
 (defun jdee-symbol-list (&optional force-update)
   "Return a list of variables to be processed by `jdee-save-project'.
