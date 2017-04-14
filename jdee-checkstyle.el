@@ -65,26 +65,26 @@ style."
   :group 'jdee)
 
 (defcustom jdee-checkstyle-class "com.puppycrawl.tools.checkstyle.Main"
-  "*Java checker class.
+  "Java checker class.
 Specifies the class of the the program to be used to check the source
-in the current buffer. The default is the checkstyle program."
+in the current buffer.  The default is the checkstyle program."
   :group 'jdee-checkstyle
   :type 'string)
 
 (defcustom jdee-checkstyle-classpath nil
-  "*Specify paths of classes required to run the jdee-checkstyle application.
-The JDE uses the specified paths to construct a -classpath
-argument to pass to the Java interpreter. This option overrides the
+  "Specify paths of classes required to run the jdee-checkstyle application.
+The JDEE uses the specified paths to construct a -classpath
+argument to pass to the Java interpreter.  This option overrides the
 `jdee-global-classpath' option."
   :group 'jdee-checkstyle
   :type '(repeat (file :tag "Path")))
 
 (defcustom jdee-checkstyle-read-args nil
-  "*Specify whether to prompt for additional checker arguments.
+  "Specify whether to prompt for additional checker arguments.
 If this variable is non-nil, the jdee-checkstyle command prompts
 you to enter additional checker arguments in the minibuffer.
 These arguments are appended to those specified by customization
-variables. The JDE maintains a history list of arguments
+variables.  The JDEE maintains a history list of arguments
 entered in the minibuffer."
   :group 'jdee-checkstyle
   :type 'boolean)
@@ -97,31 +97,31 @@ entered in the minibuffer."
 
 ;; (makunbound 'jdee-checkstyle-style)
 (defcustom jdee-checkstyle-style nil
-  "*Style used to check this project's Java code. \"Sun\"
-checks for conformity to the Java code style standard established by
-Sun Microsystems. \"Custom\" specifies a a user-defined
+  "Style used to check this project's Java code.
+\"Sun\" checks for conformity to the Java code style standard established by
+Sun Microsystems.  \"Custom\" specifies a a user-defined
 style. Selecting this option causes Emacs to display an edit
 field. Enter the path of a CheckStyle configuration file that defines
 the custom coding style in this field (see the CheckStyle
 documentation for information on configuration files). Use
 `jdee-checkstyle-properties' to specify the values of properties that
 the configuration file reads from the CheckStyle command line."
-   :group 'jdee-checkstyle
-   :type '(choice (const :tag "Sun" :value nil)
+  :group 'jdee-checkstyle
+  :type '(choice (const :tag "Sun" :value nil)
 		 (file :menu-tag "Custom" :tag "Config. File")))
 
 
 (defcustom jdee-checkstyle-expanded-properties nil
-  "*Specify the values of the expanded properties specified by the
-`jdee-checkstyle-style' configuration file. (See the CheckStyle
+  "Specify the values of the expanded properties specified by the
+`jdee-checkstyle-style' configuration file.  (See the CheckStyle
 documentation for information about expanded properties.) To enter a
-property, select the INS button. Emacs displays a Property Name field
-and a Property Value field for the property. Enter the name of the
+property, select the INS button.  Emacs displays a Property Name field
+and a Property Value field for the property.  Enter the name of the
 property, for example, checkstyle.header.file, in the Property Name
 field; enter its value, for example, docs/java.header, in the Property
 Value field.  Repeat this process to display additional
-properties. You can specify as many properties as you like in
-this way. To delete a property, select the DEL button next
+properties.  You can specify as many properties as you like in
+this way.  To delete a property, select the DEL button next
 to the property."
   :group 'jdee-checkstyle
   :type '(repeat (cons
@@ -130,32 +130,33 @@ to the property."
 
 ;; (makunbound 'jdee-checkstyle-expanded-properties-file)
 (defcustom jdee-checkstyle-expanded-properties-file nil
-  "*Path of a file that specifies the values of a configuration
-file's expanded properties. If this option is set, the JDEE ignores
+  "Path of a file that specifies the values of a configuration
+file's expanded properties.  If this option is set, the JDEE ignores
 the settings of the `jdee-checkstyle-expanded-properties' variable."
-   :group 'jdee-checkstyle
-   :type '(choice (const :tag "None" :value nil)
-		  (file :menu-tag "Properties File" :tag "Path")))
+  :group 'jdee-checkstyle
+  :type '(choice (const :tag "None" :value nil)
+                 (file :menu-tag "Properties File" :tag "Path")))
 
 ;; (makunbound 'jdee-checkstyle-module-package-names-file)
 (defcustom jdee-checkstyle-module-package-names-file nil
-  "*Path of a file that specifies the package names of
+  "Path of a file that specifies the package names of
 custom style checking modules used by this project."
-   :group 'jdee-checkstyle
-   :type '(choice (const :tag "None" :value nil)
-		  (file :menu-tag "Package Names File" :tag "Path")))
+  :group 'jdee-checkstyle
+  :type '(choice (const :tag "None" :value nil)
+                 (file :menu-tag "Package Names File" :tag "Path")))
 
 ;; (makunbound 'jdee-checkstyle-output-file)
 (defcustom jdee-checkstyle-output-file nil
-  "*Path of a file to store CheckStyle's output."
-   :group 'jdee-checkstyle
-   :type '(choice (const :tag "None" :value nil)
-		  (file :menu-tag "Output File" :tag "Path")))
+  "Path of a file to store CheckStyle's output."
+  :group 'jdee-checkstyle
+  :type '(choice (const :tag "None" :value nil)
+                 (file :menu-tag "Output File" :tag "Path")))
 
 
 ;; (makunbound 'jdee-checkstyle-output-format)
 (defcustom jdee-checkstyle-output-format nil
-  "*Format of CheckStyle's output. Options are plain or XML."
+  "Format of CheckStyle's output.
+Options are plain or XML."
   :group 'jdee-checkstyle
   :type '(choice (const :tag "Plain" :value nil)
 		 (const :tag "XML" :value "xml")))
@@ -163,20 +164,19 @@ custom style checking modules used by this project."
 
 ;; (makunbound 'jdee-checkstyle-source-dir)
 (defcustom jdee-checkstyle-source-dir nil
-  "*Path of a directory to check. If you specify a
-path, CheckStyle checks all the files in the specified
-directory. Otherwise, it checks the file in the current
-buffer."
-   :group 'jdee-checkstyle
-   :type '(choice (const :tag "None" :value nil)
-		  (file :menu-tag "Source Directory" :tag "Path")))
+  "Path of a directory to check.
+If you specify a path, CheckStyle checks all the files in the specified
+directory.  Otherwise, it checks the file in the current buffer."
+  :group 'jdee-checkstyle
+  :type '(choice (const :tag "None" :value nil)
+                 (file :menu-tag "Source Directory" :tag "Path")))
 
 
 ;; (makunbound 'jdee-checkstyle-finish-hook)
 (defcustom jdee-checkstyle-finish-hook
   '(jdee-compile-finish-kill-buffer)
-  "List of functions to be invoked when CheckStyle terminates.  Each
-function should accept two arguments: the compilation buffer and a
+  "List of functions to be invoked when CheckStyle terminates.
+Each function should accept two arguments: the compilation buffer and a
 string describing how the compilation finished."
   :group 'jdee-checkstyle
   :type 'hook)
@@ -184,18 +184,18 @@ string describing how the compilation finished."
 
 ;; (makunbound 'jdee-checkstyle-source-file-extension)
 (defcustom jdee-checkstyle-source-file-extension nil
-  "*Extension of Java source files (if not java)."
+  "Extension of Java source files (if not java)."
   :group 'jdee-checkstyle
   :type '(choice (const :tag "java" :value nil)
 		 (string :menu-tag "other" :tag "Extension")))
 
 
 (defmethod jdee-checkstyle-get-property-args ((this jdee-run-vm))
-    "Get property arguments."
-    (mapcar
-     (lambda (prop)
-       (format "-D%s=%s" (car prop) (cdr prop)))
-     jdee-run-option-properties))
+  "Get property arguments."
+  (mapcar
+   (lambda (prop)
+     (format "-D%s=%s" (car prop) (cdr prop)))
+   jdee-run-option-properties))
 
 
 ;;;###autoload
@@ -379,8 +379,8 @@ string describing how the compilation finished."
 (defun jdee-checkstyle ()
   "Checks the Java program in the current buffer.
 This command invokes the style checker specified by `jdee-checkstyle-class'
-with the options specif2ied by the JDEE customization variables
-that begin with `jdee-checkstyle'. If the variable
+with the options specified by the JDEE customization variables
+that begin with `jdee-checkstyle'.  If the variable
 `jdee-checkstyle-read-args' is non-nil, this command reads
 additional compilation options from the minibuffer, with
 history enabled."
