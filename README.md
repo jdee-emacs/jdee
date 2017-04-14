@@ -30,11 +30,42 @@ JDEE also requires [JDEE Server](http://github.com/jdee-emacs/jdee-server) for s
 
 ## Installing with the Emacs package system
 
-The project is available in MELPA.
+The project is available in MELPA. To install it do the following:
+1. Add MELPA to your `.emacs` or `init.el` if you don't have it:
+```emacs-lisp
+;;; Add this at the top of the init.el file:
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/"))
+(when (< emacs-major-version 24)
+  ;; For important compatibility libraries like cl-lib
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+(package-initialize)
+```
+2. Install JDEE from Emacs using its package manager:
+```
+M-x lisp-packages
+```
+There select JDEE and install: i x
 
-For more information, see the [installation instructions](http://htmlpreview.github.com/?https://github.com/peterwvj/jdee/blob/master/doc/flat/install.html).
+3. Install [JDEE Server](http://github.com/jdee-emacs/jdee-server) from github
 
-## Installing from source
+Follow short readme at [JDEE Server](http://github.com/jdee-emacs/jdee-server).
+
+4. Customize `jdee-server-dir` to make it point to directory with JDEE Server jars.
+
+_Warning!_ Don't install JDEE Server inside JDEE installed from MELPA (`~/.emacs.d/elpa/jdee-xxx`), because it will be deleted with next update of JDEE! Create a separate directory, for example: `~/.emacs.d/jdee-server`.
+
+Customized `jdee-server-dir` in your init file should look something like:
+```emacs-lisp
+(custom-set-variables
+ '(jdee-server-dir "/Users/you/.emacs.d/jdee-server"))
+ )
+```
+
+For additional information, see the [old installation instructions](http://htmlpreview.github.com/?https://github.com/peterwvj/jdee/blob/master/doc/flat/install.html).
+
+## Installing from source (for JDEE devs only)
 
 First, clone [the github repository](https://github.com/jdee-emacs/jdee/).
 
@@ -54,9 +85,8 @@ To use this built distribution without installation, in your .emacs add:
   (require 'jdee)
 ```
 
-## Building the documentation
-
-There is a texinfo documentation: doc/jdee.texi.
+## Building the documentation in other formats
+JDEE ships with documentation in Info format, but if you want you can generate the docs in other formats too.
 
 To generate Info, HTML and PDF documentation:
 
