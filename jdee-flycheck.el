@@ -191,6 +191,17 @@ Deletes the temporary files listed in `jdee-flycheck-temp-files'"
 (defvar jdee-flycheck-temp-files nil
   "Files to delete whean the buffer is killed.")
 
+(defun jdee-copy-jdee-path-variables-between-buffers (orig-buffer dest-buffer)
+  "Copy variables with names like 'jdee-*path*' from a buffer to another."
+  (with-current-buffer dest-buffer
+    (mapc #'(lambda (elem)
+              (let ((symb (if (listp elem) (car elem) elem)))
+                (unless (not (string-match-p "jdee-.*path.*" (symbol-name symb)))
+                  (make-local-variable symb)
+                  (set symb (buffer-local-value symb orig-buffer)))
+                ))
+          (buffer-local-variables orig-buffer))))
+
 (defun jdee-flycheck-compile-buffer (checker cback &optional buffer)
   "Compile the buffer without saving it.  Creates a temporary
 file and buffer with the contents of the current buffer and compiles that one."
@@ -202,6 +213,7 @@ file and buffer with the contents of the current buffer and compiles that one."
     (with-current-buffer orig-buffer
       (write-region (point-min) (point-max) temp-file nil :silent))
     (with-current-buffer (generate-new-buffer name)
+      (jdee-copy-jdee-path-variables-between-buffers orig-buffer (current-buffer))
       (make-local-variable 'jdee-flycheck-temp-files)
       (cl-pushnew dir jdee-flycheck-temp-files)
       (insert-file-contents-literally temp-file)
