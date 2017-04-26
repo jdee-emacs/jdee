@@ -6,6 +6,7 @@
 (require 'jdee-parse)
 (require 'load-relative)
 
+;; TODO: Refactor the framework into a separate file to be required.
 (defconst jdee-test-project-1-dir (relative-expand-file-name "../../jdee-test/project-1/")
   "Directory for project-1 test code")
 (defconst jdee-test-this-dir (relative-expand-file-name "./")
@@ -188,6 +189,35 @@ private static String hello() { return \"Hello\"; }
 
 
    (message "Figure out how this fails and write the test")))
+
+(ert-deftest jdee-parse-inner-enum ()
+  "Parsing of a nested enum"
+
+  (message "Runnign jdee-parse-inner-enum")
+
+  (jdee-test-with-jdee-buffer
+      "class Testing {
+       private final String foo;
+    }"
+      jdee-test-project-1-dir
+
+    (let ((qual  (jdee-parse-get-qualified-name "InnerEnum" 'import)))
+     (should (string-equal qual "uk.org.russet.Outer.InnerEnum")))))
+
+(ert-deftest jdee-complete-inner-enum ()
+  "Class lookup of an inner enum"
+
+  (message "Running jdee-complete-inner-enum")
+
+  (jdee-test-with-jdee-buffer
+      "class Testing {
+       private final String foo;
+    }"
+      jdee-test-project-1-dir
+
+    (let ((info  (jdee-complete-get-classinfo "uk.org.russet.Outer.InnerEnum")))
+      (message "Info %s" info)
+      (should info))))
 
 
 (provide 'jdee-parse-test)

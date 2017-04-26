@@ -473,9 +473,21 @@ classes for the access level."
     answer))
 
 (defun jdee-complete-invoke-get-class-info (name access)
-  "Invoke the method jde.util.Completion.getClassInfo(String, int)"
-  (jdee-jeval-r
-   (format "jde.util.Completion.getClassInfo(\"%s\",%d);" name access)))
+  "Invoke the method jde.util.Completion.getClassInfo(String, int).
+If the class is not found, walk back the package tree to see if it is an inner class,
+which needs to be called as a.b.C$D rather than a.b.C.D"
+  (let (result (curr-name name))
+    (while (and (null result) curr-name)
+      (setq result (jdee-jeval-r
+                    (format "jde.util.Completion.getClassInfo(\"%s\",%d);" curr-name access)))
+      (unless result
+        (setq curr-name
+              (if (string-match "\\." curr-name)
+                  (replace-regexp-in-string "^\\(.+\\)\\.\\([^.]+\\)$"
+                                            "\\1$\\2"
+                                            curr-name)
+                nil))))
+    result))
 
 
 (defun jdee-complete-get-classinfo-javacode (name import access-level)
