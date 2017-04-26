@@ -4,51 +4,9 @@
 
 (require 'ert)
 (require 'jdee-parse)
-(require 'load-relative)
-
-;; TODO: Refactor the framework into a separate file to be required.
-(defconst jdee-test-project-1-dir (relative-expand-file-name "../../jdee-test/project-1/")
-  "Directory for project-1 test code")
-(defconst jdee-test-this-dir (relative-expand-file-name "./")
-  "Directory containing this test code")
-
-(defmacro jdee-test-with-jdee-buffer (content directory &rest body)
-  "Evaluate BODY in a temporary buffer with CONTENT.
-If DIRECTORY is non-nil, it used as the current directory for the test."
-  (declare (debug t)
-           (indent 2))
-  `(with-temp-buffer
-     (insert ,content)
-     (let ((jdee-mode-hook nil)
-           (java-mode-hook nil)
-           (c-mode-common-hook nil)
-           (prog-mode-hook nil)
-           (buffer-file-name (concat
-                              (if ,directory
-                                  (concat ,directory "/")
-                                jdee-test-this-dir)
-                              "Temp.java")))
-       (jdee-mode)
-       (goto-char (point-min))
-       ,@body)))
-
-(defmacro jdee-test-with-existing-class (class &rest body)
-  "Fake CLASS being defined and run BODY"
-  (declare (debug t)
-           (indent 1))
-  `(let ((advice-name (concat "class-exists-" ,class)))
-     (unwind-protect
-       (progn
-        ;; Add advice to make the class be defined
-        (advice-add
-         'jdee-parse-class-exists
-          :before-until
-          (lambda (name)
-            (string-equal name ,class))
-          '((name . advice-name)))
-        ,@body)
-       ;; When done, remove the advice
-       (advice-remove #'jdee-parse-class-exists advice-name))))
+(let ((load-path (append (list (file-name-directory (buffer-file-name)))
+                         load-path)))
+  (require 'jdee-test-with-buffer))
 
 (ert-deftest jdee-parse-find-decl-same-name ()
   "Test that `jdee-parse-find-declaration-of' works when the variable and the
@@ -73,34 +31,7 @@ class have the same name, but different spellings."
 
 
 
-(ert-deftest jdee-complete-on-newline ()
-  "Test that `jdee-complete' works when there is a newline between the previous text and the point."
 
-  (jdee-test-with-jdee-buffer
-
-    ;; Insert a basic class
-   "class Testing {
-
-     public String someString() { return \"some\"; }
-
-     public String foo() {
-         someString().
-
-         // Point on previous line
-
-     }
-
-}"
-      nil
-
-    ;; Goto to line after text
-    (goto-char (point-min))
-    (search-forward "previous line")
-    (forward-line -1)
-
-    ;; Find the variable we are completing
-    (let ((pair (jdee-parse-java-variable-at-point)))
-      (should (equal '("someString" "") pair)))))
 
 
 (ert-deftest jdee-parse-partial-value ()
@@ -204,23 +135,8 @@ private static String hello() { return \"Hello\"; }
     (let ((qual  (jdee-parse-get-qualified-name "InnerEnum" 'import)))
      (should (string-equal qual "uk.org.russet.Outer.InnerEnum")))))
 
-(ert-deftest jdee-complete-inner-enum ()
-  "Class lookup of an inner enum"
 
-  (message "Running jdee-complete-inner-enum")
-
-  (jdee-test-with-jdee-buffer
-      "class Testing {
-       private final String foo;
-    }"
-      jdee-test-project-1-dir
-
-    (let ((info  (jdee-complete-get-classinfo "uk.org.russet.Outer.InnerEnum")))
-      (message "Info %s" info)
-      (should info))))
 
 
 (provide 'jdee-parse-test)
 ;;; jdee-parse-test.el ends here
-
-
