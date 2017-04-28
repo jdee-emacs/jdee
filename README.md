@@ -67,13 +67,15 @@ For additional information, see the [old installation instructions](http://htmlp
 
 ## Installing from source (for JDEE devs only)
 
-First, clone [the github repository](https://github.com/jdee-emacs/jdee/).
+1. Clone [the github repository](https://github.com/jdee-emacs/jdee/).
+2. Open the cloned JDEE directory in dired.
+3. Being in dired, install using command: ```package-install-from-buffer```
 
-Before using it, we advise that you run the tests:
+For development you will need to install Cask:
 
 1. Install [Cask](http://cask.readthedocs.io/en/latest/index.html).
 
-2. Run ```cask install``` from the jdee directory (make sure that the
+2. Run ```cask install``` from the JDEE directory (make sure that the
    ```cask``` command is in your PATH).
 
 3. Run the tests: ```make test```
