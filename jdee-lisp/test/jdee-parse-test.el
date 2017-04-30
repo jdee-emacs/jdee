@@ -4,9 +4,9 @@
 
 (require 'ert)
 (require 'jdee-parse)
-(let ((load-path (append (list (file-name-directory (buffer-file-name)))
-                         load-path)))
-  (require 'jdee-test-with-buffer))
+(load-file
+ (expand-file-name "jdee-test-with-buffer.el"
+                   (file-name-directory (buffer-file-name))))
 
 (ert-deftest jdee-parse-find-decl-same-name ()
   "Test that `jdee-parse-find-declaration-of' works when the variable and the

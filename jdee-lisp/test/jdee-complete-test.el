@@ -4,9 +4,9 @@
 
 (require 'ert)
 (require 'jdee-complete)
-(let ((load-path (append (list (file-name-directory (buffer-file-name)))
-                         load-path)))
-  (require 'jdee-test-with-buffer))
+(load-file
+ (expand-file-name "jdee-test-with-buffer.el"
+                   (file-name-directory (buffer-file-name))))
 
 (ert-deftest jdee-complete-on-newline ()
   "Test that `jdee-complete' works when there is a newline between the previous text and the point."
