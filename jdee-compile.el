@@ -119,36 +119,19 @@ entered in the minibuffer."
   :group 'jdee-project
   :type 'boolean)
 
-(defcustom jdee-compiler-new-compile-el
-  (boundp 'compilation-error-regexp-alist-alist)
-  "Check if we have the new (21.3+) compile.el.
-Set this to t if you are running an Emacs with the new compile.el
-and want to get slightly better font-locking in the compile
-buffer.  A value of nil will force the use of older style
-compilation-error-regexp.  This variable tries to auto-detect the
-compile.el version by checking if
-`compilation-error-regexp-alist-alist' is defined."
-  :group 'jdee-compile-options
-  :type 'boolean)
+;;; Font locking for compilation erorrs and warnings:
+(setq compilation-error-regexp-alist
+      (cons '("----------\n\\([0-9]+. ERROR in \\(.*\\)\n (at line \\([0-9]+\\))\n\\(\\(.*\n\\)+?\\).*^+\n\\(.*\n\\)\\)"
+              2 3 nil 2 1 (6 compilation-error-face)
+              )
+            compilation-error-regexp-alist))
 
-(if jdee-compiler-new-compile-el
-    (progn
-      (setq compilation-error-regexp-alist
-            (cons '("----------\n\\([0-9]+. ERROR in \\(.*\\)\n (at line \\([0-9]+\\))\n\\(\\(.*\n\\)+?\\).*^+\n\\(.*\n\\)\\)"
-                    2 3 nil 2 1 (6 compilation-error-face)
-                    )
-                  compilation-error-regexp-alist))
+(setq compilation-error-regexp-alist
+      (cons '("----------\n\\([0-9]+. WARNING in \\(.*\\)\n (at line \\([0-9]+\\))\n\\(\\(.*\n\\)+?\\).*^+\n\\(.*\n\\)\\)"
+              2 3 nil 1 1 (6 compilation-warning-face)
+              )
+            compilation-error-regexp-alist))
 
-      (setq compilation-error-regexp-alist
-            (cons '("----------\n\\([0-9]+. WARNING in \\(.*\\)\n (at line \\([0-9]+\\))\n\\(\\(.*\n\\)+?\\).*^+\n\\(.*\n\\)\\)"
-                    2 3 nil 1 1 (6 compilation-warning-face)
-                    )
-                  compilation-error-regexp-alist)))
-  ;; else
-  (setq compilation-error-regexp-alist
-        (cons '("----------\n[0-9]+. \\(ERROR\\|WARNING\\) in \\(.*\\)\n (at line \\([0-9]+\\))\n\\(\\(.*\n\\)+?\\).*^+\n\\(.*\n\\)"
-                2 3)
-              compilation-error-regexp-alist)))
 
 (defvar jdee-interactive-compile-args ""
 "String of compiler arguments entered in the minibuffer.")
