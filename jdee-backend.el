@@ -171,11 +171,10 @@ environment variable."
 
 (defun jdee-backend-load-project ()
   "Load the current project on JVM backend."
-  (if (not (jdee-bsh-running-p))
-      (progn
-        (bsh-launch (oref-default 'jdee-bsh the-bsh))
-        (bsh-eval (oref-default 'jdee-bsh the-bsh)
-                  (jdee-backend-create-prj-values-str)))))
+  (unless (jdee-bsh-running-p)
+    (bsh-launch (oref-default 'jdee-bsh the-bsh)))
+  (bsh-eval (oref-default 'jdee-bsh the-bsh)
+            (jdee-backend-create-prj-values-str)))
 
 (defun jdee-backend-compile (arg-array buffer)
   "Compile ARG-ARRAY in BUFFER."
