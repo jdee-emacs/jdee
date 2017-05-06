@@ -169,8 +169,8 @@ environment variable."
   (interactive)
   (jdee-bsh-exit))
 
-(defun jdee-backend--start-bsh ()
-  "Start Beanshell server if not running."
+(defun jdee-backend-load-project ()
+  "Load the current project on JVM backend."
   (if (not (jdee-bsh-running-p))
       (progn
         (bsh-launch (oref-default 'jdee-bsh the-bsh))
@@ -179,7 +179,7 @@ environment variable."
 
 (defun jdee-backend-compile (arg-array buffer)
   "Compile ARG-ARRAY in BUFFER."
-  (jdee-backend--start-bsh)
+  (jdee-backend-load-project)
   (bsh-buffer-eval
    (oref-default 'jdee-bsh the-bsh)
    (concat (format "jde.util.CompileServer.compile(%s);" arg-array) "\n")
@@ -187,7 +187,7 @@ environment variable."
 
 (defun jdee-backend-compile-eclipse (path arg-array buffer)
   "Add PATH to class path and compile ARG-ARRAY in BUFFER using Eclipse Compiler."
-  (jdee-backend--start-bsh)
+  (jdee-backend-load-project)
   (jdee-backend-add-to-class-path path)
   (bsh-buffer-eval
    (oref-default 'jdee-bsh the-bsh)
