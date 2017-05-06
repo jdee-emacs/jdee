@@ -57,11 +57,10 @@
 (require 'jdee-backend)
 (require 'jdee-classpath)
 (require 'jdee-files)
+(require 'jdee-jdk-manager)
 
 ;; FIXME: refactor to eliminate these
 (declare-function jdee-complete-flush-classes-in-cache "jdee-complete" (class-list))
-(declare-function jdee-get-jdk-prog "jdee" (progname))
-(declare-function jdee-java-version "jdee" ())
 
 (defvar jdee-complete-last-compiled-class)
 
