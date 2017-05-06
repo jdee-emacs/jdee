@@ -171,8 +171,7 @@ environment variable."
 
 (defun jdee-backend-load-project ()
   "Load the current project on JVM backend."
-  (unless (jdee-bsh-running-p)
-    (bsh-launch (oref-default 'jdee-bsh the-bsh)))
+  (jdee-backend-launch)
   (bsh-eval (oref-default 'jdee-bsh the-bsh)
             (jdee-backend-create-prj-values-str)))
 
