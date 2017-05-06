@@ -517,11 +517,8 @@ and there are no more errors. "
     (let* (proc (thisdir (jdee-ant-get-default-directory)) outwin)
       (save-excursion
         ;; Clear out the compilation buffer and make it writable.
-        (if (not (jdee-backend-running-p))
-            (progn
-              (bsh-launch (oref-default 'jdee-bsh the-bsh))
-              (bsh-eval (oref-default 'jdee-bsh the-bsh) (jdee-backend-create-prj-values-str))))
-        (setq proc (bsh-get-process (oref-default 'jdee-bsh the-bsh)))
+        (jdee-backend-load-project)
+        (setq proc (jdee-backend-get-process))
         (set-buffer outbuf)
         (compilation-mode)
         (setq buffer-read-only nil)

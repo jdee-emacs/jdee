@@ -291,6 +291,10 @@ environment variable."
   "Return backend's Java version."
   (jdee-jeval-r "jde.util.JdeUtilities.getJavaVersion();"))
 
+(defun jdee-backend-get-process ()
+  "Return process of the JVM backend."
+  (bsh-get-process (oref-default 'jdee-bsh the-bsh)))
+
 (provide 'jdee-backend)
 
 ;;; jdee-backend.el ends here
