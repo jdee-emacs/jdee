@@ -110,7 +110,7 @@ and specify the path of the eclipse compiler ecj.jar."
          (t "javac server")))))
 
 (defcustom jdee-read-compile-args nil
-"*Specify whether to prompt for additional compiler arguments.
+  "*Specify whether to prompt for additional compiler arguments.
 If this variable is non-nil, the jdee-compile command prompts
 you to enter additional compiler arguments in the minibuffer.
 These arguments are appended to those specified by customization
@@ -156,26 +156,23 @@ compile.el version by checking if
 (defvar jdee-interactive-compile-arg-history nil
 "History of compiler arguments entered in the minibuffer.")
 
-;; (makunbound 'jdee-compile-finish-hook)
 (defcustom jdee-compile-finish-hook
   '(jdee-compile-finish-kill-buffer
     jdee-compile-finish-refresh-speedbar
     jdee-compile-finish-update-class-info)
-  "List of functions to be invoked when compilation of a
-Java source file terminates. Each function should accept
-two arguments: the compilation buffer and a string
-describing how the compilation finished."
+  "List of functions to be invoked when compilation of a Java file finishes.
+Each function should accept two arguments: the compilation buffer
+and a string describing how the compilation finished."
   :group 'jdee
   :type 'hook)
 
 (defcustom jdee-compile-option-hide-classpath nil
-  "Substitute the classpath in the compilation window for
-..."
+  "Substitute the classpath in the compilation window for ..."
   :group 'jdee-compile-options
   :type 'boolean)
 
 (defvar jdee-compile-mute nil
-  "Setting to non-nil will silence some of the message")
+  "Setting to non-nil will silence some of the message.")
 
 
 (defun jdee-compile-update-class-list ()
@@ -201,6 +198,7 @@ don't know which classes were recompiled."
 	(set-buffer (car (buffer-list)))
 	(if (eq major-mode 'jdee-mode)
 	    (progn
+              ;;; TODO: replace with observer/event
 	      (setq jdee-complete-last-compiled-class (jdee-parse-get-buffer-class))
 	      (jdee-complete-flush-classes-in-cache (list jdee-complete-last-compiled-class))
               (unless jdee-compile-mute
@@ -1331,7 +1329,9 @@ If t (or other non-nil non-number) then kill in 2 secs."
    (jdee-compile-javac-18 "javac 1.8.x"))
   "List of supported javac compilers.")
 
+;;; TODO: remove user interaction from here
 (defun jdee-compile-get-javac ()
+  "Return Java compiler that matches the current JDK."
   (let* ((jdk-version (jdee-java-version))
 	 (jdk-split-version (split-string jdk-version "[.]"))
 	 (jdk-major-version (nth 0 jdk-split-version))
@@ -1346,6 +1346,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 		(string= jdk-major-version compiler-major-version)
 		(string= jdk-minor-version compiler-minor-version))))
 	   jdee-compile-javac-compilers)))
+    ;; Suggest to use the latest if not found.
     (unless compiler
       (let ((latest-javac (car (last jdee-compile-javac-compilers))))
 	(if
@@ -1353,6 +1354,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 	     (format "The JDE does not recognize JDK %s javac. Assume JDK %s javac?"
 		     jdk-version (oref latest-javac :version)))
 	    (setq compiler latest-javac))))
+    ;; Initialize the compiler
     (if compiler
 	(if (string= (car jdee-compiler) "javac server")
 	    (oset compiler :use-server-p t)
@@ -1360,6 +1362,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 	    (oset compiler :use-server-p nil)
 	    (oset compiler
 		  :path
+                  ;; Discover compiler's path:
 		  (let ((compiler-path
                          (if (listp (car jdee-compiler))
                              (substitute-in-file-name (nth 1 (car jdee-compiler)))
@@ -1385,13 +1388,12 @@ If t (or other non-nil non-number) then kill in 2 secs."
      :path compiler-path)))
 
 (defun jdee-compile-get-the-compiler ()
-  "Get a compiler object that represents the compiler specified
-by `jdee-compiler'."
+  "Get a compiler object specified by `jdee-compiler'."
   (let* ((car-jdee-compiler (car jdee-compiler))
          (compiler-name (if (listp car-jdee-compiler) (car car-jdee-compiler) car-jdee-compiler)))
     (cond
      ((string-match "javac" compiler-name)
-       (jdee-compile-get-javac))
+      (jdee-compile-get-javac))
      ((string-match "eclipse java compiler server" compiler-name)
       (jdee-compile-get-ejc))
      (t
@@ -1400,27 +1402,25 @@ by `jdee-compiler'."
 
 ;;;###autoload
 (defun jdee-set-compile-options (options)
-  "Sets the compile options.
+  "Set the compile `OPTIONS'.
 Enter the options as you would on the command line, e.g.,
 -depend -verbose."
-  (interactive
-   "sEnter options: ")
+  (interactive "sEnter options: ")
   (setq jdee-compile-option-command-line-args (split-string options " ")))
 
 ;;;###autoload
 (defun jdee-compile ()
   "Compile the Java program in the current buffer.
 This command invokes the compiler specified by `jdee-compiler'
-with the options specified by the JDE customization variables
-that begin with `jdee-compile'. If the variable
+with the options specified by the JDEE customization variables
+that begin with `jdee-compile'.  If the variable
 `jdee-read-compile-args' is non-nil, this command reads
 additional compilation options from the minibuffer, with
-history enabled. If `jdee-compiler' specifies the JDE compile
-server, this command uses the compile server. Otherwise, it
-uses the compiler executable specified by
-`jdee-compiler' to compile."
-  (interactive)
+history enabled.  If `jdee-compiler' specifies the JDEE compile
+server, this command uses the compile server.  Otherwise, it
+uses the compiler executable specified by `jdee-compiler' to compile."
 
+  (interactive)
   (if jdee-read-compile-args
       (setq jdee-interactive-compile-args
             (read-from-minibuffer
