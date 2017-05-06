@@ -320,13 +320,11 @@ a file in the current directory:
 
 ;;;###autoload
 (defun jdee-bsh-run()
-  "*Starts the JDEE version of the BeanShell."
-  (interactive)
+  "Starts the JDEE version of the BeanShell."
   (bsh-launch (oref-default 'jdee-bsh the-bsh) t))
 
 (defun jdee-bsh-exit ()
-  "Closes the existing beanshell process"
-  (interactive)
+  "Closes the existing beanshell process."
   (if (jdee-bsh-running-p)
       (let ((process (bsh-get-process (oref-default 'jdee-bsh the-bsh))))
 	(if (and
