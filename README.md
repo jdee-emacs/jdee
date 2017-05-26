@@ -44,7 +44,7 @@ The project is available in MELPA. To install it do the following:
 ```
 2. Install JDEE from Emacs using its package manager:
 ```
-M-x lisp-packages
+M-x list-packages
 ```
 There select JDEE and install: i x
 
