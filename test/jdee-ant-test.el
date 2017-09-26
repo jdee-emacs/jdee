@@ -34,9 +34,9 @@
         (jdee-ant-invocation-method '("Script"))
         (system-type 'windows-nt))
     (with-mock
-      (stub jdee-ant-get-ant-home => "/ant-home")
+      (stub jdee-ant-get-ant-home => "/ant home")
       (mock (jdee-normalize-path jdee-ant-buildfile) => "/path/bf.xml")
-      (should (string= "ant-sh -Dant.home='/ant-home' -buildfile \"/path/bf.xml\" -emacs compile "
+      (should (string= "ant-sh -Dant.home='/ant home' -buildfile \"/path/bf.xml\" -emacs compile "
                        (jdee-build-ant-command "compile" nil))))))
 
 (provide 'jdee-ant-test)
