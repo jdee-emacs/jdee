@@ -92,6 +92,7 @@
 (require 'jdee-files)
 (require 'jdee-project-file)
 (require 'jdee-jdk-manager)
+(require 's)
 
 (defgroup jdee-ant nil
   "JDEE Ant"
@@ -249,12 +250,12 @@ the Ant home from the environment variable ANT_HOME."
 		      "\""))
 	 (classpath-delimiter  (if (and (or (eq system-type 'windows-nt)
                                             (eq system-type 'cygwin32))
-                                        (string-match "sh$" shell-file-name))
+                                        (s-matches? "sh$" shell-file-name))
                                    delimiter))
 	 (buildfile-delimiter  (if (eq system-type 'windows-nt)
 				   "\"" delimiter))
-	 (ant-program (if (or (string-match "\\\\" jdee-ant-program)
-			      (string-match "/" jdee-ant-program))
+	 (ant-program (if (or (s-matches? "\\\\" jdee-ant-program)
+			      (s-matches? "/" jdee-ant-program))
 			  (jdee-normalize-path jdee-ant-program)
 			jdee-ant-program))
 	 (ant-command
@@ -271,8 +272,8 @@ the Ant home from the environment variable ANT_HOME."
 	       (concat
 		" -Dant.home="
 		(if (or
-		     (string-match " " ant-home) ;; Quote path if it
-		     (string-match "." ant-home));; contains a space
+		     (s-matches? " " ant-home) ;; Quote path if it
+		     (s-matches? "." ant-home));; contains a space
 		    (concat delimiter ant-home delimiter)  ;; or period.
 		  ant-home)))
            (if (string= (car jdee-ant-invocation-method) "Java")
