@@ -272,7 +272,7 @@ the Ant home from the environment variable ANT_HOME."
 	       (concat
 		" -Dant.home="
 		(if (s-matches? " " ant-home) ; Quote paths with spaces
-		    (concat delimiter ant-home delimiter)
+		    (concat "\"" ant-home "\"")
 		  ant-home)))
            (if (string= (car jdee-ant-invocation-method) "Java")
                (concat
