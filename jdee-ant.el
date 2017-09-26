@@ -225,16 +225,17 @@ describing how the compilation finished"
   :type 'hook)
 
 (defcustom jdee-ant-working-directory ""
-  "*Path of the working directory to use in 'ant' build mode. This string must
-end in a slash, for example, c:/foo/bar/ or ./ . If this string is empty, the
-'ant' build mode uses the current file location as its working directory."
+  "*Path of the working directory to use in 'ant' build mode.
+This string must end in a slash, for example, c:/foo/bar/ or ./ .
+If this string is empty, the 'ant' build mode uses the current file location
+as its working directory."
   :group 'jdee-ant
   :type 'string)
 
 (defun jdee-build-ant-command (target more-args &optional buildfile)
-  "Constructs the java ant command. The variable `jdee-ant-home' is used
-if it is set, otherwise it gets the ant home from the environment
-variable ANT_HOME."
+  "Constructs the java ant command for `TARGET' and its `MORE-ARGS'.
+The variable `jdee-ant-home' is used if it is set, otherwise it gets
+the Ant home from the environment variable ANT_HOME."
 
   ;;provide a default buildfile.
   (when (null buildfile)
@@ -243,8 +244,7 @@ variable ANT_HOME."
   (let* ((ant-home (jdee-ant-get-ant-home))
 	 (delimiter (if (or
 			 (string= (car jdee-ant-invocation-method) "Java")
-			 (and (string= (car jdee-ant-invocation-method)
-				       "Script")))
+			 (string= (car jdee-ant-invocation-method) "Script"))
 			"'"
 		      "\""))
 	 (classpath-delimiter  (if (and (or (eq system-type 'windows-nt)
