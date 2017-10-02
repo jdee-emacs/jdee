@@ -313,7 +313,7 @@ string describing how the compilation finished."
   (let* ((outbuf (oref this :buffer))
 	 (vm-path (oref (jdee-run-get-vm) :path))
 	 (source-file
-	  (concat (file-name-nondirectory buffer-file-name)))
+	  (concat "./" (file-name-nondirectory buffer-file-name)))
 	 (jdee-java-directory
 	  (concat
 	   (jdee-find-jdee-data-directory)
