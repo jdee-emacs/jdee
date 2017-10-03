@@ -1591,22 +1591,22 @@ that do not exist are filtered from the result."
     ;; Bind buffer-file-name so that cider-current-dir thinks we are in this
     ;; directory.  Actually name does not matter, but it needs to be something
     ;; that can be removed.
-    (let ((buffer-file-name (expand-file-name "SomeFile.java" dir))
+    (let* ((buffer-file-name (expand-file-name "SomeFile.java" dir))
           (default-directory dir)
           (also-checked (append (list dir) already-checked))
           (local-path (cl-delete-if-not #'file-exists-p (jdee-live-sync-request:sourcepath))))
       ;; Build up the source path from this directory
       (if local
           local-path
-        (append local-path
+          (append local-path
                 ;; and the children.  This returns a list of lists, so we need to
-                ;; flatten it.
+                  ;; flatten it.
                 (apply #'append
                        (mapcar (lambda (child)
                                  (jdee-get-sourcepath-nrepl-1
                                   (expand-file-name child dir) nil also-checked))
                                (jdee-live-sync-request:child-paths)))
-                ;; and the parent.
+                  ;; and the parent.
                 (-when-let (parent (jdee-live-sync-request:parent-path))
                   (when (jdee-find-project-file parent)
                     (jdee-get-sourcepath-nrepl-1 parent nil also-checked))))))))
