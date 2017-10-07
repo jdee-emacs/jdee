@@ -489,7 +489,7 @@ annotations in other files. Options are:
 
 ;;(makunbound 'jdee-compile-option-source)
 (defcustom jdee-compile-option-source (list "default")
-"*Enables JDK version-specific features to be used in
+  "*Enables JDK version-specific features to be used in
 source files.
 
   1.3	  The compiler does not support assertions
@@ -503,6 +503,8 @@ source files.
   1.7     Enables 1.7-specific features.
 
   1.8     Enables 1.8-specific features.
+
+  1.9     Enables 1.9-specific features.
 
   Select \"default\" to use the source features that
   the compiler supports by default, i.e., to not include the -source
@@ -525,11 +527,12 @@ source files.
 	   (const "1.5")
 	   (const "1.6")
 	   (const "1.7")
-	   (const "1.8"))))
+	   (const "1.8")
+           (const "1.9"))))
 
 ;;(makunbound 'jdee-compile-option-target)
 (defcustom jdee-compile-option-target (list "default")
-"*Generate class files that will work on VMs with the specified version.
+  "*Generate class files that will work on VMs with the specified version.
 
   1.1     Ensure that generated class files will be compatible
 	  with 1.1 and 1.2 VMs.
@@ -556,6 +559,9 @@ source files.
   1.8     Generate class files that are compatible only with
 	  1.8 VMs.
 
+  1.9     Generate class files that are compatible only with
+	  1.9 VMs.
+
 Select \"default\" to use the source features that the compiler
 supports by default, i.e., to not include the -target switch on
 the compiler command line.
@@ -579,7 +585,8 @@ cross-compiling."
 	   (const "1.5")
 	   (const "1.6")
 	   (const "1.7")
-	   (const "1.8"))))
+	   (const "1.8")
+           (const "1.9"))))
 
 (defcustom jdee-compile-option-bootclasspath nil
 "*Cross-compile against the specified set of boot classes.
@@ -1214,7 +1221,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
   "Class of JDK 1.7 javac compilers.")
 
 (defmethod initialize-instance ((this jdee-compile-javac-17) &rest fields)
- ;; Call parent initializer.
+  ;; Call parent initializer.
 
   (call-next-method)
 
@@ -1223,20 +1230,37 @@ If t (or other non-nil non-number) then kill in 2 secs."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                            ;;
-;; J2SDK 1.8 Compiler                                                         ;;
+;; JDK 1.8 Compiler                                                           ;;
 ;;                                                                            ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass jdee-compile-javac-18 (jdee-compile-javac-17)
   ()
-  "Class of JDK 1.7 javac compilers.")
+  "Class of JDK 1.8 javac compilers.")
 
 (defmethod initialize-instance ((this jdee-compile-javac-18) &rest fields)
- ;; Call parent initializer.
+  ;; Call parent initializer.
 
   (call-next-method)
 
   ;; Set compiler version.
   (oset this version "1.8"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                            ;;
+;; JDK 1.9 Compiler                                                           ;;
+;;                                                                            ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defclass jdee-compile-javac-19 (jdee-compile-javac-18)
+  ()
+  "Class of JDK 1.8 javac compilers.")
+
+(defmethod initialize-instance ((this jdee-compile-javac-19) &rest fields)
+
+  ;; Call parent initializer.
+  (call-next-method)
+
+  ;; Set compiler version.
+  (oset this version "1.9"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                            ;;
@@ -1246,7 +1270,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 (defclass jdee-compile-ejc-server (jdee-compile-compiler)
   ()
   "Class for using the Eclipse java compiler as a JDEE compile server."
-)
+  )
 
 (defmethod jdee-compile-run-server ((this jdee-compile-ejc-server))
   (let* ((directory-sep-char ?/)
@@ -1309,7 +1333,8 @@ If t (or other non-nil non-number) then kill in 2 secs."
    (jdee-compile-javac-15 "javac 1.5.x")
    (jdee-compile-javac-16 "javac 1.6.x")
    (jdee-compile-javac-17 "javac 1.7.x")
-   (jdee-compile-javac-18 "javac 1.8.x"))
+   (jdee-compile-javac-18 "javac 1.8.x")
+   (jdee-compile-javac-19 "javac 1.9.x"))
   "List of supported javac compilers.")
 
 ;;; TODO: remove user interaction from here
