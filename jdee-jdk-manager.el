@@ -42,7 +42,7 @@
 	  (set-process-query-on-exit-flag proc nil)
 	  (accept-process-output proc 10)
 	  (goto-char (point-min))
-	  (re-search-forward "[1-9][.][1-9]" (point-max) t)
+          (re-search-forward "[1-9]\\([.][1-9]\\)?" (point-max) t)
 	  (setq jdee-java-version-cache (match-string 0)))
 	(kill-buffer buf)))
   jdee-java-version-cache)
