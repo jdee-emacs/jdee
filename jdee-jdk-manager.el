@@ -384,8 +384,7 @@ Signals an error if it cannot find the jar."
 	   jdk-dir)))
     (if (file-exists-p tools)
 	tools
-      (error (concat "Cannot find JDK's tools jar file (or equivalent)."
-		     "Type M-x describe-function [RET] jdee-get-jdk-dir for more info.")))))
+      nil)))
 
 (provide 'jdee-jdk-manager)
 
