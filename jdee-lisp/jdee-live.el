@@ -126,9 +126,10 @@ Sets fields to null and adds it to the nREPL registry."
                  ;; TODO: FIXME: generalise!
                  (format
                   (concat "mvn jdee:jdee-maven-nrepl:java "
-                          "-Dexec.mainClass=\"clojure.main\""
-                          " -Dexec.args=\"%s\""
-                          " -Dexec.includePluginsDependencies=true "
+                          "-Dexec.mainClass=\"clojure.main\" "
+                          "-Dexec.args=\"%s\" "
+                          "-Dexec.includePluginsDependencies=true "
+                          "--non-recursive "
                           (mapconcat #'identity jdee-live-mvn-args " ")
                           )
                   jdee-live-launch-script)
@@ -245,12 +246,17 @@ expression."
 
   (when (jdee-live-nrepl-available)
     (cider-ensure-op-supported op)
-    (let ((nrepl (jdee-live--get-nrepl)))
-      (with-slots (client) nrepl
-        (thread-first (list "op" op
-                            "session" (jdee-live-nrepl-get-session nrepl))
-          (cider-nrepl-send-sync-request client)
-          (nrepl-dict-get (or name op)))))))
+    (let ((nrepl (jdee-live--get-nrepl))
+          answer)
+      (setq answer
+            (with-slots (client) nrepl
+              (thread-first (list "op" op
+                                  "session" (jdee-live-nrepl-get-session nrepl))
+                (cider-nrepl-send-sync-request client)
+                (nrepl-dict-get (or name op))))
+            )
+      answer)))
+
 
 
 (defun jdee-live-sync-request:classpath ()

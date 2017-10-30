@@ -21,12 +21,8 @@ public class ExecJavaMojo
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        System.setProperty("jdee.sourceRoots", asPath(compileSourceRoots));
-        System.setProperty("jdee.testSourceRoots", asPath(testCompileSourceRoots));
         if ((null != parent) &&
             (null != parent.getBasedir())) {
-            System.out.println("parent: " + parent +
-                               ", basedir: " + parent.getBasedir());
             System.setProperty("jdee.parentPath",
                                parent.getBasedir().getAbsolutePath());
         }

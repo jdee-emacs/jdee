@@ -1081,7 +1081,7 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
                     (member curcar '(?$ ?_ ?\\))) ;; _ \
                 (forward-char -1))
                ((looking-back "\\.\\(\\(\\s-\\|\\s>\\)*\\)")
-                (setq dot-offset 1)
+                (setq dot-offset (- (match-end 0) (match-beginning 0)))
                 (goto-char (match-beginning 1))
                 (if (eq ?\) (char-before (- (point) 1)))
                    (progn
@@ -1102,6 +1102,9 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
         ;;
         (skip-syntax-backward " >")
 
+        ;; If we ended up in a comment, skip over it
+        ;; (while (jdee-parse-comment-or-quoted-p)
+        ;;   (backward-char))
 
         ;; Now move point to the beginning of the expression, e.g.,
 	    ;; from
@@ -1113,7 +1116,7 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
 	    ;;  obj.f1.ge
 	    ;; ^
 	    ;;
-	    (progn
+        (when (> dot-offset  0)
 	      (setq curcar (char-before))
 	      (while (or (and (>= curcar ?a) (<= curcar ?z))
                      (and (>= curcar ?A) (<= curcar ?Z))
@@ -1142,62 +1145,62 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
              ((eq curcar ?\[ )
               (setq bracket-count (1- bracket-count))))
             (forward-char -1)
-            (setq curcar (char-before)))
+            (setq curcar (char-before))))
 
-	      (setq beg-point (point))
-	      (set-marker jdee-parse-current-beginning intermediate-point)
-	      (set-marker jdee-parse-current-end original-point)
-	      (setq middle-point (- intermediate-point dot-offset offset))
-	      (setq first-part
-                (buffer-substring-no-properties beg-point middle-point))
-	      (setq first-part (jdee-parse-isolate-to-parse first-part))
+        (setq beg-point (point))
+        (set-marker jdee-parse-current-beginning intermediate-point)
+        (set-marker jdee-parse-current-end original-point)
+        (setq middle-point (- intermediate-point dot-offset offset))
+        (setq first-part
+              (buffer-substring-no-properties beg-point middle-point))
+        (setq first-part (jdee-parse-isolate-to-parse first-part))
 
-	      ;;replacing newline by empty strings new lines seems to break the
-	      ;;beanshell
-	      (while (string-match "\n" first-part)
-            (setq first-part (replace-match "" nil nil first-part)))
+        ;;replacing newline by empty strings new lines seems to break the
+        ;;beanshell
+        (while (string-match "\n" first-part)
+          (setq first-part (replace-match "" nil nil first-part)))
 
-	      ;;replacing extra spaces for "". This done to reduce the space
-	      ;;that the completion title takes
-	      (while (string-match " " first-part)
-            (setq first-part (replace-match "" nil nil first-part)))
+        ;;replacing extra spaces for "". This done to reduce the space
+        ;;that the completion title takes
+        (while (string-match " " first-part)
+          (setq first-part (replace-match "" nil nil first-part)))
 
-	      (setq second-part
-                (buffer-substring-no-properties
-                 intermediate-point original-point-before-ws))
+        (setq second-part
+              (buffer-substring-no-properties
+               intermediate-point original-point-before-ws))
 
-          (while (string-match "\\s-\\|\\s>" second-part)
-            (setq second-part (replace-match "" nil nil second-part)))
+        (while (string-match "\\s-\\|\\s>" second-part)
+          (setq second-part (replace-match "" nil nil second-part)))
 
-	      ;;Checking for casting
-	      ;; ((Object) obj).ge
-	      ;; FIXME can't work ok for generic type, eg: ((List<String>) obj).ge
-	      (if (and (not cast-type)
-                   (string= first-part "")
-                   (eq (char-before (+ 1 middle-point)) ?\()
-                   (eq (char-before (+ 2 middle-point)) ?\())
-              (save-excursion
-                (goto-char (+ middle-point 1))
-                (setq first-paren (point))
-                (setq second-paren (jdee-parse-match-paren-position))
-                (setq cast-type (buffer-substring-no-properties
-                                 (+ 1 first-paren) second-paren))))
+        ;;Checking for casting
+        ;; ((Object) obj).ge
+        ;; FIXME can't work ok for generic type, eg: ((List<String>) obj).ge
+        (if (and (not cast-type)
+                 (string= first-part "")
+                 (eq (char-before (+ 1 middle-point)) ?\()
+                 (eq (char-before (+ 2 middle-point)) ?\())
+            (save-excursion
+              (goto-char (+ middle-point 1))
+              (setq first-paren (point))
+              (setq second-paren (jdee-parse-match-paren-position))
+              (setq cast-type (buffer-substring-no-properties
+                               (+ 1 first-paren) second-paren))))
 
-          ;; If the parsed region is just white-space, move the start of the
-          ;; region to the end of the region to preserve the whitespace
-          (when (string-match "^\\(\\s-\\|\\s>\\)+$"
-                              (buffer-substring-no-properties jdee-parse-current-beginning
-                                                              jdee-parse-current-end))
-            (set-marker jdee-parse-current-beginning jdee-parse-current-end))
+        ;; If the parsed region is just white-space, move the start of the
+        ;; region to the end of the region to preserve the whitespace
+        (when (string-match "^\\(\\s-\\|\\s>\\)+$"
+                            (buffer-substring-no-properties jdee-parse-current-beginning
+                                                            jdee-parse-current-end))
+          (set-marker jdee-parse-current-beginning jdee-parse-current-end))
 
-	      (if cast-type
-              (progn
-                (setq jdee-parse-casting t)
-                (list cast-type second-part))
+        (if cast-type
             (progn
-              (setq jdee-parse-casting nil)
-              (list first-part second-part))))
-	    )))))
+              (setq jdee-parse-casting t)
+              (list cast-type second-part))
+          (progn
+            (setq jdee-parse-casting nil)
+            (list first-part second-part))))
+	    ))))
 
 (defun jdee-parse-isolate-to-parse (s)
   "Returns the right expression that needs completion in S."
