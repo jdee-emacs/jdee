@@ -437,7 +437,7 @@ a double prefix C-u C-u it will skip trying to run a single class as well."
 ;; Building
 ;;
 
-(defun jdee-maven-get-extra-build-flags ()
+(defun jdee-maven-get-user-build-flags ()
   "From a set of jdee-maven-build-user-properties, compile a list of flags to add to the maven build command"
   (string-join
    (mapcar
@@ -449,10 +449,10 @@ a double prefix C-u C-u it will skip trying to run a single class as well."
   "Build using the maven command from PATH (default to `default-directory')"
   (interactive)
   (let ((default-directory (jdee-maven-get-default-directory path)))
-    (if (eq nil jdee-maven-build-user-properties)
+    (if (null jdee-maven-build-user-properties)
         (compilation-start (format "%s %s" jdee-maven-program jdee-maven-build-phase))
-      (compilation-start (format "%s %s %s" jdee-maven-program (jdee-maven-get-extra-build-flags) jdee-maven-build-phase))
-     )))
+      (compilation-start (format "%s %s %s" jdee-maven-program (jdee-maven-get-user-build-flags) jdee-maven-build-phase))
+      )))
 
 ;;;###autoload
 (defun jdee-maven-hook ()

@@ -10,7 +10,6 @@
 (require 'jdee-maven)
 (require 'cl)
 
-
 ;;
 ;; Testing: jdee-maven-get-default-directory
 ;;
@@ -34,15 +33,12 @@ doesn't try to hit the file system."
                      (list "/a/b/c/src/main" without-pom)
                      (list "/a/b/c/src/main/java" without-pom))))
 
-
     (let ((default-directory (caar (last dirs))))
-      
       (cl-letf (((symbol-function 'directory-files) (lambda (d) (cadr (assoc d dirs)))))
         (with-mock
-          (stub file-readable-p => t)
-          
-          (should (string= (format "%s/" (car (nth 2 dirs)))
-                           (jdee-maven-get-default-directory))))))))
+         (stub file-readable-p => t)
+         (should (string= (format "%s/" (car (nth 2 dirs)))
+                          (jdee-maven-get-default-directory))))))))
 ;;
 ;; Testing: jdee-maven-scope-file
 ;;
@@ -91,10 +87,18 @@ doesn't try to hit the file system."
   "Check that `jdee-maven-check-classpath-file*' calls maven and returns nul when it fails"
   (cl-letf (((symbol-function 'call-process) (lambda (&rest _) (insert "BUILD FAILURE"))))
     (with-mock
-      (mock (file-readable-p *) => nil)
-      (should (null (jdee-maven-check-classpath-file* nil "some/random/path.cp" "/a/b/c" nil))))))
+     (mock (file-readable-p *) => nil)
+     (should (null (jdee-maven-check-classpath-file* nil "some/random/path.cp" "/a/b/c" nil))))))
 
+(ert-deftest test-jdee-maven-get-user-build-flags ()
+  (let ((jdee-maven-build-user-properties nil))
+    (should (string= "" (jdee-maven-get-user-build-flags))))
 
+  (let ((jdee-maven-build-user-properties '(("foo" . "42"))))
+    (should (string= "-Dfoo=\"42\"" (jdee-maven-get-user-build-flags))))
+
+  (let ((jdee-maven-build-user-properties '(("foo" . "42") ("bar" . "11"))))
+    (should (string= "-Dfoo=\"42\" -Dbar=\"11\"" (jdee-maven-get-user-build-flags)))))
 
 (provide 'jdee-maven-test)
 ;;; jdee-maven-test.el ends here
