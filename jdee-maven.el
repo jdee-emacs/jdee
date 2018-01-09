@@ -75,6 +75,17 @@ to the prj.el with something like:
  :group 'jdee-maven
  :type '(repeat (string :tag "Artifact:")))
 
+(defcustom jdee-maven-build-user-properties nil
+  "An alist of string key-value pairs as the user properties to set during maven build phase.
+ie.:
+ '((\"sample.property\" . \"myvalue\"))
+
+would turn into:
+ -Dsample.property=\"myvalue\"
+
+on the maven commandline"
+  :group 'jdee-maven
+  :type '(alist :key-type string :value-type string))
 
 (defcustom jdee-maven-init-hook '(jdee-maven-from-file-hook)
   "A list of functions to call to try and initialize the maven integeration.
@@ -426,12 +437,22 @@ a double prefix C-u C-u it will skip trying to run a single class as well."
 ;; Building
 ;;
 
+(defun jdee-maven-get-extra-build-flags ()
+  "From a set of jdee-maven-build-user-properties, compile a list of flags to add to the maven build command"
+  (string-join
+   (mapcar
+    #'(lambda (property) (format "-D%s=\"%s\"" (car property) (cdr property) ))
+    jdee-maven-build-user-properties) " "))
+
 ;;;###autoload
 (defun jdee-maven-build (&optional path)
   "Build using the maven command from PATH (default to `default-directory')"
   (interactive)
   (let ((default-directory (jdee-maven-get-default-directory path)))
-    (compilation-start (format "%s %s" jdee-maven-program jdee-maven-build-phase))))
+    (if (eq nil jdee-maven-build-user-properties)
+        (compilation-start (format "%s %s" jdee-maven-program jdee-maven-build-phase))
+      (compilation-start (format "%s %s %s" jdee-maven-program (jdee-maven-get-extra-build-flags) jdee-maven-build-phase))
+     )))
 
 ;;;###autoload
 (defun jdee-maven-hook ()
