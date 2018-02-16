@@ -304,13 +304,16 @@ is again true)."
     (let ((nrepl (jdee-live--get-nrepl)))
       (if (and nrepl (eq (oref nrepl response) 'initializing))
           ;; Repl was create asynchronously and is not yet done initializing.
-          ;; Wait for it to finish starting, unless it was again request
+          ;; Wait for it to finish starting, unless it was again requested
           ;; asynchronously
           (unless async (jdee-live-nrepl-wait-for-server-ready nrepl))
-        ;; Repl does not exist or is not doing asynchonous initialization.
 
-        (jdee-live-nrepl-connect (or nrepl (make-instance 'jdee-live-nrepl))
-                                 async)))))
+        ;; Repl does not exist or is not doing asynchonous initialization.
+        ;; If there is no pom to start the maven process with, do nothing
+        (if (jdee-live-project-directory-for (cider-current-dir))
+            (jdee-live-nrepl-connect (or nrepl (make-instance 'jdee-live-nrepl))
+                                     async)
+          (message "No pom found, so not starting mvn based nrepl"))))))
 
 (defun jdee-live-suppress-cider-buffer (cider-buffer)
   "Keep the cider buffer from popping up when it it is ready.
