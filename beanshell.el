@@ -748,7 +748,7 @@ or `bsh-vm' point to a Java vm on your system."
     (concat
      "Cannot find the BeanShell jar file at "
      (expand-file-name bsh-jar)
-     ". Type C-h bsh-jar for more info."))
+     ". Type C-h v bsh-jar for more info."))
 
    (if bsh-vm
        (cl-assert
