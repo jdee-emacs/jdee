@@ -60,7 +60,6 @@ Customized `jdee-server-dir` in your init file should look something like:
 ```emacs-lisp
 (custom-set-variables
  '(jdee-server-dir "/Users/you/.emacs.d/jdee-server"))
- )
 ```
 
 For additional information, see the [old installation instructions](http://htmlpreview.github.com/?https://github.com/peterwvj/jdee/blob/master/doc/flat/install.html).
