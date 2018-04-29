@@ -26,10 +26,8 @@
 
 ;;; Commentary:
 
-;; This is one of a set of packages that make up the Java Development
-;; Environment (JDE) for Emacs. See the JDE User's Guide for more
-;; information. It includes code for using the Eclipse compiler
-;; originally written by Suraj Acharya.
+;; It includes code for using the Eclipse compiler originally written
+;; by Suraj Acharya.
 
 ;; When customizing the jdee-compiler variable to use the option for
 ;; "eclipse java compiler server" you will also need to specify the
@@ -51,32 +49,23 @@
 ;; java -cp <path to jar> org.eclipse.jdt.internal.compiler.batch.Main
 ;; This should print out a usage message for the "Eclipse Java Compiler".
 
-;; The latest version of the JDE is available at
-;; <URL:http://jdee.sourceforge.net/>.
-
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Landes <landes <at> mailc dt net>
-
 ;;; Code:
 
 (require 'eieio)
 (require 'cl-lib)
 (require 'compile)
+(require 'jdee-backend)
+(require 'jdee-classpath)
+(require 'jdee-files)
+(require 'jdee-jdk-manager)
 
 ;; FIXME: refactor to eliminate these
-(declare-function jdee-bsh-running-p "jdee-bsh" ())
-(declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
 (declare-function jdee-complete-flush-classes-in-cache "jdee-complete" (class-list))
-(declare-function jdee-create-prj-values-str "jdee" nil)
-(declare-function jdee-get-global-classpath "jdee" ())
-(declare-function jdee-get-jdk-prog "jdee" (progname))
-(declare-function jdee-java-version "jdee" ())
-(declare-function jdee-normalize-path "jdee" (path &optional symbol))
-(defvar jdee-classpath-separator)
+
 (defvar jdee-complete-last-compiled-class)
 
 (defgroup jdee-compile-options nil
-  "JDE Compiler Options"
+  "JDEE Compiler Options"
   :group 'jdee
   :prefix "jdee-compile-option-")
 
@@ -121,7 +110,7 @@ and specify the path of the eclipse compiler ecj.jar."
          (t "javac server")))))
 
 (defcustom jdee-read-compile-args nil
-"*Specify whether to prompt for additional compiler arguments.
+  "*Specify whether to prompt for additional compiler arguments.
 If this variable is non-nil, the jdee-compile command prompts
 you to enter additional compiler arguments in the minibuffer.
 These arguments are appended to those specified by customization
@@ -130,36 +119,19 @@ entered in the minibuffer."
   :group 'jdee-project
   :type 'boolean)
 
-(defcustom jdee-compiler-new-compile-el
-  (boundp 'compilation-error-regexp-alist-alist)
-  "Check if we have the new (21.3+) compile.el.
-Set this to t if you are running an Emacs with the new compile.el
-and want to get slightly better font-locking in the compile
-buffer.  A value of nil will force the use of older style
-compilation-error-regexp.  This variable tries to auto-detect the
-compile.el version by checking if
-`compilation-error-regexp-alist-alist' is defined."
-  :group 'jdee-compile-options
-  :type 'boolean)
+;;; Font locking for compilation erorrs and warnings:
+(setq compilation-error-regexp-alist
+      (cons '("----------\n\\([0-9]+. ERROR in \\(.*\\)\n (at line \\([0-9]+\\))\n\\(\\(.*\n\\)+?\\).*^+\n\\(.*\n\\)\\)"
+              2 3 nil 2 1 (6 compilation-error-face)
+              )
+            compilation-error-regexp-alist))
 
-(if jdee-compiler-new-compile-el
-    (progn
-      (setq compilation-error-regexp-alist
-            (cons '("----------\n\\([0-9]+. ERROR in \\(.*\\)\n (at line \\([0-9]+\\))\n\\(\\(.*\n\\)+?\\).*^+\n\\(.*\n\\)\\)"
-                    2 3 nil 2 1 (6 compilation-error-face)
-                    )
-                  compilation-error-regexp-alist))
+(setq compilation-error-regexp-alist
+      (cons '("----------\n\\([0-9]+. WARNING in \\(.*\\)\n (at line \\([0-9]+\\))\n\\(\\(.*\n\\)+?\\).*^+\n\\(.*\n\\)\\)"
+              2 3 nil 1 1 (6 compilation-warning-face)
+              )
+            compilation-error-regexp-alist))
 
-      (setq compilation-error-regexp-alist
-            (cons '("----------\n\\([0-9]+. WARNING in \\(.*\\)\n (at line \\([0-9]+\\))\n\\(\\(.*\n\\)+?\\).*^+\n\\(.*\n\\)\\)"
-                    2 3 nil 1 1 (6 compilation-warning-face)
-                    )
-                  compilation-error-regexp-alist)))
-  ;; else
-  (setq compilation-error-regexp-alist
-        (cons '("----------\n[0-9]+. \\(ERROR\\|WARNING\\) in \\(.*\\)\n (at line \\([0-9]+\\))\n\\(\\(.*\n\\)+?\\).*^+\n\\(.*\n\\)"
-                2 3)
-              compilation-error-regexp-alist)))
 
 (defvar jdee-interactive-compile-args ""
 "String of compiler arguments entered in the minibuffer.")
@@ -167,23 +139,24 @@ compile.el version by checking if
 (defvar jdee-interactive-compile-arg-history nil
 "History of compiler arguments entered in the minibuffer.")
 
-;; (makunbound 'jdee-compile-finish-hook)
 (defcustom jdee-compile-finish-hook
   '(jdee-compile-finish-kill-buffer
     jdee-compile-finish-refresh-speedbar
     jdee-compile-finish-update-class-info)
-  "List of functions to be invoked when compilation of a
-Java source file terminates. Each function should accept
-two arguments: the compilation buffer and a string
-describing how the compilation finished."
+  "List of functions to be invoked when compilation of a Java file finishes.
+Each function should accept two arguments: the compilation buffer
+and a string describing how the compilation finished."
   :group 'jdee
   :type 'hook)
 
 (defcustom jdee-compile-option-hide-classpath nil
-  "Substitute the classpath in the compilation window for
-..."
+  "Substitute the classpath in the compilation window for ..."
   :group 'jdee-compile-options
   :type 'boolean)
+
+(defvar jdee-compile-mute nil
+  "Setting to non-nil will silence some of the message.")
+
 
 (defun jdee-compile-update-class-list ()
   (let ((class-dir
@@ -192,12 +165,11 @@ describing how the compilation finished."
 	   (jdee-normalize-path
 	    jdee-compile-option-directory
 	    'jdee-compile-option-directory))))
-    (message (concat "Updating class list for " class-dir))
-    (jdee-jeval (concat
-		"jde.util.JdeUtilities.updateClassList(\""
-		class-dir
-	       "\");"))
-    (message "Updating class list...done.")))
+    (unless jdee-compile-mute
+      (message (concat "Updating class list for " class-dir)))
+    (jdee-backend-update-class-list class-dir)
+    (unless jdee-compile-mute
+      (message "Updating class list...done."))))
 
 (defun jdee-compile-finish-update-class-info (buf msg)
   "Flush the classinfo cache and update the class list used by
@@ -209,20 +181,22 @@ don't know which classes were recompiled."
 	(set-buffer (car (buffer-list)))
 	(if (eq major-mode 'jdee-mode)
 	    (progn
+              ;;; TODO: replace with observer/event
 	      (setq jdee-complete-last-compiled-class (jdee-parse-get-buffer-class))
 	      (jdee-complete-flush-classes-in-cache (list jdee-complete-last-compiled-class))
-	      (message "Flushed completion cache.")
+              (unless jdee-compile-mute
+                (message "Flushed completion cache."))
 	      (setq jdee-complete-last-compiled-class nil)
 	      (jdee-compile-update-class-list))))
     (error nil)))
 
+;;; TODO: remove from here and add observer
 (defun jdee-compile-finish-refresh-speedbar (buf msg)
   "Refresh speedbar at the end of a compilation."
   (if (and (boundp 'speedbar-frame)
 	   (frame-live-p speedbar-frame)
 	   (frame-visible-p speedbar-frame))
-       (speedbar-refresh)))
-
+      (speedbar-refresh)))
 
 (defcustom jdee-compile-jump-to-first-error t
   "*Automatically jump to the first error when a compilation process completes."
@@ -233,25 +207,32 @@ don't know which classes were recompiled."
   (delete-windows-on buf)
   (kill-buffer buf))
 
+(defun jdee-compile--successful-compilation-p (msg buffer-content)
+  "Return non-nil when `MSG' or `BUFFER-CONTENT' don't contain errors."
+  (null (or (string-match "exited abnormally" msg)
+            (string-match "BUILD FAILED" buffer-content))))
+
+(defun jdee-compile--kill-compile-buffer (buf)
+  "Make the compilation buffer `BUF' go away in a few seconds."
+  (if (if (numberp jdee-compile-enable-kill-buffer)
+          (not (minusp jdee-compile-enable-kill-buffer))
+        jdee-compile-enable-kill-buffer)
+      (lexical-let ((compile-buffer buf))
+        (run-at-time
+         (format "%d sec" (if (numberp jdee-compile-enable-kill-buffer)
+                              jdee-compile-enable-kill-buffer 2))
+         nil 'jdee-compile-kill-buffer
+         compile-buffer)
+        (message "No compilation errors"))))
+
 ;; Thanks to Jack Donohue <donohuej@synovation.com>.
 (defun jdee-compile-finish-kill-buffer (buf msg)
-  "Removes the jdee-compile window after a few seconds if no errors."
+  "Remove the jdee-compile window after a few seconds if no errors."
   (with-current-buffer buf
-    (if (null (or (string-match ".*exited abnormally.*" msg)
-		  (string-match ".*BUILD FAILED.*" (buffer-string))))
-	;;no errors, make the compilation window go away in a few seconds
-	(if (if (numberp jdee-compile-enable-kill-buffer)
-		(not (minusp jdee-compile-enable-kill-buffer))
-	      jdee-compile-enable-kill-buffer)
-	    (lexical-let ((compile-buffer buf))
-	      (run-at-time
-	       (format "%d sec" (if (numberp jdee-compile-enable-kill-buffer)
-				    jdee-compile-enable-kill-buffer 2))
-	       nil 'jdee-compile-kill-buffer
-	       compile-buffer)
-	      (message "No compilation errors")))
-      ;;there were errors, so jump to the first error
-      (if jdee-compile-jump-to-first-error (next-error 1)))))
+    (if (jdee-compile--successful-compilation-p msg (buffer-string))
+        (jdee-compile--kill-compile-buffer buf)
+      (when jdee-compile-jump-to-first-error
+        (next-error 1)))))
 
 
 (defcustom jdee-compile-option-command-line-args nil
@@ -508,7 +489,7 @@ annotations in other files. Options are:
 
 ;;(makunbound 'jdee-compile-option-source)
 (defcustom jdee-compile-option-source (list "default")
-"*Enables JDK version-specific features to be used in
+  "*Enables JDK version-specific features to be used in
 source files.
 
   1.3	  The compiler does not support assertions
@@ -522,6 +503,8 @@ source files.
   1.7     Enables 1.7-specific features.
 
   1.8     Enables 1.8-specific features.
+
+  1.9     Enables 1.9-specific features.
 
   Select \"default\" to use the source features that
   the compiler supports by default, i.e., to not include the -source
@@ -544,11 +527,12 @@ source files.
 	   (const "1.5")
 	   (const "1.6")
 	   (const "1.7")
-	   (const "1.8"))))
+	   (const "1.8")
+           (const "1.9"))))
 
 ;;(makunbound 'jdee-compile-option-target)
 (defcustom jdee-compile-option-target (list "default")
-"*Generate class files that will work on VMs with the specified version.
+  "*Generate class files that will work on VMs with the specified version.
 
   1.1     Ensure that generated class files will be compatible
 	  with 1.1 and 1.2 VMs.
@@ -575,6 +559,9 @@ source files.
   1.8     Generate class files that are compatible only with
 	  1.8 VMs.
 
+  1.9     Generate class files that are compatible only with
+	  1.9 VMs.
+
 Select \"default\" to use the source features that the compiler
 supports by default, i.e., to not include the -target switch on
 the compiler command line.
@@ -598,7 +585,8 @@ cross-compiling."
 	   (const "1.5")
 	   (const "1.6")
 	   (const "1.7")
-	   (const "1.8"))))
+	   (const "1.8")
+           (const "1.9"))))
 
 (defcustom jdee-compile-option-bootclasspath nil
 "*Cross-compile against the specified set of boot classes.
@@ -710,6 +698,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 		     :documentation
 		     "Window that displays the compilation buffer.")
    (interactive-args :initarg :interactive-args
+                     :initform nil
 		     :type list
 		     :documentation
 		     "Arguments entered in the minibuffer.")
@@ -899,20 +888,20 @@ If t (or other non-nil non-number) then kill in 2 secs."
       (let ((inhibit-read-only t)) ; make compilation buffer temporarily writable
 	(insert (format "cd %s\n" default-directory))
 	(insert (concat
-	       compiler-path
-	       " "
-	       (mapconcat (lambda (x)
-			    (if (and flag
-				     jdee-compile-option-hide-classpath)
-				(progn
-				  (setq flag nil)
-				  "...")
-			      (if (not (string= x "-classpath"))
-				  x
-				(progn
-				  (setq flag t)
-				  x)))) args " ")
-	       "\n\n")))
+                 compiler-path
+                 " "
+                 (mapconcat (lambda (x)
+                              (if (and flag
+                                       jdee-compile-option-hide-classpath)
+                                  (progn
+                                    (setq flag nil)
+                                    "...")
+                                (if (not (string= x "-classpath"))
+                                    x
+                                  (progn
+                                    (setq flag t)
+                                    x)))) args " ")
+                 "\n\n")))
 
       (let* ((process-environment (cons "EMACS=t" process-environment))
 	     (w32-quote-process-args ?\")
@@ -928,14 +917,15 @@ If t (or other non-nil non-number) then kill in 2 secs."
 	(setq compilation-in-progress
 	      (cons proc compilation-in-progress))))))
 
+;;; TODO: extract code duplicated with EJC version
 (defmethod jdee-compile-run-server ((this jdee-compile-compiler))
   (let* ((directory-sep-char ?/)
-	   (args
-	    (append
-	    (jdee-compile-get-args this)))
-	   (source-path
-	    (jdee-normalize-path buffer-file-name))
-	   (arg-array (concat "new String[] {\"" source-path "\"")))
+         (args
+          (append
+           (jdee-compile-get-args this)))
+         (source-path
+          (jdee-normalize-path buffer-file-name))
+         (arg-array (concat "new String[] {\"" source-path "\"")))
 
     (if args
 	(setq arg-array
@@ -948,45 +938,32 @@ If t (or other non-nil non-number) then kill in 2 secs."
 		args
 		","))))
 
-      (setq arg-array (concat arg-array "}"))
+    (setq arg-array (concat arg-array "}"))
 
-      (with-current-buffer (oref (oref this buffer) buffer)
+    (with-current-buffer (oref (oref this buffer) buffer)
 
-	(insert "CompileServer output:\n\n")
+      (insert "CompileServer output:\n\n")
 
-	(let* ((inhibit-read-only t)
-	       flag
-	       (arg-string
-		(mapconcat
-		 (lambda (x)
-		   (if (and flag
-			    jdee-compile-option-hide-classpath)
-		       (progn
-			 (setq flag nil)
-			 "...")
-		     (if (not (string= x "-classpath"))
-			 x
-		       (progn
-			 (setq flag t)
-			 x))))
-		 args " ")))
+      (let* ((inhibit-read-only t)
+             flag
+             (arg-string
+              (mapconcat
+               (lambda (x)
+                 (if (and flag
+                          jdee-compile-option-hide-classpath)
+                     (progn
+                       (setq flag nil)
+                       "...")
+                   (if (not (string= x "-classpath"))
+                       x
+                     (progn
+                       (setq flag t)
+                       x))))
+               args " ")))
 
-	  (insert arg-string " " source-path "\n")))
+        (insert arg-string " " source-path "\n")))
 
-      (if (not (jdee-bsh-running-p))
-	  (progn
-	    (bsh-launch (oref-default 'jdee-bsh the-bsh))
-	    (bsh-eval (oref-default 'jdee-bsh the-bsh) (jdee-create-prj-values-str))))
-
-      (bsh-buffer-eval
-       (oref-default 'jdee-bsh the-bsh)
-       (concat
-	(format
-	 "jde.util.CompileServer.compile(%s);"
-	 arg-array)
-	"\n")
-       (oref this buffer))))
-
+    (jdee-backend-compile arg-array (oref this buffer))))
 
 (defmethod jdee-compile-launch ((this jdee-compile-compiler))
 
@@ -1244,7 +1221,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
   "Class of JDK 1.7 javac compilers.")
 
 (defmethod initialize-instance ((this jdee-compile-javac-17) &rest fields)
- ;; Call parent initializer.
+  ;; Call parent initializer.
 
   (call-next-method)
 
@@ -1253,20 +1230,37 @@ If t (or other non-nil non-number) then kill in 2 secs."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                            ;;
-;; J2SDK 1.8 Compiler                                                         ;;
+;; JDK 1.8 Compiler                                                           ;;
 ;;                                                                            ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass jdee-compile-javac-18 (jdee-compile-javac-17)
   ()
-  "Class of JDK 1.7 javac compilers.")
+  "Class of JDK 1.8 javac compilers.")
 
 (defmethod initialize-instance ((this jdee-compile-javac-18) &rest fields)
- ;; Call parent initializer.
+  ;; Call parent initializer.
 
   (call-next-method)
 
   ;; Set compiler version.
   (oset this version "1.8"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                            ;;
+;; JDK 1.9 Compiler                                                           ;;
+;;                                                                            ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defclass jdee-compile-javac-19 (jdee-compile-javac-18)
+  ()
+  "Class of JDK 1.8 javac compilers.")
+
+(defmethod initialize-instance ((this jdee-compile-javac-19) &rest fields)
+
+  ;; Call parent initializer.
+  (call-next-method)
+
+  ;; Set compiler version.
+  (oset this version "1.9"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                            ;;
@@ -1276,75 +1270,59 @@ If t (or other non-nil non-number) then kill in 2 secs."
 (defclass jdee-compile-ejc-server (jdee-compile-compiler)
   ()
   "Class for using the Eclipse java compiler as a JDEE compile server."
-)
+  )
 
 (defmethod jdee-compile-run-server ((this jdee-compile-ejc-server))
-    (let* ((directory-sep-char ?/)
-	   (args
-	    (append
-             (list
-              "-Xemacs"
-              "-noExit"
-;;               "-sourcepath"
-;;               (mapconcat 'identity (jdee-expand-wildcards-and-normalize jdee-sourcepath) ":")
-              )
-	    (jdee-compile-get-args this)))
-	   (source-path
-	    (jdee-normalize-path buffer-file-name))
-	   (arg-array (concat "new String[] {\"" source-path "\"")))
+  (let* ((directory-sep-char ?/)
+         (args
+          (append
+           (list
+            "-Xemacs"
+            "-noExit"
+            ;;               "-sourcepath"
+            ;;               (mapconcat 'identity (jdee-expand-wildcards-and-normalize jdee-sourcepath) ":")
+            )
+           (jdee-compile-get-args this)))
+         (source-path
+          (jdee-normalize-path buffer-file-name))
+         (arg-array (concat "new String[] {\"" source-path "\"")))
 
-      (if args
-	  (setq arg-array
-		(concat
-		 arg-array
-		 ","
-		 (mapconcat
-		  (lambda (arg)
-		    (concat "\"" arg "\""))
-		  args
-		  ","))))
+    (if args
+        (setq arg-array
+              (concat
+               arg-array
+               ","
+               (mapconcat
+                (lambda (arg)
+                  (concat "\"" arg "\""))
+                args
+                ","))))
 
-      (setq arg-array (concat arg-array "}"))
+    (setq arg-array (concat arg-array "}"))
 
-      (with-current-buffer (oref (oref this buffer) buffer)
+    (with-current-buffer (oref (oref this buffer) buffer)
 
-	(insert "CompileServer output:\n\n")
+      (insert "CompileServer output:\n\n")
 
-	(let (flag temp)
-	  (setq temp
-	    (mapconcat
-	     (lambda (x)
-	       (if (and flag
-			jdee-compile-option-hide-classpath)
-		   (progn
-		     (setq flag nil)
-		     "...")
-		 (if (not (string= x "-classpath"))
-		     x
-		   (progn
-		     (setq flag t)
-		     x)))) args " "))
+      (let (flag temp)
+        (setq temp
+              (mapconcat
+               (lambda (x)
+                 (if (and flag
+                          jdee-compile-option-hide-classpath)
+                     (progn
+                       (setq flag nil)
+                       "...")
+                   (if (not (string= x "-classpath"))
+                       x
+                     (progn
+                       (setq flag t)
+                       x)))) args " "))
 
-	  (insert temp " "))
-	(insert source-path "\n"))
+        (insert temp " "))
+      (insert source-path "\n"))
 
-      (if (not (jdee-bsh-running-p))
-	  (progn
-	    (bsh-launch (oref-default 'jdee-bsh the-bsh))
-	    (bsh-eval (oref-default 'jdee-bsh the-bsh) (jdee-create-prj-values-str))))
-      (bsh-eval (oref-default 'jdee-bsh the-bsh)
-                   (format "addClassPath(\"%s\");" (oref this :path)))
-      (bsh-buffer-eval
-       (oref-default 'jdee-bsh the-bsh)
-       (concat
-	(format
-         "if ((new org.eclipse.jdt.internal.compiler.batch.Main(new java.io.PrintWriter(System.out), new java.io.PrintWriter(System.out), true, null, null)).compile(%s)) { print (\"0\");} else {print (\"1\");};"
-         arg-array)
-	"\n")
-       (oref this buffer))))
-
-
-
+    (jdee-backend-compile-eclipse (oref this :path) arg-array (oref this buffer))))
 
 (defvar jdee-compile-javac-compilers
   (list
@@ -1355,10 +1333,13 @@ If t (or other non-nil non-number) then kill in 2 secs."
    (jdee-compile-javac-15 "javac 1.5.x")
    (jdee-compile-javac-16 "javac 1.6.x")
    (jdee-compile-javac-17 "javac 1.7.x")
-   (jdee-compile-javac-18 "javac 1.8.x"))
+   (jdee-compile-javac-18 "javac 1.8.x")
+   (jdee-compile-javac-19 "javac 1.9.x"))
   "List of supported javac compilers.")
 
+;;; TODO: remove user interaction from here
 (defun jdee-compile-get-javac ()
+  "Return Java compiler that matches the current JDK."
   (let* ((jdk-version (jdee-java-version))
 	 (jdk-split-version (split-string jdk-version "[.]"))
 	 (jdk-major-version (nth 0 jdk-split-version))
@@ -1373,6 +1354,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 		(string= jdk-major-version compiler-major-version)
 		(string= jdk-minor-version compiler-minor-version))))
 	   jdee-compile-javac-compilers)))
+    ;; Suggest to use the latest if not found.
     (unless compiler
       (let ((latest-javac (car (last jdee-compile-javac-compilers))))
 	(if
@@ -1380,6 +1362,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 	     (format "The JDE does not recognize JDK %s javac. Assume JDK %s javac?"
 		     jdk-version (oref latest-javac :version)))
 	    (setq compiler latest-javac))))
+    ;; Initialize the compiler
     (if compiler
 	(if (string= (car jdee-compiler) "javac server")
 	    (oset compiler :use-server-p t)
@@ -1387,6 +1370,7 @@ If t (or other non-nil non-number) then kill in 2 secs."
 	    (oset compiler :use-server-p nil)
 	    (oset compiler
 		  :path
+                  ;; Discover compiler's path:
 		  (let ((compiler-path
                          (if (listp (car jdee-compiler))
                              (substitute-in-file-name (nth 1 (car jdee-compiler)))
@@ -1412,13 +1396,12 @@ If t (or other non-nil non-number) then kill in 2 secs."
      :path compiler-path)))
 
 (defun jdee-compile-get-the-compiler ()
-  "Get a compiler object that represents the compiler specified
-by `jdee-compiler'."
+  "Get a compiler object specified by `jdee-compiler'."
   (let* ((car-jdee-compiler (car jdee-compiler))
          (compiler-name (if (listp car-jdee-compiler) (car car-jdee-compiler) car-jdee-compiler)))
     (cond
      ((string-match "javac" compiler-name)
-       (jdee-compile-get-javac))
+      (jdee-compile-get-javac))
      ((string-match "eclipse java compiler server" compiler-name)
       (jdee-compile-get-ejc))
      (t
@@ -1427,27 +1410,25 @@ by `jdee-compiler'."
 
 ;;;###autoload
 (defun jdee-set-compile-options (options)
-  "Sets the compile options.
+  "Set the compile `OPTIONS'.
 Enter the options as you would on the command line, e.g.,
 -depend -verbose."
-  (interactive
-   "sEnter options: ")
+  (interactive "sEnter options: ")
   (setq jdee-compile-option-command-line-args (split-string options " ")))
 
 ;;;###autoload
 (defun jdee-compile ()
   "Compile the Java program in the current buffer.
 This command invokes the compiler specified by `jdee-compiler'
-with the options specified by the JDE customization variables
-that begin with `jdee-compile'. If the variable
+with the options specified by the JDEE customization variables
+that begin with `jdee-compile'.  If the variable
 `jdee-read-compile-args' is non-nil, this command reads
 additional compilation options from the minibuffer, with
-history enabled. If `jdee-compiler' specifies the JDE compile
-server, this command uses the compile server. Otherwise, it
-uses the compiler executable specified by
-`jdee-compiler' to compile."
-  (interactive)
+history enabled.  If `jdee-compiler' specifies the JDEE compile
+server, this command uses the compile server.  Otherwise, it
+uses the compiler executable specified by `jdee-compiler' to compile."
 
+  (interactive)
   (if jdee-read-compile-args
       (setq jdee-interactive-compile-args
             (read-from-minibuffer
@@ -1487,8 +1468,6 @@ uses the compiler executable specified by
                     (split-string jdee-interactive-compile-args " ")))
           (jdee-compile-compile compiler))
       (error "Unknown compiler. Aborting compilation."))))
-
-
 
 (provide 'jdee-compile)
 

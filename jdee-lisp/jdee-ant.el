@@ -1,11 +1,8 @@
-;; jdee-ant.el --- Use Apache Ant to build your JDE projects
-;; $Id$
+;;; jdee-ant.el --- Frontend to Apache Ant
 
 ;; Copyright (C) 2009 by Paul Landes
 ;; Author: Jason Stell | jason.stell@globalone.net
 ;; Author: Kevin A. Burton ( burton@openprivacy.org )
-;; Created: 19 Oct 2000
-;; Version 1.4.4
 
 ;; This file is not part of Emacs
 
@@ -24,21 +21,10 @@
 ;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
-;; Commentary:
+;;; Commentary:
 ;; This file defines jdee-ant-build and some helper functions.
 ;; jdee-ant-build uses the specified ant program/shell script to
 ;; execute a specified build file (in the project root).
-;;
-;;
-;; TODO:
-;;
-;; Notes:
-;; -- The JDEE (Java Development Environment for Emacs) can be
-;;    downloaded at http://jdee.sourceforge.net
-;;
-;; -- Apache Ant is a Java & XML build system that can be downloaded
-;;    at http://jakarta.apache.org/ant/
-;;
 ;;
 ;;; History:
 ;;
@@ -97,18 +83,16 @@
 ;;    Initial Version
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;; Code:
+
 (require 'cl-lib)
 (require 'compile)
-
-;; FIXME: refactor to avoid this
-(declare-function jdee-normalize-path "jdee" (path &optional sym))
-(declare-function jdee-get-jdk-prog "jdee" (progname))
-(declare-function jdee-get-tools-jar "jdee" nil)
-(declare-function jdee-build-classpath "jdee" (path &optional sym quote-path-p))
-(declare-function jdee-create-prj-values-str "jdee" nil)
-(declare-function jdee-root-dir-p "jdee" (dir))
-(declare-function jdee-update-autoloaded-symbols "jdee-project-file" nil)
-(declare-function jdee-bsh-running-p "jdee-bsh" nil)
+(require 'jdee-classpath)
+(require 'jdee-backend)
+(require 'jdee-files)
+(require 'jdee-project-file)
+(require 'jdee-jdk-manager)
+(require 's)
 
 (defgroup jdee-ant nil
   "JDEE Ant"
@@ -208,6 +192,7 @@ current directory for the build definition file. Also note that, if non-nil,
 this will relax the requirement for an explicit jdee project file.  If
 `jdee-ant-read-buildfile' is enable that value is used as a default if valid."
    :group 'jdee-ant
+   :safe 'booleanp
    :type 'boolean)
 
 (defcustom jdee-ant-complete-target t
@@ -241,16 +226,17 @@ describing how the compilation finished"
   :type 'hook)
 
 (defcustom jdee-ant-working-directory ""
-  "*Path of the working directory to use in 'ant' build mode. This string must
-end in a slash, for example, c:/foo/bar/ or ./ . If this string is empty, the
-'ant' build mode uses the current file location as its working directory."
+  "*Path of the working directory to use in 'ant' build mode.
+This string must end in a slash, for example, c:/foo/bar/ or ./ .
+If this string is empty, the 'ant' build mode uses the current file location
+as its working directory."
   :group 'jdee-ant
   :type 'string)
 
 (defun jdee-build-ant-command (target more-args &optional buildfile)
-  "Constructs the java ant command. The variable `jdee-ant-home' is used
-if it is set, otherwise it gets the ant home from the environment
-variable ANT_HOME."
+  "Constructs the java ant command for `TARGET' and its `MORE-ARGS'.
+The variable `jdee-ant-home' is used if it is set, otherwise it gets
+the Ant home from the environment variable ANT_HOME."
 
   ;;provide a default buildfile.
   (when (null buildfile)
@@ -259,18 +245,17 @@ variable ANT_HOME."
   (let* ((ant-home (jdee-ant-get-ant-home))
 	 (delimiter (if (or
 			 (string= (car jdee-ant-invocation-method) "Java")
-			 (and (string= (car jdee-ant-invocation-method)
-				       "Script")))
+			 (string= (car jdee-ant-invocation-method) "Script"))
 			"'"
 		      "\""))
 	 (classpath-delimiter  (if (and (or (eq system-type 'windows-nt)
                                             (eq system-type 'cygwin32))
-                                        (string-match "sh$" shell-file-name))
+                                        (s-matches? "sh$" shell-file-name))
                                    delimiter))
 	 (buildfile-delimiter  (if (eq system-type 'windows-nt)
 				   "\"" delimiter))
-	 (ant-program (if (or (string-match "\\\\" jdee-ant-program)
-			      (string-match "/" jdee-ant-program))
+	 (ant-program (if (or (s-matches? "\\\\" jdee-ant-program)
+			      (s-matches? "/" jdee-ant-program))
 			  (jdee-normalize-path jdee-ant-program)
 			jdee-ant-program))
 	 (ant-command
@@ -286,10 +271,8 @@ variable ANT_HOME."
 	   (if ant-home
 	       (concat
 		" -Dant.home="
-		(if (or
-		     (string-match " " ant-home) ;; Quote path if it
-		     (string-match "." ant-home));; contains a space
-		    (concat delimiter ant-home delimiter)  ;; or period.
+		(if (s-matches? " " ant-home) ; Quote paths with spaces
+		    (concat "\"" ant-home "\"")
 		  ant-home)))
            (if (string= (car jdee-ant-invocation-method) "Java")
                (concat
@@ -533,11 +516,8 @@ and there are no more errors. "
     (let* (proc (thisdir (jdee-ant-get-default-directory)) outwin)
       (save-excursion
         ;; Clear out the compilation buffer and make it writable.
-        (if (not (jdee-bsh-running-p))
-            (progn
-              (bsh-launch (oref-default 'jdee-bsh the-bsh))
-              (bsh-eval (oref-default 'jdee-bsh the-bsh) (jdee-create-prj-values-str))))
-        (setq proc (bsh-get-process (oref-default 'jdee-bsh the-bsh)))
+        (jdee-backend-load-project)
+        (setq proc (jdee-backend-get-process))
         (set-buffer outbuf)
         (compilation-mode)
         (setq buffer-read-only nil)
@@ -552,8 +532,8 @@ and there are no more errors. "
         (set-process-filter proc 'jdee-ant-filter)
         ;;resets the jdee-ant-passed-security-exception flag
         (setq jdee-ant-passed-security-exception nil)
-        (process-send-string proc (concat "jde.util.AntServer.start(\""
-                                          command "\");" "\n")))
+        (process-send-string proc
+                             (jdee-backend-get-ant-start-server-command command)))
       (setq outwin (display-buffer outbuf))
       (save-excursion
         ;; (setq buffer-read-only t)  ;;; Non-ergonomic.
@@ -734,4 +714,4 @@ Returns nil if it cannot find a project file in DIR or an ascendant directory."
 
 (provide 'jdee-ant)
 
-;; End of jdee-ant.el
+;;; jdee-ant.el ends here

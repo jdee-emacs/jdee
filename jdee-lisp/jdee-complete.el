@@ -10,35 +10,23 @@
 
 ;; Keywords: java, intellisense, completion
 
-;; Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 Rodrigo Reyes, Paul Kinnucan,
-;;                          Stephane Nicolas, David Ponce, Javier Lopez
+;; Copyright (C) 1999-2004 Rodrigo Reyes, Paul Kinnucan,
+;;                         Stephane Nicolas, David Ponce, Javier Lopez
 ;; Copyright (C) 2009 by Paul Landes
 
 ;; This package follows the GNU General Public Licence (GPL), see the
 ;; COPYING file that comes along with GNU Emacs. This is free software,
 ;; you can redistribute it and/or modify it under the GNU GPL terms.
 
-;; Java is a registered trademark of Sun Microsystem, Inc.
-
 ;;; Commentary:
 
-;; This is one of a set of packages that make up the
-;; Java Development Environment for Emacs (JDEE). See the
-;; JDEE User's Guide for more information.
-
-
-;; This package adds smart completion to the JDE. How it works is
+;; This package adds smart completion to the JDEE.  How it works is
 ;; simple : put the cursor at the end of a statement "under
 ;; construction", eg. "myVariable.rem<CURSOR HERE> and call the
 ;; jdee-complete-at-point emacs-lisp function (this is by default
-;; C-.). A completion is then inserted. If multiple completions are
+;; C-.). A completion is then inserted.  If multiple completions are
 ;; possible, calling the completion function again will cycle through
 ;; all the possibilities (as dabbrev-mode does).
-
-;; To retrieve all the possible completions, it uses the java code in
-;; jde.util.Completion.getClassInfo(), called by beanshell. That
-;; need the class to be compiled (but that's not worst than an etag
-;; call).
 
 ;; Known bugs/problems :
 
@@ -46,20 +34,12 @@
 ;; Move all the strings manipulation to the java side so that
 ;; class info can be loaded in the background.
 
-;; The latest version of the JDEE is available at
-;; <URL:http://jdee.sourceforge.net>.
-
-;; Please send any comments, bugs, or upgrade requests to
-;; Paul Kinnucan at pkinnucan@attbi.com
-
-;;jdee-eldoc for completion signatures
+;;; Code:
 
 (require 'eldoc)
+(require 'jdee-backend)
 (require 'jdee-parse)
 (require 'semantic/idle)
-
-;; FIXME: refactor
-(declare-function jdee-jeval-r "jdee-bsh" (java-statement))
 
 (defgroup jdee-complete nil
   "JDE Completion"
@@ -473,7 +453,7 @@ classes for the access level."
     answer))
 
 (defun jdee-complete-invoke-get-class-info (name access)
-  "Invoke the method jde.util.Completion.getClassInfo(String, int).
+  "Invoke the method jde.util.Completion.getClassInfo(String, int)
 If the class is not found, walk back the package tree to see if it is an inner class,
 which needs to be called as a.b.C$D rather than a.b.C.D"
   (let (result (curr-name name))
@@ -486,31 +466,12 @@ which needs to be called as a.b.C$D rather than a.b.C.D"
                   (replace-regexp-in-string "^\\(.+\\)\\.\\([^.]+\\)$"
                                             "\\1$\\2"
                                             curr-name)
-                nil))))
+              nil))))
     result))
 
-
-(defun jdee-complete-get-classinfo-javacode (name import access-level)
-  "Return the java code that calls the
-jde.util.Completion.getClassInfo function with the short java class
-name NAME and the package list IMPORT where to look at."
-  (save-excursion
-    (concat
-     "{ "
-     "String[] lst = new String[" (number-to-string (length import)) "];\n"
-     (let ((count -1))
-       (mapconcat
-	(function
-	 (lambda (x)
-	   (setq count (+ 1 count))
-	   (concat "lst[" (int-to-string count) "]=\""
-		   (car (nth count import)) "\";\n")))
-	import
-	" "))
-     "jde.util.Completion.getClassInfo(\"" name "\",lst,"
-     (number-to-string access-level) ");\n"
-     "}")))
-
+(message "Other option from merge from master")
+;;  "Return class info for class NAME and ACCESS."
+;;  (jdee-backend-get-classinfo-access name access))
 
 (defun jdee-complete-sort-comparison (first second)
   (string< (car first) (car second)))
@@ -551,7 +512,7 @@ into (\"var\" \"java.lang.String\ var\")"
 
 (defun jdee-complete-build-completion-list (classinfo)
   "Build a completion list from the CLASSINFO list, as returned by the
-jde.util.Completion.getClassInfo function."
+jdee-backend-get-class-info function."
   (let (result tmp)
     ;; get the variable fields
     (setq tmp (nth jdee-complete-fields classinfo))

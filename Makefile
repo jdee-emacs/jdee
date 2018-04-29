@@ -1,3 +1,29 @@
+EMACS ?= emacs
+EMACSFLAGS = -L . --debug
+CASK ?= cask
+#VERSION = $(shell git describe --tags --abbrev=0 | sed 's/^v//')
+VERSION = 2.4.2
+PACKAGE_NAME = jdee-$(VERSION)
+
+ELS = $(wildcard *.el)
+OBJECTS = $(ELS:.el=.elc)
+
+elpa:
+	$(CASK) install
+	$(CASK) update
+	touch $@
+
+.PHONY: build
+build : elpa $(OBJECTS)
+
+.PHONY: test
+test : clean
+	$(CASK) exec ert-runner $(EMACSFLAGS)
+
+.PHONY: clean
+clean :
+	rm -f $(OBJECTS)
+
 all: jdee-nrepl jdee-maven-nrepl jdee-live jdee-sample jdee-lisp
 
 nrepl:
@@ -36,3 +62,14 @@ jdee-lisp:
 
 test:
 	$(MAKE) -C jdee-lisp test
+.PHONY: elpaclean
+elpaclean : clean
+	rm -f elpa
+	rm -rf .cask # Clean packages installed for development
+
+%.elc : %.el
+	$(CASK) build
+
+.PHONY: run-jdee
+run-jdee: elpa
+	cask exec emacs -Q -L . --eval "(require 'jdee)"

@@ -22,16 +22,17 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, US
 
-;; Commentary:
+;;; Commentary:
 
-;; This package interfaces emacs to jdb, the debugger
-;; distributed as part of JavaSoft's Java
-;; Development Kit (JDK).
+;; This package interfaces Emacs to jdb, the debugger
+;; distributed as part of JDK.
 
 ;;; Code:
 
 (require 'cl-lib)
 (require 'eieio)
+(require 'jdee-classpath)
+(require 'jdee-files)
 (require 'jdee-open-source)
 (require 'jdee-parse)
 (require 'jdee-util)
@@ -41,16 +42,12 @@
   (require 'wid-edit))
 
 ;; FIXME: refactor
-(declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
 (declare-function jdee-dbs-debugger-running-p "jdee-dbs" ())
 (declare-function jdee-dbs-get-target-process "jdee-dbs" ())
-(declare-function jdee-expand-wildcards-and-normalize "jdee" (path &optional symbol))
 (declare-function jdee-jdb-get-jdb "jdee-jdb" ())
-(declare-function jdee-normalize-path "jdee" (path &optional symbol))
+
 (defvar jdee-dbs-the-debugger)
 (defvar jdee-debugger);; jde
-(defvar jdee-global-classpath)
-(defvar jdee-sourcepath)
 
 ;; ======================================================================
 ;; jdee-db variables
@@ -1583,7 +1580,7 @@ buffer. This command creates a command buffer for the debug session."
 		   (string= main-class ""))
 		  (setq main-class
 			(if (buffer-file-name)
-			    (concat (jdee-db-get-package)
+			    (concat (jdee-parse-get-package)
 				    (file-name-sans-extension
 				     (file-name-nondirectory (buffer-file-name))))
 			  (read-string "Java class to debug: "))))
@@ -1660,7 +1657,7 @@ buffer. This command creates a command buffer for the debug session."
 	 (not applet-class)
 	 (string= applet-class ""))
 	(setq applet-class
-	      (concat (jdee-db-get-package)
+	      (concat (jdee-parse-get-package)
 		      (file-name-sans-extension
 		       (file-name-nondirectory (buffer-file-name))))))
     (jdee-debug-applet-init applet-class  applet-doc)))
@@ -1857,9 +1854,8 @@ type `jdee-db-breakpoint'."
 	     jdee-db-breakpoint-id-counter)
      :id   jdee-db-breakpoint-id-counter
      :file file
-     :class (concat (jdee-db-get-package)
-		    (jdee-db-get-class)))))
-
+     :class (concat (jdee-parse-get-package)
+		    (jdee-parse-get-class)))))
 
 (defun jdee-debug-set-breakpoint ()
   "Ask debugger to set a breakpoint at the current line
@@ -1957,39 +1953,15 @@ in the current buffer."
 	nil nil
 	'jdee-db-interactive-app-arg-history))))
 
-
-(defun jdee-db-get-package ()
-  "Return the package of the class whose source file resides in the current
-buffer."
-  (save-excursion
-    (goto-char (point-min))
-    (if (re-search-forward "^[ \t]*\\<\\(package\\) +\\([^ \t\n]*\\) *;" (point-max) t)
-	(concat (buffer-substring-no-properties (match-beginning 2) (match-end 2))
-		"."))))
-
-(defun jdee-db-get-class () "Lookups and return fully qualified class
-name, e.g. A$B if point is in inner class B of A."
-  (interactive)
-  (let ((class-info (jdee-parse-get-innermost-class-at-point)))
-    (if class-info
-      (save-excursion
-	(goto-char (cdr class-info))
-	(let ((parent (jdee-db-get-class)))
-	(if (not parent)
-	    (car class-info)
-	    (concat parent "$" (car class-info))))))))
-
-
 (defun jdee-db-src-dir-matches-file-p (file)
-  "Return true if one of `jdee-sourcepath'
-matches FILE."
+  "Return non-nill if one of `jdee-sourcepath' matches `FILE'."
   (let* ((directory-sep-char ?/)
-		 (filename (jdee-normalize-path file)))
+         (filename (jdee-normalize-path file)))
     (cl-find-if
      (lambda (dir-x)
        (string-match
-		(concat "^" dir-x)
-		filename))
+        (concat "^" dir-x)
+        filename))
      (jdee-get-sourcepath))))
 
 

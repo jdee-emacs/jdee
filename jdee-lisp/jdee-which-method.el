@@ -1,5 +1,4 @@
 ;;; jdee-which-method.el --- Print current method in mode line
-;; $Id$
 
 ;; Copyright (C) 1997-2004 Paul Kinnucan
 ;; Copyright (C) 2009 by Paul Landes
@@ -40,7 +39,7 @@
 
 ;;;###autoload
 (defcustom jdee-which-method-mode t
-  "Enables the JDE's which method mode.
+  "Enables the JDEE's which method mode.
 When which method mode is enabled, the current method name is
 displayed in the mode line."
   :group 'jdee-which-method
@@ -66,24 +65,22 @@ displayed in the mode line."
     (jdee-which-method-mode
      ("--" jdee-which-method-format "--"))
     "-%-")
-  "Format for the JDE source buffer mode line."
+  "Format for the JDEE source buffer mode line."
   :group 'jdee
   :type 'sexp)
 
 (defcustom jdee-which-full-class-name nil
   "Display full inner-class name in JDE's which method mode.
 If nil then display only the last component of class name.
-\(see `jdee-which-method-max-length', `jdee-which-method-class-min-length')
-"
+\(see `jdee-which-method-max-length', `jdee-which-method-class-min-length')."
   :group 'jdee-which-method
   :type  'boolean)
 
 (defcustom jdee-which-method-max-length 20
-  "Specify the maximum length of the which-method-string \(see
-`jdee-which-method-format'). If nil, the string is not \
-truncated."
+  "Specify max length of the `which-method-string'.
+If nil, the string is not truncated.  See `jdee-which-method-format'."
   :type '(choice (const :tag "No truncation" :value nil)
-		 (integer :tag "Max. length"))
+                 (integer :tag "Max. length"))
   :group 'jdee-which-method)
 
 (defcustom jdee-which-method-class-min-length 4
@@ -95,11 +92,10 @@ is not nil. If the full method name is still greater than
   :type '(integer :tag "Min. length")
   :group 'jdee-which-method)
 
-
 (defcustom jdee-which-method-abbrev-symbol "~"
-"Symbol used to indicate abbreviated part of a method name."
-    :group 'jdee-which-method
-    :type  'string)
+  "Symbol used to indicate abbreviated part of a method name."
+  :group 'jdee-which-method
+  :type  'string)
 
 ;;; Code, nothing to customize below here
 ;;; -------------------------------------
@@ -126,133 +122,132 @@ is not nil. If the full method name is still greater than
 
 (defun jdee-which-method-truncate-begin (str truncation)
   (if (> truncation (length jdee-which-method-abbrev-symbol))
-	 (concat jdee-which-method-abbrev-symbol (substring str truncation))
-       str))
+      (concat jdee-which-method-abbrev-symbol (substring str truncation))
+    str))
 
 (defun jdee-which-method-truncate-end (str truncation)
   (let ((str-length (length str)))
     (if (> truncation (length jdee-which-method-abbrev-symbol))
-	(concat (substring str 0 (- str-length truncation))
-		jdee-which-method-abbrev-symbol)
+        (concat (substring str 0 (- str-length truncation))
+                jdee-which-method-abbrev-symbol)
       str)))
 
 (defun jdee-which-method-class-name(name)
   (if jdee-which-full-class-name
       (car (jdee-which-full-class-namef (jdee-parse-get-innermost-class-at-point)))
-    (caar name)
-    ))
+    (caar name)))
 
 (defun jdee-which-method-update ()
   (interactive)
-  (if (and
-       jdee-which-method-mode
-       (eq major-mode 'jdee-mode))
+  (if (and jdee-which-method-mode
+           (eq major-mode 'jdee-mode))
       (condition-case info
-	  (let ((p (point)))
-	    (unless (or
-		     (= jdee-which-method-current-point-loc p)
-		     (and
-		      (>= p (car jdee-which-method-current-method-bounds))
-		      (<= p (cdr jdee-which-method-current-method-bounds))))
-	      (let ((name;; (jdee-parse-get-method-at-point)
-		     (if jdee-parse-the-method-map
-			 (jdee-parse-method-map-get-method-at jdee-parse-the-method-map))
-		     ))
-		(if name
-		    (let* ((name-pair (car name))
-			   (class (jdee-which-method-class-name name))
-			   (method (cdr name-pair))
-			   (bounds (cdr name))
-			   (class-length (length class))
-			   (method-length (length method))
-			   ;; initialize the truncation with 0!
-			   (trunc-class 0)
-			   (trunc-method 0)
-			   (trunc-complete 0))
-		      (when jdee-which-method-max-length
-			;; compute necessary truncation of method and/or class
-			(if jdee-parse-buffer-contains-multiple-classes-p
-			    (when (> (+ class-length method-length 1)
-				     jdee-which-method-max-length)
-			      (setq trunc-complete (- (+ class-length
-							 method-length 1)
-						      jdee-which-method-max-length))
-			      (if (< (- class-length trunc-complete)
-				     jdee-which-method-class-min-length)
-				  (setq trunc-class
-					(- class-length
-					   jdee-which-method-class-min-length)
-					trunc-method (- trunc-complete
-							trunc-class))
-				(setq trunc-method 0
-				      trunc-class trunc-complete)))
-			  (when (> method-length jdee-which-method-max-length)
-			    (setq trunc-method (- method-length
-						  jdee-which-method-max-length)))))
-		      ;; truncate method and class with the computed truncation
-		      ;; (possible 0, then no truncation is done in fact)
-		      (setq class (jdee-which-method-truncate-end class trunc-class)
-			    method (jdee-which-method-truncate-end method trunc-method))
-		      ;; set the displayed string from the (possible truncated)
-		      ;; class and method parts according to
-		      ;; jdee-parse-buffer-contains-multiple-classes-p.
-		      (setq jdee-which-method-current
-			    (if jdee-parse-buffer-contains-multiple-classes-p
-				(format "M:%s.%s" class method)
-			      (format "M:%s" method)))
-		      (setq jdee-which-method-current-point-loc p)
-		      (setq jdee-which-method-current-method-bounds bounds))
-		  (progn
-		    (setq name (jdee-which-class-name (jdee-parse-get-innermost-class-at-point)))
-		    (setq jdee-which-method-current-point-loc p)
-		    (setq jdee-which-method-current-method-bounds (cons -1 -1))
-		    (if name
-			(let* ((class (car name))
-			       (class-length (length class)))
-			  ;; possible truncate the string to display
-			  (when (and jdee-which-method-max-length
-				     (> class-length jdee-which-method-max-length))
-			    (setq class (jdee-which-method-truncate-begin class
-									 (- class-length
-									    jdee-which-method-max-length))))
-			  (setq jdee-which-method-current (format "C:%s" class)))
-		      (setq jdee-which-method-current jdee-which-method-unknown))))
-		(unless (equal jdee-which-method-current jdee-which-method-previous)
-		  (setq jdee-which-method-previous jdee-which-method-current)
-		  (force-mode-line-update)))))
-	(error
-	 ;; (debug)
-	 (cancel-timer jdee-which-method-idle-timer)
-	 (setq jdee-which-method-idle-timer nil)
-	 (message "Error in jdee-which-method-update: %s" info)))))
+          (let ((p (point)))
+            (unless (or
+                     (= jdee-which-method-current-point-loc p)
+                     (and
+                      (>= p (car jdee-which-method-current-method-bounds))
+                      (<= p (cdr jdee-which-method-current-method-bounds))))
+              (let ((name ;; (jdee-parse-get-method-at-point)
+                     (if jdee-parse-the-method-map
+                         (jdee-parse-method-map-get-method-at jdee-parse-the-method-map))
+                     ))
+                (if name
+                    (let* ((name-pair (car name))
+                           (class (jdee-which-method-class-name name))
+                           (method (cdr name-pair))
+                           (bounds (cdr name))
+                           (class-length (length class))
+                           (method-length (length method))
+                           ;; initialize the truncation with 0!
+                           (trunc-class 0)
+                           (trunc-method 0)
+                           (trunc-complete 0))
+                      (when jdee-which-method-max-length
+                        ;; compute necessary truncation of method and/or class
+                        (if jdee-parse-buffer-contains-multiple-classes-p
+                            (when (> (+ class-length method-length 1)
+                                     jdee-which-method-max-length)
+                              (setq trunc-complete (- (+ class-length
+                                                         method-length 1)
+                                                      jdee-which-method-max-length))
+                              (if (< (- class-length trunc-complete)
+                                     jdee-which-method-class-min-length)
+                                  (setq trunc-class
+                                        (- class-length
+                                           jdee-which-method-class-min-length)
+                                        trunc-method (- trunc-complete
+                                                        trunc-class))
+                                (setq trunc-method 0
+                                      trunc-class trunc-complete)))
+                          (when (> method-length jdee-which-method-max-length)
+                            (setq trunc-method (- method-length
+                                                  jdee-which-method-max-length)))))
+                      ;; truncate method and class with the computed truncation
+                      ;; (possible 0, then no truncation is done in fact)
+                      (setq class (jdee-which-method-truncate-end class trunc-class)
+                            method (jdee-which-method-truncate-end method trunc-method))
+                      ;; set the displayed string from the (possible truncated)
+                      ;; class and method parts according to
+                      ;; jdee-parse-buffer-contains-multiple-classes-p.
+                      (setq jdee-which-method-current
+                            (if jdee-parse-buffer-contains-multiple-classes-p
+                                (format "M:%s.%s" class method)
+                              (format "M:%s" method)))
+                      (setq jdee-which-method-current-point-loc p)
+                      (setq jdee-which-method-current-method-bounds bounds))
+                  (progn
+                    (setq name (jdee-which-class-name (jdee-parse-get-innermost-class-at-point)))
+                    (setq jdee-which-method-current-point-loc p)
+                    (setq jdee-which-method-current-method-bounds (cons -1 -1))
+                    (if name
+                        (let* ((class (car name))
+                               (class-length (length class)))
+                          ;; possible truncate the string to display
+                          (when (and jdee-which-method-max-length
+                                     (> class-length jdee-which-method-max-length))
+                            (setq class (jdee-which-method-truncate-begin class
+                                                                          (- class-length
+                                                                             jdee-which-method-max-length))))
+                          (setq jdee-which-method-current (format "C:%s" class)))
+                      (setq jdee-which-method-current jdee-which-method-unknown))))
+                (unless (equal jdee-which-method-current jdee-which-method-previous)
+                  (setq jdee-which-method-previous jdee-which-method-current)
+                  (force-mode-line-update)))))
+        (error
+         ;; (debug)
+         (cancel-timer jdee-which-method-idle-timer)
+         (setq jdee-which-method-idle-timer nil)
+         (message "Error in jdee-which-method-update: %s" info)))))
 
 (defun jdee-which-full-class-namef (name)
-  ;; name and return value is: (string . point) or nil.
+  "name and return value is: (string . point) or nil."
   (save-excursion
     (do ((rv name)) ((not name) rv)
       (goto-char (cdr name))
       (setq name (jdee-parse-get-innermost-class-at-point))
-      (if name (setf (car rv) (concat (car name) "." (car rv)))))))
+      (when name
+        (setf (car rv) (concat (car name) "." (car rv)))))))
 
 (defun jdee-which-class-name (name)
-  ;; use given name or gather full-name:
+  "Use given `NAME' or gather full-name."
   (if jdee-which-full-class-name
       (jdee-which-full-class-namef name)
-    name
-    ))
+    name))
 
 (defun jdee-which-method-update-on-entering-buffer ()
-  ;; This is a hook function. Catch all errors to
-  ;; avoid canceling other hooks.
+  "This is a hook function.
+Catch all errors to avoid canceling other hooks."
+
   (condition-case err
       (progn
-	(setq jdee-which-method-current-point-loc 0)
-	(setq jdee-which-method-current-method-bounds (cons -1 -1))
-	(jdee-which-method-update))
+        (setq jdee-which-method-current-point-loc 0)
+        (setq jdee-which-method-current-method-bounds (cons -1 -1))
+        (jdee-which-method-update))
     (error (message
-	    "Which method update error: %s"
-	    (error-message-string err)))))
+            "Which method update error: %s"
+            (error-message-string err)))))
 
 (provide 'jdee-which-method)
 
-;; jdee-which-method.el ends here
+;;; jdee-which-method.el ends here

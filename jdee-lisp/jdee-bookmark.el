@@ -1,5 +1,4 @@
 ;;; jdee-bookmark.el -- Organize bookmarked classes.
-;; $Id: $
 
 ;; Author: Paul Landes <landes <at> mailc dt net>
 ;; Maintainer: Paul Landes
@@ -32,8 +31,6 @@
 
 (require 'jdee-parse)
 (require 'jdee-util)
-
-(declare-function jdee-assert-mode "jdee" (&optional no-raise-p))
 
 (defgroup jdee-bookmark nil
   "JDEE Bookmarks"
@@ -113,4 +110,4 @@ Function `jdee-find-class-source' is used to visit these Java source files (see
 
 (provide 'jdee-bookmark)
 
-;; End of jdee-bookmark.el
+;;; jdee-bookmark.el ends here

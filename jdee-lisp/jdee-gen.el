@@ -1,7 +1,6 @@
-;;; jdee-gen.el -- Integrated Development Environment for Java.
+;;; jdee-gen.el -- JDEE code templates
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
-;; Maintainer: Paul Landes <landes <at> mailc dt net>
 ;; Keywords: java, tools
 
 ;; Copyright (C) 1997, 1998, 2000, 2001, 2002, 2003, 2004 Paul Kinnucan.
@@ -22,8 +21,12 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 ;;
+;;; Commentary:
+
+;;; Code:
 
 (require 'tempo)
+(require 'jdee-classpath)
 
 ;; FIXME: (require 'cc-cmds) doesn't work
 (declare-function c-indent-line "cc-cmds" (&optional syntax quiet ignore-point-pos))
@@ -60,8 +63,6 @@
         (goto-char tempo-initial-pos))
     (put template 'no-self-insert nil)))
 
-
-
 (defgroup jdee-gen nil
   "JDE Autocoder"
   :group 'jdee
@@ -93,6 +94,13 @@ Note: According to the Java Code Convention [section 6.4], this value should
   "*If non-nil, generate Javadoc for all jdee-gen-* code generation functions."
   :group 'jdee-gen
   :type  'boolean)
+
+(defcustom jdee-gen-test-path "src/test/java"
+  "The directory within a project where test code is stored.  For Maven
+and Gradle \"src/test/java\" is standard path."
+  :group 'jdee-gen
+  :type  'string)
+
 
 (defcustom jdee-gen-space-after-castings t
   "*If non-nil, add space between a class casting and what comes after it."
@@ -356,22 +364,33 @@ by the car of `jdee-gen-interface-to-gen'."
 	  (goto-char ins-pos)
 	  (jdee-wiz-implement-interface-internal interface)))))
 
-(defun jdee-gen-get-package-statement ()
+(defvar jdee-gen-package-name nil)
+
+(defun jdee-gen-get-package-statement (&optional package)
+  "Return the formated package statement to insert into a java buffer.
+
+If PACKAGE is set, use it as a default.
+
+Ask the user for confirmation.  Also sets buffer local
+`jdee-gen-package-name'."
   (require 'jdee-package)
   (let* ((package-dir (jdee-package-get-package-directory))
 	 (suggested-package-name
-	  (if (or
-	       (string= package-dir jdee-package-unknown-package-name)
-	       (string= package-dir ""))
-	      nil
-	    (jdee-package-convert-directory-to-package package-dir)))
+          (or package
+              (if (or
+                   (string= package-dir jdee-package-unknown-package-name)
+                   (string= package-dir ""))
+                  nil
+                (jdee-package-convert-directory-to-package package-dir))))
 	 (package-name
-	  (read-from-minibuffer "Package: " suggested-package-name)))
+          (or jdee-gen-package-name
+              (read-from-minibuffer "Package: " suggested-package-name))))
     (if (and
 	 package-name
 	 (not (string= package-name "")))
-	(format "package %s;\n\n" package-name))))
-
+        (progn
+          (set (make-local-variable 'jdee-gen-package-name) package-name)
+          (format "package %s;\n\n" package-name)))))
 
 (defcustom jdee-gen-method-signature-padding-1 ""
   "String that comes just after the function name and just before
@@ -884,10 +903,6 @@ See `jdee-gen-get-set-var-template'."
     "(P \"Variable type: \" type t)"
     "(P \"Variable name: \" name t)"
     "'&'>"
-    "(when jdee-gen-create-javadoc "
-    " (progn (require 'jdee-javadoc) (jdee-javadoc-insert-start-block))"
-    " '(l \"* Describe \" (s name) \" here.\" '>'n"
-    "'> (jdee-javadoc-insert-end-block)))"
     "(jdee-gen-get-set-member-annotations"
     "  (tempo-lookup-named 'type)"
     "  (tempo-lookup-named 'name))"
@@ -897,15 +912,6 @@ See `jdee-gen-get-set-var-template'."
 
     "(jdee-gen-blank-lines 2 -1)"
     ;;we begin by the getter
-    "(when jdee-gen-create-javadoc "
-    "'(l '> (jdee-javadoc-insert-start-block)"
-    "\"* Get the <code>\" (jdee-gen-lookup-and-capitalize 'name) \"</code> value.\" '>'n"
-    "'> (jdee-javadoc-insert-empty-line)"
-    "'>"
-    "(let ((type (tempo-lookup-named 'type)))"
-    "  (jdee-gen-save-excursion (jdee-javadoc-insert 'tempo-template-jdee-javadoc-return-tag)))"
-    "'> (jdee-javadoc-insert-end-block)))"
-
     "(jdee-gen-method-signature"
     "  \"public\""
     "  (jdee-gen-lookup-named 'type)"
@@ -922,16 +928,6 @@ See `jdee-gen-get-set-var-template'."
     "'n"
 
     ;;we continue with the setter
-    "(when jdee-gen-create-javadoc "
-    "'(l '> (jdee-javadoc-insert-start-block)"
-    "\"* Set the <code>\" (jdee-gen-lookup-and-capitalize 'name) \"</code> value.\" '>'n"
-    "\"*\" '>'n"
-    ;; ToDo: use jdee-wiz-get-set-variable-prefix
-    "\"* @param \" (jdee-gen-lookup-named 'name)"
-    "\" The new \" (jdee-gen-lookup-and-capitalize 'name) \" value.\" '>'n"
-    "'> (jdee-javadoc-insert-end-block)))"
-
-    ;; name the method
     "(jdee-gen-method-signature "
     "  \"public\""
     "  \"void\""
@@ -940,7 +936,7 @@ See `jdee-gen-get-set-var-template'."
     "          (jdee-gen-lookup-named 'name))"
     " )"
 
-   "(jdee-gen-electric-brace)"
+    "(jdee-gen-electric-brace)"
 
     "'>\"this.\" (s name) \" = \" (jdee-gen-lookup-named 'name)"
     "\";\" '>'n \"}\" '>'n"
@@ -4130,6 +4126,7 @@ by rebinding the Return key to its original binding."
   (if jdee-electric-return-mode
       (message "electric return mode on")
     (message "electric return mode off")))
+
 
 (provide 'jdee-gen)
 

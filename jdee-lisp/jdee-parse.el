@@ -1,4 +1,4 @@
-;;; jdee-parse.el
+;;; jdee-parse.el --- Class parsing mechanisms
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -22,6 +22,10 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
+;;; Commentary:
+
+;;; Code:
+
 (require 'avl-tree)
 (require 'cl-lib)
 (require 'efc)
@@ -33,12 +37,12 @@
 (require 'semantic/sb)
 (require 'thingatpt)
 
+(require 'jdee-backend)
 (eval-when-compile (require 'cl))
 
 ;; FIXME: refactor
 (defvar jdee-complete-private)
 (defvar jdee-complete-current-list)
-(declare-function jdee-jeval-r "jdee-bsh" (java-statement))
 (declare-function jdee-complete-find-completion-for-pair "jdee-complete" (pair &optional exact-completion access-level))
 (declare-function jdee-import-find-and-import "jdee-import" (class &optional no-errors no-exclude qualifiedp))
 
@@ -105,7 +109,32 @@ the type of a class could not be found an it tried to import it")
 	  "."         ;;   - period
 	  (160 . 255) ;;   - accented characters
 	  )))
-"Regular expression that matches any Java symbol.")
+  "Regular expression that matches any Java symbol.")
+
+(defun jdee-parse-java-name-parts-re (&optional sep)
+  " Create a regular expression that will identify java name parts.
+
+Name parts are things like java.util.Map or Map or java/util/Map
+
+Create a match group.
+
+SEP defaults to ."
+  (format "\\([[:alpha:]_$][[:alnum:]_$%s]*\\)" (or sep ".")))
+
+(defun jdee-parse-java-name-part-re ()
+  "Set one match region on the name"
+  (jdee-parse-java-name-parts-re ""))
+
+(defun jdee-parse-java-fqn-re ()
+  "
+Set 3 match regions
+1 - FQN
+2 - package name
+3 - unqualified class name
+"
+  (format "\\(%s[.]%s\\)" (jdee-parse-java-name-parts-re) (jdee-parse-java-name-part-re)))
+
+          
 
 (defun jdee-parse-after-buffer-changed ()
   "Reparse the current buffer after any change.
@@ -126,7 +155,7 @@ match `jdee-auto-parse-max-buffer-size' threshold."
 	(<= jdee-auto-parse-max-buffer-size 0)
 	(< (buffer-size) jdee-auto-parse-max-buffer-size))))
 
-(eval-when (compile)
+(eval-when-compile
   (defsubst jdee-auto-parse-delay ()
     "Return the time in seconds before auto-parse triggering."
     (- (timer-until jdee-auto-parse-buffer-timer (current-time)))))
@@ -441,6 +470,15 @@ current buffer resides."
 	 pos
        0))))
 
+;;FIXME: remove in favor of jdee-parse-get-package-name
+(defun jdee-parse-get-package ()
+  "Return the package of the class whose source file resides in the current buffer."
+  (save-excursion
+    (goto-char (point-min))
+    (if (re-search-forward "^[ \t]*\\<\\(package\\) +\\([^ \t\n]*\\) *;" (point-max) t)
+	(concat (buffer-substring-no-properties (match-beginning 2) (match-end 2))
+		"."))))
+
 (defun jdee-parse-get-unqualified-name (name)
   "Gets the last name in a qualified name."
   (let ((unqualified-name (substring name (string-match "[^.]+$" name))))
@@ -577,14 +615,25 @@ Returns nil, if point is not in a class."
   ;; (goto-char (aref (c-search-uplist-for-classkey (c-parse-state)) 0))
   )
 
+;;TODO: check if it duplicates something in this file
+(defun jdee-parse-get-class ()
+  "Lookups and return fully qualified class name, e.g. A$B if point
+is in inner class B of A."
+  (interactive)
+  (let ((class-info (jdee-parse-get-innermost-class-at-point)))
+    (if class-info
+        (save-excursion
+          (goto-char (cdr class-info))
+          (let ((parent (jdee-parse-get-class)))
+            (if (not parent)
+                (car class-info)
+              (concat parent "$" (car class-info))))))))
 
 (defun jdee-parse-select-qualified-class-name (class &optional prompt)
   "PROMPT the user to select the fully qualified name for CLASS.
 Return the selection."
   (condition-case err
-      (let ((names
-	     (jdee-jeval-r
-	      (format "jde.util.JdeUtilities.getQualifiedName(\"%s\");" class))))
+      (let ((names (jdee-backend-get-qualified-name class)))
 	(if names
 	    (if (> (length names) 1)
 		(efc-query-options
@@ -652,12 +701,35 @@ If called interactively, add the name in the mini-buffer."
   (file-name-sans-extension (file-name-nondirectory
 			     (or (buffer-file-name) "Object.java"))))
 
+;;;TODO: is the same as jdee-parse-get-buffer-class?
+(defun jdee-parse-fqn ()
+  "Return the fully qualified class name at point.
+If not in a class, use the buffer name."
+  (interactive)
+  (let* ((pkg (jdee-parse-get-package))
+         (class (or (jdee-parse-get-class)
+                    (caar (semantic-find-tags-by-type "class" (current-buffer)))))
+         (rtnval  (if pkg
+                      (format "%s%s" pkg class)
+                    class)))
+    rtnval))
+
+;;;TODO: move to UI package
+(defun jdee-parse-fqn-to-kill-ring ()
+  "Copy the qualified class name of class containing point to the kill ring.
+Return the fully qualified name."
+  (interactive)
+  (let* ((fqn (jdee-parse-fqn)))
+    (kill-new fqn)
+    (when (called-interactively-p 'any)
+      (message "%s added to kill ring" fqn))
+    fqn))
 
 (defun jdee-parse-double-backslashes (name)
-  (mapconcat (lambda (x) (if (eq x ?\\)
-			     "\\\\"
-			   (string x)))
-	     name ""))
+  (mapconcat  (lambda (x) (if (eq x ?\\)
+                         "\\\\"
+                       (string x)))
+              name ""))
 
 (defvar jdee-parse-java-symbol-declare-re
   (rx
@@ -860,7 +932,7 @@ fast."
   (interactive)
   (save-some-buffers (not compilation-ask-about-save) nil)
   (let ((parse-error
-	 (jdee-jeval-r (concat "jde.parser.ParserMain.parseFile(\"" (buffer-file-name) "\");"))))
+         (jdee-backend-parse-file (buffer-file-name))))
     (if parse-error
 	(jdee-display-parse-error parse-error)
       (message "Parsed %s successfully" (buffer-name)))))
@@ -1186,6 +1258,7 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
               (setq cast-type (buffer-substring-no-properties
                                (+ 1 first-paren) second-paren))))
 
+
         ;; If the parsed region is just white-space, move the start of the
         ;; region to the end of the region to preserve the whitespace
         (when (string-match "^\\(\\s-\\|\\s>\\)+$"
@@ -1194,12 +1267,12 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
           (set-marker jdee-parse-current-beginning jdee-parse-current-end))
 
         (if cast-type
-            (progn
-              (setq jdee-parse-casting t)
-              (list cast-type second-part))
-          (progn
-            (setq jdee-parse-casting nil)
-            (list first-part second-part))))
+		  (progn
+		    (setq jdee-parse-casting t)
+		    (list cast-type second-part))
+		(progn
+		  (setq jdee-parse-casting nil)
+		  (list first-part second-part))))
 	    ))))
 
 (defun jdee-parse-isolate-to-parse (s)
@@ -1208,11 +1281,11 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
 	 (inside-quotes nil))
     (while (and (> index 0)
 		(not stop))
-      (setq index (- index 1))
+      (setq index (1- index))
       (setq curcar (aref s index))
       (cond
        ((eq ?\" curcar);;Checking if we are inside double quotes
-	(if (not (eq ?\\ (aref s (- index 1))));;if the quote is not escape
+	(if (not (eq ?\\ (aref s (max 0 (1- index))))) ;;if the quote is not escape
 	    (setq inside-quotes (not inside-quotes))))
        ((eq ?\) curcar)
 	(if (not inside-quotes)
@@ -1245,6 +1318,42 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
     (goto-char current)
     match))
 
+(defun jdee--parse-integer-p (thing)
+  "Return true when `THING' is an integer."
+  (not (null (string-match-p "^-?[0-9][0-9_]*$" thing))))
+
+(defun jdee--parse-long-p (thing)
+  "Return true when `THING' is a long.
+For example: 001L or 134l."
+  (not (null (string-match-p "^-?[0-9][0-9_]*[lL]$" thing))))
+
+(defun jdee--parse-double-p (thing)
+  "Return true when `THING' is a double."
+  (not (null (string-match-p
+              "^[-+]?[0-9_]*\\.?[0-9_]*[0-9]\\([eE][-+]?[0-9]+\\)?$"
+              thing))))
+
+(defun jdee--parse-float-p (thing)
+  "Return true when `THING' is a float.
+For example: 000F or 123f."
+  (not (null (string-match-p
+              "^[-+]?[0-9_]*\\.?[0-9_]*[0-9]\\([eE][-+]?[0-9]+\\)?[fF]$"
+              thing))))
+
+(defun jdee--parse-boolean-p (thing)
+  "Return true when `THING' is a boolean."
+  (string-match "false\\|true" thing))
+
+(defun jdee--parse-char-p (thing)
+  "Return true when `THING' is a char."
+  (and (= (length thing) 3)
+       (and (string= "'" (substring thing 0 1))
+            (string= "'" (substring thing 2 3)))))
+
+(defun jdee--parse-string-p (thing)
+  "Return true when `THING' is a string literal."
+  (not (null (string-match "\".*\"" thing))))
+
 (defun jdee-parse-eval-type-of (expr)
   "Get type of EXPR. This function returns a class name or builtin
 Java type name, e.g., int."
@@ -1254,31 +1363,13 @@ Java type name, e.g., int."
 	    qualified-name chop-pos temp answer)
 	(setq answer
 	      (cond
-	       ;;If it's number returns an int
-	       ((integerp expr)
-		"int")
-	       ;;If it's 001L or 134l return long
-	       ((if (and (integerp (substring expr 0 (- (length expr) 1)))
-			 (or (string= "L" (substring expr (- (length expr) 1)
-						     (length expr)))
-			     (string= "l" (substring expr (- (length expr) 1)
-						     (length expr)))))
-		    "long"))
-	       ;;If it's a floating point return float
-	       ((floatp expr)
-		"double")
-	       ;;If it's 000F or 1234f return float
-	       ((if (and (floatp (substring expr 0 (- (length expr) 1)))
-			 (or (string= "F" (substring expr (- (length expr) 1)
-						     (length expr)))
-			     (string= "f" (substring expr (- (length expr) 1)
-						     (length expr)))))
-		    "float"))
-	       ((string-match "false\\|true" expr)
-		"boolean")
-	       ;;Checking if it's a character
-	       ((string= "'" (substring expr 0 1))
-		"char")
+	       ((jdee--parse-integer-p expr) "int")
+	       ((jdee--parse-long-p expr) "long")
+	       ((jdee--parse-double-p expr) "double")
+	       ((jdee--parse-float-p expr) "float")
+	       ((jdee--parse-boolean-p expr) "boolean")
+	       ((jdee--parse-char-p expr) "char")
+	       ((jdee--parse-string-p expr) "java.lang.String")
 	       ;; If it's "this", we return the class name of the class we code in
 	       ((and class-at-point (string= "this" expr))
 		(jdee-parse-get-qualified-name class-at-point t))
@@ -1379,10 +1470,10 @@ Java type name, e.g., int."
                     (let (work)
                       (setq type
                             (cond
-                             ;; handle primitive types, e.g., int
+				  ;; handle primitive types, e.g., int
                              ((member result jdee-parse-primitive-types)
                               result)
-                             ;; quickly make sure fully qualified name
+			     ;; quickly make sure fully qualified name
                              ;;doesn't exist
                              ((and result-qualifier
                                    (jdee-parse-class-exists
@@ -1395,10 +1486,10 @@ Java type name, e.g., int."
                                     (jdee-parse-get-inner-class-name
                                      result result-qualifier))
                               work)
-                             ;; otherwise use unqualified class name
+			       ;; otherwise use unqualified class name
                              (t
                               (jdee-parse-get-qualified-name result
-                                                             t)))))
+								    t)))))
 
                     (if type
                         (progn
@@ -1482,12 +1573,7 @@ Java type name, e.g., int."
 
 (defun jdee-parse-get-component-type-of-array-class (name)
   (if (string= "[" (substring name 0 1))
-      (let (result)
-	(setq result
-	      (jdee-jeval
-	       (concat "System.out.println( Class.forName(\""
-		       name
-		       "\").getComponentType().getName()) ;"))) ;;removed \n
+      (let ((result (jdee-backend-get-component-type-name name)))
 	(substring result 0 (- (length result) 1)))
     name))
 
@@ -1585,7 +1671,7 @@ try importing the class"
 	(while (string-match "\\\\" name)
 	  (setq name (replace-match "" nil nil name)))
 
-	(jdee-jeval-r (concat "jde.util.JdeUtilities.classExists(\"" name "\");")))))
+        (jdee-backend-class-exists-p name))))
 
 (defun jdee-parse-get-inner-class (expr)
   "Takes a single argument like B.A and split it up in a name

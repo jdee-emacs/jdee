@@ -1,5 +1,4 @@
 ;;; jdee-parse-expr.el -- Beanshell JDEE integration.
-;; $Id: jde.el 127 2009-08-12 08:22:57Z paullandes $
 
 ;; Author: Paul Landes <landes <at> mailc dot net>
 ;; Maintainer: Paul Landes
@@ -23,10 +22,6 @@
 ;; Boston, MA 02111-1307, USA.
 
 ;;; Commentary:
-
-;; This library has beanshell specific functionality.  Most of it was taken
-;; from jde.el and placed here in an attempt to make jde.el a little skinner
-;; and make a home for beanshell specific code.
 
 ;;; Code:
 
@@ -242,7 +237,7 @@ setter, otherwise, make a getter."
 (eval-after-load
     "jdee"
   '(progn
-     ;; wait until jdee-mode-map is defined in jde.el
+     ;; wait until jdee-mode-map is defined in jdee.el
 
      ;; clobbers `kill-word'
      (define-key jdee-mode-map "\M-d" 'jdee-kill-camel-tok)
@@ -251,4 +246,4 @@ setter, otherwise, make a getter."
 
 (provide 'jdee-parse-expr)
 
-;; End of jdee-parse-expr.el
+;;; jdee-parse-expr.el ends here

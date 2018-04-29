@@ -6,7 +6,7 @@
 (require 'jdee-complete)
 (load-file
  (expand-file-name "jdee-test-with-buffer.el"
-                   (file-name-directory (buffer-file-name))))
+                   (file-name-directory (or load-file-name (buffer-file-name)))))
 
 (ert-deftest jdee-complete-on-newline ()
   "Test that `jdee-complete' works when there is a newline between the previous text and the point."

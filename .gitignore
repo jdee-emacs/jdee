@@ -8,11 +8,19 @@ dist
 elpa
 build.properties
 build
+*.info
+/doc/jdee
 
-# Backup files
+#EMACS
 *~
+TAGS
 
-# Vagrant
-.vagrant
-.lein-repl-history
-
+# texinfo
+*.aux
+*.cp
+*.cps
+*.log
+*.pdf
+*.toc
+*.fn
+*.fns

@@ -24,17 +24,15 @@
 
 ;;; Commentary:
 
+;;; Code:
+
 (require 'cl-lib)
 (require 'eieio)
+(require 'jdee-classpath)
+(require 'jdee-files)
+(require 'jdee-jdk-manager)
 (require 'jdee-open-source);; jdee-find-class-source-file
-
-;; FIXME: refactor
-(defvar jdee-global-classpath);; jde
-(declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
-(declare-function jdee-normalize-path "jdee" (path &optional symbol))
-(declare-function jdee-java-version "jdee" ())
-(declare-function jdee-get-jdk-prog "jdee" (progname))
-(declare-function jdee-get-global-class "jdee" ())
+(require 'jdee-parse)
 
 (defcustom jdee-run-mode-hook nil
   "*List of hook functions run by `jdee-run-mode' (see `run-hooks')."
@@ -1141,6 +1139,39 @@ to a debugger."
 
   (oset this :version "1.6"))
 
+(defclass jdee-run-vm-1-7 (jdee-run-vm-1-6) ()
+  "Represents the JDK 1.7.x vm")
+
+(defmethod initialize-instance ((this jdee-run-vm-1-7) &rest fields)
+  "Constructor for the class representing the JDK 1.7 vm."
+
+  ;; Call parent initializer.
+  (call-next-method)
+
+  (oset this :version "1.7"))
+
+(defclass jdee-run-vm-1-8 (jdee-run-vm-1-7) ()
+  "Represents the JDK 1.8.x vm")
+
+(defmethod initialize-instance ((this jdee-run-vm-1-8) &rest fields)
+  "Constructor for the class representing the JDK 1.8 vm."
+
+  ;; Call parent initializer.
+  (call-next-method)
+
+  (oset this :version "1.8"))
+
+(defclass jdee-run-vm-1-9 (jdee-run-vm-1-8) ()
+  "Represents the JDK 1.9.x vm")
+
+(defmethod initialize-instance ((this jdee-run-vm-1-9) &rest fields)
+  "Constructor for the class representing the JDK 1.9 vm."
+
+  ;; Call parent initializer.
+  (call-next-method)
+
+  (oset this :version "1.9"))
+
 
 
 (defvar jdee-run-virtual-machines
@@ -1150,7 +1181,10 @@ to a debugger."
    (jdee-run-vm-1-3 "JDK 1.3 vm")
    (jdee-run-vm-1-4 "JDK 1.4 vm")
    (jdee-run-vm-1-5 "JDK 1.5 vm")
-   (jdee-run-vm-1-6 "JDK 1.6 vm"))
+   (jdee-run-vm-1-6 "JDK 1.6 vm")
+   (jdee-run-vm-1-7 "JDK 1.7 vm")
+   (jdee-run-vm-1-8 "JDK 1.8 vm")
+   (jdee-run-vm-1-9 "JDK 1.9 vm"))
   "*List of supported virtual machines.")
 
 (defun jdee-run-get-vm ()
@@ -1207,16 +1241,16 @@ interact with the program."
 		 (or jdee-run-read-app-args
 		     (not (= prefix 1))))
 		(read-main-class
-		  (= prefix -1)))
+                 (= prefix -1)))
 	    (oset
 	     vm
 	     :main-class
 	     (if read-main-class
 		 (read-from-minibuffer
 		  "Main class: "
-		  (concat (jdee-db-get-package)
-		      (file-name-sans-extension
-		       (file-name-nondirectory (buffer-file-name)))))
+		  (concat (jdee-parse-get-package)
+                          (file-name-sans-extension
+                           (file-name-nondirectory (buffer-file-name)))))
 	       (jdee-run-get-main-class)))
 	    (let ((jdee-run-read-app-args read-app-args))
 	      (jdee-run-vm-launch vm)))
@@ -1229,12 +1263,12 @@ source buffer belongs."
   (let ((main-class
 	 (if jdee-run-option-jar
 	     (jdee-normalize-path 'jdee-run-application-class)
-	 jdee-run-application-class)))
+           jdee-run-application-class)))
     (if (or
 	 (not main-class)
 	 (string= main-class ""))
 	(setq main-class
-	      (concat (jdee-db-get-package)
+	      (concat (jdee-parse-get-package)
 		      (file-name-sans-extension
 		       (file-name-nondirectory (buffer-file-name))))))
     main-class))

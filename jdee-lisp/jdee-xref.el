@@ -1,5 +1,4 @@
 ;; jdee-xref.el --- Class cross-reference commands for the JDEE.
-;; $Id$
 ;;
 ;; Copyright (C) 2002, 2003 Andrew Hyatt
 ;; Copyright (C) 2009 by Paul Landes
@@ -65,22 +64,23 @@
 ;; subclass (when the user asks about calls to the subclass).
 ;;
 ;; There is also a global table across all packages, which is a
-;; map of which classes are subclasses of which other classes. This
+;; map of which classes are subclasses of which other classes.  This
 ;; makes it possible to investigate a class's subclasses when looking
 ;; for references.
-;;
+
+;;; Code:
 
 (require 'cl-lib)
 (require 'etags) ; find-tag-marker-ring
 (require 'jdee-class)
+(require 'jdee-classpath)
+(require 'jdee-files)
 (require 'jdee-parse)
-(require 'jdee-parse-class)
+(require 'jdee-project-file)
+(require 'jdee-bytecode)
 (require 'tree-widget)
 
-;; FIXME: refactor
-(declare-function jdee-normalize-path "jdee" (path &optional symbol))
-(declare-function jdee-expand-wildcards-and-normalize "jdee" (path &optional symbol))
-(declare-function jdee-get-jdk-prog "jdee" (progname))
+(declare-function jdee-get-jdk-prog "jdee-jdk-manager" (progname))
 
 (defconst jdee-xref-version "1.5")
 
@@ -321,11 +321,11 @@ circumstance we just create tiny hashes to conserve memory."
 					    (list value))) hash))
 
 (defun jdee-xref-add-class-info-to-db (info package-data subclasses)
-  (message (concat "Parsing class " (jdee-parse-class-extract-classname info)))
+  (message (concat "Parsing class " (jdee-bytecode-extract-classname info)))
   (add-to-list 'jdee-xref-parsed-classes
-	       (jdee-parse-class-extract-classname info))
+	       (jdee-bytecode-extract-classname info))
   (let ((package (jdee-parse-get-package-from-name
-		  (jdee-parse-class-extract-classname info))))
+		  (jdee-bytecode-extract-classname info))))
     ;; If there is no existing package data
     (unless (gethash package package-data)
       (puthash package
@@ -336,29 +336,29 @@ circumstance we just create tiny hashes to conserve memory."
     (destructuring-bind (caller-hash interface-hash
 				     method-and-field-hash superclass-hash)
 	(gethash package package-data)
-      (puthash (jdee-parse-class-extract-classname info)
-	       (jdee-parse-class-extract-interfaces info)
+      (puthash (jdee-bytecode-extract-classname info)
+	       (jdee-bytecode-extract-interfaces info)
 	       interface-hash)
-      (puthash (jdee-parse-class-extract-classname info)
-	       (append (jdee-parse-class-extract-method-signatures info)
-		       (jdee-parse-class-extract-field-signatures info))
+      (puthash (jdee-bytecode-extract-classname info)
+	       (append (jdee-bytecode-extract-method-signatures info)
+		       (jdee-bytecode-extract-field-signatures info))
 	       method-and-field-hash)
-      (puthash (jdee-parse-class-extract-classname info)
-	       (jdee-parse-class-extract-superclass info)
+      (puthash (jdee-bytecode-extract-classname info)
+	       (jdee-bytecode-extract-superclass info)
 	       superclass-hash)
       (jdee-xref-append-hash
-       (jdee-parse-class-extract-superclass info)
-       (jdee-parse-class-extract-classname info) subclasses)
+       (jdee-bytecode-extract-superclass info)
+       (jdee-bytecode-extract-classname info) subclasses)
       (dolist (call (nreverse
-		     (jdee-parse-class-extract-method-calls info)))
+		     (jdee-bytecode-extract-method-calls info)))
 	(let ((calls (car call))
 	      (called (cadr call)))
 	  (if (or (not jdee-xref-store-prefixes)
 		  (and
 		   (jdee-xref-substring-member (car calls)
-					      jdee-xref-store-prefixes)
+                                               jdee-xref-store-prefixes)
 		   (jdee-xref-substring-member (car called)
-					      jdee-xref-store-prefixes)))
+                                               jdee-xref-store-prefixes)))
 	      (let* ((dqcalled (list (car called)
 				     (nth 1 called)
 				     (when (nth 2 called)
@@ -758,4 +758,4 @@ call list of all files modified in emacs"
 
 (provide 'jdee-xref)
 
-;; End of jdee-xref.el
+;;; jdee-xref.el ends here

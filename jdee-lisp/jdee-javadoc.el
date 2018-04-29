@@ -1,4 +1,4 @@
-;;; jdee-javadoc.el --- JDE javadoc autodoc
+;;; jdee-javadoc.el --- JDEE javadoc autodoc
 
 ;; Author: David Ponce <david@dponce.com>
 ;; Maintainer: David Ponce
@@ -34,8 +34,10 @@
 ;;; Code:
 
 (require 'semantic/java)
+(require 'jdee-backend)
 (require 'jdee-javadoc-gen)
 (require 'jdee-parse)
+(require 'jdee-project-file)
 (require 'regexp-opt)
 (require 'tempo)
 
@@ -70,14 +72,11 @@
 
 	(put 'working-status-forms 'lisp-indent-function 2))))
 
-;; FIXME: refactor
-(declare-function jdee-jeval-r "jdee-bsh" (java-statement))
-
 ;;;; Customization
 ;;;; -------------
 
 (defgroup jdee-javadoc nil
-  "JDE javadoc utilities"
+  "JDEE javadoc utilities"
   :group 'jdee
   :prefix "jdee-javadoc-")
 
@@ -368,10 +367,8 @@ are issued for (maybe) undeclared exceptions."
 That is if TYPE inherits from java.lang.RuntimeException or if Java
 reflection failed to process TYPE."
   (condition-case nil
-      (jdee-jeval-r
-       (format "jde.util.Completion.isAncestorOf(%S,%S);"
-	       "java.lang.RuntimeException"
-	       (jdee-parse-get-qualified-name type)))
+      (jdee-backend-is-ancestor-of "java.lang.RuntimeException"
+                                   (jdee-parse-get-qualified-name type))
     (error t)))
 
 ;;;; Text helpers

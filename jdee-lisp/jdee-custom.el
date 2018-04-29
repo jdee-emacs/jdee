@@ -1,5 +1,4 @@
-;;; jdee-custom.el -- Integrated Development Environment for Java.
-;; $Id$
+;;; jdee-custom.el -- JDEE customizer
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Keywords: java, tools
@@ -23,10 +22,6 @@
 ;; Boston, MA 02111-1307, USA.
 
 ;;; Commentary:
-
-;; This is one of a set of packages that make up the
-;; Java Development Environment (JDE) for Emacs. See the
-;; JDE User's Guide for more information.
 
 ;;; Code:
 
@@ -160,4 +155,4 @@ for JDEE variables in group customization buffers."
 
 (provide 'jdee-custom)
 
-;; End of jdee-custom.el
+;;; jdee-custom.el ends here

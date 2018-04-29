@@ -1,5 +1,4 @@
 ;; jdee-open-source.el -- Open class source files
-;; $Id$
 ;;
 ;; Author: Klaus Berndl
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -16,24 +15,21 @@
 ;;
 ;;; Commentary:
 
-;; This is one of a set of packages that make up the
-;; Java Development Environment (JDE) for Emacs. See the
-;; JDE User's Guide for more information.
-
 ;; This package allows to open the class at point.
+
+;;; Code:
 
 (require 'cl-lib)
 (require 'etags);; find-tag-marker-ring
+(require 'efc)
+(require 'jdee-backend)
+(require 'jdee-classpath)
+(require 'jdee-files)
 (require 'jdee-complete);; jdee-complete-private
 (require 'jdee-import);; jdee-import-get-import
 (require 'jdee-parse)
 (require 'jdee-util)
 (require 'semantic/senator)
-
-;; FIXME: refactor
-(declare-function jdee-expand-wildcards-and-normalize "jdee" (path &optional symbol))
-(declare-function jdee-jeval-r "jdee-bsh" (java-statement))
-(defvar jdee-sourcepath)
 
 (defcustom jdee-open-class-at-point-find-file-function 'find-file-other-window
   "Define the function for opening the class at point. See
@@ -241,11 +237,7 @@ not associated with any project."
 	      (or unqual-class
 		  (read-from-minibuffer "Class: " (thing-at-point 'symbol))))
 	     (class-names
-	      ;;expand the names into full names, or a list of names
-	      (jdee-jeval-r
-	       (concat
-		"jde.util.JdeUtilities.getQualifiedName(\""
-		unqualified-name "\");"))))
+              (jdee-backend-get-qualified-name unqualified-name)))
 	;;Check return value of QualifiedName
 	(if (or (eq class-names nil)
 		(not (listp class-names)))
@@ -260,10 +252,10 @@ not associated with any project."
 	      ;;then show it
 	      (progn(other-window 1)
 		    (jdee-find-class-source (car class-names)))
-		  ;;else let the user choose
+            ;;else let the user choose
 	    (let ((class (efc-query-options class-names "Which class?")))
-		  (if class
-		      (jdee-find-class-source class))))
+              (if class
+                  (jdee-find-class-source class))))
 	  (setq jdee-project-context-switching-enabled-p old-value)))
     (error
      (message "%s" (error-message-string err)))))
@@ -302,6 +294,93 @@ you to select one of the interfaces to show."
 	    (if interface
 		(jdee-show-class-source interface)))))))
 
+(defvar jdee-open-source-archive nil
+  "Will be set to the name of the archive (jar, zip, etc) that is
+  the real source of a buffer.  See `jdee-open-source-resource'
+  and `jdee-find-class-source-file'.")
+
+(defvar jdee-open-source-resource nil
+  "Will be set to the resource path within
+  `jdee-open-source-archive' that is the real source of the
+  buffer.")
+
+
+;; (defun jdee-open-source-find-file (marker filename directory &rest formats)
+;;   "See if there is a buffer matching FILENAME that was opened via
+;; `jdee-find-class-source-file'.  Return that buffer or nil.
+
+;; This function is designed as :before-until advice for
+;; `compilation-find-file'.
+;; "
+;;   ;; FIXME: If the FILENAME looks like <path to archive>:<path to source>,
+;;   ;; try and open it
+
+;;   (let ((buffer (get-file-buffer filename)))
+;;     (when (and buffer
+;;                (with-current-buffer buffer
+;;                  jdee-open-source-archive))
+;;       buffer)))
+
+
+;;
+;; Add support for finding files in archives.
+;;
+;;(advice-add 'compilation-find-file :before-until  #'jdee-open-source-find-file)
+
+
+(defadvice compilation-find-file (around jdee-open-source-find-file activate)
+  "See if there is a buffer matching FILENAME that was opened via
+`jdee-find-class-source-file'.  Return that buffer or nil.
+
+This function is designed as :before-until advice for
+`compilation-find-file'.
+"
+  ;; FIXME: If the FILENAME looks like <path to archive>:<path to source>,
+  ;; try and open it
+
+  (let ((buffer (get-file-buffer filename)))
+    (if (and buffer (with-current-buffer buffer jdee-open-source-archive))
+        buffer
+      ad-do-it)))
+
+
+;; (defun jdee-open-source-find-file-of-fqn (fn marker filename directory &rest formats)
+;;   "Check if FILENAME matches an FQN and load it.  Return that buffer or pass onto FN.
+
+;; This function is designed as :around advice for
+;; `compilation-find-file'.
+;; "
+
+;;   (if (string-match (format "^%s$" (jdee-parse-java-fqn-re)) filename)
+;;       (let ((path (jdee-find-class-source-file filename)))
+;;         (cond
+;;          ((bufferp path) path)
+;;          ((stringp path) (apply fn marker path directory formats))
+;;          (t (apply fn marker filename directory formats))))
+;;     (apply fn marker filename directory formats)))
+
+
+;;(advice-add 'compilation-find-file :around  #'jdee-open-source-find-file-of-fqn)
+
+(defadvice compilation-find-file (around jdee-open-source-find-file-of-fqn activate)
+  "Check if FILENAME matches an FQN and load it.  Return that buffer or pass onto FN.
+
+ This function is designed as :around advice for
+ `compilation-find-file'."
+  
+  (if (string-match (format "^%s$" (jdee-parse-java-fqn-re)) filename)
+      (let ((path (jdee-find-class-source-file filename)))
+        (cond
+         ((bufferp path) path)
+         ((stringp path)
+          (progn
+            (ad-set-arg 1 path)
+            ad-do-it))
+         (t ad-do-it)))
+    ad-do-it))
+
+
+  
 (defun jdee-find-class-source-file (class)
   "Find the source file for a specified class.
 CLASS is the fully qualified name of the class. This function searchs
@@ -310,7 +389,12 @@ specified by `jdee-sourcepath' for the source file corresponding to
 CLASS. If it finds the source file in a directory, it returns the
 file's path. If it finds the source file in an archive, it returns a
 buffer containing the contents of the file. If this function does not
-find the source for the class, it returns nil."
+find the source for the class, it returns nil.
+
+If CLASS is found in an archive, set both
+`jdee-open-source-archive' and `jdee-open-source-resource' buffer
+local.
+"
   (let* ((outer-class (car (split-string class "[$]")))
          (file (concat
 		(jdee-parse-get-unqualified-name outer-class)
@@ -337,11 +421,14 @@ find the source for the class, it returns nil."
 			    (if (and (numberp exit-status) (= exit-status 0))
 				(progn
 				  (jdee-mode)
+                                  (set (make-local-variable 'jdee-open-source-archive) path)
+                                  (set (make-local-variable 'jdee-open-source-resource) class-file-name)
+
 				  (goto-char (point-min))
 				  (setq buffer-undo-list nil)
 				  (setq buffer-saved-size (buffer-size))
 				  (set-buffer-modified-p nil)
-				  (setq buffer-read-only t)
+                          	  (setq buffer-read-only t)
 				  (throw 'found buffer))
 			      (progn
 				(set-buffer-modified-p nil)
@@ -405,8 +492,8 @@ qualified classes).")
 
 ;;;###autoload
 (defun jdee-read-class (&optional prompt fq-prompt
-				 this-class-p confirm-fq-p no-confirm-nfq-p
-				 validate-fn)
+                                  this-class-p confirm-fq-p no-confirm-nfq-p
+                                  validate-fn)
   "Select a class interactively.  PROMPT is used to prompt the user for the
 first class name, FQ-PROMPT is used only if the class name expands into more
 than one fully qualified name.
@@ -470,13 +557,9 @@ When called interactively, select the class and copy it to the kill ring."
       (setq fqc (first ctup)
 	    uq-name (third ctup))
       (if fqc
-	  (if (not (jdee-jeval-r (concat "jde.util.JdeUtilities."
-					"classExists(\""
-					fqc "\");")))
+	  (if (not (jdee-backend-class-exists-p fqc))
 	      (error "No match for %s" uq-name))
-	(setq classes (jdee-jeval-r (concat "jde.util.JdeUtilities."
-					   "getQualifiedName(\""
-					   uq-name "\");")))
+	(setq classes (jdee-backend-get-qualified-name uq-name))
 	(if (= 0 (length classes))
 	    (error "Not match for %s" uq-name))
 	(setq fqc (jdee-choose-class classes fq-prompt uq-name confirm-fq-p))))
@@ -496,7 +579,7 @@ If it finds the source file, it opens the file in a buffer."
 	(progn
 	  (if (typep source 'buffer)
 	      (switch-to-buffer source)
-	      ;; (pop-to-buffer source other-window)
+            ;; (pop-to-buffer source other-window)
 	    (if (not (string-equal (buffer-file-name)  source))
 		(if other-window
 		    (find-file-other-window source)
@@ -512,6 +595,23 @@ If it finds the source file, it opens the file in a buffer."
       (message "JDE error: Could not find source for \"%s\" in this
 project's source path. See `jdee-sourcepath' for more information." class))))
 
+(defun jdee-browse-class-at-point ()
+  "Displays the class of the object at point in the BeanShell Class
+Browser. Point can be in a variable name, class name, method name, or field name).
+This command has the  same requirements to work as the field/method-completion
+feature in JDEE (see `jdee-complete-at-point')."
+  (interactive)
+  (if (jdee-open-functions-exist)
+      (let* ((thing-of-interest (thing-at-point 'symbol))
+	     (pair (save-excursion (end-of-thing 'symbol)
+				   (jdee-parse-java-variable-at-point)))
+	     (class-to-open (jdee-open-get-class-to-open
+			     pair thing-of-interest)))
+	(if (and class-to-open (stringp class-to-open))
+	    (jdee-backend-explore-class class-to-open)
+          (error "Can not parse the thing at point!")))
+    (message "You need JDEE >= 2.2.6 and Senator for using this feature!")))
+
 (provide 'jdee-open-source)
 
-;; End of jdee-open-source.el
+;;; jdee-open-source.el ends here

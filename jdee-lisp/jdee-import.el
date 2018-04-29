@@ -38,6 +38,7 @@
 
 (require 'cl-lib)
 (require 'efc)
+(require 'jdee-backend)
 (require 'jdee-parse)
 (require 'semantic/fw)
 (require 'semantic/find)
@@ -45,7 +46,6 @@
 
 ;; FIXME: refactor
 (declare-function jdee-choose-class "jdee-open-source" (classes &optional prompt uq-name confirm-fq-p))
-(declare-function jdee-jeval-r "jdee-bsh" (java-statement))
 
 ;;;;
 ;;;; Customization
@@ -186,14 +186,11 @@ the same package as the class in the current buffer."
 	(string= pkg (jdee-parse-get-package-from-name class)))))
 
 (defun jdee-import-get-qualified-names (unqualified-class)
-  "Returns a list containing all qualified name for UNQUALIFIED-CLASS."
-  (jdee-jeval-r
-   (concat
-    "jde.util.JdeUtilities.getQualifiedName(\""
-    unqualified-class "\");")))
+  "Return a list containing all qualified name for UNQUALIFIED-CLASS."
+  (jdee-backend-get-qualified-name unqualified-class))
 
 (defun jdee-import-get-imports ()
-  "Returns a list containing all imported classes."
+  "Return a list containing all imported classes."
   (let* (imports
 	 (tags  (semantic-fetch-tags))
 	 (import-tags (semantic-brute-find-tag-by-class 'include tags)))

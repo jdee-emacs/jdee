@@ -6,7 +6,8 @@
 (require 'jdee-parse)
 (load-file
  (expand-file-name "jdee-test-with-buffer.el"
-                   (file-name-directory (buffer-file-name))))
+                   (file-name-directory (or (buffer-file-name)
+                                            load-file-name))))
 
 (ert-deftest jdee-parse-find-decl-same-name ()
   "Test that `jdee-parse-find-declaration-of' works when the variable and the

@@ -17,25 +17,86 @@ Additional information can be found at http://jdee.sourceforge.net/rootpage.html
 
 ## Requirements
 
-Emacs 24.3 is the oldest version that JDEE can be expected to run in.
+Emacs 24.4 is the oldest version that JDEE can be expected to run in.
 
-JDEE requires [JDEE Server](http://github.com/jdee-emacs/jdee-server) for some operations.
+If you install JDEE through the Emacs package system, it will take
+care of installing the prerequisites for you:
+* flycheck
+* memoize
+* dash
+These packages can be found on ELPA and/or MELPA.
 
-## Install from distribution
+JDEE also requires [JDEE Server](http://github.com/jdee-emacs/jdee-server) for some operations.
 
-The project is available in MELPA.
+## Installing with the Emacs package system
 
-For more information, see ```doc/install.html```
+The project is available in MELPA. To install it do the following:
+1. Add MELPA to your `.emacs` or `init.el` if you don't have it:
+```emacs-lisp
+;;; Add this at the top of the init.el file:
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/"))
+(when (< emacs-major-version 24)
+  ;; For important compatibility libraries like cl-lib
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+(package-initialize)
+```
+2. Install JDEE from Emacs using its package manager:
+```
+M-x list-packages
+```
+There select JDEE and install: i x
 
-## Build from source options
+3. Install [JDEE Server](http://github.com/jdee-emacs/jdee-server) from github
 
-1. Run tests: ```make test```
+Follow short readme at [JDEE Server](http://github.com/jdee-emacs/jdee-server).
+
+4. Customize `jdee-server-dir` to make it point to directory with JDEE Server jars.
+
+_Warning!_ Don't install JDEE Server inside JDEE installed from MELPA (`~/.emacs.d/elpa/jdee-xxx`), because it will be deleted with next update of JDEE! Create a separate directory, for example: `~/.emacs.d/jdee-server`.
+
+Customized `jdee-server-dir` in your init file should look something like:
+```emacs-lisp
+(custom-set-variables
+ '(jdee-server-dir "/Users/you/.emacs.d/jdee-server"))
+```
+
+For additional information, see the [old installation instructions](http://htmlpreview.github.com/?https://github.com/peterwvj/jdee/blob/master/doc/flat/install.html).
+
+## Installing from source (for JDEE devs only)
+
+1. Clone [the github repository](https://github.com/jdee-emacs/jdee/).
+2. Open the cloned JDEE directory in dired.
+3. Being in dired, install using command: ```package-install-from-buffer```
+
+For development you will need to install Cask:
+
+1. Install [Cask](http://cask.readthedocs.io/en/latest/index.html).
+
+2. Run ```cask install``` from the JDEE directory (make sure that the
+   ```cask``` command is in your PATH).
+
+3. Run the tests: ```make test```
 
 To use this built distribution without installation, in your .emacs add:
+
 ```emacs-lisp
   (add-to-list 'load-path "/path/to/jdee")
   (require 'jdee)
 ```
+
+## Building the documentation in other formats
+JDEE ships with documentation in Info format, but if you want you can generate the docs in other formats too.
+
+To generate Info, HTML and PDF documentation:
+
+- Install texinfo.
+
+- For PDF generation, you also need texi2dvi, texinfo-tex, texlive-ec
+  and texlive-cm-super.
+
+- In the doc/ subdirectory, run: ```makeinfo --info --html --pdf jdee.texi```
 
 ## Features
 
@@ -58,18 +119,19 @@ Some of the features of JDEE include:
 - runs on any platform supported by GNU Emacs 24.3 and later
 - easily and infinitely customizable
 
-### Known Issues
+### [Known Issues](https://github.com/jdee-emacs/jdee/issues)
 
 - Static imports don't quite work
 - Limited support for Java template beyond basic highlighting, parsing, and
   indenting.
 - Indentation after multi-line annotations might be unexpected
-- It's a little crufty after all these years - patches welcome :-)
 
 ### Troubleshooting
 
-- If you notice a bug, open an issue on Github on the
-  [JDEE repository](https://github.com/jdee-emacs/jdee)
+- If you notice a bug, open an issue on Github
+  [Issues](https://github.com/jdee-emacs/jdee/issues)
+
+*Always include JDEE and Emacs versions when reporting issues. Thanks!*
 
 ## Community
 
@@ -79,5 +141,7 @@ Some of the features of JDEE include:
 ## Authors
 
 - Paul Kinnucan (original author and contributor)
-- Paul Landes (current maintainer)
-- Shyamal Prasad (current maintainer)
+- Przemysław Wojnowski (primary maintainer/owner)
+- Paul Landes (maintainer)
+- Shyamal Prasad (maintainer)
+- Phil Lord (maintainer)

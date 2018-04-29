@@ -1,5 +1,4 @@
-;;; jdee-make.el -- Integrated Development Environment for Java.
-;; $Id$
+;;; jdee-make.el -- make support for JDEE
 
 ;; Author: Paul Kinnucan <pkinnucan@attbi.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -23,15 +22,17 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
+;;; Commentary:
+
+;;; Code:
+
 (require 'cl-lib)
 (require 'compile)
-
-;; FIXME: refactor
-(declare-function jdee-root-dir-p "jdee" (dir))
-(declare-function jdee-normalize-path "jdee" (path &optional symbol))
+(require 'jdee-files)
+(require 'jdee-project-file)
 
 (defgroup jdee-make nil
-  "JDE Make Interface"
+  "JDEE Make Interface"
   :group 'jdee
   :prefix "jdee-make-")
 
@@ -166,7 +167,7 @@ enter to the make program along with the arguments specified by
 
 ;;;###autoload
 (defun jdee-make-show-options ()
-  "Show the JDE Make Options panel."
+  "Show the JDEE Make Options panel."
   (interactive)
   (customize-apropos "jdee-make" 'groups))
 
@@ -176,4 +177,4 @@ enter to the make program along with the arguments specified by
 
 (provide 'jdee-make)
 
-;; End of jdee-make.el
+;;; jdee-make.el ends here

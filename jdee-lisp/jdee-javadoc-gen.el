@@ -1,5 +1,4 @@
 ;;; jdee-javadoc-gen.el -- Javadoc builder
-;; $Id$
 
 ;; Author: Sergey A Klibanov <sakliban@cs.wustl.edu>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>, Sergey A Klibanov
@@ -30,18 +29,15 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'efc)
+(require 'jdee-classpath)
 (require 'jdee-compile)
+(require 'jdee-files)
 (require 'jdee-help)
 
 ;; FIXME: refactor
-(defvar jdee-global-classpath)
-(defvar jdee-sourcepath)
-(declare-function jdee-expand-wildcards-and-normalize "jdee" (path &optional symbol))
-(declare-function jdee-normalize-path "jdee" (path &optional symbol))
-(declare-function jdee-cygpath "jdee" (path &optional direction))
-(declare-function jdee-get-jdk-dir "jdee" ())
-(declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
-(declare-function jdee-get-global-classpath "jdee" ())
+(declare-function jdee-cygpath "jdee-cygwin" (path &optional direction))
+(declare-function jdee-get-jdk-dir "jdee-jdk-manager" ())
 
 (defgroup jdee-javadoc nil
   "Javadoc template generator"
@@ -633,4 +629,4 @@ browser."
 
 (provide 'jdee-javadoc-gen)
 
-;;; End of jdee-javadoc-gen.el
+;;; jdee-javadoc-gen.el ends here

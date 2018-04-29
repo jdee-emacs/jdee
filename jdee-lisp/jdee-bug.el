@@ -1,5 +1,4 @@
 ;;; jdee-bug.el -- JDEbug Interface
-;; $Id$
 
 ;; Author: Paul Kinnucan <paulk@mathworks.com>
 ;; Maintainer: Paul Landes <landes <at> mailc dt net>
@@ -25,13 +24,10 @@
 
 ;;; Commentary:
 
-;; This is one of a set of packages that make up the
-;; Java Development Environment (JDE) for Emacs. See the
-;; JDE User's Guide for more information.
-
 ;;; Code:
 
 (require 'cl-lib)
+(require 'jdee-files)
 (require 'jdee-parse)
 (require 'jdee-dbs)
 (require 'jdee-dbo)
@@ -46,16 +42,14 @@
 (declare-function jdee-find-jdee-doc-directory "jdee" ())
 (declare-function jdee-java-major-version "jdee" ())
 (declare-function jdee-java-minor-version "jdee" ())
-(declare-function jdee-normalize-path "jdee" (path &optional symbol))
 
 (defgroup jdee-bug nil
   "JDEbug General Options"
   :group 'jdee
   :prefix "jdee-bug")
 
-
 (defcustom jdee-bug-debug nil
-"*IMPORTANT!!!! Leave this switch in its default state (off) unless
+  "*IMPORTANT!!!! Leave this switch in its default state (off) unless
 you need to modify the *JDEbug* Java source code. Setting this switch
 on causes the JDE to load *JDEbug* from its java/classes directory
 instead of from jde.jar. It also causes the JDE to run the debugger in

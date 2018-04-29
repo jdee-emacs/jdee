@@ -1,5 +1,4 @@
 ;;; jdee-bsh.el -- Beanshell JDEE integration.
-;; $Id: jde.el 127 2009-08-12 08:22:57Z paullandes $
 
 ;; Author: Paul Kinnucan <pkinnucan@attbi.com>
 ;; Maintainer: Paul Landes
@@ -25,15 +24,14 @@
 
 ;;; Commentary:
 
-;; This library has beanshell specific functionality.  Most of it was taken
-;; from jde.el and placed here in an attempt to make jde.el a little skinner
-;; and make a home for beanshell specific code.
+;; This library has beanshell specific functionality.
 
 ;;; Code:
 
 (require 'cl-lib)
 (require 'compile)
 (require 'eieio)
+(require 'jdee-classpath)
 (require 'beanshell)
 (require 'jdee-parse-expr)
 (require 'jdee-util)
@@ -44,15 +42,12 @@
   '(require 'cl))
 
 ;; FIXME: refactor to eliminate these
-(defvar jdee-devel-debug);; jde.el
 (defvar jdee-current-project);; jdee-project-file.el
 (declare-function jdee-get-project "jdee-project-file" (symbol project));;
 (declare-function jdee-run-get-vm "jdee-run" ())
-(declare-function jdee-build-classpath "jdee" (paths &optional symbol quote-path-p))
-(declare-function jdee-get-tools-jar "jdee" ())
-(declare-function jdee-expand-classpath "jdee" (classpath &optional symbol))
-(declare-function jdee-get-global-classpath "jdee" ())
-(declare-function jdee-create-prj-values-str "jdee" ())
+(declare-function jdee-get-tools-jar "jdee-jdk-manager" ())
+;; FIXME: remove this ugly dep:
+(declare-function jdee-backend-create-prj-values-str "jdee-backend" ())
 
 ;; Avoid recursive requires, where a plugin might require this file
 (autoload 'jdee-pi-get-bsh-classpath "jdee-plugins")
@@ -67,6 +62,13 @@
 See https://github.com/jdee-emacs/jdee-server"
   :group 'jdee
   :type 'directory)
+
+(defcustom jdee-devel-debug nil
+  "If true, use the JDEE Java classes in the jde/java/classes
+directory instead of the jde.jar. This variable is intended for
+use in testing the JDEE's java classes."
+  :group 'jdee-project
+  :type 'boolean)
 
 (defclass jdee-bsh-buffer (bsh-comint-buffer) ()
   "JDEE's beanshell buffer")
@@ -209,7 +211,7 @@ prints out, Emacs has nothing to evaluate or report."
     (let ((the-bsh (oref-default 'jdee-bsh the-bsh)))
       (when (not (bsh-running-p the-bsh))
 	(bsh-launch the-bsh)
-	(bsh-eval the-bsh (jdee-create-prj-values-str)))
+	(bsh-eval the-bsh (jdee-backend-create-prj-values-str)))
       (when (not no-print-p)
 	(if (string= (substring java-statement -1) ";")
 	    (setq java-statement (substring java-statement 0 -1)))
@@ -305,8 +307,8 @@ a file in the current directory:
       (if (not (jdee-bsh-running-p))
 	  (progn
 	    (bsh-launch (oref-default 'jdee-bsh the-bsh))
-	    (bsh-eval (oref-default 'jdee-bsh the-bsh) (jdee-create-prj-values-str))))
-
+	    (bsh-eval (oref-default 'jdee-bsh the-bsh)
+                      (jdee-backend-create-prj-values-str))))
 
       (bsh-buffer-eval
        (oref-default 'jdee-bsh the-bsh)
@@ -318,13 +320,11 @@ a file in the current directory:
 
 ;;;###autoload
 (defun jdee-bsh-run()
-  "*Starts the JDEE version of the BeanShell."
-  (interactive)
+  "Starts the JDEE version of the BeanShell."
   (bsh-launch (oref-default 'jdee-bsh the-bsh) t))
 
 (defun jdee-bsh-exit ()
-  "Closes the existing beanshell process"
-  (interactive)
+  "Closes the existing beanshell process."
   (if (jdee-bsh-running-p)
       (let ((process (bsh-get-process (oref-default 'jdee-bsh the-bsh))))
 	(if (and

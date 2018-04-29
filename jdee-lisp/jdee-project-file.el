@@ -27,11 +27,11 @@
 ;;; Code:
 
 (require 'cl-lib)
-
-;; FIXME: refactor
-(declare-function jdee-wiz-set-bsh-project "jdee-wiz" ())
-(declare-function jdee-root-dir-p "jdee" (dir))
-(declare-function jdee-log-msg "jdee" (msg &rest args))
+(require 'jdee-backend)
+(require 'jdee-custom)
+(require 'jdee-files)
+(require 'jdee-log)
+(require 'jdee-maven)
 
 (defconst jdee-project-file-version "1.0"
   "*The current JDEE project file version number.")
@@ -64,8 +64,8 @@ temporarily when stepping through code."
 (defcustom jdee-project-file-name "prj.el"
   "*Specify name of JDEE project file.
 When it loads a Java source file, the JDEE looks for a lisp file of
-this name (the default is prj.el in the source file hierarchy. If it
-finds such a file, it loads the file. You can use this file to set the
+this name (the default is prj.el) in the source file hierarchy.  If it
+finds such a file, it loads the file.  You can use this file to set the
 classpath, compile options, and other JDEE options on a
 project-by-project basis."
   :group 'jdee-project
@@ -89,17 +89,18 @@ being loaded.")
 (defvar jdee-current-project ""
   "Path of the project file for the current project.")
 
-(defun jdee-find-project-file (dir)
-  "Finds the next project file upwards in the directory tree
-from DIR. Returns nil if it cannot find a project file in DIR
-or an ascendant directory."
+(defun jdee-find-project-file (dir &optional file-name)
+  "Finds the next project file named FILE-NAME (defaults to
+`jdee-project-file-name') upwards in the directory tree from
+DIR.  Returns nil if it cannot find a project file in DIR or an
+ascendant directory."
   (let* ((directory-sep-char ?/) ;; Override NT/XEmacs setting
-	 (file (cl-find jdee-project-file-name
+	 (file (cl-find (or file-name jdee-project-file-name)
 			(directory-files dir) :test 'string=)))
     (if file
 	(expand-file-name file dir)
       (if (not (jdee-root-dir-p dir))
-	  (jdee-find-project-file (expand-file-name ".." dir))))))
+	  (jdee-find-project-file (expand-file-name ".." dir) file-name)))))
 
 (defvar jdee-buffer-project-file ""
   "Path of project file associated with the current Java source buffer.")
@@ -207,7 +208,7 @@ Leave point at the location of the call, or after the last expression."
 	   (string-match "^jdee-" (symbol-name symbol)))))
 
 (defvar jdee-symbol-list nil
-  "*A list of jde variables which are processed by `jdee-save-project'.")
+  "*A list of JDEE variables to process by `jdee-save-project'.")
 
 (defun jdee-symbol-list (&optional force-update)
   "Return a list of variables to be processed by `jdee-save-project'.
@@ -481,6 +482,27 @@ have been loaded)."
        'jdee-set-variable-init-value
        jdee-dirty-variables)))
 
+(defun jdee-project-update-class-list()
+  "Update the class list used to resolve class names.
+The first time you invoke a JDEE wizard, the JDEE builds a list of all classes on
+the classpath defined by jdee-global-classpath. Wizards use this list to resolve
+unqualified class names. If you add any classes to the classpath after invoking
+a wizard, you should update the class list."
+  (interactive)
+  (jdee-backend-load-project-class-list))
+
+(defun jdee-project-update-backend()
+  "Update the JVM's concept of the current project and the
+classpath associated with it.  This may cause an update scan of the
+class list the next time a wizard uses the class list for a lookup.
+The scanning only occurs if the project is newly opened or its
+classpath has been changed since the last scan, and switching between
+projects does not necessarily force a rescan as the scan information
+is cached in the beanshell.  You can force a rescan for a project by
+calling `jdee-project-update-class-list'."
+  (interactive)
+  (jdee-backend-load-project-class-list2))
+
 ;; Code to update JDEE customization variables when a user switches
 ;; from a Java source buffer belonging to one project to a buffer
 ;; belonging to another.
@@ -503,7 +525,7 @@ differs from the old buffer's."
 	    (progn
 	      (setq jdee-current-project project-file-path)
 	      (jdee-load-project-file)
-	      (jdee-wiz-set-bsh-project))))
+	      (jdee-project-update-backend))))
     (error (message
 	    "Project file reload error: %s"
 	    (error-message-string err)))))
@@ -518,6 +540,9 @@ defined by the current project's project file."
   (jdee-custom-adjust-groups)
   (jdee-load-project-file))
 
+(when (or (not (boundp 'jdee-maven-disabled-p))
+          (not jdee-maven-disabled-p))
+  (add-hook 'jdee-mode-hook 'jdee-maven-hook))
 
 (provide 'jdee-project-file)
 
