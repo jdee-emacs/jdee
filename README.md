@@ -131,11 +131,6 @@ Some of the features of JDEE include:
 - If you notice a bug, open an issue on Github
   [Issues](https://github.com/jdee-emacs/jdee/issues)
 
-## Mailing lists archives
-
-- The archives of [old mailing list](http://sourceforge.net/p/jdee/mailman/) is hosted by
-  sourceforge. It includes `jdee-announce`, `jdee-users`, and `jdee-devel`.
-
 ## Authors
 
 - Paul Kinnucan (original author and contributor)
