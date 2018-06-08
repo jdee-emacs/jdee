@@ -4031,17 +4031,14 @@ time to enable or disable eelctric return mode."
   :type 'boolean
   :set '(lambda (sym val)
 	  (if (featurep 'jdee)
-	    (let ((curr-project
-		   (with-current-buffer jdee-current-buffer
-		     jdee-current-project)))
-	      (mapc
-	       (lambda (buf)
-		 (with-current-buffer buf
-		   (let ((key (car (read-from-string "[return]"))))
-		       (if val
-			   (define-key (current-local-map) key 'jdee-electric-return)
-			 (local-unset-key key)))))
-	       (jdee-get-project-source-buffers))))
+              (mapc
+               (lambda (buf)
+                 (with-current-buffer buf
+                   (let ((key (car (read-from-string "[return]"))))
+                     (if val
+                         (define-key (current-local-map) key 'jdee-electric-return)
+                       (local-unset-key key)))))
+               (jdee-get-project-source-buffers)))
 	  (setq jdee-electric-return-mode val)
 	  (set-default sym val)))
 
