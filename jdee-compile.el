@@ -1262,6 +1262,26 @@ If t (or other non-nil non-number) then kill in 2 secs."
   ;; Set compiler version.
   (oset this version "1.9"))
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                            ;;
+;; JDK 10.0 Compiler                                                           ;;
+;;                                                                            ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defclass jdee-compile-javac-10-0 (jdee-compile-javac-19)
+  ()
+  "Class of JDK 10.0 javac compilers.")
+
+(defmethod initialize-instance ((this jdee-compile-javac-10-0) &rest fields)
+
+  ;; Call parent initializer.
+  (call-next-method)
+
+  ;; Set compiler version.
+  (oset this version "10.0"))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                            ;;
 ;; Eclipse Compiler                                                             ;;
@@ -1326,15 +1346,16 @@ If t (or other non-nil non-number) then kill in 2 secs."
 
 (defvar jdee-compile-javac-compilers
   (list
-   (jdee-compile-javac-11 "javac 1.1.x")
-   (jdee-compile-javac-12 "javac 1.2.x")
-   (jdee-compile-javac-13 "javac 1.3.x")
-   (jdee-compile-javac-14 "javac 1.4.x")
-   (jdee-compile-javac-15 "javac 1.5.x")
-   (jdee-compile-javac-16 "javac 1.6.x")
-   (jdee-compile-javac-17 "javac 1.7.x")
-   (jdee-compile-javac-18 "javac 1.8.x")
-   (jdee-compile-javac-19 "javac 1.9.x"))
+   (jdee-compile-javac-11)
+   (jdee-compile-javac-12)
+   (jdee-compile-javac-13)
+   (jdee-compile-javac-14)
+   (jdee-compile-javac-15)
+   (jdee-compile-javac-16)
+   (jdee-compile-javac-17)
+   (jdee-compile-javac-18)
+   (jdee-compile-javac-19)
+   (jdee-compile-javac-10-0))
   "List of supported javac compilers.")
 
 ;;; TODO: remove user interaction from here
@@ -1358,9 +1379,9 @@ If t (or other non-nil non-number) then kill in 2 secs."
     (unless compiler
       (let ((latest-javac (car (last jdee-compile-javac-compilers))))
 	(if
-	    (yes-or-no-p
+	    (and t (yes-or-no-p
 	     (format "The JDE does not recognize JDK %s javac. Assume JDK %s javac?"
-		     jdk-version (oref latest-javac :version)))
+		     jdk-version (oref latest-javac :version))))
 	    (setq compiler latest-javac))))
     ;; Initialize the compiler
     (if compiler
