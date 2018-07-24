@@ -212,6 +212,12 @@ file and buffer with the contents of the current buffer and compiles that one."
       (unless jdee-compile-option-directory
         (set (make-local-variable 'jdee-compile-option-directory)
              (expand-file-name "classes" dir)))
+      ;; Use jdee-compile-option-directory dir from orig-buffer if it is set
+      ;; as a local variable. When compiling a test file this dir is normally
+      ;; test-classes, not classes. Runtime classes and test classes have
+      ;; different jdee-compile-option-directory in the same project.
+      (let ((v (buffer-local-value 'jdee-compile-option-directory orig-buffer)))
+        (if v (set 'jdee-compile-option-directory v)))
 
       (setq compilation-finish-functions
             (lambda (buf msg)
