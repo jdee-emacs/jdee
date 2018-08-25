@@ -30,6 +30,7 @@
 
 (require 'flycheck)
 (require 'cl-lib)
+(require 'jdee-files)
 
 (defclass jdee-flycheck-compiler (jdee-compile-compiler)
   ((post-fn         :initarg :post-fn
@@ -199,8 +200,7 @@ file and buffer with the contents of the current buffer and compiles that one."
          (orig-buffer (or buffer (current-buffer)))
          (dir (make-temp-file "JDEE_flycheck_" t))
          (temp-file (expand-file-name name dir)))
-    (with-current-buffer orig-buffer
-      (write-region (point-min) (point-max) temp-file nil :silent))
+    (jdee-files-write-buffer-to-file orig-buffer temp-file)
     (with-current-buffer (generate-new-buffer name)
       (make-local-variable 'jdee-flycheck-temp-files)
       (cl-pushnew dir jdee-flycheck-temp-files)
