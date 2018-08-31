@@ -437,15 +437,16 @@ If CLASS is found in an archive, set both
          (package (jdee-parse-get-package-from-name outer-class)))
     (catch 'found
       (loop for path in (jdee-expand-wildcards-and-normalize jdee-sourcepath 'jdee-sourcepath) do
-            (if (jdee-archive-file-p path)
-                (jdee--open-class-from-archive path)
-              (if (file-exists-p (expand-file-name file path))
-                  (throw 'found (expand-file-name file path))
-                (let* ((pkg-path (subst-char-in-string ?. ?/ package))
-                       (pkg-dir (expand-file-name pkg-path path))
-                       (file-path (expand-file-name file pkg-dir)))
-                  (if (file-exists-p file-path)
-                      (throw 'found file-path)))))))))
+            (let* ((pkg-path (subst-char-in-string ?. ?/ package))
+                   (pkg-dir (expand-file-name pkg-path path))
+                   (file-path (expand-file-name file pkg-dir)))
+              (cond
+               ((jdee-archive-file-p path)
+                (jdee--open-class-from-archive path))
+               ((file-exists-p (expand-file-name file path))
+                (throw 'found (expand-file-name file path)))
+               ((file-exists-p file-path)
+                (throw 'found file-path))))))))
 
 (defcustom jdee-preferred-packages
   '("java.util" "java" "javax")
