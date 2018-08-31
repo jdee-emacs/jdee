@@ -22,6 +22,7 @@
 (require 'cl-lib)
 (require 'etags);; find-tag-marker-ring
 (require 'efc)
+(require 'jdee-archive)
 (require 'jdee-backend)
 (require 'jdee-classpath)
 (require 'jdee-files)
@@ -399,9 +400,7 @@ If CLASS is found in an archive, set both
          (package (jdee-parse-get-package-from-name outer-class)))
     (catch 'found
       (loop for path in (jdee-expand-wildcards-and-normalize jdee-sourcepath 'jdee-sourcepath) do
-            (if (and (file-exists-p path)
-                     (or (string-match "\.jar$" path)
-                         (string-match "\.zip$" path)))
+            (if (jdee-archive-file-p path)
                 (let* ((bufname (concat file " (" (file-name-nondirectory path) ")"))
                        (buffer (get-buffer bufname)))
                   (if buffer

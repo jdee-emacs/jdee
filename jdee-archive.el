@@ -32,6 +32,12 @@
 (require 'jdee-classpath)
 (require 'memoize)
 
+(defun jdee-archive-file-p (filepath)
+  "Return t if the `FILEPATH' is an existing JAR or ZIP file."
+  (and (file-exists-p filepath)
+       (or (string-match "\.jar$" filepath)
+           (string-match "\.zip$" filepath))))
+
 (defun jdee-archive-files-hashtable (coll)
   "Convert the COLL which looks like an `archive-files' vector to
 a hashtable of string to 'indexed."
