@@ -380,6 +380,43 @@ This function is designed as :before-until advice for
          (t ad-do-it)))
     ad-do-it))
 
+(defun jdee--open-source-set-archive-buffer-properties (path class-file-name)
+  (jdee-mode)
+  (set (make-local-variable 'jdee-open-source-archive) path)
+  (set (make-local-variable 'jdee-open-source-resource) class-file-name)
+
+  (goto-char (point-min))
+  (setq buffer-undo-list nil)
+  (setq buffer-saved-size (buffer-size))
+  (set-buffer-modified-p nil)
+  (setq buffer-read-only t))
+
+(defun jdee--open-class-from-archive-into-buffer (path bufname)
+  "Open class source from archive given in `PATH' into buffer `BUFNAME'."
+  (let* ((pkg-path (subst-char-in-string ?. ?/ package))
+         (class-file-name (concat  pkg-path "/" file))
+         success)
+    (setq buffer (get-buffer-create bufname))
+    (with-current-buffer buffer
+      (setq buffer-file-name (expand-file-name (concat path ":" class-file-name)))
+      (setq buffer-file-truename file)
+      (let ((exit-status
+             (archive-extract-by-stdout path class-file-name archive-zip-extract)))
+        (if (and (numberp exit-status) (= exit-status 0))
+            (progn
+              (jdee--open-source-set-archive-buffer-properties path class-file-name)
+              (throw 'found buffer))
+          (progn
+            (set-buffer-modified-p nil)
+            (kill-buffer buffer)))))))
+
+(defun jdee--open-class-from-archive (path)
+  "Open class source from archive given in `PATH'."
+  (let* ((bufname (concat file " (" (file-name-nondirectory path) ")"))
+         (buffer (get-buffer bufname)))
+    (when buffer
+      (throw 'found buffer))
+    (jdee--open-class-from-archive-into-buffer path bufname)))
 
 (defun jdee-find-class-source-file (class)
   "Find the source file for a specified class.
@@ -401,34 +438,7 @@ If CLASS is found in an archive, set both
     (catch 'found
       (loop for path in (jdee-expand-wildcards-and-normalize jdee-sourcepath 'jdee-sourcepath) do
             (if (jdee-archive-file-p path)
-                (let* ((bufname (concat file " (" (file-name-nondirectory path) ")"))
-                       (buffer (get-buffer bufname)))
-                  (if buffer
-                      (throw 'found buffer)
-                    (let* ((pkg-path (subst-char-in-string ?. ?/ package))
-                           (class-file-name (concat  pkg-path "/" file))
-                           success)
-                      (setq buffer (get-buffer-create bufname))
-                      (with-current-buffer buffer
-                        (setq buffer-file-name (expand-file-name (concat path ":" class-file-name)))
-                        (setq buffer-file-truename file)
-                        (let ((exit-status
-                               (archive-extract-by-stdout path class-file-name archive-zip-extract)))
-                          (if (and (numberp exit-status) (= exit-status 0))
-                              (progn
-                                (jdee-mode)
-                                (set (make-local-variable 'jdee-open-source-archive) path)
-                                (set (make-local-variable 'jdee-open-source-resource) class-file-name)
-
-                                (goto-char (point-min))
-                                (setq buffer-undo-list nil)
-                                (setq buffer-saved-size (buffer-size))
-                                (set-buffer-modified-p nil)
-                                (setq buffer-read-only t)
-                                (throw 'found buffer))
-                            (progn
-                              (set-buffer-modified-p nil)
-                              (kill-buffer buffer))))))))
+                (jdee--open-class-from-archive path)
               (if (file-exists-p (expand-file-name file path))
                   (throw 'found (expand-file-name file path))
                 (let* ((pkg-path (subst-char-in-string ?. ?/ package))
