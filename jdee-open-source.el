@@ -382,18 +382,16 @@ This function is designed as :before-until advice for
 
 (defun jdee-find-class-source-file (class)
   "Find the source file for a specified class.
-CLASS is the fully qualified name of the class. This function searchs
+CLASS is the fully qualified name of the class.  This function searches
 the directories and source file archives (i.e., jar or zip files)
 specified by `jdee-sourcepath' for the source file corresponding to
-CLASS. If it finds the source file in a directory, it returns the
-file's path. If it finds the source file in an archive, it returns a
-buffer containing the contents of the file. If this function does not
+CLASS.  If it finds the source file in a directory, it returns the
+file's path.  If it finds the source file in an archive, it returns a
+buffer containing the contents of the file.  If this function does not
 find the source for the class, it returns nil.
 
 If CLASS is found in an archive, set both
-`jdee-open-source-archive' and `jdee-open-source-resource' buffer
-local.
-"
+`jdee-open-source-archive' and `jdee-open-source-resource' buffer local."
   (let* ((outer-class (car (split-string class "[$]")))
          (file (concat
                 (jdee-parse-get-unqualified-name outer-class)
