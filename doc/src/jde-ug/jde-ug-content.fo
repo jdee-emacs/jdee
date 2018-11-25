@@ -2738,7 +2738,7 @@ The Java Development Environment (JDE) is an Emacs Lisp
 	    [State]  button and choose Set for current  session if you
 	    want the settings to apply only  to the current project or Save for  future sessions if
 	    you want the settings to  apply to all projects. In either case, you
-	    should save  the new settings in you project file if your project has  a
+	    should save  the new settings in your project file if your project has  a
 	    project file. To save the new settings in your project  file, switch to
 	    a source buffer and choose JDE-&gt;Options-&gt;Save
 		Project.</fo:block>
