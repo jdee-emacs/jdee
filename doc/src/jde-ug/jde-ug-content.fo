@@ -3759,7 +3759,7 @@ The Java Development Environment (JDE) is an Emacs Lisp
                   </fo:block>&lt;/screenshot&gt;</fo:block>
       
             </fo:block>
-            <fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">The top-level menu contains an entry for each each class
+            <fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">The top-level menu contains an entry for each class
 	defined by the active buffer followed by entries for the
 	imports and package of the current buffer. Selecting the entry
 	for a class displays a submenu listing the inner classes,
