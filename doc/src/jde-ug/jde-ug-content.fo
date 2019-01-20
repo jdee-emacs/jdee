@@ -1955,7 +1955,7 @@ The Java Development Environment (JDE) is an Emacs Lisp
 	    </fo:block>
                      <fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">at the current point in your Java source buffer (or any buffer,
 	      tempo doesn't care). </fo:block>
-                     <fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">The preceding example is admittedly not vary useful because it
+                     <fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">The preceding example is admittedly not very useful because it
 	      always prints the same text. You can create more useful templates,
 	      using special tempo template symbols and lisp forms. This
 	      approach, for example, allows you to create a template that can
