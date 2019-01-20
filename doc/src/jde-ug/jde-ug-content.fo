@@ -2153,7 +2153,7 @@ The Java Development Environment (JDE) is an Emacs Lisp
 	    <fo:block color="red">&lt;varname&gt;jde-compiler&lt;/varname&gt;</fo:block>) has the same set of  command-line
 	    switches as the latest version of <fo:block color="red">&lt;varname&gt;javac&lt;/varname&gt;</fo:block> , the
 	    compiler supplied with JavaSoft's JDK. If the command-line  switch for
-	    a particular option supported by the compiler  your are using is not
+	    a particular option supported by the compiler  you are using is not
 	    the same as that specified by the latest  version of
 	    <fo:block color="red">&lt;varname&gt;javac&lt;/varname&gt;</fo:block>, you must use the variable
 	    <fo:block color="red">&lt;varname&gt;jde-compile-option-command-line-args&lt;/varname&gt;</fo:block>  to select the
