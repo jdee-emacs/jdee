@@ -1346,16 +1346,16 @@ If t (or other non-nil non-number) then kill in 2 secs."
 
 (defvar jdee-compile-javac-compilers
   (list
-   (jdee-compile-javac-11)
-   (jdee-compile-javac-12)
-   (jdee-compile-javac-13)
-   (jdee-compile-javac-14)
-   (jdee-compile-javac-15)
-   (jdee-compile-javac-16)
-   (jdee-compile-javac-17)
-   (jdee-compile-javac-18)
-   (jdee-compile-javac-19)
-   (jdee-compile-javac-10-0))
+   (jdee-compile-javac-11 "javac 1.1.x")
+   (jdee-compile-javac-12 "javac 1.2.x")
+   (jdee-compile-javac-13 "javac 1.3.x")
+   (jdee-compile-javac-14 "javac 1.4.x")
+   (jdee-compile-javac-15 "javac 1.5.x")
+   (jdee-compile-javac-16 "javac 1.6.x")
+   (jdee-compile-javac-17 "javac 1.7.x")
+   (jdee-compile-javac-18 "javac 1.8.x")
+   (jdee-compile-javac-19 "javac 1.9.x")
+   (jdee-compile-javac-10-0 "javac 1.10.x"))
   "List of supported javac compilers.")
 
 ;;; TODO: remove user interaction from here

@@ -1955,7 +1955,7 @@ The Java Development Environment (JDE) is an Emacs Lisp
 	    </fo:block>
                      <fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">at the current point in your Java source buffer (or any buffer,
 	      tempo doesn't care). </fo:block>
-                     <fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">The preceding example is admittedly not vary useful because it
+                     <fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">The preceding example is admittedly not very useful because it
 	      always prints the same text. You can create more useful templates,
 	      using special tempo template symbols and lisp forms. This
 	      approach, for example, allows you to create a template that can
@@ -2153,7 +2153,7 @@ The Java Development Environment (JDE) is an Emacs Lisp
 	    <fo:block color="red">&lt;varname&gt;jde-compiler&lt;/varname&gt;</fo:block>) has the same set of  command-line
 	    switches as the latest version of <fo:block color="red">&lt;varname&gt;javac&lt;/varname&gt;</fo:block> , the
 	    compiler supplied with JavaSoft's JDK. If the command-line  switch for
-	    a particular option supported by the compiler  your are using is not
+	    a particular option supported by the compiler  you are using is not
 	    the same as that specified by the latest  version of
 	    <fo:block color="red">&lt;varname&gt;javac&lt;/varname&gt;</fo:block>, you must use the variable
 	    <fo:block color="red">&lt;varname&gt;jde-compile-option-command-line-args&lt;/varname&gt;</fo:block>  to select the
@@ -2738,7 +2738,7 @@ The Java Development Environment (JDE) is an Emacs Lisp
 	    [State]  button and choose Set for current  session if you
 	    want the settings to apply only  to the current project or Save for  future sessions if
 	    you want the settings to  apply to all projects. In either case, you
-	    should save  the new settings in you project file if your project has  a
+	    should save  the new settings in your project file if your project has  a
 	    project file. To save the new settings in your project  file, switch to
 	    a source buffer and choose JDE-&gt;Options-&gt;Save
 		Project.</fo:block>
@@ -3759,7 +3759,7 @@ The Java Development Environment (JDE) is an Emacs Lisp
                   </fo:block>&lt;/screenshot&gt;</fo:block>
       
             </fo:block>
-            <fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">The top-level menu contains an entry for each each class
+            <fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">The top-level menu contains an entry for each class
 	defined by the active buffer followed by entries for the
 	imports and package of the current buffer. Selecting the entry
 	for a class displays a submenu listing the inner classes,

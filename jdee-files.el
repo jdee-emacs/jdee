@@ -231,5 +231,10 @@ root names match EXCLUDE-REGEXPS. Return the files normalized against SYMBOL."
            (string= (file-truename dir) "/")
            (string= (file-truename parent) "/")))))))
 
+(defun jdee-files-write-buffer-to-file (buffer target-file)
+  "Write whole `BUFFER' to `TARGET-FILE'."
+  (with-current-buffer buffer
+    (write-region (point-min) (point-max) target-file nil :silent)))
+
 (provide 'jdee-files)
 ;;; jdee-files.el ends here

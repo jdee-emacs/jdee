@@ -32,6 +32,12 @@
 (require 'jdee-classpath)
 (require 'memoize)
 
+(defun jdee-archive-file-p (filepath)
+  "Return t if the `FILEPATH' is an existing JAR or ZIP file."
+  (and (file-exists-p filepath)
+       (or (string-match "\.jar$" filepath)
+           (string-match "\.zip$" filepath))))
+
 (defun jdee-archive-files-hashtable (coll)
   "Convert the COLL which looks like an `archive-files' vector to
 a hashtable of string to 'indexed."
@@ -48,7 +54,7 @@ RESOURCE."
     (if (eq 'missing (gethash resource ht 'missing))
         nil
       (list archive resource))))
-  
+
 
 (defun jdee-archive-resource (buf archive resource)
   "For the buffer BUR, which needs to be in `archive-mode', find
@@ -102,17 +108,17 @@ RESOURCE.  Kills the buffer with the archive."
 lists of file names.
 
 Return:
-   nil if not found  
+   nil if not found
    \"file\" if fqn is a class file on disk
    '(archive resource) for a file contained in an archive (JAR file).
 "
-  
-  (cl-loop for p in (apply #'append paths)  
+
+  (cl-loop for p in (apply #'append paths)
            for rtnval = (or (jdee-archive-is-resource-on-disk-p p resource)
                             (jdee-archive-has-resource-in-existing-buffer-p p resource)
                             (jdee-archive-has-resource-p p resource))
            when rtnval
-               return rtnval))
+           return rtnval))
 (defun jdee-archive-resource-to-string (resource)
   "Convert the result of `jdee-archive-find-resource' to a string.
 "
@@ -120,7 +126,7 @@ Return:
    ((null resource) nil)
    ((listp resource) (apply #'format "%s:%s" resource))
    (t resource)))
-  
+
 
 ;;;###autoload
 (defun jdee-archive-which (fqn &optional disp &rest paths)
@@ -128,14 +134,14 @@ Return:
 Search PATHS or `jdee-global-classpath' if nil.
 
 Return:
-   nil if not found  
+   nil if not found
    \"file\" if fqn is a class file on disk
    '(archive resource) for a file contained in an archive (JAR file).
 "
   (interactive "sFQN: \np")
   (let* ((resource (format "%s.class" (subst-char-in-string ?. ?/ fqn)))
          (rtnval (apply #'jdee-archive-find-resource resource (or paths (list jdee-global-classpath)))))
-    
+
     (if rtnval
         (let ((as-string (jdee-archive-resource-to-string rtnval)))
           (kill-new as-string)

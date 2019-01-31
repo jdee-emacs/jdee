@@ -22,6 +22,7 @@
 (require 'cl-lib)
 (require 'etags);; find-tag-marker-ring
 (require 'efc)
+(require 'jdee-archive)
 (require 'jdee-backend)
 (require 'jdee-classpath)
 (require 'jdee-files)
@@ -62,12 +63,12 @@ for FILE, but proper EOL-conversion and charcater interpretation is done!"
   (let ((exp-filename (make-symbol "exp-filename")))
     `(let ((,exp-filename (expand-file-name ,file)))
        (if (and (file-exists-p ,exp-filename)
-		(file-readable-p ,exp-filename))
-	   (with-temp-buffer
-	     (insert-file-contents ,exp-filename)
-	     (goto-char (point-min))
-	     ,@body)
-	 nil))))
+                (file-readable-p ,exp-filename))
+           (with-temp-buffer
+             (insert-file-contents ,exp-filename)
+             (goto-char (point-min))
+             ,@body)
+         nil))))
 
 (defun jdee-open-get-class-to-open (pair parsed-symbol)
   "Evaluates PARSE-SYMBOL to check if it is a variable name or a class name.
@@ -118,7 +119,7 @@ checks if it is a member of the base class(\"super\")."
       (semantic-fetch-tags)
       (setq parsed-symbol (concat "\\b" parsed-symbol "\\b"))
       (while (not (senator-re-search-forward parsed-symbol nil t))
-	(message "Could not find %s in %s" parsed-symbol (buffer-name))
+        (message "Could not find %s in %s" parsed-symbol (buffer-name))
         ;; searching for the thing-of-interest has failed
         ;; let's try in the base class
         (progn
@@ -147,9 +148,9 @@ checks if it is a member of the base class(\"super\")."
 if any) of the current class or interface."
   (jdee-remove-type
    (append (semantic-tag-type-superclasses
-	    (semantic-current-tag-of-class 'type))
-	   (semantic-tag-type-interfaces (semantic-current-tag-of-class
-					  'type)))))
+            (semantic-current-tag-of-class 'type))
+           (semantic-tag-type-interfaces (semantic-current-tag-of-class
+                                          'type)))))
 
 (defun jdee-remove-type (list)
   "Removes generics '<Type>' declaration from every given
@@ -175,54 +176,54 @@ $CLASSPATH, then in the current directory."
   (interactive)
   (if (jdee-open-functions-exist)
       (let* ((old-point (if position
-			    (prog1
-				(point)
-			      (goto-char position))))
-	     (thing-of-interest (thing-at-point 'symbol))
-	     (pair (save-excursion
-		     (end-of-thing 'symbol)
-		     (jdee-parse-java-variable-at-point)))
-	     (class-to-open (jdee-open-get-class-to-open
-			     pair thing-of-interest)))
-	(if old-point
-	    (goto-char old-point))
-	(if (and class-to-open
-		 (stringp class-to-open))
-	    ;; Handle the case where the definition of the symbol is in the current buffer.
-	    (let ((pos
-		   (and
-		    (string= (car pair) "")
-		    (jdee-parse-find-declaration-of thing-of-interest))))
-	      (ring-insert find-tag-marker-ring (point-marker))
-	      (if pos
-		  (goto-char pos)
-		;; Handle the case where the definition is in another buffer or an
-		;; unopened source file.
-		(let ((source
-		       (jdee-find-class-source-file class-to-open)))
-		  (if source
-		      ;; we have found the source file. So let´s open it and
-		      ;; then jump to the thing-of-interest
-		      (progn
-			(if (typep source 'buffer)
-			    (let ((pop-up-frames t))
-			      (set-buffer source)
-			      (display-buffer source)
-			      ;; (jdee-mode)
-			      ;; (semantic-new-buffer-fcn)
-			      ;; (semantic-fetch-tags)
-			      )
-			  ;; (switch-to-buffer source)
-			  ;; (pop-to-buffer source other-window)
-			  ;; if the current buffer contains java-file-name do not try to
-			  ;; open the file
-			  (if (not (string-equal (buffer-file-name) source))
-			      (funcall (or jdee-open-cap-ff-function-temp-override
-					   jdee-open-class-at-point-find-file-function)
-				       source)))
-			(jdee-open-jump-to-class thing-of-interest class-to-open))
-		    (message "Can not find the source for \"%s\"." class-to-open)))))
-	  (message "Cannot determine the class of \"%s\"." thing-of-interest)))
+                            (prog1
+                                (point)
+                              (goto-char position))))
+             (thing-of-interest (thing-at-point 'symbol))
+             (pair (save-excursion
+                     (end-of-thing 'symbol)
+                     (jdee-parse-java-variable-at-point)))
+             (class-to-open (jdee-open-get-class-to-open
+                             pair thing-of-interest)))
+        (if old-point
+            (goto-char old-point))
+        (if (and class-to-open
+                 (stringp class-to-open))
+            ;; Handle the case where the definition of the symbol is in the current buffer.
+            (let ((pos
+                   (and
+                    (string= (car pair) "")
+                    (jdee-parse-find-declaration-of thing-of-interest))))
+              (ring-insert find-tag-marker-ring (point-marker))
+              (if pos
+                  (goto-char pos)
+                ;; Handle the case where the definition is in another buffer or an
+                ;; unopened source file.
+                (let ((source
+                       (jdee-find-class-source-file class-to-open)))
+                  (if source
+                      ;; we have found the source file. So let´s open it and
+                      ;; then jump to the thing-of-interest
+                      (progn
+                        (if (typep source 'buffer)
+                            (let ((pop-up-frames t))
+                              (set-buffer source)
+                              (display-buffer source)
+                              ;; (jdee-mode)
+                              ;; (semantic-new-buffer-fcn)
+                              ;; (semantic-fetch-tags)
+                              )
+                          ;; (switch-to-buffer source)
+                          ;; (pop-to-buffer source other-window)
+                          ;; if the current buffer contains java-file-name do not try to
+                          ;; open the file
+                          (if (not (string-equal (buffer-file-name) source))
+                              (funcall (or jdee-open-cap-ff-function-temp-override
+                                           jdee-open-class-at-point-find-file-function)
+                                       source)))
+                        (jdee-open-jump-to-class thing-of-interest class-to-open))
+                    (message "Can not find the source for \"%s\"." class-to-open)))))
+          (message "Cannot determine the class of \"%s\"." thing-of-interest)))
     (message "You need JDEE >= 2.2.6 and Senator to use this command.")))
 
 (defun jdee-open-class-source ( &optional unqual-class )
@@ -234,29 +235,29 @@ not associated with any project."
   (interactive)
   (condition-case err
       (let* ((unqualified-name
-	      (or unqual-class
-		  (read-from-minibuffer "Class: " (thing-at-point 'symbol))))
-	     (class-names
+              (or unqual-class
+                  (read-from-minibuffer "Class: " (thing-at-point 'symbol))))
+             (class-names
               (jdee-backend-get-qualified-name unqualified-name)))
-	;;Check return value of QualifiedName
-	(if (or (eq class-names nil)
-		(not (listp class-names)))
-	    (error "Cannot find %s" unqualified-name))
-	(ring-insert find-tag-marker-ring (point-marker))
-	;; Turn off switching project settings to avoid
-	;; resetting jdee-sourcepath.
-	(let ((old-value jdee-project-context-switching-enabled-p))
-	  (setq jdee-project-context-switching-enabled-p nil)
-	  ;;If the list is only one long
-	  (if (eq 1 (length class-names))
-	      ;;then show it
-	      (progn(other-window 1)
-		    (jdee-find-class-source (car class-names)))
+        ;;Check return value of QualifiedName
+        (if (or (eq class-names nil)
+                (not (listp class-names)))
+            (error "Cannot find %s" unqualified-name))
+        (ring-insert find-tag-marker-ring (point-marker))
+        ;; Turn off switching project settings to avoid
+        ;; resetting jdee-sourcepath.
+        (let ((old-value jdee-project-context-switching-enabled-p))
+          (setq jdee-project-context-switching-enabled-p nil)
+          ;;If the list is only one long
+          (if (eq 1 (length class-names))
+              ;;then show it
+              (progn(other-window 1)
+                    (jdee-find-class-source (car class-names)))
             ;;else let the user choose
-	    (let ((class (efc-query-options class-names "Which class?")))
+            (let ((class (efc-query-options class-names "Which class?")))
               (if class
                   (jdee-find-class-source class))))
-	  (setq jdee-project-context-switching-enabled-p old-value)))
+          (setq jdee-project-context-switching-enabled-p old-value)))
     (error
      (message "%s" (error-message-string err)))))
 
@@ -266,17 +267,17 @@ not associated with any project."
 (defun jdee-show-superclass-source-2 (tags)
   (if tags
       (if (= (length tags) 1)
-	  (jdee-show-class-source (car tags))
-	(let ((parent (efc-query-options tags "Which super class?")))
-	  (if parent
-	      (jdee-show-class-source parent))))
+          (jdee-show-class-source (car tags))
+        (let ((parent (efc-query-options tags "Which super class?")))
+          (if parent
+              (jdee-show-class-source parent))))
     (error "Superclass not available")))
 
 (defun jdee-show-superclass-source ()
   "Show the source for the parent of the class at point."
   (interactive)
   (let ((tags (semantic-tag-type-superclasses
-		 (semantic-current-tag-of-class 'type))))
+                 (semantic-current-tag-of-class 'type))))
     (jdee-show-superclass-source-2 tags)))
 ;; Thanks to Sandip Chitale <sandip.chitale@blazesoft.com>
 
@@ -286,13 +287,13 @@ If the class implements more than one interface, this command prompts
 you to select one of the interfaces to show."
   (interactive)
   (let ((tags (semantic-tag-type-interfaces
-		 (semantic-current-tag-of-class 'type))))
+                 (semantic-current-tag-of-class 'type))))
     (if tags
-	(if (= (length tags) 1)
-	    (jdee-show-class-source (car tags))
-	  (let ((interface (efc-query-options tags "Which interface?")))
-	    (if interface
-		(jdee-show-class-source interface)))))))
+        (if (= (length tags) 1)
+            (jdee-show-class-source (car tags))
+          (let ((interface (efc-query-options tags "Which interface?")))
+            (if interface
+                (jdee-show-class-source interface)))))))
 
 (defvar jdee-open-source-archive nil
   "Will be set to the name of the archive (jar, zip, etc) that is
@@ -367,7 +368,7 @@ This function is designed as :before-until advice for
 
  This function is designed as :around advice for
  `compilation-find-file'."
-  
+
   (if (string-match (format "^%s$" (jdee-parse-java-fqn-re)) filename)
       (let ((path (jdee-find-class-source-file filename)))
         (cond
@@ -379,67 +380,73 @@ This function is designed as :before-until advice for
          (t ad-do-it)))
     ad-do-it))
 
+(defun jdee--open-source-set-archive-buffer-properties (path class-file-name)
+  (jdee-mode)
+  (set (make-local-variable 'jdee-open-source-archive) path)
+  (set (make-local-variable 'jdee-open-source-resource) class-file-name)
 
-  
+  (goto-char (point-min))
+  (setq buffer-undo-list nil)
+  (setq buffer-saved-size (buffer-size))
+  (set-buffer-modified-p nil)
+  (setq buffer-read-only t))
+
+(defun jdee--open-class-from-archive-into-buffer (path bufname)
+  "Open class source from archive given in `PATH' into buffer `BUFNAME'."
+  (let* ((pkg-path (subst-char-in-string ?. ?/ package))
+         (class-file-name (concat  pkg-path "/" file))
+         success)
+    (setq buffer (get-buffer-create bufname))
+    (with-current-buffer buffer
+      (setq buffer-file-name (expand-file-name (concat path ":" class-file-name)))
+      (setq buffer-file-truename file)
+      (let ((exit-status
+             (archive-extract-by-stdout path class-file-name archive-zip-extract)))
+        (if (and (numberp exit-status) (= exit-status 0))
+            (progn
+              (jdee--open-source-set-archive-buffer-properties path class-file-name)
+              (throw 'found buffer))
+          (progn
+            (set-buffer-modified-p nil)
+            (kill-buffer buffer)))))))
+
+(defun jdee--open-class-from-archive (path)
+  "Open class source from archive given in `PATH'."
+  (let* ((bufname (concat file " (" (file-name-nondirectory path) ")"))
+         (buffer (get-buffer bufname)))
+    (when buffer
+      (throw 'found buffer))
+    (jdee--open-class-from-archive-into-buffer path bufname)))
+
 (defun jdee-find-class-source-file (class)
   "Find the source file for a specified class.
-CLASS is the fully qualified name of the class. This function searchs
+CLASS is the fully qualified name of the class.  This function searches
 the directories and source file archives (i.e., jar or zip files)
 specified by `jdee-sourcepath' for the source file corresponding to
-CLASS. If it finds the source file in a directory, it returns the
-file's path. If it finds the source file in an archive, it returns a
-buffer containing the contents of the file. If this function does not
+CLASS.  If it finds the source file in a directory, it returns the
+file's path.  If it finds the source file in an archive, it returns a
+buffer containing the contents of the file.  If this function does not
 find the source for the class, it returns nil.
 
 If CLASS is found in an archive, set both
-`jdee-open-source-archive' and `jdee-open-source-resource' buffer
-local.
-"
+`jdee-open-source-archive' and `jdee-open-source-resource' buffer local."
   (let* ((outer-class (car (split-string class "[$]")))
          (file (concat
-		(jdee-parse-get-unqualified-name outer-class)
-		".java"))
+                (jdee-parse-get-unqualified-name outer-class)
+                ".java"))
          (package (jdee-parse-get-package-from-name outer-class)))
     (catch 'found
       (loop for path in (jdee-expand-wildcards-and-normalize jdee-sourcepath 'jdee-sourcepath) do
-	      (if (and (file-exists-p path)
-		       (or (string-match "\.jar$" path)
-			   (string-match "\.zip$" path)))
-		  (let* ((bufname (concat file " (" (file-name-nondirectory path) ")"))
-			 (buffer (get-buffer bufname)))
-		    (if buffer
-			(throw 'found buffer)
-		      (let* ((pkg-path (subst-char-in-string ?. ?/ package))
-			     (class-file-name (concat  pkg-path "/" file))
-			     success)
-			(setq buffer (get-buffer-create bufname))
-			(with-current-buffer buffer
-			  (setq buffer-file-name (expand-file-name (concat path ":" class-file-name)))
-			  (setq buffer-file-truename file)
-			  (let ((exit-status
-				 (archive-extract-by-stdout path class-file-name archive-zip-extract)))
-			    (if (and (numberp exit-status) (= exit-status 0))
-				(progn
-				  (jdee-mode)
-                                  (set (make-local-variable 'jdee-open-source-archive) path)
-                                  (set (make-local-variable 'jdee-open-source-resource) class-file-name)
-
-				  (goto-char (point-min))
-				  (setq buffer-undo-list nil)
-				  (setq buffer-saved-size (buffer-size))
-				  (set-buffer-modified-p nil)
-                          	  (setq buffer-read-only t)
-				  (throw 'found buffer))
-			      (progn
-				(set-buffer-modified-p nil)
-				(kill-buffer buffer))))))))
-		(if (file-exists-p (expand-file-name file path))
-		    (throw 'found (expand-file-name file path))
-		  (let* ((pkg-path (subst-char-in-string ?. ?/ package))
-			 (pkg-dir (expand-file-name pkg-path path))
-			 (file-path (expand-file-name file pkg-dir)))
-		    (if (file-exists-p file-path)
-		      (throw 'found file-path)))))))))
+            (let* ((pkg-path (subst-char-in-string ?. ?/ package))
+                   (pkg-dir (expand-file-name pkg-path path))
+                   (file-path (expand-file-name file pkg-dir)))
+              (cond
+               ((jdee-archive-file-p path)
+                (jdee--open-class-from-archive path))
+               ((file-exists-p (expand-file-name file path))
+                (throw 'found (expand-file-name file path)))
+               ((file-exists-p file-path)
+                (throw 'found file-path))))))))
 
 (defcustom jdee-preferred-packages
   '("java.util" "java" "javax")
@@ -466,22 +473,22 @@ is only one unique fully qualified class found for the simple
 class name \(that is the class without the package part in the
 name)."
   (let ((sort-helper
-	 (lambda (a b)
-	   (dolist (pkg jdee-preferred-packages)
-	     (let ((len (length pkg)))
-	       (cond ((eq t (compare-strings pkg 0 len a 0 len))
-		      (return t))
-		     ((eq t (compare-strings pkg 0 len b 0 len))
-		      (return nil))
-		     (t (string< a b))))))))
+         (lambda (a b)
+           (dolist (pkg jdee-preferred-packages)
+             (let ((len (length pkg)))
+               (cond ((eq t (compare-strings pkg 0 len a 0 len))
+                      (return t))
+                     ((eq t (compare-strings pkg 0 len b 0 len))
+                      (return nil))
+                     (t (string< a b))))))))
     (setq classes (sort classes sort-helper))
     (setq prompt (or prompt "Class"))
     (let ((default (if uq-name
-		       (jdee-import-get-import uq-name))))
+                       (jdee-import-get-import uq-name))))
       (setq default (or default (car classes)))
       (if (and (not confirm-fq-p) (= 1 (length classes)))
-	  (car classes)
-	(efc-query-options classes prompt "Class" jdee-read-class-fq-items default)))))
+          (car classes)
+        (efc-query-options classes prompt "Class" jdee-read-class-fq-items default)))))
 
 (defvar jdee-read-class-items nil
   "*History for `jdee-read-class' read items.")
@@ -529,40 +536,40 @@ When called interactively, select the class and copy it to the kill ring."
   (interactive (list nil nil t))
   (setq fq-prompt (or fq-prompt "Select qualified class"))
   (let ((ctup (jdee-parse-class-name 'point))
-	uinput uq-name classes initial-input fqc default)
+        uinput uq-name classes initial-input fqc default)
     (if (and (null ctup)
-	     (eq major-mode 'jdee-mode)
-	     this-class-p)
-	(setq ctup
-	      (jdee-parse-class-name (jdee-parse-get-buffer-class))))
+             (eq major-mode 'jdee-mode)
+             this-class-p)
+        (setq ctup
+              (jdee-parse-class-name (jdee-parse-get-buffer-class))))
     (setq default (cond ((null ctup) nil)
-			((first ctup) (first ctup))
-			(t (third ctup))))
+                        ((first ctup) (first ctup))
+                        (t (third ctup))))
     (setq prompt (concat (or prompt "Class")
-			 (if default
-			     (format " (default %s): " default)
-			   ": ")))
+                         (if default
+                             (format " (default %s): " default)
+                           ": ")))
     (setq uinput
-	  (if (and default no-confirm-nfq-p)
-	      (prog1
-		  default
-		(setq fq-prompt (format "%s" fq-prompt)))
-	    (read-string prompt nil 'jdee-read-class-items default)))
+          (if (and default no-confirm-nfq-p)
+              (prog1
+                  default
+                (setq fq-prompt (format "%s" fq-prompt)))
+            (read-string prompt nil 'jdee-read-class-items default)))
     (setq ctup (jdee-parse-class-name uinput))
     (if (null ctup)
-	(error "Doesn't appear to be a classname: `%s'" uinput))
+        (error "Doesn't appear to be a classname: `%s'" uinput))
     (if validate-fn
-	(setq fqc (funcall validate-fn ctup)))
+        (setq fqc (funcall validate-fn ctup)))
     (when (not (eq 'pass fqc))
       (setq fqc (first ctup)
-	    uq-name (third ctup))
+            uq-name (third ctup))
       (if fqc
-	  (if (not (jdee-backend-class-exists-p fqc))
-	      (error "No match for %s" uq-name))
-	(setq classes (jdee-backend-get-qualified-name uq-name))
-	(if (= 0 (length classes))
-	    (error "Not match for %s" uq-name))
-	(setq fqc (jdee-choose-class classes fq-prompt uq-name confirm-fq-p))))
+          (if (not (jdee-backend-class-exists-p fqc))
+              (error "No match for %s" uq-name))
+        (setq classes (jdee-backend-get-qualified-name uq-name))
+        (if (= 0 (length classes))
+            (error "Not match for %s" uq-name))
+        (setq fqc (jdee-choose-class classes fq-prompt uq-name confirm-fq-p))))
     (when (called-interactively-p 'interactive)
       (kill-new fqc)
       (message "Copied `%s'" fqc))
@@ -576,22 +583,22 @@ If it finds the source file, it opens the file in a buffer."
   (interactive (list (jdee-read-class "Class") current-prefix-arg))
   (let ((source (jdee-find-class-source-file class)))
     (if source
-	(progn
-	  (if (typep source 'buffer)
-	      (switch-to-buffer source)
+        (progn
+          (if (typep source 'buffer)
+              (switch-to-buffer source)
             ;; (pop-to-buffer source other-window)
-	    (if (not (string-equal (buffer-file-name)  source))
-		(if other-window
-		    (find-file-other-window source)
-		  (find-file source))))
-	  (if (fboundp 'senator-re-search-forward)
-	      (let ((inner-class-pos (string-match "\\$" class)))
-		(if inner-class-pos
-		    (let ((inner-class (substring class (+ 1 inner-class-pos))))
-		      (when inner-class
-			(goto-char (point-min))
-			(senator-re-search-forward
-			 (concat "\\b" inner-class "\\b") nil t)))))))
+            (if (not (string-equal (buffer-file-name)  source))
+                (if other-window
+                    (find-file-other-window source)
+                  (find-file source))))
+          (if (fboundp 'senator-re-search-forward)
+              (let ((inner-class-pos (string-match "\\$" class)))
+                (if inner-class-pos
+                    (let ((inner-class (substring class (+ 1 inner-class-pos))))
+                      (when inner-class
+                        (goto-char (point-min))
+                        (senator-re-search-forward
+                         (concat "\\b" inner-class "\\b") nil t)))))))
       (message "JDE error: Could not find source for \"%s\" in this
 project's source path. See `jdee-sourcepath' for more information." class))))
 
@@ -603,12 +610,12 @@ feature in JDEE (see `jdee-complete-at-point')."
   (interactive)
   (if (jdee-open-functions-exist)
       (let* ((thing-of-interest (thing-at-point 'symbol))
-	     (pair (save-excursion (end-of-thing 'symbol)
-				   (jdee-parse-java-variable-at-point)))
-	     (class-to-open (jdee-open-get-class-to-open
-			     pair thing-of-interest)))
-	(if (and class-to-open (stringp class-to-open))
-	    (jdee-backend-explore-class class-to-open)
+             (pair (save-excursion (end-of-thing 'symbol)
+                                   (jdee-parse-java-variable-at-point)))
+             (class-to-open (jdee-open-get-class-to-open
+                             pair thing-of-interest)))
+        (if (and class-to-open (stringp class-to-open))
+            (jdee-backend-explore-class class-to-open)
           (error "Can not parse the thing at point!")))
     (message "You need JDEE >= 2.2.6 and Senator for using this feature!")))
 
