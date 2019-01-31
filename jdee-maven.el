@@ -118,6 +118,13 @@ calling functions after the first non-nil return."
                                   (repeat (string :tag "Source path"))
                                   (repeat (string :tag "Runtime path")))))
 
+(defcustom jdee-maven-mvn-extra-args (list)
+  "List of additional arguments to provide to maven when querying for classpath and sourcepath.
+--offline is sometimes a useful value to include."
+  :group 'jdee-maven
+  :type '(repeat (string :tag "Argument")))
+
+
 (defun jdee-maven-get-default-directory (&optional path)
   "Gets the default-directory by searching for the `jdee-maven-buildfile' usually pom.xml.
   Find the directory of the closest  maven project file (see
@@ -173,15 +180,16 @@ CLASSIFIER - the maven the classifier, usually nil or \"sources\""
         classpath-file-path
       (with-current-buffer (get-buffer-create (format "*%s*"  "jdee-maven-check-classpath-file"))
         (let* ((default-directory pom-dir)
-               (args (list "dependency:build-classpath"
-                           (format "-DincludeScope=%s" scope)
-                           (format "-Dmdep.outputFile=%s" output-file)
-                           (if classifier
-                               (format "-Dclassifier=%s" classifier)
-                             nil)
-                           (if (and classifier jdee-maven-artifacts-excluded-from-sources)
-                               (format "-DexcludeArtifactIds=%s" (mapconcat 'identity jdee-maven-artifacts-excluded-from-sources ","))
-                             nil))))
+               (args (append (list "dependency:build-classpath"
+                                   (format "-DincludeScope=%s" scope)
+                                   (format "-Dmdep.outputFile=%s" output-file)
+                                   (if classifier
+                                       (format "-Dclassifier=%s" classifier)
+                                     nil)
+                                   (if (and classifier jdee-maven-artifacts-excluded-from-sources)
+                                       (format "-DexcludeArtifactIds=%s" (mapconcat 'identity jdee-maven-artifacts-excluded-from-sources ","))
+                                     nil))
+                             jdee-maven-mvn-extra-args)))
           (erase-buffer)
           (pop-to-buffer (current-buffer))
           (apply 'call-process "mvn" nil t t (cl-remove-if-not 'identity args)))
