@@ -133,7 +133,7 @@ Set 3 match regions
 "
   (format "\\(%s[.]%s\\)" (jdee-parse-java-name-parts-re) (jdee-parse-java-name-part-re)))
 
-          
+
 
 (defun jdee-parse-after-buffer-changed ()
   "Reparse the current buffer after any change.
@@ -1116,32 +1116,34 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
 	    ;;
 	    ;;  obj.f1.ge
 	    ;; ^
-	    ;;
+	    ;; Note that if we did not find a dot, (e.g., new Widget), we are
+	    ;; already at the beginning of the text part of the expression.
 	    (progn
 	      (setq curcar (char-before))
-	      (while (or (and (>= curcar ?a) (<= curcar ?z))
-			 (and (>= curcar ?A) (<= curcar ?Z))
-			 (and (>= curcar ?0) (<= curcar ?9))
-			 (>= curcar 127)
-			 (and (eq curcar ? ) (or (< 0 paren-count)
-						 (< 0 bracket-count)))
-			 (and (member curcar '(?$ ?\" ?\. ?\_ ?\\ ?\( ?\) ?\, ?\[ ?\]))
-			      (if (eq curcar ?\[)
-				  (> bracket-count 0)
-				t)))
-		(cond
-		 ((eq curcar ?\))
-		  (progn
-		    (forward-char -1)
-		    (goto-char (jdee-parse-match-paren-position))))
-		 ((eq curcar ?\( )
-		  (setq paren-count (1- paren-count)))
-		 ((eq curcar ?\] )
-		  (setq bracket-count (1+ bracket-count)))
-		 ((eq curcar ?\[ )
-		  (setq bracket-count (1- bracket-count))))
-		(forward-char -1)
-		(setq curcar (char-before)))
+          (when (> dot-offset 0)
+            (while (or (and (>= curcar ?a) (<= curcar ?z))
+                       (and (>= curcar ?A) (<= curcar ?Z))
+                       (and (>= curcar ?0) (<= curcar ?9))
+                       (>= curcar 127)
+                       (and (eq curcar ? ) (or (< 0 paren-count)
+                                               (< 0 bracket-count)))
+                       (and (member curcar '(?$ ?\" ?\. ?\_ ?\\ ?\( ?\) ?\, ?\[ ?\]))
+                            (if (eq curcar ?\[)
+                                (> bracket-count 0)
+                              t)))
+              (cond
+               ((eq curcar ?\))
+                (progn
+                  (forward-char -1)
+                  (goto-char (jdee-parse-match-paren-position))))
+               ((eq curcar ?\( )
+                (setq paren-count (1- paren-count)))
+               ((eq curcar ?\] )
+                (setq bracket-count (1+ bracket-count)))
+               ((eq curcar ?\[ )
+                (setq bracket-count (1- bracket-count))))
+              (forward-char -1)
+              (setq curcar (char-before))))
 
 	      (setq beg-point (point))
 	      (set-marker jdee-parse-current-beginning intermediate-point)
