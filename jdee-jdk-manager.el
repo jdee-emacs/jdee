@@ -147,8 +147,8 @@ by the current project."
    ((string-match "[^0-9]\\(1\\.[456789]\\)\\-" dir)
     (match-string 1 dir))
 
-   ;; java-7-openjdk-amd64 etc
-   ((string-match "-\\([456789]\\)-" dir)
+   ;; java-11-openjdk-amd64 etc
+   ((string-match "java-\\([0-9]+\\)-" dir)
     (concat "1." (match-string 1 dir)))))
 
 (defun jdee--jdk-find-darwin-jdk ()
