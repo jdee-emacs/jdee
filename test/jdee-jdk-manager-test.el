@@ -125,12 +125,13 @@
   (should (string= "1.7" (jdee--jdk-get-version "/usr/lib64/jvm/jdk1.7.0_21")))
   (should (string= "1.7" (jdee--jdk-get-version "/usr/lib/jvm/java-7-openjdk-amd64")))
   (should (string= "1.8" (jdee--jdk-get-version "/usr/lib/jvm/java-8-oracle")))
+  (should (string= "1.11" (jdee--jdk-get-version "/usr/lib/jvm/java-11-openjdk-amd64")))
   (should
    (string=
     "1.8"
     (jdee--jdk-get-version
      "/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.51-4.b16.fc22.x86_64")))
-    (should
+  (should
    (string=
     "1.9"
     (jdee--jdk-get-version
