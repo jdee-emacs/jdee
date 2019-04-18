@@ -149,10 +149,13 @@ defined, otherwise the classpath specified by the CLASSPATH
 environment variable."
   (let* ((directory-sep-char ?/)  ;; Override NT/XEmacs setting
          (classpath
-          (jdee-build-path-arg nil (jdee-get-global-classpath) t 'jdee-global-classpath)))
-    (format "jde.util.JdeUtilities.setProjectValues(\"%s\", %s);"
+          (jdee-build-path-arg nil (jdee-get-global-classpath) t 'jdee-global-classpath))
+         (sourcepath
+          (jdee-build-path-arg nil jdee-sourcepath t 'jdee-sourcepath)))
+    (format "jde.util.JdeUtilities.setProjectValues(\"%s\", %s, %s);"
             jdee-current-project
-            classpath)))
+            classpath
+            sourcepath)))
 
 (defun jdee-backend-launch ()
   "Start JVM backend if it's not rurnnig."
