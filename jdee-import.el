@@ -641,7 +641,9 @@ bucket contains imports that do not belong to any group."
 					     (car bin2)))))))
 	  ((eq jdee-import-sorted-groups 'gor)
 	   (let* ((group-list (mapcar (function
-				       (lambda (item) (cdr item)))
+                                   ;; If item does not have a second element,
+                                   ;; that means to use the regex itself
+				       (lambda (item) (or (cdr item) (car item))))
 				      jdee-import-group-of-rules)))
 	     (setq bins
 		   (sort bins
