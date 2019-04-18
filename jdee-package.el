@@ -231,7 +231,13 @@ the package directory as specified by one of the entries in
 `jdee-package-search-classpath-variables' or `jdee-sourcepath'.
 If these variables do not specify the root of the package directory,
 this command does nothing. This command signals an error if the
- major mode of the current buffer is not `jdee-mode'."
+ major mode of the current buffer is not `jdee-mode'.
+
+The buffer is not modified if the package statement that would be
+inserted exactly matches the existing package statement.  This
+means that this can be called from `jdee-mode-hook` without
+spuriously marking the buffer as modified.
+"
   (interactive)
   (or (eq major-mode 'jdee-mode)
       (error "Invalid major mode found.  Must be `jdee-mode'"))
@@ -239,9 +245,10 @@ this command does nothing. This command signals an error if the
     (unless (string= package "")
       (goto-char (point-min))
       (if (re-search-forward jdee-package-package-regexp nil t)
-	  (replace-match package)
-	(insert package)
-	(newline)))))
+          (unless (string-equal package (match-string 0))
+	        (replace-match package))
+	    (insert package)
+	    (newline)))))
 
 ;; Register and initialize the customization variables defined
 ;; by this package.
