@@ -940,7 +940,7 @@ return \"Name\"."
     answer))
 
 
-(defun jdee-wiz-get-get-method(type name &optional staticp &optional class-name)
+(defun jdee-wiz-get-get-method(type name &optional staticp class-name)
   "Returns a string representing a get method"
   (let ((filtered-name (jdee-wiz-get-name name))
 	get (javadoc "") temp temp2)

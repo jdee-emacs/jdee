@@ -31,7 +31,7 @@
 (require 'jdee-project-file)
 
 ;;;###autoload
-(defun jdee-stat-loc-report (&optional count &optional total-files)
+(defun jdee-stat-loc-report (&optional count total-files)
   "Generates a report showing the number of code, comment,
 javadoc, and blank lines in the current Java source buffer. Optionally
 a total count could be passed to be displayed, as well as the number of
