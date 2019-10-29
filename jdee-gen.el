@@ -696,7 +696,7 @@ It then moves the point to the location of the first method."
    ";; We jump back and add those things retrospectively."
    "(progn (tempo-backward-mark)"
    " (jdee-gen-save-excursion"
-   "  (jdee-gen-main-method))"
+   "  (jdee-gen-main))"
    " (tempo-backward-mark)"
    " (jdee-gen-save-excursion"
    "  (jdee-wiz-gen-method \"private\" \"\""
@@ -2057,32 +2057,6 @@ command, `jdee-gen-change-listener', as a side-effect."
 	     "Insert skeleton change listener."))
 	  (set-default sym val)))
 
-(defcustom jdee-gen-main-method-template
-  '(
-    "(jdee-gen-save-excursion"
-    " (jdee-wiz-gen-method"
-    "   \"public static\""
-    "   \"void\""
-    "   \"main\""
-    "   \"String[] args\""
-    "   \"\" \"\"))"
-    ";; don't move point"
-    "(setq tempo-marks nil)"
-    )
-  "Template for generating the main method.
-Setting this variable defines a template instantiation
-command, `jdee-gen-main-method', as a side-effect."
-  :group 'jdee-gen
-  :type '(repeat string)
-  :set '(lambda (sym val)
-	  (defalias 'jdee-gen-main-method
-	    (tempo-define-template
-	     "main-method"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert skeleton main method."))
-	  (set-default sym val)))
-
 
 (defcustom  jdee-gen-println
   '(
@@ -3315,7 +3289,7 @@ It then moves the point to the location of the first method."
 
 (defcustom jdee-gen-code-templates
   (list (cons "Get Set Pair" 'jdee-gen-get-set)
-	(cons "main method" 'jdee-gen-main-method)
+	(cons "main method" 'jdee-gen-main)
 	(cons "toString Method (Apache)" 'jdee-gen-tostring-method)
 	(cons "Equals Method" 'jdee-gen-equals-method)
 	(cons "Hash Code Method" 'jdee-gen-hashcode-method)
@@ -3387,6 +3361,29 @@ list bound to `jdee-gen-abbrev-templates'. "
        abbrev
        (format "JDE template for %s control flow abbreviation." abbrev)
        'jdee-gen-abbrev-templates))))
+
+(defcustom jdee-gen-main-method-template
+  '(
+    "(jdee-gen-save-excursion"
+    " (jdee-wiz-gen-method"
+    "   \"public static\""
+    "   \"void\""
+    "   \"main\""
+    "   \"String[] args\""
+    "   \"\" \"\"))"
+    ";; don't move point"
+    "(setq tempo-marks nil)"
+    )
+  "Template for generating the main method.
+Setting this variable defines a template instantiation
+command, `jdee-gen-main', as a side-effect."
+  :group 'jdee-gen
+  :type '(repeat string)
+  :set '(lambda (sym val)
+	  (jdee-gen-define-abbrev-template
+	   "main"
+	   (jdee-gen-read-template val))
+	  (set-default sym val)))
 
 (defcustom jdee-gen-cflow-enable t
   "Enables abbreviations for Java control flow constructs."
