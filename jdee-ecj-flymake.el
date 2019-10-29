@@ -156,7 +156,7 @@ To use this funtion set the java line in `flymake-allowed-file-name-masks' to
                            temp-file
                            (file-name-directory buffer-file-name))))
         (list "java" (append  (list "-jar" (oref  (jdee-compile-get-ejc) path) "-noExit" "-Xemacs")
-			      (jdee-compile-classpath-arg (jdee-compile-get-the-compiler))
+                              (jdee-compile-classpath-arg (jdee-compile-get-the-compiler))
                               jdee-ecj-command-line-args
                               (list local-file))))))
 
@@ -305,10 +305,10 @@ the output stream."
   "Start syntax check process."
   (let* ((process nil))
     (condition-case err
-	(progn
-	  (when dir
-	    (let ((default-directory dir))
-	      (flymake-log 3 "starting process on dir %s" default-directory)))
+        (progn
+          (when dir
+            (let ((default-directory dir))
+              (flymake-log 3 "starting process on dir %s" default-directory)))
 
           (cond
            ((and (listp cmd) (processp (car cmd)))
@@ -327,24 +327,24 @@ the output stream."
                          (process-id process) (process-command process)
                          default-directory)))
 
-	  (set-process-filter process 'flymake-process-filter)
+          (set-process-filter process 'flymake-process-filter)
           (push process flymake-processes)
 
           (setq flymake-is-running t)
           (setq flymake-last-change-time nil)
           (setq flymake-check-start-time (flymake-float-time))
 
-	  (flymake-report-status nil "*")
+          (flymake-report-status nil "*")
 
-	  process)
+          process)
       (error
        (let* ((err-str (format "Failed to launch syntax check process  with args : %s"
-			       (error-message-string err)))
-	      (source-file-name buffer-file-name)
-	      (cleanup-f        (flymake-get-cleanup-function source-file-name)))
-	 (flymake-log 0 err-str)
-	 (funcall cleanup-f)
-	 (flymake-report-fatal-status "PROCERR" err-str))))))
+                               (error-message-string err)))
+              (source-file-name buffer-file-name)
+              (cleanup-f        (flymake-get-cleanup-function source-file-name)))
+         (flymake-log 0 err-str)
+         (funcall cleanup-f)
+         (flymake-report-fatal-status "PROCERR" err-str))))))
 
 
 (defun jdee-ecj-flymake-process-filter (process output)

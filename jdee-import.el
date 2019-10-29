@@ -69,11 +69,11 @@ If more than one fully qualified class names match the unqualified name that you
 the command prompts you to select only the classes that are not excluded."
   :group 'jdee-project
   :type '(repeat
-	  (cons :tag "Exclude rule"
-		(choice :tag "Exclude test"
-			(regexp :tag "Regexp")
-			(function :tag "Test function"))
-		(boolean :tag "Exclude synonyms"))))
+          (cons :tag "Exclude rule"
+                (choice :tag "Exclude test"
+                        (regexp :tag "Regexp")
+                        (function :tag "Test function"))
+                (boolean :tag "Exclude synonyms"))))
 
 ;; auto sorting of import statements
 (defcustom jdee-import-auto-sort nil
@@ -106,10 +106,10 @@ See command `jdee-import-organize'. Note: For sorting the packages
 within each group, see variable `jdee-import-reverse-sort-group'."
   :group 'jdee-project
   :type '(choice :tag "Order"
-		 (const :tag "No sort"                  nil)
-		 (const :tag "group-of-rules order"     gor)
-		 (const :tag "alphabetic order"         asc)
-		 (const :tag "reverse alphabetic order" desc)))
+                 (const :tag "No sort"                  nil)
+                 (const :tag "group-of-rules order"     gor)
+                 (const :tag "alphabetic order"         asc)
+                 (const :tag "reverse alphabetic order" desc)))
 
 (defcustom jdee-import-group-function 'jdee-import-group-of
   "*Function used to associate an import token to a group.
@@ -130,15 +130,15 @@ Each group definition is a pair (REGEXP . GROUP) where:
     group name or nil if REGEXP is the group name."
   :group 'jdee-project
   :type '(repeat
-	  (cons :tag "Group Rule"
-		regexp
-		(choice :tag "Group Name"
-			(string  :tag "A String")
-			(integer :tag "Match data at")
-			(const   :tag "The Regexp" nil))))
+          (cons :tag "Group Rule"
+                regexp
+                (choice :tag "Group Name"
+                        (string  :tag "A String")
+                        (integer :tag "Match data at")
+                        (const   :tag "The Regexp" nil))))
   :set '(lambda (sym val)
-	  ;; delete empty entries!
-	  (set-default sym (delete '("") val))))
+          ;; delete empty entries!
+          (set-default sym (delete '("") val))))
 
 (defcustom jdee-import-default-group-name nil
   "*Default group name if no group name is found.
@@ -146,7 +146,7 @@ If a group name is not found in `jdee-import-group-of-rules' then this
 group name is used.  If nil no default group name is used."
   :group 'jdee-project
   :type '(choice (string  :tag "A String")
-		 (const :tag "none" nil)))
+                 (const :tag "none" nil)))
 
 (defcustom jdee-import-insert-group-names nil
   "*If non-nil `jdee-import-organize' inserts group name before imports.
@@ -183,7 +183,7 @@ in the latter case, supplying the no-exclude argument to `jdee-import-all' will 
 the same package as the class in the current buffer."
   (let ((pkg (jdee-parse-get-package-name)))
     (if pkg
-	(string= pkg (jdee-parse-get-package-from-name class)))))
+        (string= pkg (jdee-parse-get-package-from-name class)))))
 
 (defun jdee-import-get-qualified-names (unqualified-class)
   "Return a list containing all qualified name for UNQUALIFIED-CLASS."
@@ -192,13 +192,13 @@ the same package as the class in the current buffer."
 (defun jdee-import-get-imports ()
   "Return a list containing all imported classes."
   (let* (imports
-	 (tags  (semantic-fetch-tags))
-	 (import-tags (semantic-brute-find-tag-by-class 'include tags)))
+         (tags  (semantic-fetch-tags))
+         (import-tags (semantic-brute-find-tag-by-class 'include tags)))
     (dolist (import-tag import-tags)
       (setq imports
-	    (cons
-	     (semantic-tag-name import-tag)
-	     imports)))
+            (cons
+             (semantic-tag-name import-tag)
+             imports)))
     (nreverse imports)))
 
 (defun jdee-import-get-import (unqualified-class)
@@ -206,12 +206,12 @@ the same package as the class in the current buffer."
 This name may have the form \"package.*\". Returns nil,
 if there is no import statement for UNQUALIFIED-CLASS."
   (let (import
-	(imports (jdee-import-get-imports))
-	(qualified-names (jdee-import-get-qualified-names unqualified-class)))
+        (imports (jdee-import-get-imports))
+        (qualified-names (jdee-import-get-qualified-names unqualified-class)))
     (catch 'found
       (dolist (class qualified-names)
-	(if (setq import (jdee-import-already-imports-class class imports))
-	    (throw 'found import))))))
+        (if (setq import (jdee-import-already-imports-class class imports))
+            (throw 'found import))))))
 
 (defun jdee-import-get-import-insertion-point ()
   "Determine where to insert an import statement.
@@ -224,36 +224,36 @@ contains a class definition, return the beginning
 of the line before the class definition; otherwise,
 return the beginning of the buffer."
   (cl-flet ((insertion-point-after
-	     (tag-end)
-	     (goto-char tag-end)
-	     (if (eolp) (forward-char 1)(forward-line 1)) ;skip comment
-	     (point)
-	     ))
+             (tag-end)
+             (goto-char tag-end)
+             (if (eolp) (forward-char 1)(forward-line 1)) ;skip comment
+             (point)
+             ))
     (let* ((tags (semantic-fetch-tags)) ;(xx (message "tags = %s" tags))
-	   (import-tag (car
-			(last (semantic-brute-find-tag-by-class
-			       'include tags))))
-	   (package-tag (car (semantic-brute-find-tag-by-class
-			      'package tags)))
-	   (class-tag (car (semantic-brute-find-tag-by-class
-			    'type tags)))
-	   )
+           (import-tag (car
+                        (last (semantic-brute-find-tag-by-class
+                               'include tags))))
+           (package-tag (car (semantic-brute-find-tag-by-class
+                              'package tags)))
+           (class-tag (car (semantic-brute-find-tag-by-class
+                            'type tags)))
+           )
       (save-excursion
-	(cond (import-tag
-	       (insertion-point-after (semantic-tag-end import-tag)))
-	      (package-tag
-	       (insertion-point-after (semantic-tag-end package-tag))
-	       (insert "\n")		;empty line before new imports
-	       (unless (eolp)		;empty line after new imports
-		 (save-excursion (insert "\n")))
-	       (point))
-	      (class-tag
-	       (let ((comment-token (semantic-documentation-for-tag
-				     class-tag 'lex)))
-		 (if comment-token
-		     (semantic-lex-token-start comment-token)
-		   (semantic-tag-start class-tag))))
-	      (t 1)))
+        (cond (import-tag
+               (insertion-point-after (semantic-tag-end import-tag)))
+              (package-tag
+               (insertion-point-after (semantic-tag-end package-tag))
+               (insert "\n")                ;empty line before new imports
+               (unless (eolp)                ;empty line after new imports
+                 (save-excursion (insert "\n")))
+               (point))
+              (class-tag
+               (let ((comment-token (semantic-documentation-for-tag
+                                     class-tag 'lex)))
+                 (if comment-token
+                     (semantic-lex-token-start comment-token)
+                   (semantic-tag-start class-tag))))
+              (t 1)))
       )))
 
 (defun jdee-import-import (class)
@@ -288,23 +288,23 @@ semantic Java parser and requires JDE 2.1.6-beta24 and above."
   (or (eq major-mode 'jdee-mode)
       (error "Invalid major mode found. Must be 'jdee-mode'."))
   (or (and (local-variable-p 'semantic--parse-table (current-buffer))
-	   (symbol-value 'semantic--parse-table))
+           (symbol-value 'semantic--parse-table))
       (error "Semantic Java parser not found."))
   (and (called-interactively-p 'interactive)
        (consp current-prefix-arg)
        (setq reverse t))
   (let* ((tags  (semantic-fetch-tags))
-	 (depends (semantic-brute-find-tag-by-class 'include tags)))
+         (depends (semantic-brute-find-tag-by-class 'include tags)))
     (if depends
-	(let* ((first-import-tag (car depends))
-	       (last-import-tag  (nth (1- (length depends)) depends))
-	       (start (semantic-tag-start first-import-tag))
-	       (end   (semantic-tag-end   last-import-tag)))
-	  (when (and start end)
-	    (require 'sort)
-	    (let (sort-fold-case)
-	      (sort-lines reverse start end)
-	      (goto-char start)))))))
+        (let* ((first-import-tag (car depends))
+               (last-import-tag  (nth (1- (length depends)) depends))
+               (start (semantic-tag-start first-import-tag))
+               (end   (semantic-tag-end   last-import-tag)))
+          (when (and start end)
+            (require 'sort)
+            (let (sort-fold-case)
+              (sort-lines reverse start end)
+              (goto-char start)))))))
 
 (defun jdee-import-find-and-import (class &optional no-errors no-exclude qualifiedp)
   "*Insert an import statement for a class in the current buffer.
@@ -324,83 +324,83 @@ classpath, except jars implicitly included by the jvm, e.g.,
 rt.jar. The NO-ERRORS is used to avoid showing erros to the user."
   (interactive
    (cl-flet ((vfn
-	      (class)
-	      (let ((existing-import (jdee-import-get-import (third class))))
-		(if (null existing-import)
-		    class
-		  (message "Skipping: already imported %s" existing-import)
-		  'pass))))
+              (class)
+              (let ((existing-import (jdee-import-get-import (third class))))
+                (if (null existing-import)
+                    class
+                  (message "Skipping: already imported %s" existing-import)
+                  'pass))))
      (list (jdee-read-class nil nil nil nil nil #'vfn) nil current-prefix-arg t)))
   (if qualifiedp
       (unless (eq class 'pass)
-	(jdee-parse-class-exists "java.util.List")
-	(jdee-import-insert-import (list class) (not no-exclude)))
+        (jdee-parse-class-exists "java.util.List")
+        (jdee-import-insert-import (list class) (not no-exclude)))
     (let (existing-import)
       (setq existing-import (jdee-import-get-import class))
       (if (not (null existing-import))
-	  (message "Skipping: already imported %s" existing-import)
-	(let ((imports (jdee-import-get-qualified-names class)))
-	  (setq imports (cl-remove-duplicates imports :test 'equal))
-	  (if imports
-	      (jdee-import-insert-import imports (not no-exclude))
-	    (if (not no-errors)
-		(message "Error: could not find %s." class))))))))
+          (message "Skipping: already imported %s" existing-import)
+        (let ((imports (jdee-import-get-qualified-names class)))
+          (setq imports (cl-remove-duplicates imports :test 'equal))
+          (if imports
+              (jdee-import-insert-import imports (not no-exclude))
+            (if (not no-errors)
+                (message "Error: could not find %s." class))))))))
 
 (defun jdee-import-exclude-imports (imports)
   "Remove imports from IMPORTS according to `jdee-import-excluded-classes'."
   (if jdee-import-excluded-classes
       (let (synonym-list ; synonyms to be excluded
-	    remaining-imports)
-	;; Exclude all imports matching an element of jdee-import-excluded-classes
-	;; and collect all synonyms to be excluded.
-	(setq remaining-imports
-	      (mapcar
-	       (lambda (import)
-		 (catch 'found
-		   (dolist (rule jdee-import-excluded-classes)
-		     (when (and
-			    (string-match "[.]" import)
-			    (if (functionp (car rule))
-				(funcall (car rule) import)
-			      (string-match (car rule) import)))
-		       (message "Excluding %s." import)
-		       (when (cdr rule)    ; exclude all classes having same name?
-			 (setq synonym-list
-			       (cons (jdee-parse-get-unqualified-name import) synonym-list)))
-		       (throw 'found nil)))
-		   import))
-	       imports))
-	;; Exclude all synonyms contained in synonym-list.
-	(setq remaining-imports
-	      (mapcar
-	       (lambda (import)
-		 (if import
-		     (catch 'found
-		       (dolist (synonym synonym-list)
-			 (when (string-match (concat (regexp-quote synonym) "$") import)
-			   (message "Excluding synonym %s." import)
-			   (throw 'found nil)))
-		       import)))
-	       remaining-imports))
-	;; Remove all nil inserted instead of excluded classes.
-	(delq nil remaining-imports))
+            remaining-imports)
+        ;; Exclude all imports matching an element of jdee-import-excluded-classes
+        ;; and collect all synonyms to be excluded.
+        (setq remaining-imports
+              (mapcar
+               (lambda (import)
+                 (catch 'found
+                   (dolist (rule jdee-import-excluded-classes)
+                     (when (and
+                            (string-match "[.]" import)
+                            (if (functionp (car rule))
+                                (funcall (car rule) import)
+                              (string-match (car rule) import)))
+                       (message "Excluding %s." import)
+                       (when (cdr rule)    ; exclude all classes having same name?
+                         (setq synonym-list
+                               (cons (jdee-parse-get-unqualified-name import) synonym-list)))
+                       (throw 'found nil)))
+                   import))
+               imports))
+        ;; Exclude all synonyms contained in synonym-list.
+        (setq remaining-imports
+              (mapcar
+               (lambda (import)
+                 (if import
+                     (catch 'found
+                       (dolist (synonym synonym-list)
+                         (when (string-match (concat (regexp-quote synonym) "$") import)
+                           (message "Excluding synonym %s." import)
+                           (throw 'found nil)))
+                       import)))
+               remaining-imports))
+        ;; Remove all nil inserted instead of excluded classes.
+        (delq nil remaining-imports))
     imports))
 
 (defun jdee-import-insert-import (new-imports &optional exclude)
   "Asks user, if necessary, to choose one of NEW-IMPORTS and
 inserts the selected import in the buffer."
   (let* ((existing-imports (jdee-import-get-imports))
-	 (candidate-imports (if exclude
-				(jdee-import-exclude-imports new-imports)
-			      new-imports))
-	 (new-import
-	  (if (> (length candidate-imports) 1)
-	      (jdee-import-choose-import candidate-imports)
-	    (car candidate-imports))))
+         (candidate-imports (if exclude
+                                (jdee-import-exclude-imports new-imports)
+                              new-imports))
+         (new-import
+          (if (> (length candidate-imports) 1)
+              (jdee-import-choose-import candidate-imports)
+            (car candidate-imports))))
     (if new-import
-	(if (jdee-import-already-imports-class new-import existing-imports)
-	    (message "This buffer already imports %s" new-import)
-	  (jdee-import-insert-imports-into-buffer (list new-import))))))
+        (if (jdee-import-already-imports-class new-import existing-imports)
+            (message "This buffer already imports %s" new-import)
+          (jdee-import-insert-imports-into-buffer (list new-import))))))
 
 (defun jdee-import-insert-imports-into-buffer (new-imports &optional exclude)
   "Inserts imports into the correct place in the buffer."
@@ -410,14 +410,14 @@ inserts the selected import in the buffer."
     (if exclude
         (setq new-imports (jdee-import-exclude-imports new-imports)))
     (loop for new-import in new-imports do
-	  (when (> (length new-import) 0) ;; added to avoid insert empty import statements.
-	    (insert (concat "import " new-import ";\n"))
-	    (message "Imported %s" new-import)))
+          (when (> (length new-import) 0) ;; added to avoid insert empty import statements.
+            (insert (concat "import " new-import ";\n"))
+            (message "Imported %s" new-import)))
     (if jdee-import-auto-collapse-imports
-	(let (jdee-import-auto-collapse-imports) ;; setting this to avoid infinite recursion
-	  (jdee-import-collapse-imports)))
+        (let (jdee-import-auto-collapse-imports) ;; setting this to avoid infinite recursion
+          (jdee-import-collapse-imports)))
     (if jdee-import-auto-sort
-	(funcall jdee-import-auto-sort-function))
+        (funcall jdee-import-auto-sort-function))
     (semantic-fetch-tags)
     (semantic-parse-changes)
     ))
@@ -429,15 +429,15 @@ inserts the selected import in the buffer."
    class-name
    existing-imports
    :test (lambda (new existing)
-		   (let ((new-package (jdee-parse-get-package-from-name new))
-			 (new-class (jdee-parse-get-unqualified-name new))
-			 (existing-package (jdee-parse-get-package-from-name existing))
-			 (existing-class (jdee-parse-get-unqualified-name existing)))
-		     (and
-		      (string= new-package existing-package)
-		      (or
-		       (string= new-class existing-class)
-		       (string= existing-class "*")))))))
+                   (let ((new-package (jdee-parse-get-package-from-name new))
+                         (new-class (jdee-parse-get-unqualified-name new))
+                         (existing-package (jdee-parse-get-package-from-name existing))
+                         (existing-class (jdee-parse-get-unqualified-name existing)))
+                     (and
+                      (string= new-package existing-package)
+                      (or
+                       (string= new-class existing-class)
+                       (string= existing-class "*")))))))
 
 (defun jdee-import-strip-existing-imports (new-imports existing-imports)
   "Exclude classes that have already been imported."
@@ -446,7 +446,7 @@ inserts the selected import in the buffer."
    (mapcar
     (lambda (new-import)
       (unless  (jdee-import-already-imports-class new-import existing-imports)
-	new-import))
+        new-import))
     new-imports)))
 
 (defun jdee-import-choose-import (new-imports)
@@ -478,94 +478,94 @@ The current buffer must be in `jdee-mode'."
        (consp current-prefix-arg)
        (setq comment t))
   (let* ((tags    (semantic-fetch-tags))
-	 (imports (semantic-brute-find-tag-by-class 'include tags)))
+         (imports (semantic-brute-find-tag-by-class 'include tags)))
     (if (not imports)
-	(message "No import found")
+        (message "No import found")
       (let* ((packages (semantic-brute-find-tag-by-class 'package tags))
-	     (package-imports
-	      (append
-	       (mapcar
-		(lambda (package)
-		  ;; Return a global import name from PACKAGE tag.
-		  ;; That is add ".*" at end of tag name.
-		  (concat (semantic-tag-name package) ".*"))
-		packages)
-	       (delq nil
-		     (mapcar
-		      (lambda (import)
-			;; Return tag name if IMPORT is global or nil if not.
-			;; IMPORT is global if its name ends with ".*".
-			(let ((name (semantic-tag-name import)))
-			  (and (string-match "[.][*]\\'" name)
-			       name)))
-		      imports))))
-	     (first-import (car imports))
-	     extra-imports
-	     required-imports)
-	(save-excursion
-	  ;; Get the list of extra imports
-	  ;; Going to character zero so the the count-matches method work.
-	  (goto-char 0)
-	  (while imports
-	    (let* ((import (car imports))
-		   (name (semantic-tag-name import))
-		   (classname (jdee-import-get-classname name))
-		   (case-fold-search nil)
-		   (number-of-matches
-		    (count-matches
-		     (concat "\\b" classname "\\b"))))
-	      (if (or
-		   ;; If name is already listed in the set
-		   ;; of required imports...
-		   (member name required-imports)
-		   ;;or the class is not reference in the file
-		   ;;and is not an import of the whole package i.e. .*
-		   (and (< number-of-matches 2)
-			(not (string= classname "*")))
-		   ;; or imports a class in the current package...
-		   (and
-		    ;; make sure name is not a package import, e.g., foo.bar.*
-		    (not (string-match "[.][*]\\'" name))
-		    (member
-		     ;; convert class import to equivalent package import
-		     ;; e.g., foo.barClass to foo.*
-		     (concat
-		      (substring
-		       name
-		       0
-		       (or (string-match "[.][^.]+\\'" name)
-			   (length name)))
-		      ".*")
-		     package-imports)))
-		  ;; add name to the list of extra imports...
-		  (setq extra-imports (cons import extra-imports))
-		;; otherwise add to the list or required  imports
-		(setq required-imports (cons name required-imports))))
-	    (setq imports (cdr imports)))
-	  (if (not extra-imports)
-	      (message "No extra imports found")
-	    (let ((count 0))
-	      ;; Move the point at the beginning of the first import
-	      (goto-char (semantic-tag-start first-import))
-	      ;; Kill or comment out extra imports
-	      (while extra-imports
-		(let* ((extra-import (car extra-imports))
-		       (start (semantic-tag-start extra-import))
-		       (end (semantic-tag-end extra-import)))
-		  (setq count  (1+ count))
-		  (if comment
-		      (comment-region start end)
-		    ;; The following assumes that there is only one import
-		    ;; statement on the same line. Line end comments are deleted
-		    ;; too.
-		    (kill-region start
-				 (progn
-				   (goto-char end)
-				   (forward-line)
-				   (point))))
-		  (setq extra-imports (cdr extra-imports))))
-	      (message "%d extra import%s removed"
-		       count (if (= count 1) "" "s")))))))))
+             (package-imports
+              (append
+               (mapcar
+                (lambda (package)
+                  ;; Return a global import name from PACKAGE tag.
+                  ;; That is add ".*" at end of tag name.
+                  (concat (semantic-tag-name package) ".*"))
+                packages)
+               (delq nil
+                     (mapcar
+                      (lambda (import)
+                        ;; Return tag name if IMPORT is global or nil if not.
+                        ;; IMPORT is global if its name ends with ".*".
+                        (let ((name (semantic-tag-name import)))
+                          (and (string-match "[.][*]\\'" name)
+                               name)))
+                      imports))))
+             (first-import (car imports))
+             extra-imports
+             required-imports)
+        (save-excursion
+          ;; Get the list of extra imports
+          ;; Going to character zero so the the count-matches method work.
+          (goto-char 0)
+          (while imports
+            (let* ((import (car imports))
+                   (name (semantic-tag-name import))
+                   (classname (jdee-import-get-classname name))
+                   (case-fold-search nil)
+                   (number-of-matches
+                    (count-matches
+                     (concat "\\b" classname "\\b"))))
+              (if (or
+                   ;; If name is already listed in the set
+                   ;; of required imports...
+                   (member name required-imports)
+                   ;;or the class is not reference in the file
+                   ;;and is not an import of the whole package i.e. .*
+                   (and (< number-of-matches 2)
+                        (not (string= classname "*")))
+                   ;; or imports a class in the current package...
+                   (and
+                    ;; make sure name is not a package import, e.g., foo.bar.*
+                    (not (string-match "[.][*]\\'" name))
+                    (member
+                     ;; convert class import to equivalent package import
+                     ;; e.g., foo.barClass to foo.*
+                     (concat
+                      (substring
+                       name
+                       0
+                       (or (string-match "[.][^.]+\\'" name)
+                           (length name)))
+                      ".*")
+                     package-imports)))
+                  ;; add name to the list of extra imports...
+                  (setq extra-imports (cons import extra-imports))
+                ;; otherwise add to the list or required  imports
+                (setq required-imports (cons name required-imports))))
+            (setq imports (cdr imports)))
+          (if (not extra-imports)
+              (message "No extra imports found")
+            (let ((count 0))
+              ;; Move the point at the beginning of the first import
+              (goto-char (semantic-tag-start first-import))
+              ;; Kill or comment out extra imports
+              (while extra-imports
+                (let* ((extra-import (car extra-imports))
+                       (start (semantic-tag-start extra-import))
+                       (end (semantic-tag-end extra-import)))
+                  (setq count  (1+ count))
+                  (if comment
+                      (comment-region start end)
+                    ;; The following assumes that there is only one import
+                    ;; statement on the same line. Line end comments are deleted
+                    ;; too.
+                    (kill-region start
+                                 (progn
+                                   (goto-char end)
+                                   (forward-line)
+                                   (point))))
+                  (setq extra-imports (cdr extra-imports))))
+              (message "%d extra import%s removed"
+                       count (if (= count 1) "" "s")))))))))
 
 ;;;;
 ;;;; Helper functions
@@ -587,20 +587,20 @@ A group is found as soon as the import name matches a regexp in
 `jdee-import-group-of-rules'.  The returned group name depends on the
 corresponding group definition in `jdee-import-group-of-rules'."
   (let ((import-name (semantic-tag-name import-tag))
-	(groups      jdee-import-group-of-rules)
-	match rule regexp group)
+        (groups      jdee-import-group-of-rules)
+        match rule regexp group)
     (while (and groups (not match))
       (setq rule    (car groups)
-	    groups  (cdr groups)
-	    regexp  (car rule)
-	    group   (cdr rule)
-	    match   (and (string-match regexp import-name)
-			 (cond ((stringp  group)
-				group)
-			       ((integerp group)
-				(match-string group import-name))
-			       (t
-				regexp)))))
+            groups  (cdr groups)
+            regexp  (car rule)
+            group   (cdr rule)
+            match   (and (string-match regexp import-name)
+                         (cond ((stringp  group)
+                                group)
+                               ((integerp group)
+                                (match-string group import-name))
+                               (t
+                                regexp)))))
     match))
 
 (defun jdee-import-bucketize (imports)
@@ -615,60 +615,60 @@ bucket contains imports that do not belong to any group."
     ;; for imports not in any group.
     (while imports
       (setq import  (car imports)
-	    imports (cdr imports)
-	    group   (funcall (or jdee-import-group-function
-				 #'jdee-import-group-of)
-			     import))
+            imports (cdr imports)
+            group   (funcall (or jdee-import-group-function
+                                 #'jdee-import-group-of)
+                             import))
       (if (not group)
-	  (setq others (cons import others))
-	(setq bin (assoc group bins))
-	(if bin
-	    (setcdr bin (cons import (cdr bin)))
-	  (setq bins (cons (cons group (list import)) bins)))))
+          (setq others (cons import others))
+        (setq bin (assoc group bins))
+        (if bin
+            (setcdr bin (cons import (cdr bin)))
+          (setq bins (cons (cons group (list import)) bins)))))
     ;; If required sort the bins by group name
     ;; Remember that bins are in reverse order at this point.
     (cond ((eq jdee-import-sorted-groups 'asc)
-	   (setq bins (sort bins
-			    (function
-			     (lambda (bin1 bin2)
-			       (string-lessp (car bin2)
-					     (car bin1)))))))
-	  ((eq jdee-import-sorted-groups 'desc)
-	   (setq bins (sort bins
-			    (function
-			     (lambda (bin1 bin2)
-			       (string-lessp (car bin1)
-					     (car bin2)))))))
-	  ((eq jdee-import-sorted-groups 'gor)
-	   (let* ((group-list (mapcar (function
+           (setq bins (sort bins
+                            (function
+                             (lambda (bin1 bin2)
+                               (string-lessp (car bin2)
+                                             (car bin1)))))))
+          ((eq jdee-import-sorted-groups 'desc)
+           (setq bins (sort bins
+                            (function
+                             (lambda (bin1 bin2)
+                               (string-lessp (car bin1)
+                                             (car bin2)))))))
+          ((eq jdee-import-sorted-groups 'gor)
+           (let* ((group-list (mapcar (function
                                    ;; If item does not have a second element,
                                    ;; that means to use the regex itself
-				       (lambda (item) (or (cdr item) (car item))))
-				      jdee-import-group-of-rules)))
-	     (setq bins
-		   (sort bins
-			 (function
-			  (lambda (bin1 bin2)
-			    (let* ((name1 (car bin1))
-				   (name2 (car bin2))
-				   (idx1 (length (member name1 group-list)))
-				   (idx2 (length (member name2 group-list))))
-			      (< idx1 idx2)))))))))
+                                       (lambda (item) (or (cdr item) (car item))))
+                                      jdee-import-group-of-rules)))
+             (setq bins
+                   (sort bins
+                         (function
+                          (lambda (bin1 bin2)
+                            (let* ((name1 (car bin1))
+                                   (name2 (car bin2))
+                                   (idx1 (length (member name1 group-list)))
+                                   (idx2 (length (member name2 group-list))))
+                              (< idx1 idx2)))))))))
     ;; Build the vector of buckets.
     (setq bins (vconcat
-		(delq nil
-		      (nreverse
-		       (cons (cons jdee-import-default-group-name
-				   others)
-			     bins))))
-	  n    (length bins)
-	  i    0)
+                (delq nil
+                      (nreverse
+                       (cons (cons jdee-import-default-group-name
+                                   others)
+                             bins))))
+          n    (length bins)
+          i    0)
     ;; Sort each bucket.
     (while (< i n)
       (setq bin (aref bins i))
       (setcdr bin (if jdee-import-reverse-sort-group
-		      (semantic-sort-tags-by-name-decreasing (cdr bin))
-		    (semantic-sort-tags-by-name-increasing (cdr bin))))
+                      (semantic-sort-tags-by-name-decreasing (cdr bin))
+                    (semantic-sort-tags-by-name-increasing (cdr bin))))
       (setq i (1+ i)))
     bins))
 
@@ -680,7 +680,7 @@ If optional NAME is non-nil add it as comment just before the group."
     (when skip-line
       (newline)
       (if jdee-import-blank-line-between-groups
-	  (newline)))
+          (newline)))
     (when (and jdee-import-insert-group-names name)
       (insert comment-start name)
       (newline))
@@ -722,73 +722,73 @@ version of the JDE with the semantic parser."
        (setq force t))
   (save-excursion
     (let* ((tags  (semantic-fetch-tags))
-	   (imports (semantic-brute-find-tag-by-class 'include tags)))
+           (imports (semantic-brute-find-tag-by-class 'include tags)))
       (if imports
-	  (let* ((bins (jdee-import-bucketize imports))
-		 (n    (length bins))
-		 i l sl changed group bin)
-	    (if force
-		(setq changed t)
-	      ;; Check if imports already ordered
-	      (setq sl (apply #'append (mapcar #'cdr bins))
-		    l  imports)
-	      (while (and (not changed) l)
-		(setq changed (not (string-equal
-				    (semantic-tag-name (car l))
-				    (semantic-tag-name (car sl))))
-		      l  (cdr l)
-		      sl (cdr sl))))
-	    (if (not changed)
-		(message "Import statements already ordered")
-	      ;; Imports need to be reordered.
-	      ;; 1- Get ordered import texts
-	      (setq i 0)
-	      (while (< i n)
-		(setq bin (aref bins i))
-		(setcdr bin (mapcar (function
-				     (lambda (import)
-				       (buffer-substring-no-properties
-					(semantic-tag-start import)
-					(progn
-					  (goto-char (semantic-tag-end import))
-					  (end-of-line)	; keep any line comment
-					  (point)))))
-				    (cdr bin)))
-		(setq i (1+ i)))
-	      ;; 2- Keep the point at the beginning of the first import
-	      (goto-char (semantic-tag-start (car imports)))
-	      ;; 2b- But check if the previous line already contains the
-	      ;; group name for the first group
-	      (when jdee-import-insert-group-names
-		(setq i 0)
-		(while (and (< i n) (not group))
-		  (setq group (aref bins i)
-			i     (1+ i)))
-		(when (car group)
-		  (forward-line -1)
-		  (if (not (string< (concat comment-start (car group))
-				    (thing-at-point 'line)))
-		      (forward-line 1)))
-		(setq group nil))
-	      ;; 3- Kill current imports
-	      (kill-region (point)
-			   (progn
-			     (goto-char (semantic-tag-end
-					 (car (reverse imports))))
-			     (end-of-line)
-			     (point)))
-	      ;; 4- Insert ordered imports
-	      ;; Insert the first group found
-	      (setq i 0)
-	      (while (and (< i n) (not group))
-		(setq group (aref bins i)
-		      i     (1+ i)))
-	      (jdee-import-insert-group (cdr group) nil (car group))
-	      ;; Insert the others with a blank line before each group
-	      (while (< i n)
-		(setq group (aref bins i)
-		      i (1+ i))
-		(jdee-import-insert-group (cdr group) 'skip-line (car group)))))))))
+          (let* ((bins (jdee-import-bucketize imports))
+                 (n    (length bins))
+                 i l sl changed group bin)
+            (if force
+                (setq changed t)
+              ;; Check if imports already ordered
+              (setq sl (apply #'append (mapcar #'cdr bins))
+                    l  imports)
+              (while (and (not changed) l)
+                (setq changed (not (string-equal
+                                    (semantic-tag-name (car l))
+                                    (semantic-tag-name (car sl))))
+                      l  (cdr l)
+                      sl (cdr sl))))
+            (if (not changed)
+                (message "Import statements already ordered")
+              ;; Imports need to be reordered.
+              ;; 1- Get ordered import texts
+              (setq i 0)
+              (while (< i n)
+                (setq bin (aref bins i))
+                (setcdr bin (mapcar (function
+                                     (lambda (import)
+                                       (buffer-substring-no-properties
+                                        (semantic-tag-start import)
+                                        (progn
+                                          (goto-char (semantic-tag-end import))
+                                          (end-of-line)        ; keep any line comment
+                                          (point)))))
+                                    (cdr bin)))
+                (setq i (1+ i)))
+              ;; 2- Keep the point at the beginning of the first import
+              (goto-char (semantic-tag-start (car imports)))
+              ;; 2b- But check if the previous line already contains the
+              ;; group name for the first group
+              (when jdee-import-insert-group-names
+                (setq i 0)
+                (while (and (< i n) (not group))
+                  (setq group (aref bins i)
+                        i     (1+ i)))
+                (when (car group)
+                  (forward-line -1)
+                  (if (not (string< (concat comment-start (car group))
+                                    (thing-at-point 'line)))
+                      (forward-line 1)))
+                (setq group nil))
+              ;; 3- Kill current imports
+              (kill-region (point)
+                           (progn
+                             (goto-char (semantic-tag-end
+                                         (car (reverse imports))))
+                             (end-of-line)
+                             (point)))
+              ;; 4- Insert ordered imports
+              ;; Insert the first group found
+              (setq i 0)
+              (while (and (< i n) (not group))
+                (setq group (aref bins i)
+                      i     (1+ i)))
+              (jdee-import-insert-group (cdr group) nil (car group))
+              ;; Insert the others with a blank line before each group
+              (while (< i n)
+                (setq group (aref bins i)
+                      i (1+ i))
+                (jdee-import-insert-group (cdr group) 'skip-line (car group)))))))))
 
 (defcustom jdee-import-collapse-imports-threshold 2
   "Threshold level used by `jdee-import-collapse-imports' to decide when a
@@ -810,27 +810,27 @@ invoking `jdee-import-kill-extra-imports' to clean up."
   (or (eq major-mode 'jdee-mode)
       (error "Major mode must be 'jdee-mode'"))
   (let* ((tags    (semantic-fetch-tags))
-	 (imports (semantic-brute-find-tag-by-class 'include tags)))
+         (imports (semantic-brute-find-tag-by-class 'include tags)))
     (if (<= jdee-import-collapse-imports-threshold 0)
-	(message "Collapse threshold set to zero. No collapsing will occur.")
+        (message "Collapse threshold set to zero. No collapsing will occur.")
     (if (not imports)
-	(message "No import found")
+        (message "No import found")
       (let* ((package-buckets (jdee-import-collapse-imports-bucketize imports))
-	     (extra-imports   nil)
-	     (required-imports nil)
-	     (new-imports nil))
-	(while package-buckets
-	  (let*
-	      ((bucket (car package-buckets)))
-	    (if (>= (length bucket) jdee-import-collapse-imports-threshold)
-		(progn
-		  (add-to-list 'extra-imports (cdr bucket))
-		  ;; Add the collapsing package statement
-		  (add-to-list 'new-imports (concat (car bucket) ".*")))
-	      (add-to-list 'required-imports (cdr bucket))))
-	  (setq package-buckets (cdr package-buckets)))
-	(jdee-import-insert-imports-into-buffer new-imports)
-	(jdee-import-kill-extra-imports comments))))))
+             (extra-imports   nil)
+             (required-imports nil)
+             (new-imports nil))
+        (while package-buckets
+          (let*
+              ((bucket (car package-buckets)))
+            (if (>= (length bucket) jdee-import-collapse-imports-threshold)
+                (progn
+                  (add-to-list 'extra-imports (cdr bucket))
+                  ;; Add the collapsing package statement
+                  (add-to-list 'new-imports (concat (car bucket) ".*")))
+              (add-to-list 'required-imports (cdr bucket))))
+          (setq package-buckets (cdr package-buckets)))
+        (jdee-import-insert-imports-into-buffer new-imports)
+        (jdee-import-kill-extra-imports comments))))))
 
 
 ;; Contributed by Martin Schwamberger.
@@ -843,32 +843,32 @@ is used by `jdee-import-all'. This function is roughly the opposite of
 `jdee-import-collapse-imports'."
    (interactive "P")
    (let* ((tags  (semantic-fetch-tags))
-	  (imports (semantic-brute-find-tag-by-class 'include tags))
-	  import-all
-	  package-import-start
-	  package-import-end
-	  jdee-import-auto-collapse-imports) ; disable auto collapse
+          (imports (semantic-brute-find-tag-by-class 'include tags))
+          import-all
+          package-import-start
+          package-import-end
+          jdee-import-auto-collapse-imports) ; disable auto collapse
      (dolist (import imports)
        (when package-import-start
-	 ;; kill from start of package-import to beginning of following import
-	 (kill-region package-import-start (semantic-tag-start import))
-	 (setq import-all t)
-	 (setq package-import-start nil))
+         ;; kill from start of package-import to beginning of following import
+         (kill-region package-import-start (semantic-tag-start import))
+         (setq import-all t)
+         (setq package-import-start nil))
        (when (string-match "\\.\\*" (semantic-tag-name import)) ; package-import?
-	 (setq package-import-start (semantic-tag-start import))
-	 (setq package-import-end (semantic-tag-end import))))
+         (setq package-import-start (semantic-tag-start import))
+         (setq package-import-end (semantic-tag-end import))))
      ;; kill last import?
      (when package-import-start
        ;; kill from start of package-import to end of line
        (kill-region package-import-start
-		    (save-excursion
-		      (goto-char package-import-end)
-		      (end-of-line)
-		      (or (eobp) (forward-char))
-		      (point)))
+                    (save-excursion
+                      (goto-char package-import-end)
+                      (end-of-line)
+                      (or (eobp) (forward-char))
+                      (point)))
        (setq import-all t))
      (if import-all
-	 (jdee-import-all no-exclude))))
+         (jdee-import-all no-exclude))))
 
 
 (defun jdee-import-collapse-imports-bucketize (imports)
@@ -876,14 +876,14 @@ is used by `jdee-import-all'. This function is roughly the opposite of
   (let ((package-buckets))
     (while imports
       (let* ((import (car imports))
-	     (name (semantic-tag-name import))
-	     (packagename (jdee-parse-get-package-from-name name))
-	     (packagebin))
-	(setq packagebin (assoc packagename package-buckets))
-	(if packagebin
-	    (setcdr packagebin (cons import (cdr packagebin)))
-	  (setq package-buckets (cons (cons packagename (list import)) package-buckets)))
-	(setq imports (cdr imports))))
+             (name (semantic-tag-name import))
+             (packagename (jdee-parse-get-package-from-name name))
+             (packagebin))
+        (setq packagebin (assoc packagename package-buckets))
+        (if packagebin
+            (setcdr packagebin (cons import (cdr packagebin)))
+          (setq package-buckets (cons (cons packagename (list import)) package-buckets)))
+        (setq imports (cdr imports))))
   package-buckets))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -911,86 +911,86 @@ buffer that start with an uppercase character, have at least one lower
 case character, and that are not included in an import statement and
 are not the names of inner or outer classes declared in this buffer."
   (let (declared-classes
-	imported-classes
-	classes-to-import)
+        imported-classes
+        classes-to-import)
 
     ;; Get the names of classes that are already imported into this buffer.
     (let ((import-tags (semantic-brute-find-tag-by-class 'include (current-buffer))))
       (setq
-	imported-classes
-	(mapcar
-	 (lambda (import-tag)
-	   (jdee-parse-get-unqualified-name (semantic-tag-name import-tag)))
-	 import-tags)))
+        imported-classes
+        (mapcar
+         (lambda (import-tag)
+           (jdee-parse-get-unqualified-name (semantic-tag-name import-tag)))
+         import-tags)))
 
     ;; Get the names of classes declared in this buffer.
     (let ((buffer-class-tags (semantic-brute-find-tag-by-class 'type (current-buffer))))
       (dolist (class-tag buffer-class-tags)
-	(setq declared-classes (append declared-classes  (list (semantic-tag-name class-tag))))
-	(jdee-import-find-declared-classes class-tag declared-classes)))
+        (setq declared-classes (append declared-classes  (list (semantic-tag-name class-tag))))
+        (jdee-import-find-declared-classes class-tag declared-classes)))
 
     ;; Sort through the Java tokens in this buffer, looking
     ;; for identifiers that start with an uppercase character and
     ;; do not appear in an import statement or a toplevel
     ;; class declaration.
     (let ((tokens (semantic-lex-buffer 1000)))
-	     (dolist (token tokens classes-to-import)
+             (dolist (token tokens classes-to-import)
       (let ((type (car token))
-	    (start (cadr token))
-	    (end (cddr token)))
-	(if (eq type 'IDENTIFIER)
-	    (let (case-fold-search
-		  (name (buffer-substring-no-properties start end)))
-	      (unless (or
-		       (string-match "^[a-z]" name)
-		       (not (string-match "[a-z]" name))
-		       (member name declared-classes)
-		       (member name imported-classes))
-		(add-to-list 'classes-to-import  name t)))))))))
+            (start (cadr token))
+            (end (cddr token)))
+        (if (eq type 'IDENTIFIER)
+            (let (case-fold-search
+                  (name (buffer-substring-no-properties start end)))
+              (unless (or
+                       (string-match "^[a-z]" name)
+                       (not (string-match "[a-z]" name))
+                       (member name declared-classes)
+                       (member name imported-classes))
+                (add-to-list 'classes-to-import  name t)))))))))
 
 (defun jdee-import-is-included0 (name import0)
   "check single qualified name against a single qualified class name."
   (and import0
        (let* ((len0 (length import0))
-	      (dotstar (eq t (compare-strings import0 (- len0 2) len0 ".*" nil nil nil)))
-	      (import (if dotstar (substring import0 0 (- len0 2)) import0))
-	      (len (length import)))
-	 (or
-	  (string-equal import name)	; name.equals(import)
-	  (and
-	   (eq t (compare-strings name 0 len import nil nil nil))  ; name.startsWith(import)
-	   (eq t (compare-strings name len (1+ len) "." nil nil )) ; name[len] == "."
-	   ))
-	 )))
+              (dotstar (eq t (compare-strings import0 (- len0 2) len0 ".*" nil nil nil)))
+              (import (if dotstar (substring import0 0 (- len0 2)) import0))
+              (len (length import)))
+         (or
+          (string-equal import name)        ; name.equals(import)
+          (and
+           (eq t (compare-strings name 0 len import nil nil nil))  ; name.startsWith(import)
+           (eq t (compare-strings name len (1+ len) "." nil nil )) ; name[len] == "."
+           ))
+         )))
 
 (defun jdee-import-is-included1 (name classes)
   "check single qualified name against list of qualified classes"
   (and name
        (do* ((imports classes (cdr imports))
-	     (import (car imports) (car imports))
-	     (incl (jdee-import-is-included0 name import) (jdee-import-is-included0 name import)))
-	   ((or (null import) incl) incl)
-	 )))
+             (import (car imports) (car imports))
+             (incl (jdee-import-is-included0 name import) (jdee-import-is-included0 name import)))
+           ((or (null import) incl) incl)
+         )))
 
 (defun jdee-import-is-included (names classes)
   "check single or list of qualified names against qualified classes"
   (if (listp names)
       (do* ((nlist names (cdr nlist))
-	    (name (car nlist) (car nlist))
-	    (incl (jdee-import-is-included1 name classes) (jdee-import-is-included1 name classes))
-	    )
-	  ((or (null name) incl) incl))
+            (name (car nlist) (car nlist))
+            (incl (jdee-import-is-included1 name classes) (jdee-import-is-included1 name classes))
+            )
+          ((or (null name) incl) incl))
     (jdee-import-is-included1 names classes)
     ))
 
 (defun jdee-import-filter-inner-imports (qualified-names)
   "remove names that are imported by outer classes or some.package.*"
   (let* ((import-tags (semantic-brute-find-tag-by-class 'include (current-buffer)))
-	 (imported-classes (mapcar (lambda (import-tag) (semantic-tag-name import-tag)) import-tags))
-	 (imports nil))
+         (imported-classes (mapcar (lambda (import-tag) (semantic-tag-name import-tag)) import-tags))
+         (imports nil))
     (dolist (qnames qualified-names imports)
       (if (not (jdee-import-is-included qnames imported-classes))
-	  (setq imports (cons qnames imports))))
+          (setq imports (cons qnames imports))))
     ))
 
 (defun jdee-import-all-show ()
@@ -999,12 +999,12 @@ buffer that are not declared or explicitly imported into this
 buffer and hence may need to be imported."
   (interactive)
   (let ((candidate-imports
-	 (jdee-import-all-find-classes-to-import)))
+         (jdee-import-all-find-classes-to-import)))
     (with-output-to-temp-buffer "*jde import*"
       (mapcar
        (lambda(match)
-	 (princ match)
-	 (princ "\n"))
+         (princ match)
+         (princ "\n"))
        candidate-imports))))
 
 (defun jdee-import-all-filter (unqualified-imports &optional no-exclude)
@@ -1018,12 +1018,12 @@ any classes that appear to be included by outer-class imports."
    (lambda (unqualified-class)
      (let ((qualified-imports (jdee-import-get-qualified-names unqualified-class)))
        (if no-exclude
-	   qualified-imports
-	 (jdee-import-exclude-imports qualified-imports))))
+           qualified-imports
+         (jdee-import-exclude-imports qualified-imports))))
    unqualified-imports))
-	)
+        )
     (if (or no-exclude (not jdee-import-exclude-inner-imports))
-	imports
+        imports
       (jdee-import-filter-inner-imports imports))))
 
 (defun jdee-import-all-unique ()
@@ -1033,18 +1033,18 @@ which there is only one fully qualified name on the current
 classpath."
   (interactive)
   (let ((list
-	 (jdee-import-all-filter (jdee-import-all-find-classes-to-import)))
-	(retn))
+         (jdee-import-all-filter (jdee-import-all-find-classes-to-import)))
+        (retn))
     (delq nil
-	  ;; take single length sublists, and return item..
-	  (mapcar
-	   (lambda(item)
-	     (if (= 1 (length item))
-		 (add-to-list 'retn
-			      (car item))))
-	   list))
+          ;; take single length sublists, and return item..
+          (mapcar
+           (lambda(item)
+             (if (= 1 (length item))
+                 (add-to-list 'retn
+                              (car item))))
+           list))
     (if (< 0 (length retn))
-	(jdee-import-insert-imports-into-buffer retn))))
+        (jdee-import-insert-imports-into-buffer retn))))
 
 (defclass jdee-import-all-dialog(efc-multi-option-dialog) nil)
 
@@ -1056,15 +1056,15 @@ classpath."
   "Sort the options."
   ;; sort the ones with the most options first...
   (sort list
-	(lambda(a b)
-	  ;; sort lexically
-	  (if (= (length a)
-		 (length b))
-	      (string< (car a)
-		       (car b))
-	    ;; or by length
-	    (> (length a)
-	       (length b))))))
+        (lambda(a b)
+          ;; sort lexically
+          (if (= (length a)
+                 (length b))
+              (string< (car a)
+                       (car b))
+            ;; or by length
+            (> (length a)
+               (length b))))))
 
 (defun jdee-import-all (&optional no-exclude)
   "Imports all classes that need to be imported into the current buffer.
@@ -1074,31 +1074,31 @@ Classes specified by `jdee-import-excluded-classes' will be excluded,
 unless the prefix argument NO-EXCLUDE is non-nil."
   (interactive "P")
   (let* ((imports
-	  (jdee-import-all-filter
-	   (jdee-import-all-find-classes-to-import) no-exclude))
-	 (unique-imports
-	  (delq
-	   nil
-	   (mapcar
-	   (lambda (import) (if (= (length import) 1) (car import)))
-	   imports)))
-	 (ambiguous-imports
-	  (delq
-	   nil
-	   (mapcar
-	   (lambda (import) (if (> (length import) 1) import))
-	   imports)))
-	 (dialog
-	  (if ambiguous-imports
-	      (jdee-import-all-dialog
-	       "Multi Classes Option"
-	       :options ambiguous-imports
-	       :text "Select imports to insert."))))
+          (jdee-import-all-filter
+           (jdee-import-all-find-classes-to-import) no-exclude))
+         (unique-imports
+          (delq
+           nil
+           (mapcar
+           (lambda (import) (if (= (length import) 1) (car import)))
+           imports)))
+         (ambiguous-imports
+          (delq
+           nil
+           (mapcar
+           (lambda (import) (if (> (length import) 1) import))
+           imports)))
+         (dialog
+          (if ambiguous-imports
+              (jdee-import-all-dialog
+               "Multi Classes Option"
+               :options ambiguous-imports
+               :text "Select imports to insert."))))
     (if dialog
-	(progn
-	  (efc-dialog-show dialog)
-	  (setq unique-imports
-		(append unique-imports (oref dialog selection)))))
+        (progn
+          (efc-dialog-show dialog)
+          (setq unique-imports
+                (append unique-imports (oref dialog selection)))))
     (jdee-import-insert-imports-into-buffer unique-imports)))
 
 ;;;###autoload

@@ -70,12 +70,12 @@
 (defun jdee-widget-tree-close-button-callback (widget &optional event)
   ;; Set parent state to closed.
   (let* ((parent (widget-get widget :parent))
-	(entries (widget-get parent :args))
-	(children (widget-get parent :children)))
+        (entries (widget-get parent :args))
+        (children (widget-get parent :children)))
     (while (and entries children)
       (widget-put (car entries) :value (widget-value (car children)))
       (setq entries (cdr entries)
-	    children (cdr children)))
+            children (cdr children)))
     (widget-value-set parent nil)))
 
 (define-widget 'jdee-widget-tree 'default
@@ -92,40 +92,40 @@
 (defun jdee-widget-tree-value-create-callback (widget)
   ;; Insert all values
   (let ((open (widget-value widget))
-	(tag (widget-get widget :tag))
-	(entries (widget-get widget :args))
-	children buttons)
+        (tag (widget-get widget :tag))
+        (entries (widget-get widget :args))
+        children buttons)
     (cond ((null entries)
-	   ;; Empty node.
-	   (insert (widget-get widget :prefix-empty) tag "\n"))
-	  (open
-	   ;; Open node.
-	   (push
-	    (widget-create-child-and-convert widget 'jdee-widget-tree-close-button)
-		buttons)
-	   (insert "-\\ " tag "\n")
-	   (let ((prefix (concat (widget-get widget :prefix)
-				(widget-get widget :prefix-extra)))
-		entry)
-	     (while entries
-	       (setq entry (car entries)
-		     entries (cdr entries))
-	       (insert prefix)
-	       (push (if entries
-			(widget-create-child-and-convert widget entry
-							  :prefix prefix
-							  :prefix-extra " | ")
-		       ;; Last entry uses a different prefix.
-		       (widget-create-child-and-convert
-			widget entry
-			:prefix prefix
-			:prefix-empty " `--- "))
-		     children))))
-	  (t
-	   ;; Closed node.
-	   (push (widget-create-child-and-convert widget 'jdee-widget-tree-open-button)
-		buttons)
-	   (insert "-- " tag "\n")))
+           ;; Empty node.
+           (insert (widget-get widget :prefix-empty) tag "\n"))
+          (open
+           ;; Open node.
+           (push
+            (widget-create-child-and-convert widget 'jdee-widget-tree-close-button)
+                buttons)
+           (insert "-\\ " tag "\n")
+           (let ((prefix (concat (widget-get widget :prefix)
+                                (widget-get widget :prefix-extra)))
+                entry)
+             (while entries
+               (setq entry (car entries)
+                     entries (cdr entries))
+               (insert prefix)
+               (push (if entries
+                        (widget-create-child-and-convert widget entry
+                                                          :prefix prefix
+                                                          :prefix-extra " | ")
+                       ;; Last entry uses a different prefix.
+                       (widget-create-child-and-convert
+                        widget entry
+                        :prefix prefix
+                        :prefix-empty " `--- "))
+                     children))))
+          (t
+           ;; Closed node.
+           (push (widget-create-child-and-convert widget 'jdee-widget-tree-open-button)
+                buttons)
+           (insert "-- " tag "\n")))
     (widget-put widget :children children)
     (widget-put widget :buttons buttons)))
 
@@ -146,33 +146,33 @@
   (widget-insert "Test tree widget. \n\n")
 
 ;   (setq tree (widget-create 'tree
-;			:tag "Foo"
-;			'(tree :tag "First")
-;			'(tree :tag "Second"
-;			       :value nil
-;			       (tree :tag "Nested"))
-;			'(tree :tag "Third")))
+;                        :tag "Foo"
+;                        '(tree :tag "First")
+;                        '(tree :tag "Second"
+;                               :value nil
+;                               (tree :tag "Nested"))
+;                        '(tree :tag "Third")))
 
   (setq tree (widget-create 'jdee-widget-tree
-		  :tag "<test.Foo:139>"
-		  '(jdee-widget-tree :tag "n  int  0")
-		  ;; '(jdee-widget-tree :tag '(jdee-widget-tree :tag "n  int  0"))
-		  '(jdee-widget-tree :tag "a  double 5.5")
-		  '(jdee-widget-tree :tag "s  S      <test.S:145>"
-			 (jdee-widget-tree :tag "b   boolean  true"))))
+                  :tag "<test.Foo:139>"
+                  '(jdee-widget-tree :tag "n  int  0")
+                  ;; '(jdee-widget-tree :tag '(jdee-widget-tree :tag "n  int  0"))
+                  '(jdee-widget-tree :tag "a  double 5.5")
+                  '(jdee-widget-tree :tag "s  S      <test.S:145>"
+                         (jdee-widget-tree :tag "b   boolean  true"))))
 
 ;   (let*  ((threads
-;	  (list
-;	   (list "ThreadGroup" 189 "system"
-;		 (list
-;		  (list "Thread" 190 "Signal dispatcher" "runnable" "suspended by debugger")
-;		  (list "Thread" 191 "Reference Handler" "waiting" "suspended by debugger")
-;		  (list "Thread" 192 "Finalizer" "waiting" "suspended by debugger")))
-;	   (list "ThreadGroup" 193 "main"
-;		 (list
-;		  (list "Thread" 1 "main" "runnable" "suspended at breakpoint"))
-;		 nil)))
-;	 (tree (jdee-dbs-map-threads-to-tree threads)))
+;          (list
+;           (list "ThreadGroup" 189 "system"
+;                 (list
+;                  (list "Thread" 190 "Signal dispatcher" "runnable" "suspended by debugger")
+;                  (list "Thread" 191 "Reference Handler" "waiting" "suspended by debugger")
+;                  (list "Thread" 192 "Finalizer" "waiting" "suspended by debugger")))
+;           (list "ThreadGroup" 193 "main"
+;                 (list
+;                  (list "Thread" 1 "main" "runnable" "suspended at breakpoint"))
+;                 nil)))
+;         (tree (jdee-dbs-map-threads-to-tree threads)))
 
 
 ;  (apply 'widget-create tree))
@@ -208,44 +208,44 @@ tree."
 
 (defun jdee-widget-dtree-create-callback (widget)
   (let ((open (widget-value widget))
-	(tag (widget-get widget :tag))
-	children buttons)
+        (tag (widget-get widget :tag))
+        children buttons)
     (cond
      (open
       (push (widget-create-child-and-convert widget 'jdee-widget-tree-close-button)
-		buttons)
+                buttons)
       (insert "-\\ " tag "\n")
       (let ((prefix (concat (widget-get widget :prefix)
-				(widget-get widget :prefix-extra)))
-	    (nodes (widget-get widget :nodes))
-	    node)
+                                (widget-get widget :prefix-extra)))
+            (nodes (widget-get widget :nodes))
+            node)
 
-	(when (and (widget-get widget :has-nodes)
-		   (not nodes))
-	  (setq nodes
-		(funcall (widget-get widget :node-fcn) widget))
-	  (if nodes
-	      (widget-put widget :nodes nodes)
-	    (widget-put widget :has-nodes nil)))
+        (when (and (widget-get widget :has-nodes)
+                   (not nodes))
+          (setq nodes
+                (funcall (widget-get widget :node-fcn) widget))
+          (if nodes
+              (widget-put widget :nodes nodes)
+            (widget-put widget :has-nodes nil)))
 
-	(while nodes
-	  (setq node (car nodes)
-		nodes (cdr nodes))
-	  (insert prefix)
-	  (push
-	   (if nodes
-	       (widget-create-child-and-convert widget node
-						:prefix prefix
-						:prefix-extra " | ")
-	     (widget-create-child-and-convert
-	      widget node
-	      :prefix prefix
-	      :prefix-empty " `--- "))
-	   children))))
+        (while nodes
+          (setq node (car nodes)
+                nodes (cdr nodes))
+          (insert prefix)
+          (push
+           (if nodes
+               (widget-create-child-and-convert widget node
+                                                :prefix prefix
+                                                :prefix-extra " | ")
+             (widget-create-child-and-convert
+              widget node
+              :prefix prefix
+              :prefix-empty " `--- "))
+           children))))
      (t
       ;; Closed node.
       (push (widget-create-child-and-convert widget 'jdee-widget-tree-open-button)
-	    buttons)
+            buttons)
       (insert "-- " tag "\n")))
     (widget-put widget :children children)
     (widget-put widget :buttons buttons)))
@@ -268,52 +268,52 @@ tree."
 
 (defun jdee-widget-java-var-to-tree (process var)
   (let* ((var-name (oref var name))
-	 (var-type (oref var jtype))
-	 (var-value (oref var value))
-	 (var-tag (format "%s %s" var-type var-name)))
+         (var-type (oref var jtype))
+         (var-value (oref var value))
+         (var-tag (format "%s %s" var-type var-name)))
     (cond
      ((typep var-value 'jdee-dbs-java-udci)
       (setq var-tag (format "%s [id: %d]" var-tag (oref var-value :id)))
       (if (string= (oref var-value :jtype) "java.lang.String")
-	  (let* ((cmd (jdee-dbs-get-string
-		       "get string"
-		       :process process
-		       :object-id (oref var-value id)))
-		 (str-val (jdee-dbs-cmd-exec cmd)))
-	    (list 'tree-widget
-		  :tag var-tag
-		  :node-name var-tag
-		  :open (jdee-dbo-locals-open-p var-tag)
-		  :value t
-		  (list 'tree-widget :tag str-val)))
-	(list 'jdee-widget-java-obj
-	      :tag var-tag
-	      :node-name var-tag
-	      :open (jdee-dbo-locals-open-p var-tag)
-	      :process process
-	      :object-id (oref var-value :id))))
+          (let* ((cmd (jdee-dbs-get-string
+                       "get string"
+                       :process process
+                       :object-id (oref var-value id)))
+                 (str-val (jdee-dbs-cmd-exec cmd)))
+            (list 'tree-widget
+                  :tag var-tag
+                  :node-name var-tag
+                  :open (jdee-dbo-locals-open-p var-tag)
+                  :value t
+                  (list 'tree-widget :tag str-val)))
+        (list 'jdee-widget-java-obj
+              :tag var-tag
+              :node-name var-tag
+              :open (jdee-dbo-locals-open-p var-tag)
+              :process process
+              :object-id (oref var-value :id))))
      ((typep var-value 'jdee-dbs-java-array)
       (setq var-tag (format "%s [id: %d]" var-tag (oref var-value :id)))
       (list 'jdee-widget-java-array
-	    :tag var-tag
-	    :node-name var-tag
-	    :open (jdee-dbo-locals-open-p var-tag)
-	    :process process :object var-value))
+            :tag var-tag
+            :node-name var-tag
+            :open (jdee-dbo-locals-open-p var-tag)
+            :process process :object var-value))
      ((typep var-value 'jdee-dbs-java-primitive)
       (list 'tree-widget
-	    :tag var-tag
-	    :node-name var-tag
-	    :open (jdee-dbo-locals-open-p var-tag)
-	    :value t
-	    (list 'tree-widget
-		  :tag (format "%s" (oref var-value value)))))
+            :tag var-tag
+            :node-name var-tag
+            :open (jdee-dbo-locals-open-p var-tag)
+            :value t
+            (list 'tree-widget
+                  :tag (format "%s" (oref var-value value)))))
      ((typep var-value 'jdee-dbs-java-null)
       (list 'tree-widget
-	    :tag var-tag
-	    :node-name var-tag
-	    :open (jdee-dbo-locals-open-p var-tag)
-	    :value t
-	    (list 'tree-widget :tag "null")))
+            :tag var-tag
+            :node-name var-tag
+            :open (jdee-dbo-locals-open-p var-tag)
+            :value t
+            (list 'tree-widget :tag "null")))
      (t
       (error "Unidentified type of local variable: %s" var-tag)))))
 
@@ -321,23 +321,23 @@ tree."
   (if (widget-get obj-widget :args)
       (widget-get obj-widget :args)
     (let* ((process (widget-get obj-widget :process))
-	   (object-id (widget-get obj-widget :object-id))
-	   (cmd
-	    (jdee-dbs-get-object
-	     (format "get_object %d" object-id)
-	     :process process
-	     :object-id object-id))
-	   (object
-	    (jdee-dbs-cmd-exec cmd))
-	   (fields (oref object fields))
-	   field
-	   nodes)
+           (object-id (widget-get obj-widget :object-id))
+           (cmd
+            (jdee-dbs-get-object
+             (format "get_object %d" object-id)
+             :process process
+             :object-id object-id))
+           (object
+            (jdee-dbs-cmd-exec cmd))
+           (fields (oref object fields))
+           field
+           nodes)
       (while fields
-	(setq field (car fields) fields (cdr fields))
-	(setq field (cdr field))
-	(push
-	 (jdee-widget-java-var-to-tree process field)
-	 nodes))
+        (setq field (car fields) fields (cdr fields))
+        (setq field (cdr field))
+        (push
+         (jdee-widget-java-var-to-tree process field)
+         nodes))
       nodes)))
 
 (define-widget 'jdee-widget-java-obj 'tree-widget
@@ -359,76 +359,76 @@ the object exists, and  ID is the debugger id for the object."
   (cond
      ((typep element 'jdee-dbs-java-udci)
       (if (string= (oref element :jtype) "java.lang.String")
-	  (let* ((cmd (jdee-dbs-get-string
-		       "get string"
-		       :process process
-		       :object-id (oref element id)))
-		 (str-val (jdee-dbs-cmd-exec cmd)))
-	    (list 'tree-widget
-		  :tag (format "[%d] %s" index str-val)
-		  :node-name (format "[%d] %s" index str-val)
-		  :open (jdee-dbo-locals-open-p (format "[%d] %s" index str-val))
-		  ))
-	(list 'jdee-widget-java-obj
-	      :tag (format "[%d] %s" index (oref element jtype))
-	      :node-name (format "[%d] %s" index (oref element jtype))
-	      :open (jdee-dbo-locals-open-p (format "[%d] %s" index (oref element jtype)))
-	      :process process
-	      :object-id (oref element id))))
+          (let* ((cmd (jdee-dbs-get-string
+                       "get string"
+                       :process process
+                       :object-id (oref element id)))
+                 (str-val (jdee-dbs-cmd-exec cmd)))
+            (list 'tree-widget
+                  :tag (format "[%d] %s" index str-val)
+                  :node-name (format "[%d] %s" index str-val)
+                  :open (jdee-dbo-locals-open-p (format "[%d] %s" index str-val))
+                  ))
+        (list 'jdee-widget-java-obj
+              :tag (format "[%d] %s" index (oref element jtype))
+              :node-name (format "[%d] %s" index (oref element jtype))
+              :open (jdee-dbo-locals-open-p (format "[%d] %s" index (oref element jtype)))
+              :process process
+              :object-id (oref element id))))
      ((typep element 'jdee-dbs-java-array)
       (list 'jdee-widget-java-array
-	    :tag (format "[%d] %s" index (oref element jtype))
-	    :node-name (format "[%d] %s" index (oref element jtype))
-	    :open (jdee-dbo-locals-open-p (format "[%d] %s" index (oref element jtype)))
-	    :process process
-	    :object element))
+            :tag (format "[%d] %s" index (oref element jtype))
+            :node-name (format "[%d] %s" index (oref element jtype))
+            :open (jdee-dbo-locals-open-p (format "[%d] %s" index (oref element jtype)))
+            :process process
+            :object element))
      ((typep element 'jdee-dbs-java-primitive)
       (list 'tree-widget :tag (format "[%d] %s"  index (oref element value))))
      ((typep element 'jdee-dbs-java-null)
       (list 'tree-widget :tag (format "[%d] null" index)))
      (t
       (error "Unidentified type of object: <%s|%s>" (oref element jtype)
-	     (oref element id)))))
+             (oref element id)))))
 
 (defun jdee-widget-java-array-get-elements (array-widget)
   (if (widget-get array-widget :args)
       (widget-get array-widget :args)
     (let* ((process (widget-get array-widget :process))
-	   (array (widget-get array-widget :object))
-	   cmd array-length)
+           (array (widget-get array-widget :object))
+           cmd array-length)
 
       (setq cmd
-	    (jdee-dbs-get-array
-	     (format "get_array_length %d" (oref array id))
-	     :process process
-	     :array array))
+            (jdee-dbs-get-array
+             (format "get_array_length %d" (oref array id))
+             :process process
+             :array array))
       (jdee-dbs-cmd-exec cmd)
 
       (setq array-length
-	    (if (slot-boundp array 'length)
-		(oref array length)
-	      0))
+            (if (slot-boundp array 'length)
+                (oref array length)
+              0))
 
       (when (> array-length 0)
-	(setq cmd
-	      (jdee-dbs-get-array
-	       (format "get_array_elements %d" (oref array id))
-	       :process process
-	       :array array
-	       :index 0
-	       :length array-length))
-	(jdee-dbs-cmd-exec cmd)
-	(let ((elements (oref array elements))
-	      element
-	      nodes
-	      (index 0))
-	  (while elements
-	    (setq element (car elements) elements (cdr elements))
-	    (setq nodes
-		  (append nodes
-			  (list (jdee-widget-java-array-element-to-tree process element index))))
-	    (setq index (1+ index)))
-	  nodes)))))
+        (setq cmd
+              (jdee-dbs-get-array
+               (format "get_array_elements %d" (oref array id))
+               :process process
+               :array array
+               :index 0
+               :length array-length))
+        (jdee-dbs-cmd-exec cmd)
+        (let ((elements (oref array elements))
+              element
+              nodes
+              (index 0))
+          (while elements
+            (setq element (car elements) elements (cdr elements))
+            (setq nodes
+                  (append nodes
+                          (list (jdee-widget-java-array-element-to-tree process element index))))
+            (setq index (1+ index)))
+          nodes)))))
 
 (define-widget 'jdee-widget-java-array 'tree-widget
   "A widget that represents a Java array. Clicking on the widget's
@@ -486,9 +486,9 @@ expand button causes the widget to display the values of the array."
 (defun jdee-widget-option-tree-close-button-callback (widget &optional event)
   ;; Set parent state to closed.
   (let* ((parent (widget-get widget :parent))
-	(entries (widget-get parent :args))
-	(group (car (widget-get parent :children)))
-	(children (widget-get group :children)))
+        (entries (widget-get parent :args))
+        (group (car (widget-get parent :children)))
+        (children (widget-get group :children)))
     ;; Get values entered by user from children and
     ;; insert them in the corresponding widget definitions
     ;; so that they appear the next time the user expands
@@ -496,32 +496,32 @@ expand button causes the widget to display the values of the array."
     (while (and entries children)
       (widget-put (car entries) :value (widget-value (car children)))
       (setq entries (cdr entries)
-	    children (cdr children)))
+            children (cdr children)))
     (widget-value-set parent nil)))
 
 (defun jdee-widget-option-tree-value-create-callback (widget)
   (let ((open-widget-p (widget-value widget))
-	(tag (widget-get widget :tag))
-	(entries (widget-get widget :args))
-	entry children buttons)
+        (tag (widget-get widget :tag))
+        (entries (widget-get widget :args))
+        entry children buttons)
     (cond (open-widget-p
-	   ;; Wrap widgets in this tree in a group widget
-	   ;; to ensure proper formatting.
-	   (let ((group-type
-		  (list 'group :args entries))
-		 group-widget)
-	   (push
-	    (widget-create-child-and-convert
-	     widget
-	     'jdee-widget-option-tree-close-button)
-		buttons)
-	   (insert "-\\ " tag "\n")
-	   (push (widget-create-child-and-convert widget group-type) children)))
-	  (t
-	   (push (widget-create 'jdee-widget-option-tree-open-button
-			  :parent widget)
-		 buttons)
-	   (insert "-- " tag "\n")))
+           ;; Wrap widgets in this tree in a group widget
+           ;; to ensure proper formatting.
+           (let ((group-type
+                  (list 'group :args entries))
+                 group-widget)
+           (push
+            (widget-create-child-and-convert
+             widget
+             'jdee-widget-option-tree-close-button)
+                buttons)
+           (insert "-\\ " tag "\n")
+           (push (widget-create-child-and-convert widget group-type) children)))
+          (t
+           (push (widget-create 'jdee-widget-option-tree-open-button
+                          :parent widget)
+                 buttons)
+           (insert "-- " tag "\n")))
     (widget-put widget :children children)
     (widget-put widget :buttons buttons)))
 
@@ -548,31 +548,31 @@ expand button causes the widget to display the values of the array."
   (widget-insert "Test panel widget. \n\n")
 
   (let ((panel (widget-create
-		'jdee-widget-option-tree
-		:tag "Compile Options"
-		'(cons :tag "Debugger Options"
-		   (radio-button-choice :format "%t \n%v"
-					:tag "Debugger "
-					(const "jdb")
-					(const "oldjdb")
-					(const "Other"))
-		   (cons :tag "Other Debugger Info"
-			 (string :tag "Path")
-			 (radio-button-choice :format "%t \n%v"
-					      :tag "Type "
-					      (const "Executable")
-					      (const "Class"))))
-		  '(repeat (string :tag "Path"))
-		  '(editable-field :tag "classpath"
-				  :format "  %t:  %v\n  %h \n\n"
-				  :size 40
-				  :doc "Name of project.")
-		  '(editable-field :tag "compiler"
-				  :format "  %t:  %v\n  %h \n\n"
-				  :size 40
-				  :doc "Name of project.")
-		  '(jdee-widget-option-tree :tag "Debugger Options"
-					   (repeat (string :tag "Path"))))))
+                'jdee-widget-option-tree
+                :tag "Compile Options"
+                '(cons :tag "Debugger Options"
+                   (radio-button-choice :format "%t \n%v"
+                                        :tag "Debugger "
+                                        (const "jdb")
+                                        (const "oldjdb")
+                                        (const "Other"))
+                   (cons :tag "Other Debugger Info"
+                         (string :tag "Path")
+                         (radio-button-choice :format "%t \n%v"
+                                              :tag "Type "
+                                              (const "Executable")
+                                              (const "Class"))))
+                  '(repeat (string :tag "Path"))
+                  '(editable-field :tag "classpath"
+                                  :format "  %t:  %v\n  %h \n\n"
+                                  :size 40
+                                  :doc "Name of project.")
+                  '(editable-field :tag "compiler"
+                                  :format "  %t:  %v\n  %h \n\n"
+                                  :size 40
+                                  :doc "Name of project.")
+                  '(jdee-widget-option-tree :tag "Debugger Options"
+                                           (repeat (string :tag "Path"))))))
     (use-local-map widget-keymap)
     (widget-setup)))
 

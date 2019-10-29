@@ -70,10 +70,10 @@ of the test runner in the edit field."
   :group 'jdee-junit
   :tag "Test Runner"
   :type '(choice
-	  (const :tag "Text UI" :value "junit.textui.TestRunner")
-	  (const :tag "Swing GUI" :value "junit.swingui.TestRunner")
-	  (const :tag "AWT GUI" :value "junit.awtui.TestRunner")
-	  (string :tag "Custom UI")))
+          (const :tag "Text UI" :value "junit.textui.TestRunner")
+          (const :tag "Swing GUI" :value "junit.swingui.TestRunner")
+          (const :tag "AWT GUI" :value "junit.awtui.TestRunner")
+          (string :tag "Custom UI")))
 
 (defcustom jdee-junit-tester-name-tag (cons "Test" nil)
   "Specifies a prefix or suffix to use in test class name.
@@ -82,8 +82,8 @@ or FooTest.  Having a test suffix plays nicely with `projectile-mode'."
   :group 'jdee-junit
   :tag "Test Class Name Tag"
   :type '(cons
-	  (string :tag "Tag" :value "T")
-	  (choice :tag "Tag Type"
+          (string :tag "Tag" :value "T")
+          (choice :tag "Tag Type"
                   (const :tag "Prefix" :value t)
                   (const :tag "Suffix" :value nil))))
 
@@ -93,7 +93,7 @@ or FooTest.  Having a test suffix plays nicely with `projectile-mode'."
   "Get the name of a tester class based on `TESTEE-NAME'.
 The `testee-name' is joined with `jdee-junit-tester-name-tag'."
   (let ((tag (car jdee-junit-tester-name-tag))
-	(prefixp (cdr jdee-junit-tester-name-tag)))
+        (prefixp (cdr jdee-junit-tester-name-tag)))
     (if prefixp
         (concat tag testee-name)
       (concat testee-name tag))))
@@ -102,16 +102,16 @@ The `testee-name' is joined with `jdee-junit-tester-name-tag'."
   "Get the name of a testee class from the `TESTER-NAME'.
 The result comes from removing prefixed or affixed `jdee-junit-tester-name-tag'."
   (let ((tag (car jdee-junit-tester-name-tag))
-	(prefixp (cdr jdee-junit-tester-name-tag)))
+        (prefixp (cdr jdee-junit-tester-name-tag)))
     (if prefixp
-	(progn
-	  (string-match
-	   (concat "^" tag "\\(.*\\)")
-	   tester-name))
+        (progn
+          (string-match
+           (concat "^" tag "\\(.*\\)")
+           tester-name))
       (progn
-	(string-match
-	 (concat "\\(.*\\)" tag "$")
-	 tester-name)))
+        (string-match
+         (concat "\\(.*\\)" tag "$")
+         tester-name)))
     (substring tester-name (match-beginning 1) (match-end 1))))
 
 (defcustom jdee-junit-test-class-template
@@ -201,13 +201,13 @@ command `jdee-junit-test-class', as a side-effect."
   :group 'jdee-junit
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-junit-test-class-internal
-	    (tempo-define-template
-	     "java-junit-test-class-buffer-template"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert a generic JUnit test class buffer skeleton."))
-	  (set-default sym val)))
+          (defalias 'jdee-junit-test-class-internal
+            (tempo-define-template
+             "java-junit-test-class-buffer-template"
+             (jdee-gen-read-template val)
+             nil
+             "Insert a generic JUnit test class buffer skeleton."))
+          (set-default sym val)))
 
 (defalias 'jdee-junit-test-class-internal
   (tempo-define-template
@@ -302,13 +302,13 @@ command `jdee-junit4-test-class', as a side-effect."
   :group 'jdee-junit
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-junit4-test-class-internal
-	    (tempo-define-template
-	     "java-junit4-test-class-buffer-template"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert a generic JUnit 4 test class buffer skeleton."))
-	  (set-default sym val)))
+          (defalias 'jdee-junit4-test-class-internal
+            (tempo-define-template
+             "java-junit4-test-class-buffer-template"
+             (jdee-gen-read-template val)
+             nil
+             "Insert a generic JUnit 4 test class buffer skeleton."))
+          (set-default sym val)))
 
 (defalias 'jdee-junit4-test-class-internal
   (tempo-define-template
@@ -383,9 +383,9 @@ tests generated with this template requires the JUnit test framework."
   "Create a buffer containing a JUnit4 test skeleton."
   (interactive)
   (let ((tester-name
-	 (jdee-junit-get-tester-name
-	  (file-name-sans-extension
-	   (file-name-nondirectory buffer-file-name)))))
+         (jdee-junit-get-tester-name
+          (file-name-sans-extension
+           (file-name-nondirectory buffer-file-name)))))
     (find-file (concat tester-name ".java"))
     (jdee-junit4-test-class-internal)
     (goto-char (point-min))
@@ -420,13 +420,13 @@ tests generated with this template requires the JUnit test framework."
   :group 'jdee-junit
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-junit-add-test-to-suite-internal
-	    (tempo-define-template
-	     "Adding JUnit test to suit"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert JUnit test to suite."))
-	  (set-default sym val)))
+          (defalias 'jdee-junit-add-test-to-suite-internal
+            (tempo-define-template
+             "Adding JUnit test to suit"
+             (jdee-gen-read-template val)
+             nil
+             "Insert JUnit test to suite."))
+          (set-default sym val)))
 
 (defalias 'jdee-junit-add-test-to-suite-internal
   (tempo-define-template
@@ -453,8 +453,8 @@ tests generated with this template requires the JUnit test framework."
                (jdee-normalize-path 'jdee-junit-working-directory))))
         (oset vm :main-class jdee-junit-testrunner-type )
         (jdee-run-set-app-args (concat (jdee-parse-get-package)
-				       (file-name-sans-extension
-					(file-name-nondirectory (buffer-file-name)))))
+                                       (file-name-sans-extension
+                                        (file-name-nondirectory (buffer-file-name)))))
         (cd working-directory)
         (jdee-run-vm-launch vm))
     (error "The jdee-junit-run command works only in a Java source buffer")))

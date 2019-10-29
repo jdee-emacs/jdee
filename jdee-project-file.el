@@ -54,7 +54,7 @@ temporarily when stepping through code."
   "Toggles project switching on or off."
   (interactive)
   (setq jdee-project-context-switching-enabled-p
-	(not jdee-project-context-switching-enabled-p)))
+        (not jdee-project-context-switching-enabled-p)))
 
 (defcustom jdee-project-name "default"
 "Specifies name of project to which the current buffer belongs."
@@ -95,12 +95,12 @@ being loaded.")
 DIR.  Returns nil if it cannot find a project file in DIR or an
 ascendant directory."
   (let* ((directory-sep-char ?/) ;; Override NT/XEmacs setting
-	 (file (cl-find (or file-name jdee-project-file-name)
-			(directory-files dir) :test 'string=)))
+         (file (cl-find (or file-name jdee-project-file-name)
+                        (directory-files dir) :test 'string=)))
     (if file
-	(expand-file-name file dir)
+        (expand-file-name file dir)
       (if (not (jdee-root-dir-p dir))
-	  (jdee-find-project-file (expand-file-name ".." dir) file-name)))))
+          (jdee-find-project-file (expand-file-name ".." dir) file-name)))))
 
 (defvar jdee-buffer-project-file ""
   "Path of project file associated with the current Java source buffer.")
@@ -110,16 +110,16 @@ ascendant directory."
   "Return all the project files in the current directory tree,
 starting with the topmost."
   (let* ((directory-sep-char ?/) ;; Override NT/XEmacs setting
-	 (file (jdee-find-project-file dir))
-	 current-dir files)
+         (file (jdee-find-project-file dir))
+         current-dir files)
     (while file
       (setq files (append (list file) files))
       (setq current-dir (file-name-directory file))
       (setq
        file
        (if (not (jdee-root-dir-p current-dir))
-	   (jdee-find-project-file
-	    (expand-file-name ".." current-dir)))))
+           (jdee-find-project-file
+            (expand-file-name ".." current-dir)))))
     files))
 
 (defvar jdee-loading-project nil
@@ -139,21 +139,21 @@ Emacs startup values."
   (interactive)
   (setq jdee-loading-project t)
   (let ((prj-files
-	 (jdee-find-project-files
-	  ;; Need to normalize path to work around bug in the
-	  ;; cygwin version of XEmacs.
-	  (expand-file-name "." default-directory))))
+         (jdee-find-project-files
+          ;; Need to normalize path to work around bug in the
+          ;; cygwin version of XEmacs.
+          (expand-file-name "." default-directory))))
     (if prj-files
-	(progn
-	  (jdee-set-variables-init-value)
-	  (loop for file in prj-files do
-	    (setq jdee-loading-project-file file)
-	    (jdee-log-msg "jdee-load-project-file: Loading %s" file)
-	    ;; reset project file version
-	    (setq jdee-loaded-project-file-version nil)
-	    (load-file file)
-	    (setq jdee-loading-project-file nil))
-	  (run-hooks 'jdee-project-hooks))
+        (progn
+          (jdee-set-variables-init-value)
+          (loop for file in prj-files do
+            (setq jdee-loading-project-file file)
+            (jdee-log-msg "jdee-load-project-file: Loading %s" file)
+            ;; reset project file version
+            (setq jdee-loaded-project-file-version nil)
+            (load-file file)
+            (setq jdee-loading-project-file nil))
+          (run-hooks 'jdee-project-hooks))
       (jdee-set-variables-init-value t)))
   (setq jdee-loading-project nil))
 
@@ -165,7 +165,7 @@ Emacs startup values."
    (lambda (java-buffer)
      (with-current-buffer java-buffer
        (message "Loading project file for %s ..."
-		(buffer-file-name java-buffer))
+                (buffer-file-name java-buffer))
        (jdee-load-project-file)))
    (jdee-get-java-source-buffers)))
 
@@ -175,7 +175,7 @@ Emacs startup values."
   (interactive)
   (let ((prj-file (jdee-find-project-file default-directory)))
     (if prj-file
-	(find-file prj-file)
+        (find-file prj-file)
       (message "Project file not found."))))
 
 
@@ -186,26 +186,26 @@ Leave point at the location of the call, or after the last expression."
     (goto-char (point-min))
     (catch 'found
       (while t
-	(let ((sexp (condition-case nil
-			(read (current-buffer))
-		      (end-of-file (throw 'found nil)))))
-	  (when (and (listp sexp)
-		     (eq (car sexp) symbol))
-	    (delete-region (save-excursion
-			     (backward-sexp)
-			     (point))
-			   (point))
-	    (throw 'found nil)))))
+        (let ((sexp (condition-case nil
+                        (read (current-buffer))
+                      (end-of-file (throw 'found nil)))))
+          (when (and (listp sexp)
+                     (eq (car sexp) symbol))
+            (delete-region (save-excursion
+                             (backward-sexp)
+                             (point))
+                           (point))
+            (throw 'found nil)))))
     (unless (bolp)
       (princ "\n"))))
 
 (defun jdee-symbol-p (symbol)
   "Return non-nil if SYMBOL is a JDEE variable."
   (and (or
-	(get symbol 'custom-type)
-	(get symbol 'jdee-project))
+        (get symbol 'custom-type)
+        (get symbol 'jdee-project))
        (or (string-match "^bsh-" (symbol-name symbol))
-	   (string-match "^jdee-" (symbol-name symbol)))))
+           (string-match "^jdee-" (symbol-name symbol)))))
 
 (defvar jdee-symbol-list nil
   "*A list of JDEE variables to process by `jdee-save-project'.")
@@ -222,7 +222,7 @@ packages loaded after startup of the JDEE."
     (mapatoms
      (lambda (symbol)
        (if (jdee-symbol-p symbol)
-	   (setq jdee-symbol-list (cons symbol jdee-symbol-list))))))
+           (setq jdee-symbol-list (cons symbol jdee-symbol-list))))))
   jdee-symbol-list)
 
 (defun jdee-set-project-name (name)
@@ -234,10 +234,10 @@ packages loaded after startup of the JDEE."
 existing value."
   (let ((proj-alist (get symbol 'jdee-project)))
     (if (null proj-alist)
-	(put symbol 'jdee-project (list (cons project (list value))))
+        (put symbol 'jdee-project (list (cons project (list value))))
       (if (assoc project proj-alist)
-	  (setcdr (assoc project proj-alist) (list value))
-	(put symbol 'jdee-project (pushnew (cons project (list value)) proj-alist))))))
+          (setcdr (assoc project proj-alist) (list value))
+        (put symbol 'jdee-project (pushnew (cons project (list value)) proj-alist))))))
 
 (defun jdee-get-project (symbol project)
   "Gets the value for SYMBOL that is associated with PROJECT, or nil if none.
@@ -251,8 +251,8 @@ To test if SYMBOL has any value for PROJECT, use
 
 (defun jdee-save-open-buffer (project)
   "Create a new buffer or open an existing buffer for PROJECT."
-  (let ((auto-insert nil)	; turn off auto-insert when
-	buffer standard-output)	; creating a new file
+  (let ((auto-insert nil)        ; turn off auto-insert when
+        buffer standard-output)        ; creating a new file
     (setq buffer (find-file-noselect project))
     (setq standard-output buffer)
     (with-current-buffer buffer
@@ -273,8 +273,8 @@ To test if SYMBOL has any value for PROJECT, use
 (defun jdee-save-close-buffer (project)
   "Save and close the buffer associated with PROJECT."
   (let* ((buffer
-	  (find-buffer-visiting project))
-	 (standard-output buffer))
+          (find-buffer-visiting project))
+         (standard-output buffer))
     (if buffer
         (progn
           (princ ")\n")
@@ -289,19 +289,19 @@ To test if SYMBOL has any value for PROJECT, use
   (mapc
    (lambda (project)
      (if (and (not (string= (car project) "default"))
-	      (member (car project) projects))
-	 (let ((buffer
-		(find-buffer-visiting (car project)))
-	       standard-output)
-	   (if (null buffer)
-	       (setq standard-output (setq buffer (jdee-save-open-buffer (car project))))
-	     (setq standard-output buffer))
-	   (jdee-log-msg "jdee-save-variable: Saving %S in %s" symbol (car project))
-	   (princ "\n '(")
-	   (princ symbol)
-	   (princ " ")
-	   (prin1 (custom-quote (car (cdr project))))
-	   (princ ")"))))
+              (member (car project) projects))
+         (let ((buffer
+                (find-buffer-visiting (car project)))
+               standard-output)
+           (if (null buffer)
+               (setq standard-output (setq buffer (jdee-save-open-buffer (car project))))
+             (setq standard-output buffer))
+           (jdee-log-msg "jdee-save-variable: Saving %S in %s" symbol (car project))
+           (princ "\n '(")
+           (princ symbol)
+           (princ " ")
+           (prin1 (custom-quote (car (cdr project))))
+           (princ ")"))))
    (get symbol 'jdee-project)))
 
 (defun jdee-save-needs-saving-p (symbol projects)
@@ -310,62 +310,62 @@ are settings to be saved, this function also resolves which project
 should receive the customized values."
   (unless (= (length projects) 0)
     (let ((value (symbol-value symbol))
-	  val-to-save
-	  current-proj proj-iter)
+          val-to-save
+          current-proj proj-iter)
       (setq current-proj (car projects))
       (cond
       ;; CASE: current value changed from saved value in current
        ;; project
        ((and (jdee-project-present-p symbol current-proj)
-	     (not (null (get symbol 'customized-value))) ;; not decustomized.
-	     (not (equal value (jdee-get-project symbol current-proj))))
-	(jdee-log-msg "jdee-save-needs-saving-p: changed value for %S in project `%s'"
-		     symbol current-proj)
-	(jdee-put-project symbol current-proj value)
-	t)
+             (not (null (get symbol 'customized-value))) ;; not decustomized.
+             (not (equal value (jdee-get-project symbol current-proj))))
+        (jdee-log-msg "jdee-save-needs-saving-p: changed value for %S in project `%s'"
+                     symbol current-proj)
+        (jdee-put-project symbol current-proj value)
+        t)
        ;; CASE: no value for symbol in current project - check all
        ;; parent projects (plus default) to see if value has changed
        ((and (not (jdee-project-present-p symbol current-proj))
-	     (progn
-	       (setq val-to-save value)
-	       (setq proj-iter (cdr projects))
-	       (while (and proj-iter
-			   (not (jdee-project-present-p symbol (car proj-iter))))
-		 (setq proj-iter (cdr proj-iter)))
-	       (if proj-iter
-		   (not (equal value
-			       (jdee-get-project symbol (car proj-iter))))
-		 (setq val-to-save (eval (car (get symbol 'customized-value))))
-		 (and (not (null (get symbol 'customized-value))) ;; has been customized.
-		      (or                               ;; either
-		       (null (get symbol 'saved-value)) ;; not saved in .emacs file, or
-		       (not (equal val-to-save          ;; different from value in .emacs file
-				   (eval (car (get symbol 'saved-value))))))))))
-	(jdee-log-msg "jdee-save-needs-saving-p: override value %S from parent `%s' in project `%s'"
-		     symbol (car proj-iter) current-proj)
-	(jdee-put-project symbol current-proj val-to-save)
-	t)
+             (progn
+               (setq val-to-save value)
+               (setq proj-iter (cdr projects))
+               (while (and proj-iter
+                           (not (jdee-project-present-p symbol (car proj-iter))))
+                 (setq proj-iter (cdr proj-iter)))
+               (if proj-iter
+                   (not (equal value
+                               (jdee-get-project symbol (car proj-iter))))
+                 (setq val-to-save (eval (car (get symbol 'customized-value))))
+                 (and (not (null (get symbol 'customized-value))) ;; has been customized.
+                      (or                               ;; either
+                       (null (get symbol 'saved-value)) ;; not saved in .emacs file, or
+                       (not (equal val-to-save          ;; different from value in .emacs file
+                                   (eval (car (get symbol 'saved-value))))))))))
+        (jdee-log-msg "jdee-save-needs-saving-p: override value %S from parent `%s' in project `%s'"
+                     symbol (car proj-iter) current-proj)
+        (jdee-put-project symbol current-proj val-to-save)
+        t)
        ;; CASE: current value same as value in the deepest project that
        ;; holds that value - re-save it
        ((progn
-	  (setq proj-iter projects)
-	  (while (and proj-iter
-		      (not (jdee-project-present-p symbol (car proj-iter))))
-	    (setq proj-iter (cdr proj-iter)))
-	  (if proj-iter
-	      (equal value (jdee-get-project symbol (car proj-iter)))))
-	(jdee-log-msg "jdee-save-needs-saving-p: original value for %S in project `%s'"
-		     symbol (car proj-iter))
-	t)))))
+          (setq proj-iter projects)
+          (while (and proj-iter
+                      (not (jdee-project-present-p symbol (car proj-iter))))
+            (setq proj-iter (cdr proj-iter)))
+          (if proj-iter
+              (equal value (jdee-get-project symbol (car proj-iter)))))
+        (jdee-log-msg "jdee-save-needs-saving-p: original value for %S in project `%s'"
+                     symbol (car proj-iter))
+        t)))))
 
 (defun jdee-save-project-internal (projects)
   (let ((projects-reversed (nreverse projects)))
     (jdee-log-msg "jdee-save-project-internal: projects: %S" projects-reversed)
     (mapc 'jdee-save-open-buffer projects-reversed)
     (mapc (lambda (symbol)
-	    (if (jdee-save-needs-saving-p symbol projects-reversed)
-		(jdee-save-variable symbol projects-reversed)))
-	  (jdee-symbol-list))
+            (if (jdee-save-needs-saving-p symbol projects-reversed)
+                (jdee-save-variable symbol projects-reversed)))
+          (jdee-symbol-list))
     (mapc 'jdee-save-close-buffer projects-reversed)))
 
 ;;;###autoload
@@ -379,13 +379,13 @@ file from the same directory tree, the saved settings will be restored
 for that file."
   (interactive)
   (let* ((directory-sep-char ?/) ;; Override NT/XEmacs setting
-	(project-file-paths (jdee-find-project-files default-directory)))
+        (project-file-paths (jdee-find-project-files default-directory)))
     (if (not project-file-paths)
-	(setq project-file-paths
-	      (list (expand-file-name jdee-project-file-name
-				      (read-file-name "Save in directory: "
-						      default-directory
-						      default-directory)))))
+        (setq project-file-paths
+              (list (expand-file-name jdee-project-file-name
+                                      (read-file-name "Save in directory: "
+                                                      default-directory
+                                                      default-directory)))))
     (jdee-save-project-internal project-file-paths)))
 
 ;;;###autoload
@@ -400,20 +400,20 @@ the directory specified, thus allowing the user to create and maintain
 hierarchical projects."
   (interactive "DCreate new project in directory: ")
   (let* ((directory-sep-char ?/) ;; Override NT/XEmacs setting
-	 (prj-file (expand-file-name jdee-project-file-name new-dir))
-	 (projects (jdee-find-project-files new-dir)))
+         (prj-file (expand-file-name jdee-project-file-name new-dir))
+         (projects (jdee-find-project-files new-dir)))
     (if (not (member prj-file projects))
-	;; create empty project file if none found
-	(let* ((auto-insert nil)	; disable auto-insert
-	       (standard-output (find-file-noselect prj-file))
-	       (message-log-max nil))	; disable message log
-	  (princ "(jdee-project-file-version ")
-	  (prin1 jdee-project-file-version)
-	  (princ ")\n(jdee-set-variables)\n")
-	  (with-current-buffer standard-output
-	    (save-buffer))
-	  (kill-buffer standard-output)
-	  (setq projects (nconc projects (list prj-file)))))
+        ;; create empty project file if none found
+        (let* ((auto-insert nil)        ; disable auto-insert
+               (standard-output (find-file-noselect prj-file))
+               (message-log-max nil))        ; disable message log
+          (princ "(jdee-project-file-version ")
+          (prin1 jdee-project-file-version)
+          (princ ")\n(jdee-set-variables)\n")
+          (with-current-buffer standard-output
+            (save-buffer))
+          (kill-buffer standard-output)
+          (setq projects (nconc projects (list prj-file)))))
     (jdee-save-project-internal projects)))
 
 
@@ -433,39 +433,39 @@ This function is used in JDEE project files."
   (while args
     (let ((entry (car args)))
       (if (listp entry)
-	  (let* ((symbol (nth 0 entry))
-		 (value (nth 1 entry))
-		 (customized (nth 2 entry))
-		 (set (or (and (local-variable-if-set-p symbol nil) 'set)
-			  (get symbol 'custom-set)
-			  'set-default)))
+          (let* ((symbol (nth 0 entry))
+                 (value (nth 1 entry))
+                 (customized (nth 2 entry))
+                 (set (or (and (local-variable-if-set-p symbol nil) 'set)
+                          (get symbol 'custom-set)
+                          'set-default)))
 
-	    (add-to-list 'jdee-dirty-variables symbol)
+            (add-to-list 'jdee-dirty-variables symbol)
 
-	    (if (or customized
-		    jdee-loaded-project-file-version)
-		(put symbol 'customized-value (list value)))
-	    (if jdee-loading-project-file
-		(progn
-		  (jdee-log-msg "jdee-set-variables: Loading %S from project %s" symbol
-			       jdee-loading-project-file)
-		  (jdee-put-project symbol
-				   jdee-loading-project-file
-				   (eval value)))
-	      (jdee-log-msg "jdee-set-variables: Loading %S from unknown project" symbol))
-	    (when (default-boundp symbol)
-	      ;; Something already set this, overwrite it
-	      (funcall set symbol (eval value)))
-	    (setq args (cdr args)))))))
+            (if (or customized
+                    jdee-loaded-project-file-version)
+                (put symbol 'customized-value (list value)))
+            (if jdee-loading-project-file
+                (progn
+                  (jdee-log-msg "jdee-set-variables: Loading %S from project %s" symbol
+                               jdee-loading-project-file)
+                  (jdee-put-project symbol
+                                   jdee-loading-project-file
+                                   (eval value)))
+              (jdee-log-msg "jdee-set-variables: Loading %S from unknown project" symbol))
+            (when (default-boundp symbol)
+              ;; Something already set this, overwrite it
+              (funcall set symbol (eval value)))
+            (setq args (cdr args)))))))
 
 (defsubst jdee-set-variable-init-value(symbol)
   "Set a variable  to the value it has at Emacs startup."
  (let ((val-to-set (eval (car (or (get symbol 'saved-value)
-				   (get symbol 'standard-value)))))
-	(set (or (get symbol 'custom-set) 'set-default)))
+                                   (get symbol 'standard-value)))))
+        (set (or (get symbol 'custom-set) 'set-default)))
     (if (or (get symbol 'customized-value)
-	    (get symbol 'jdee-project))
-	(funcall set symbol val-to-set))
+            (get symbol 'jdee-project))
+        (funcall set symbol val-to-set))
     (put symbol 'customized-value nil)
     (put symbol 'jdee-project nil)
     (jdee-put-project symbol "default" val-to-set)))
@@ -515,20 +515,20 @@ for a newly activated Java buffer when the new buffer's project
 differs from the old buffer's."
   (condition-case err
       (let ((project-file-path (jdee-find-project-file default-directory)))
-	(if (not project-file-path) (setq project-file-path ""))
-	(if (and
-	     jdee-project-context-switching-enabled-p
-	     (not (jdee-debugger-running-p))
-	     (not (string=
-		   (file-truename jdee-current-project)
-		   (file-truename project-file-path))))
-	    (progn
-	      (setq jdee-current-project project-file-path)
-	      (jdee-load-project-file)
-	      (jdee-project-update-backend))))
+        (if (not project-file-path) (setq project-file-path ""))
+        (if (and
+             jdee-project-context-switching-enabled-p
+             (not (jdee-debugger-running-p))
+             (not (string=
+                   (file-truename jdee-current-project)
+                   (file-truename project-file-path))))
+            (progn
+              (setq jdee-current-project project-file-path)
+              (jdee-load-project-file)
+              (jdee-project-update-backend))))
     (error (message
-	    "Project file reload error: %s"
-	    (error-message-string err)))))
+            "Project file reload error: %s"
+            (error-message-string err)))))
 
 (defun jdee-update-autoloaded-symbols ()
   "Regenerate `jdee-symbol-list' and reload

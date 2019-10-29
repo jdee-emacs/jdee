@@ -109,10 +109,10 @@ ways. The first is via the ant script/program that comes with ant.
 The second is via java and the third is via the Ant Server."
   :group 'jdee-ant
   :type '(list
-	   (radio-button-choice
-	     (const "Script")
-	     (const "Java")
-	     (const "Ant Server"))))
+           (radio-button-choice
+             (const "Script")
+             (const "Java")
+             (const "Ant Server"))))
 
 (defcustom jdee-ant-home ""
   "*Directory where ant is installed."
@@ -217,8 +217,8 @@ option has no effect if jdee-ant-read-target is nil."
   :type 'string)
 
 (defcustom jdee-ant-build-hook '(jdee-compile-finish-kill-buffer
-				jdee-compile-finish-refresh-speedbar
-				jdee-compile-finish-update-class-info)
+                                jdee-compile-finish-refresh-speedbar
+                                jdee-compile-finish-update-class-info)
   "*List of hook functions run by `jdee-ant-build' (see `run-hooks'). Each
 function should accept two arguments: the compilation buffer and a string
 describing how the compilation finished"
@@ -243,58 +243,58 @@ the Ant home from the environment variable ANT_HOME."
     (setq buildfile jdee-ant-buildfile))
 
   (let* ((ant-home (jdee-ant-get-ant-home))
-	 (delimiter (if (or
-			 (string= (car jdee-ant-invocation-method) "Java")
-			 (string= (car jdee-ant-invocation-method) "Script"))
-			"'"
-		      "\""))
-	 (classpath-delimiter  (if (and (or (eq system-type 'windows-nt)
+         (delimiter (if (or
+                         (string= (car jdee-ant-invocation-method) "Java")
+                         (string= (car jdee-ant-invocation-method) "Script"))
+                        "'"
+                      "\""))
+         (classpath-delimiter  (if (and (or (eq system-type 'windows-nt)
                                             (eq system-type 'cygwin32))
                                         (s-matches? "sh$" shell-file-name))
                                    delimiter))
-	 (buildfile-delimiter  (if (eq system-type 'windows-nt)
-				   "\"" delimiter))
-	 (ant-program (if (or (s-matches? "\\\\" jdee-ant-program)
-			      (s-matches? "/" jdee-ant-program))
-			  (jdee-normalize-path jdee-ant-program)
-			jdee-ant-program))
-	 (ant-command
-	  (concat
-	   (if (string= (car jdee-ant-invocation-method) "Script") ant-program)
-	   (if (string= (car jdee-ant-invocation-method) "Java")
-	       (concat
-		(jdee-get-jdk-prog 'java)
-		" -classpath "
-		classpath-delimiter
-		(jdee-ant-build-classpath)
-		classpath-delimiter))
-	   (if ant-home
-	       (concat
-		" -Dant.home="
-		(if (s-matches? " " ant-home) ; Quote paths with spaces
-		    (concat "\"" ant-home "\"")
-		  ant-home)))
+         (buildfile-delimiter  (if (eq system-type 'windows-nt)
+                                   "\"" delimiter))
+         (ant-program (if (or (s-matches? "\\\\" jdee-ant-program)
+                              (s-matches? "/" jdee-ant-program))
+                          (jdee-normalize-path jdee-ant-program)
+                        jdee-ant-program))
+         (ant-command
+          (concat
+           (if (string= (car jdee-ant-invocation-method) "Script") ant-program)
+           (if (string= (car jdee-ant-invocation-method) "Java")
+               (concat
+                (jdee-get-jdk-prog 'java)
+                " -classpath "
+                classpath-delimiter
+                (jdee-ant-build-classpath)
+                classpath-delimiter))
+           (if ant-home
+               (concat
+                " -Dant.home="
+                (if (s-matches? " " ant-home) ; Quote paths with spaces
+                    (concat "\"" ant-home "\"")
+                  ant-home)))
            (if (string= (car jdee-ant-invocation-method) "Java")
                (concat
                 " "
                 "org.apache.tools.ant.Main")))))
 
     (if (not (string= buildfile ""))
-	(setq ant-command
-	      (concat ant-command
-		      " -buildfile " buildfile-delimiter
-		      (jdee-normalize-path buildfile)
-		      buildfile-delimiter)))
+        (setq ant-command
+              (concat ant-command
+                      " -buildfile " buildfile-delimiter
+                      (jdee-normalize-path buildfile)
+                      buildfile-delimiter)))
 
     (if (not (string= jdee-ant-args ""))
-	(setq ant-command (concat ant-command " " jdee-ant-args)))
+        (setq ant-command (concat ant-command " " jdee-ant-args)))
 
     (if (and (not (null more-args))
-	     (not (string= more-args "")))
-	(setq ant-command (concat ant-command " " more-args)))
+             (not (string= more-args "")))
+        (setq ant-command (concat ant-command " " more-args)))
 
     (if (not (string= target ""))
-	(setq ant-command (concat ant-command " " target " ")))
+        (setq ant-command (concat ant-command " " target " ")))
 
     ant-command))
 
@@ -303,29 +303,29 @@ the Ant home from the environment variable ANT_HOME."
 classpath normalized with `jdee-build-classpath'."
 
   (let* ((ant-home (jdee-ant-get-ant-home))
-	 classpath)
+         classpath)
 
     (setq classpath (append (list (expand-file-name "lib" ant-home)
-				  (jdee-get-tools-jar))
-			    jdee-ant-user-jar-files))
+                                  (jdee-get-tools-jar))
+                            jdee-ant-user-jar-files))
 
     ;; silence the compiler
     ;; TODO: remove this boundp and require 'jdee after resolving jde
     ;; compilation warnings
     (with-no-warnings
       (when jdee-ant-use-global-classpath
-	(setq classpath (append classpath jdee-global-classpath))))
+        (setq classpath (append classpath jdee-global-classpath))))
 
     (jdee-build-classpath classpath)))
 
 (defun jdee-ant-get-ant-home ()
   "Calculate an appropriate ant home."
   (let ((ant-home
-	 (if (string= jdee-ant-home "")
-	     (getenv "ANT_HOME")
-	   jdee-ant-home)))
+         (if (string= jdee-ant-home "")
+             (getenv "ANT_HOME")
+           jdee-ant-home)))
     (if ant-home
-	(jdee-normalize-path ant-home))))
+        (jdee-normalize-path ant-home))))
 
 (defun jdee-ant-interactive-get-buildfile ()
   "Get a buildfile interactively.  This is used so that code that needs to read
@@ -335,44 +335,44 @@ classpath normalized with `jdee-build-classpath'."
   (let (buildfile)
 
     (if jdee-ant-read-buildfile
-	;;read the buildfile from the user.
+        ;;read the buildfile from the user.
 
-	;;figure out which directory to execute from.
-	(let (prompt-directory prompt-filename)
+        ;;figure out which directory to execute from.
+        (let (prompt-directory prompt-filename)
 
-	  (if jdee-ant-interactive-buildfile
-	      (progn
-		(setq prompt-directory
-		      (file-name-directory jdee-ant-interactive-buildfile))
-		(setq prompt-filename
-		      (file-name-nondirectory jdee-ant-interactive-buildfile)))
+          (if jdee-ant-interactive-buildfile
+              (progn
+                (setq prompt-directory
+                      (file-name-directory jdee-ant-interactive-buildfile))
+                (setq prompt-filename
+                      (file-name-nondirectory jdee-ant-interactive-buildfile)))
 
-	    (setq prompt-directory (jdee-ant-get-default-directory))
-	    (setq prompt-filename ""))
+            (setq prompt-directory (jdee-ant-get-default-directory))
+            (setq prompt-filename ""))
 
-	  (setq buildfile
-		(read-file-name "Buildfile: " prompt-directory nil t
-				prompt-filename))))
+          (setq buildfile
+                (read-file-name "Buildfile: " prompt-directory nil t
+                                prompt-filename))))
     (if (or (and jdee-ant-enable-find (not jdee-ant-read-buildfile)) ;enable only
-	    (and jdee-ant-enable-find jdee-ant-read-buildfile
-		 (or (null buildfile)   ;no buildfile
-		     (string= "" buildfile)
-		     (and (file-exists-p buildfile) ;buildfile is a directory
-			  (file-directory-p buildfile)))))
-	(progn
-	  (setq buildfile (jdee-ant-find-build-file
-			   (jdee-ant-get-default-directory)))
+            (and jdee-ant-enable-find jdee-ant-read-buildfile
+                 (or (null buildfile)   ;no buildfile
+                     (string= "" buildfile)
+                     (and (file-exists-p buildfile) ;buildfile is a directory
+                          (file-directory-p buildfile)))))
+        (progn
+          (setq buildfile (jdee-ant-find-build-file
+                           (jdee-ant-get-default-directory)))
 
-	  (when (null buildfile)
-	    (error "Could not find Ant build file"))
+          (when (null buildfile)
+            (error "Could not find Ant build file"))
 
-	  (when (not (file-exists-p buildfile))
-	    (error "File does not exist %s " buildfile))))
+          (when (not (file-exists-p buildfile))
+            (error "File does not exist %s " buildfile))))
 
     (if (and (not jdee-ant-enable-find)
-	     (not jdee-ant-read-buildfile))
-	;;use the default buildfile.
-	(setq buildfile (jdee-normalize-path jdee-ant-buildfile)))
+             (not jdee-ant-read-buildfile))
+        ;;use the default buildfile.
+        (setq buildfile (jdee-normalize-path jdee-ant-buildfile)))
     buildfile))
 
 ;;;###autoload
@@ -381,40 +381,40 @@ classpath normalized with `jdee-build-classpath'."
   user for certain variables.."
   (interactive
    (let* ((buildfile (jdee-ant-interactive-get-buildfile))
-	  (build-history (jdee-ant-get-from-history buildfile))
-	  (targets
-	   (if jdee-ant-read-target
-	       (if jdee-ant-complete-target
-		   (if (fboundp 'completing-read-multiple)
-		       (completing-read-multiple
-			"Target to build: "
-			(jdee-ant-get-target-alist buildfile)
-			nil
-			nil
-			(car build-history)
-			'build-history)
-		     (list (completing-read
-			    "Target to build: "
-			    (jdee-ant-get-target-alist buildfile)
-			    nil
-			    t
-			    (car build-history)
-			    'build-history)))
-		 (list (read-from-minibuffer
-			"Target to build: "
-			(car build-history)
-			nil
-			nil
-			'build-history)))))
-	  (target
-	   (jdee-ant-escape (mapconcat 'identity targets " ")))
-	  (interactive-args
-	   (if jdee-ant-read-args
-	       (read-from-minibuffer
-		"Additional build args: "
-		(nth 0 jdee-ant-interactive-args-history)
-		nil nil
-		'(jdee-ant-interactive-args-history . 1)))))
+          (build-history (jdee-ant-get-from-history buildfile))
+          (targets
+           (if jdee-ant-read-target
+               (if jdee-ant-complete-target
+                   (if (fboundp 'completing-read-multiple)
+                       (completing-read-multiple
+                        "Target to build: "
+                        (jdee-ant-get-target-alist buildfile)
+                        nil
+                        nil
+                        (car build-history)
+                        'build-history)
+                     (list (completing-read
+                            "Target to build: "
+                            (jdee-ant-get-target-alist buildfile)
+                            nil
+                            t
+                            (car build-history)
+                            'build-history)))
+                 (list (read-from-minibuffer
+                        "Target to build: "
+                        (car build-history)
+                        nil
+                        nil
+                        'build-history)))))
+          (target
+           (jdee-ant-escape (mapconcat 'identity targets " ")))
+          (interactive-args
+           (if jdee-ant-read-args
+               (read-from-minibuffer
+                "Additional build args: "
+                (nth 0 jdee-ant-interactive-args-history)
+                nil nil
+                '(jdee-ant-interactive-args-history . 1)))))
 
 
      ;; Setting the history for future use
@@ -432,8 +432,8 @@ classpath normalized with `jdee-build-classpath'."
      (list buildfile target interactive-args)))
 
   (let ((compile-command
-	 (jdee-build-ant-command target interactive-args buildfile))
-	process-connection-type)
+         (jdee-build-ant-command target interactive-args buildfile))
+        process-connection-type)
 
     (when compile-command
       ;; Force save-some-buffers to use the minibuffer
@@ -443,29 +443,29 @@ classpath normalized with `jdee-build-classpath'."
       ;; which seems not to be supported--at least on
       ;; the PC.
       (if (eq system-type 'windows-nt)
-	  (let ((temp last-nonmenu-event))
-	    ;; The next line makes emacs think that the command
-	    ;; was invoked from the minibuffer, even when it
-	    ;; is actually invoked from the menu-bar.
-	    (setq last-nonmenu-event t)
-	    (save-some-buffers (not compilation-ask-about-save) nil)
-	    (setq last-nonmenu-event temp))
-	(save-some-buffers (not compilation-ask-about-save) nil))
+          (let ((temp last-nonmenu-event))
+            ;; The next line makes emacs think that the command
+            ;; was invoked from the minibuffer, even when it
+            ;; is actually invoked from the menu-bar.
+            (setq last-nonmenu-event t)
+            (save-some-buffers (not compilation-ask-about-save) nil)
+            (setq last-nonmenu-event temp))
+        (save-some-buffers (not compilation-ask-about-save) nil))
 
       (setq compilation-finish-functions
-	    (lambda (buf msg)
-	      (run-hook-with-args 'jdee-ant-build-hook buf msg)
-	      (setq compilation-finish-functions nil)))
+            (lambda (buf msg)
+              (run-hook-with-args 'jdee-ant-build-hook buf msg)
+              (setq compilation-finish-functions nil)))
 
       (if (string= (car jdee-ant-invocation-method) "Ant Server")
-	  (progn
-	    (while (string-match "\"" compile-command)
-	      (setq compile-command (replace-match "" nil nil
-						   compile-command)))
-	    (jdee-ant-compile-internal compile-command
+          (progn
+            (while (string-match "\"" compile-command)
+              (setq compile-command (replace-match "" nil nil
+                                                   compile-command)))
+            (jdee-ant-compile-internal compile-command
                                        "No more errors"))
-	(let ((default-directory (jdee-ant-get-default-directory)))
-	  (compilation-start compile-command))))))
+        (let ((default-directory (jdee-ant-get-default-directory)))
+          (compilation-start compile-command))))))
 
 (defvar jdee-ant-comint-filter nil)
 
@@ -473,26 +473,26 @@ classpath normalized with `jdee-build-classpath'."
   "Looks for \ characters and escape them, i.e. \\"
   (if (not (null target))
       (let (temp c)
-	(while (not (string= target ""))
-	  (setq c (substring target 0 1))
-	  (if (string= c "\\")
-	      (setq temp (concat temp c)))
-	  (setq temp (concat temp c))
-	  (setq target (substring target 1)))
-	temp)))
+        (while (not (string= target ""))
+          (setq c (substring target 0 1))
+          (if (string= c "\\")
+              (setq temp (concat temp c)))
+          (setq temp (concat temp c))
+          (setq target (substring target 1)))
+        temp)))
 
 (defun jdee-ant-compile-internal (command error-message)
   "This method displays ant output in a compilation buffer.
 error-message is a string to print if the user asks to see another error
 and there are no more errors. "
   (let* (error-regexp-alist
-	 enter-regexp-alist
-	 leave-regexp-alist
-	 file-regexp-alist
-	 nomessage-regexp-alist
-	 outbuf)
+         enter-regexp-alist
+         leave-regexp-alist
+         file-regexp-alist
+         nomessage-regexp-alist
+         outbuf)
 
-    (save-excursion				       ;;getting or creating
+    (save-excursion                                       ;;getting or creating
       (setq outbuf (get-buffer-create "*compilation*"));;the compilation buffer
       (set-buffer outbuf) ;;setting the compilation buffer
 
@@ -569,42 +569,42 @@ and there are no more errors. "
 The result is inserted as it comes in the compilation buffer."
   (let ((compilation-buffer (get-buffer "*compilation*")))
     (if (not (null compilation-buffer))
-	(with-current-buffer compilation-buffer
-	  (let ((stack-trace
-		 (string-match "java.lang.SecurityException" string))
-		(end-of-result (string-match ".*bsh % " string))
-		(win (get-buffer-window "*compilation*")))
+        (with-current-buffer compilation-buffer
+          (let ((stack-trace
+                 (string-match "java.lang.SecurityException" string))
+                (end-of-result (string-match ".*bsh % " string))
+                (win (get-buffer-window "*compilation*")))
 
-	    (save-excursion
-	      ;;Insert the text, advancing the process marker
-	      (goto-char (point-max))
+            (save-excursion
+              ;;Insert the text, advancing the process marker
+              (goto-char (point-max))
 
-	      ;;if the security exception has been thrown set the
-	      ;;jdee-ant-passed-security-exception flag and filter the stack
-	      ;;trace out of the ouput
-	      (if stack-trace
-		  (progn
-		    (setq jdee-ant-passed-security-exception t)
-		    (insert (substring string 0 stack-trace))
-		    (set-buffer-modified-p nil)
-		    (compilation-mode)
-		    (jdee-ant-set-build-status (buffer-string))
-		    (jdee-ant-handle-exit)))
+              ;;if the security exception has been thrown set the
+              ;;jdee-ant-passed-security-exception flag and filter the stack
+              ;;trace out of the ouput
+              (if stack-trace
+                  (progn
+                    (setq jdee-ant-passed-security-exception t)
+                    (insert (substring string 0 stack-trace))
+                    (set-buffer-modified-p nil)
+                    (compilation-mode)
+                    (jdee-ant-set-build-status (buffer-string))
+                    (jdee-ant-handle-exit)))
 
-	      (if end-of-result
-		  (progn
-		    (if (not jdee-ant-passed-security-exception)
-			(progn
-			  (insert (substring string 0 end-of-result))
-			  (set-buffer-modified-p nil)
-			  (compilation-mode)
-			  (jdee-ant-set-build-status (buffer-string))
-			  (jdee-ant-handle-exit)))
-		    (set-process-filter proc jdee-ant-comint-filter)))
-	      (if (and (not end-of-result)
-		       (not jdee-ant-passed-security-exception))
-		  (insert string)))
-	    (if compilation-scroll-output
+              (if end-of-result
+                  (progn
+                    (if (not jdee-ant-passed-security-exception)
+                        (progn
+                          (insert (substring string 0 end-of-result))
+                          (set-buffer-modified-p nil)
+                          (compilation-mode)
+                          (jdee-ant-set-build-status (buffer-string))
+                          (jdee-ant-handle-exit)))
+                    (set-process-filter proc jdee-ant-comint-filter)))
+              (if (and (not end-of-result)
+                       (not jdee-ant-passed-security-exception))
+                  (insert string)))
+            (if compilation-scroll-output
                 (save-selected-window
                   (if win
                       (progn
@@ -642,13 +642,13 @@ function uses the same rules as `jdee-ant-build' for finding the buildfile."
   "Find the next Ant build file upwards in the directory tree from DIR.
 Returns nil if it cannot find a project file in DIR or an ascendant directory."
   (let ((file (cl-find (cond ((string= jdee-ant-buildfile "") "build.xml")
-			  (t jdee-ant-buildfile))
-		    (directory-files dir) :test 'string=)))
+                          (t jdee-ant-buildfile))
+                    (directory-files dir) :test 'string=)))
 
     (if file
-	(setq file (expand-file-name file dir))
+        (setq file (expand-file-name file dir))
       (if (not (jdee-root-dir-p dir))
-	  (setq file (jdee-ant-find-build-file (concat dir "../")))))
+          (setq file (jdee-ant-find-build-file (concat dir "../")))))
 
     file))
 
@@ -656,14 +656,14 @@ Returns nil if it cannot find a project file in DIR or an ascendant directory."
   "Returns asociation list of valid Ant project targets."
 
   (let ((targets nil )
-	(temp-buf (get-buffer-create "*jdee-ant-get-target-list-temp-buffer*")))
+        (temp-buf (get-buffer-create "*jdee-ant-get-target-list-temp-buffer*")))
     (unwind-protect
-	(with-current-buffer temp-buf
-	  (erase-buffer)
-	  (insert-file-contents buildfile)
-	  (goto-char (point-min))
-	  (while (re-search-forward jdee-ant-target-regexp (point-max) t)
-	    (setq targets (append targets (list (list (match-string 1)))))))
+        (with-current-buffer temp-buf
+          (erase-buffer)
+          (insert-file-contents buildfile)
+          (goto-char (point-min))
+          (while (re-search-forward jdee-ant-target-regexp (point-max) t)
+            (setq targets (append targets (list (list (match-string 1)))))))
       (kill-buffer temp-buf))
 
     targets))
@@ -683,29 +683,29 @@ Returns nil if it cannot find a project file in DIR or an ascendant directory."
 
 (defun jdee-ant-add-to-history (buildfile build-history)
   (let ((temp (nth 0 jdee-ant-interactive-target-history))
-	(index -1) (found nil))
+        (index -1) (found nil))
     (while (and temp (not found))
       (setq index (1+ index))
       (setq temp (nth index jdee-ant-interactive-target-history))
       (if (string= (car temp) buildfile)
-	  (setq found t)))
+          (setq found t)))
     (if found
-	(setcdr temp build-history)
+        (setcdr temp build-history)
       (setq jdee-ant-interactive-target-history
-	    (append
-	     jdee-ant-interactive-target-history
-	     (list (list buildfile (car build-history))))))))
+            (append
+             jdee-ant-interactive-target-history
+             (list (list buildfile (car build-history))))))))
 
 (defun jdee-ant-get-from-history (buildfile)
   (let ((temp (nth 0 jdee-ant-interactive-target-history))
-	(index -1) (found nil))
+        (index -1) (found nil))
     (while (and temp (not found))
       (setq index (1+ index))
       (setq temp (nth index jdee-ant-interactive-target-history))
       (if (string= (car temp) buildfile)
-	  (setq found t)))
+          (setq found t)))
     (if found
-	(cdr temp)
+        (cdr temp)
       nil)))
 
 ;; Register and initialize the customization variables defined

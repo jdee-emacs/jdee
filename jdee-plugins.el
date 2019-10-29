@@ -38,18 +38,18 @@
 
 (defclass jdee-plugin ()
   ((bsh-cp    :initarg :bsh-cp
-	      :type list
+              :type list
               :initform nil
-	      :documentation "Beanshell classpath for this plugin.")
+              :documentation "Beanshell classpath for this plugin.")
    (menu-spec :initarg :menu-spec
-	      :type list
+              :type list
               :initform nil
-	      :documentation "Specifies menu for this plugin.")
+              :documentation "Specifies menu for this plugin.")
    (plugins   :type list
-	      :allocation :class
-	      :initform nil
-	      :documentation
-	     "Installed plugins."))
+              :allocation :class
+              :initform nil
+              :documentation
+             "Installed plugins."))
 "Class of plugins.")
 
 
@@ -78,17 +78,17 @@ plugins directory named PLUGIN and that this subdirectory contains
 a subdirectory name LISP that contains a file named jdee-plugin.el.
 This function loads jdee-PLUGIN.el."
   (let* ((plugin-dir (expand-file-name plugin jdee-plugins-directory))
-	 (plugin-lisp-dir (expand-file-name "lisp" plugin-dir))
-	 (plugin-lisp-package-name (concat "jdee-" plugin))
-	 (plugin-lisp-file-name (concat plugin-lisp-package-name ".el"))
-	 (plugin-lisp-file
-	  (expand-file-name
-	   plugin-lisp-file-name
-	   plugin-lisp-dir)))
+         (plugin-lisp-dir (expand-file-name "lisp" plugin-dir))
+         (plugin-lisp-package-name (concat "jdee-" plugin))
+         (plugin-lisp-file-name (concat plugin-lisp-package-name ".el"))
+         (plugin-lisp-file
+          (expand-file-name
+           plugin-lisp-file-name
+           plugin-lisp-dir)))
     (if (file-exists-p plugin-lisp-file)
-	(progn
-	  (add-to-list 'load-path plugin-lisp-dir)
-	  (require (intern plugin-lisp-package-name)))
+        (progn
+          (add-to-list 'load-path plugin-lisp-dir)
+          (require (intern plugin-lisp-package-name)))
       (error "JDEE plugin Lisp file %s missing" plugin-lisp-file-name))))
 
 
@@ -115,9 +115,9 @@ This function loads jdee-PLUGIN.el."
 (defun jdee-pi-get-bsh-classpath ()
   "Get the plugin directories and jar files to include in the Beanshell classpath."
   (let ((plugins (oref-default 'jdee-plugin plugins))
-	classpath)
+        classpath)
     (loop for plugin in plugins do
-	  (setq classpath (append classpath (oref plugin bsh-cp))))
+          (setq classpath (append classpath (oref plugin bsh-cp))))
     classpath))
 
 
@@ -132,7 +132,7 @@ jar program is on the system path."
           "Cannot find the jar program on the system path.")
 
   (let ((zip-files
-	 (directory-files jdee-plugins-directory nil ".*[.]\\(zip\\|jar\\)")))
+         (directory-files jdee-plugins-directory nil ".*[.]\\(zip\\|jar\\)")))
 
     (when zip-files
       (let ((buf (get-buffer-create "*plugins*")))
@@ -144,7 +144,7 @@ jar program is on the system path."
           (loop for zip-file in zip-files do
                 (let ((result
                        (shell-command-to-string
-			(concat "jar xvf " zip-file))))
+                        (concat "jar xvf " zip-file))))
                   (insert "\n\n")
                   (insert (format "Installing %s ..."
                                   (file-name-sans-extension zip-file)))
@@ -158,11 +158,11 @@ jar program is on the system path."
       (append
        (list "Plug-Ins")
        (delq
-	nil
-	(cl-mapcan
-	 (lambda (plugin)
-	   (oref plugin menu-spec))
-	 (oref-default 'jdee-plugin plugins))))))
+        nil
+        (cl-mapcan
+         (lambda (plugin)
+           (oref plugin menu-spec))
+         (oref-default 'jdee-plugin plugins))))))
 
 (provide 'jdee-plugins)
 

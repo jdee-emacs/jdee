@@ -65,9 +65,9 @@ name portion of the filename string."
   :type 'string
   :group 'jdee-ejb
   :set '(lambda (sym val)
-	  (set-default 'jdee-ejb-home
-		      (file-name-sans-extension val))
-	  (set-default sym val)))
+          (set-default 'jdee-ejb-home
+                      (file-name-sans-extension val))
+          (set-default sym val)))
 
 ;; (makunbound 'jdee-ejb-local-format)
 (defcustom jdee-ejb-local-format "%sLocal.java"
@@ -75,9 +75,9 @@ name portion of the filename string."
   :type 'string
   :group 'jdee-ejb
   :set '(lambda (sym val)
-	  (set-default 'jdee-ejb-local
-		      (file-name-sans-extension val))
-	  (set-default sym val)))
+          (set-default 'jdee-ejb-local
+                      (file-name-sans-extension val))
+          (set-default sym val)))
 
 ;; (makunbound 'jdee-ejb-local-home-format)
 (defcustom jdee-ejb-local-home-format "%sLocalHome.java"
@@ -87,9 +87,9 @@ name portion of the filename string."
   :type 'string
   :group 'jdee-ejb
   :set '(lambda (sym val)
-	  (set-default 'jdee-ejb-local-home
-		      (file-name-sans-extension val))
-	  (set-default sym val)))
+          (set-default 'jdee-ejb-local-home
+                      (file-name-sans-extension val))
+          (set-default sym val)))
 
 
 ;; (makunbound 'jdee-ejb-class-format)
@@ -100,9 +100,9 @@ name portion of the filename string."
   :type 'string
   :group 'jdee-ejb
   :set '(lambda (sym val)
-	  (set-default 'jdee-ejb-class
-		      (file-name-sans-extension val))
-	  (set-default sym val)))
+          (set-default 'jdee-ejb-class
+                      (file-name-sans-extension val))
+          (set-default sym val)))
 
 ;; (makunbound 'jdee-ejb-descriptor-format)
 (defcustom jdee-ejb-descriptor-format "%sEJB.xml"
@@ -143,18 +143,18 @@ command `jdee-ejb-remote', as a side-effect."
     :group 'jdee-ejb
     :type '(repeat string)
     :set '(lambda (sym val)
-	    (defalias 'jdee-ejb-remote
-	      (tempo-define-template "java-ejb-remote-buffer-template"
-				     (jdee-gen-read-template val)
-				     nil
-				     "Insert a generic Java class buffer skeleton."))
-	    (set-default sym val)))
+            (defalias 'jdee-ejb-remote
+              (tempo-define-template "java-ejb-remote-buffer-template"
+                                     (jdee-gen-read-template val)
+                                     nil
+                                     "Insert a generic Java class buffer skeleton."))
+            (set-default sym val)))
 
   (defalias 'jdee-ejb-remote
     (tempo-define-template "java-ejb-remote-buffer-template"
-			   (jdee-gen-read-template jdee-ejb-remote-buffer-template)
-			   nil
-			   "Insert a generic Java class buffer skeleton."))
+                           (jdee-gen-read-template jdee-ejb-remote-buffer-template)
+                           nil
+                           "Insert a generic Java class buffer skeleton."))
   )
 
 ;; (makunbound 'jdee-ejb-home-buffer-template)
@@ -186,18 +186,18 @@ command `jdee-ejb-home', as a side-effect."
     :group 'jdee-ejb
     :type '(repeat string)
     :set '(lambda (sym val)
-	    (defalias 'jdee-ejb-home
-	      (tempo-define-template "java-ejb-home-buffer-template"
-				     (jdee-gen-read-template val)
-				     nil
-				     "Insert a generic Java class buffer skeleton."))
-	    (set-default sym val)))
+            (defalias 'jdee-ejb-home
+              (tempo-define-template "java-ejb-home-buffer-template"
+                                     (jdee-gen-read-template val)
+                                     nil
+                                     "Insert a generic Java class buffer skeleton."))
+            (set-default sym val)))
 
   (defalias 'jdee-ejb-home
     (tempo-define-template "java-ejb-home-buffer-template"
-			   (jdee-gen-read-template jdee-ejb-home-buffer-template)
-			   nil
-			   "Insert a generic Java class buffer skeleton."))
+                           (jdee-gen-read-template jdee-ejb-home-buffer-template)
+                           nil
+                           "Insert a generic Java class buffer skeleton."))
   )
 
 ;;;;;;; start - by yoonforh 2003-01-15 17:09:14
@@ -230,18 +230,18 @@ command `jdee-ejb-local', as a side-effect."
     :group 'jdee-ejb
     :type '(repeat string)
     :set '(lambda (sym val)
-	    (defalias 'jdee-ejb-local
-	      (tempo-define-template "java-ejb-local-buffer-template"
-				     (jdee-gen-read-template val)
-				     nil
-				     "Insert a generic Java class buffer skeleton."))
-	    (set-default sym val)))
+            (defalias 'jdee-ejb-local
+              (tempo-define-template "java-ejb-local-buffer-template"
+                                     (jdee-gen-read-template val)
+                                     nil
+                                     "Insert a generic Java class buffer skeleton."))
+            (set-default sym val)))
 
   (defalias 'jdee-ejb-local
     (tempo-define-template "java-ejb-local-buffer-template"
-			   (jdee-gen-read-template jdee-ejb-local-buffer-template)
-			   nil
-			   "Insert a generic Java class buffer skeleton."))
+                           (jdee-gen-read-template jdee-ejb-local-buffer-template)
+                           nil
+                           "Insert a generic Java class buffer skeleton."))
   )
 
 ;; (makunbound 'jdee-ejb-local-home-buffer-template)
@@ -273,18 +273,18 @@ command `jdee-ejb-local-home', as a side-effect."
     :group 'jdee-ejb
     :type '(repeat string)
     :set '(lambda (sym val)
-	    (defalias 'jdee-ejb-local-home
-	      (tempo-define-template "java-ejb-local-home-buffer-template"
-				     (jdee-gen-read-template val)
-				     nil
-				     "Insert a generic Java class buffer skeleton."))
-	    (set-default sym val)))
+            (defalias 'jdee-ejb-local-home
+              (tempo-define-template "java-ejb-local-home-buffer-template"
+                                     (jdee-gen-read-template val)
+                                     nil
+                                     "Insert a generic Java class buffer skeleton."))
+            (set-default sym val)))
 
   (defalias 'jdee-ejb-local-home
     (tempo-define-template "java-ejb-local-home-buffer-template"
-			   (jdee-gen-read-template jdee-ejb-local-home-buffer-template)
-			   nil
-			   "Insert a generic Java class buffer skeleton."))
+                           (jdee-gen-read-template jdee-ejb-local-home-buffer-template)
+                           nil
+                           "Insert a generic Java class buffer skeleton."))
   )
 
 
@@ -444,12 +444,12 @@ command `jdee-ejb-entity-bean', as a side-effect."
   :group 'jdee-ejb
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-ejb-entity-bean
-	    (tempo-define-template "java-ejb-entity-bean-template"
-				   (jdee-gen-read-template val)
-				   nil
-				   "Insert a generic Entity Bean skeleton."))
-	  (set-default sym val)))
+          (defalias 'jdee-ejb-entity-bean
+            (tempo-define-template "java-ejb-entity-bean-template"
+                                   (jdee-gen-read-template val)
+                                   nil
+                                   "Insert a generic Entity Bean skeleton."))
+          (set-default sym val)))
 
 
 ;; (makunbound 'jdee-ejb-session-bean-template)
@@ -579,12 +579,12 @@ command `jdee-ejb-session-bean', as a side-effect."
   :group 'jdee-ejb
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-ejb-session-bean
-	    (tempo-define-template "java-ejb-session-bean-template"
-				   (jdee-gen-read-template val)
-				   nil
-				   "Insert a generic Session Bean skeleton."))
-	  (set-default sym val)))
+          (defalias 'jdee-ejb-session-bean
+            (tempo-define-template "java-ejb-session-bean-template"
+                                   (jdee-gen-read-template val)
+                                   nil
+                                   "Insert a generic Session Bean skeleton."))
+          (set-default sym val)))
 
 
 ;; (makunbound 'jdee-ejb-session-descriptor-buffer-template)
@@ -631,12 +631,12 @@ command `jdee-ejb-session-descriptor', as a side-effect."
   :group 'jdee-ejb
   :type '(repeat string)
   :set '(lambda (sym val)
-	    (defalias 'jdee-ejb-session-descriptor
-	      (tempo-define-template "java-ejb-session-descriptor-buffer-template"
-				     (jdee-gen-read-template val)
-				     nil
-				     "Insert a generic XML Deployment Descriptor buffer skeleton."))
-	    (set-default sym val)))
+            (defalias 'jdee-ejb-session-descriptor
+              (tempo-define-template "java-ejb-session-descriptor-buffer-template"
+                                     (jdee-gen-read-template val)
+                                     nil
+                                     "Insert a generic XML Deployment Descriptor buffer skeleton."))
+            (set-default sym val)))
 
 ;; (makunbound 'jdee-ejb-entity-descriptor-buffer-template)
 (defcustom jdee-ejb-entity-descriptor-buffer-template
@@ -701,12 +701,12 @@ command `jdee-ejb-session-descriptor', as a side-effect."
   :group 'jdee-ejb
   :type '(repeat string)
   :set '(lambda (sym val)
-	    (defalias 'jdee-ejb-entity-descriptor
-	      (tempo-define-template "java-ejb-entity-descriptor-buffer-template"
-				     (jdee-gen-read-template val)
-				     nil
-				     "Insert a generic XML Deployment Descriptor buffer skeleton."))
-	    (set-default sym val)))
+            (defalias 'jdee-ejb-entity-descriptor
+              (tempo-define-template "java-ejb-entity-descriptor-buffer-template"
+                                     (jdee-gen-read-template val)
+                                     nil
+                                     "Insert a generic XML Deployment Descriptor buffer skeleton."))
+            (set-default sym val)))
 
 ;;;###autoload
 (defun jdee-ejb-session-bean-buffer (ejb-name)
@@ -717,7 +717,7 @@ by the jdee-ejb templates.  This includes naming the files according
 to the EJB naming convention."
   (interactive
    (let* ((insert-default-directory t)
-	  (file (read-file-name "EJB Name (no extension): ")))
+          (file (read-file-name "EJB Name (no extension): ")))
      (setq jdee-ejb-dir  (file-name-directory file))
      (list (file-name-sans-extension (file-name-nondirectory file)))))
 
@@ -734,7 +734,7 @@ by the jdee-ejb templates.  This includes naming the files according
 to the EJB naming convention."
   (interactive
    (let* ((insert-default-directory t)
-	  (file (read-file-name "EJB Name (no extension): ")))
+          (file (read-file-name "EJB Name (no extension): ")))
      (setq jdee-ejb-dir  (file-name-directory file))
      (list (file-name-sans-extension (file-name-nondirectory file)))))
 

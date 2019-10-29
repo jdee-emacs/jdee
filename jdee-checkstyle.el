@@ -108,7 +108,7 @@ documentation for information on configuration files). Use
 the configuration file reads from the CheckStyle command line."
   :group 'jdee-checkstyle
   :type '(choice (const :tag "Sun" :value nil)
-		 (file :menu-tag "Custom" :tag "Config. File")))
+                 (file :menu-tag "Custom" :tag "Config. File")))
 
 
 (defcustom jdee-checkstyle-expanded-properties nil
@@ -125,8 +125,8 @@ this way.  To delete a property, select the DEL button next
 to the property."
   :group 'jdee-checkstyle
   :type '(repeat (cons
-		  (string :tag "Property Name")
-		  (string :tag "Property Value"))))
+                  (string :tag "Property Name")
+                  (string :tag "Property Value"))))
 
 ;; (makunbound 'jdee-checkstyle-expanded-properties-file)
 (defcustom jdee-checkstyle-expanded-properties-file nil
@@ -159,7 +159,7 @@ custom style checking modules used by this project."
 Options are plain or XML."
   :group 'jdee-checkstyle
   :type '(choice (const :tag "Plain" :value nil)
-		 (const :tag "XML" :value "xml")))
+                 (const :tag "XML" :value "xml")))
 
 
 ;; (makunbound 'jdee-checkstyle-source-dir)
@@ -187,7 +187,7 @@ string describing how the compilation finished."
   "Extension of Java source files (if not java)."
   :group 'jdee-checkstyle
   :type '(choice (const :tag "java" :value nil)
-		 (string :menu-tag "other" :tag "Extension")))
+                 (string :menu-tag "other" :tag "Extension")))
 
 
 (defmethod jdee-checkstyle-get-property-args ((this jdee-run-vm))
@@ -207,34 +207,34 @@ string describing how the compilation finished."
 
 (defclass jdee-checkstyle-checker ()
   ((buffer           :initarg :buffer
-		     :type buffer
-		     :documentation
-		     "Compilation buffer")
+                     :type buffer
+                     :documentation
+                     "Compilation buffer")
    (window           :initarg :window
-		     :type window
-		     :documentation
-		     "Window that displays the compilation buffer.")
+                     :type window
+                     :documentation
+                     "Window that displays the compilation buffer.")
    (interactive-args :initarg :interactive-args
                      :initform: nil
-		     :type list
-		     :documentation
-		     "Arguments entered in the minibuffer."))
+                     :type list
+                     :documentation
+                     "Arguments entered in the minibuffer."))
   "Class of Java style checkers.")
 
 (defmethod jdee-checkstyle-create-checker-buffer ((this jdee-checkstyle-checker))
   (save-excursion
     (let ((buf (get-buffer-create "*check style*"))
-	  (error-regexp-alist compilation-error-regexp-alist)
-	  (enter-regexp-alist (if (boundp 'compilation-enter-directory-regexp-alist)
-				  compilation-enter-directory-regexp-alist))
-	  (leave-regexp-alist (if (boundp 'compilation-leave-directory-regexp-alist)
-				  compilation-leave-directory-regexp-alist))
-	  (file-regexp-alist (if (boundp 'compilation-file-regexp-alist)
-				 compilation-file-regexp-alist))
-	  (nomessage-regexp-alist (if (boundp 'compilation-nomessage-regexp-alist)
-				      compilation-nomessage-regexp-alist))
-	  (error-message "No further errors")
-	  (thisdir default-directory))
+          (error-regexp-alist compilation-error-regexp-alist)
+          (enter-regexp-alist (if (boundp 'compilation-enter-directory-regexp-alist)
+                                  compilation-enter-directory-regexp-alist))
+          (leave-regexp-alist (if (boundp 'compilation-leave-directory-regexp-alist)
+                                  compilation-leave-directory-regexp-alist))
+          (file-regexp-alist (if (boundp 'compilation-file-regexp-alist)
+                                 compilation-file-regexp-alist))
+          (nomessage-regexp-alist (if (boundp 'compilation-nomessage-regexp-alist)
+                                      compilation-nomessage-regexp-alist))
+          (error-message "No further errors")
+          (thisdir default-directory))
 
       (oset this :buffer buf)
 
@@ -243,17 +243,17 @@ string describing how the compilation finished."
       ;; Make sure a style checker process is not
       ;; already running.
       (let ((check-proc (get-buffer-process (current-buffer))))
-	(if check-proc
-	    (if (or (not (eq (process-status check-proc) 'run))
-		    (yes-or-no-p
+        (if check-proc
+            (if (or (not (eq (process-status check-proc) 'run))
+                    (yes-or-no-p
                      "A check style process is running; kill it?"))
-		(condition-case ()
-		    (progn
-		      (interrupt-process check-proc)
-		      (sit-for 1)
-		      (delete-process check-proc))
-		  (error nil))
-	      (error "Cannot have two processes in `%s' at once"
+                (condition-case ()
+                    (progn
+                      (interrupt-process check-proc)
+                      (sit-for 1)
+                      (delete-process check-proc))
+                  (error nil))
+              (error "Cannot have two processes in `%s' at once"
                      (buffer-name)))))
 
       ;; In case the checker buffer is current, make sure we get the global
@@ -269,11 +269,11 @@ string describing how the compilation finished."
       (setq buffer-read-only nil)
 
       (set (make-local-variable 'compilation-finish-functions)
-	   (lambda (buf msg)
-	     (run-hook-with-args 'jdee-checkstyle-finish-hook buf msg)
-	     (setq compilation-finish-functions nil)))
+           (lambda (buf msg)
+             (run-hook-with-args 'jdee-checkstyle-finish-hook buf msg)
+             (setq compilation-finish-functions nil)))
       (if (boundp 'compilation-error-message)
-	  (set (make-local-variable 'compilation-error-message) error-message))
+          (set (make-local-variable 'compilation-error-message) error-message))
       (set (make-local-variable 'compilation-error-regexp-alist)
            error-regexp-alist)
       (dolist (elt `((compilation-enter-directory-regexp-alist
@@ -288,8 +288,8 @@ string describing how the compilation finished."
             (set (make-local-variable (car elt)) (second elt))))
 
       (if (boundp 'compilation-directory-stack)
-	  (setq default-directory thisdir
-		compilation-directory-stack (list default-directory))))))
+          (setq default-directory thisdir
+                compilation-directory-stack (list default-directory))))))
 
 (defmethod jdee-checkstyle-get-property-args ((this jdee-checkstyle-checker))
     "Get property arguments."
@@ -311,64 +311,64 @@ string describing how the compilation finished."
       (funcall compilation-process-setup-function))
 
   (let* ((outbuf (oref this :buffer))
-	 (vm-path (oref (jdee-run-get-vm) :path))
-	 (source-file
-	  (concat "./" (file-name-nondirectory buffer-file-name)))
-	 (jdee-java-directory
-	  (concat
-	   (jdee-find-jdee-data-directory)
-	   "java/"))
-	 (args (append
-		(unless jdee-checkstyle-expanded-properties-file
-		  (jdee-checkstyle-get-property-args this))
-		(oref this :interactive-args)
-		(list "-classpath"
-		      (if jdee-checkstyle-classpath
-			  (jdee-build-classpath jdee-checkstyle-classpath)
-			(jdee-normalize-path
-			 (expand-file-name "lib/checkstyle-all.jar" jdee-java-directory))))
-		(list jdee-checkstyle-class)
-		(list "-c"
-		      (if jdee-checkstyle-style
-			  (jdee-normalize-path jdee-checkstyle-style)
-			(concat (jdee-find-jdee-data-directory) "java/lib/sun_checks.xml")))
-		(if jdee-checkstyle-expanded-properties-file
-		    (list "-p" (jdee-normalize-path jdee-checkstyle-expanded-properties-file)))
-		(if jdee-checkstyle-module-package-names-file
-		    (list "-n" (jdee-normalize-path jdee-checkstyle-module-package-names-file)))
-		(if jdee-checkstyle-output-format
-		    (list "-f" jdee-checkstyle-output-format))
-		(if jdee-checkstyle-output-file
-		    (list "-o" (jdee-normalize-path jdee-checkstyle-output-file)))
-		(if jdee-checkstyle-source-file-extension
-		    (list "-e" jdee-checkstyle-source-file-extension))
-		(if jdee-checkstyle-source-dir
-		    (list "-r" (jdee-normalize-path jdee-checkstyle-source-dir))
-		  (list source-file)))))
+         (vm-path (oref (jdee-run-get-vm) :path))
+         (source-file
+          (concat "./" (file-name-nondirectory buffer-file-name)))
+         (jdee-java-directory
+          (concat
+           (jdee-find-jdee-data-directory)
+           "java/"))
+         (args (append
+                (unless jdee-checkstyle-expanded-properties-file
+                  (jdee-checkstyle-get-property-args this))
+                (oref this :interactive-args)
+                (list "-classpath"
+                      (if jdee-checkstyle-classpath
+                          (jdee-build-classpath jdee-checkstyle-classpath)
+                        (jdee-normalize-path
+                         (expand-file-name "lib/checkstyle-all.jar" jdee-java-directory))))
+                (list jdee-checkstyle-class)
+                (list "-c"
+                      (if jdee-checkstyle-style
+                          (jdee-normalize-path jdee-checkstyle-style)
+                        (concat (jdee-find-jdee-data-directory) "java/lib/sun_checks.xml")))
+                (if jdee-checkstyle-expanded-properties-file
+                    (list "-p" (jdee-normalize-path jdee-checkstyle-expanded-properties-file)))
+                (if jdee-checkstyle-module-package-names-file
+                    (list "-n" (jdee-normalize-path jdee-checkstyle-module-package-names-file)))
+                (if jdee-checkstyle-output-format
+                    (list "-f" jdee-checkstyle-output-format))
+                (if jdee-checkstyle-output-file
+                    (list "-o" (jdee-normalize-path jdee-checkstyle-output-file)))
+                (if jdee-checkstyle-source-file-extension
+                    (list "-e" jdee-checkstyle-source-file-extension))
+                (if jdee-checkstyle-source-dir
+                    (list "-r" (jdee-normalize-path jdee-checkstyle-source-dir))
+                  (list source-file)))))
 
     (with-current-buffer outbuf
 
       (insert (format "cd %s\n" default-directory))
 
       (insert (concat
-	       vm-path
-	       " "
-	       (mapconcat 'identity args " ")
-	       "\n\n"))
+               vm-path
+               " "
+               (mapconcat 'identity args " ")
+               "\n\n"))
 
       (let* ((process-environment (cons "EMACS=t" process-environment))
-	     (w32-quote-process-args ?\")
-	     (win32-quote-process-args ?\") ;; XEmacs
-	     (proc (apply 'start-process
-			  (downcase mode-name)
-			  outbuf
-			  vm-path
-			  args)))
-	(set-process-sentinel proc 'compilation-sentinel)
-	(set-process-filter proc 'compilation-filter)
-	(set-marker (process-mark proc) (point) outbuf)
-	(setq compilation-in-progress
-	      (cons proc compilation-in-progress)))
+             (w32-quote-process-args ?\")
+             (win32-quote-process-args ?\") ;; XEmacs
+             (proc (apply 'start-process
+                          (downcase mode-name)
+                          outbuf
+                          vm-path
+                          args)))
+        (set-process-sentinel proc 'compilation-sentinel)
+        (set-process-filter proc 'compilation-filter)
+        (set-marker (process-mark proc) (point) outbuf)
+        (setq compilation-in-progress
+              (cons proc compilation-in-progress)))
 
       (set-buffer-modified-p nil)
       (setq compilation-last-buffer (oref this :buffer)))))
@@ -388,16 +388,16 @@ history enabled."
 
   (if jdee-checkstyle-read-args
       (setq jdee-checkstyle-interactive-args
-	    (read-from-minibuffer
-	     "Check args: "
-	     jdee-checkstyle-interactive-args
-	     nil nil
-	     '(jdee-checkstyle-interactive-arg-history . 1))))
+            (read-from-minibuffer
+             "Check args: "
+             jdee-checkstyle-interactive-args
+             nil nil
+             '(jdee-checkstyle-interactive-arg-history . 1))))
 
   (let ((checker (jdee-checkstyle-checker
-		  "checker"
-		  :interactive-args (if jdee-checkstyle-read-args
-					jdee-checkstyle-interactive-args))))
+                  "checker"
+                  :interactive-args (if jdee-checkstyle-read-args
+                                        jdee-checkstyle-interactive-args))))
 
     ;; Force save-some-buffers to use the minibuffer
     ;; to query user about whether to save modified buffers.
@@ -406,13 +406,13 @@ history enabled."
     ;; which seems not to be supported--at least on
     ;; the PC.
     (if (eq system-type 'windows-nt)
-	(let ((temp last-nonmenu-event))
-	  ;; The next line makes emacs think that jdee-checkstyle
-	  ;; was invoked from the minibuffer, even when it
-	  ;; is actually invoked from the menu-bar.
-	  (setq last-nonmenu-event t)
-	  (save-some-buffers (not compilation-ask-about-save) nil)
-	  (setq last-nonmenu-event temp))
+        (let ((temp last-nonmenu-event))
+          ;; The next line makes emacs think that jdee-checkstyle
+          ;; was invoked from the minibuffer, even when it
+          ;; is actually invoked from the menu-bar.
+          (setq last-nonmenu-event t)
+          (save-some-buffers (not compilation-ask-about-save) nil)
+          (setq last-nonmenu-event temp))
       (save-some-buffers (not compilation-ask-about-save) nil))
 
     (jdee-checkstyle-exec checker)))

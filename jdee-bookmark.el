@@ -43,8 +43,8 @@ Function `jdee-find-class-source' is used to visit these Java source files (see
 `jdee-bookmark-visit')."
   :group 'jdee-bookmark
   :type '(repeat (cons :tag "Entry"
-		       (string :tag "Name")
-		       (string :tag "Class"))))
+                       (string :tag "Name")
+                       (string :tag "Class"))))
 
 (defvar jdee-bookmark-history nil
   "History item list for `jdee-bookmark-prompt'.")
@@ -52,14 +52,14 @@ Function `jdee-find-class-source' is used to visit these Java source files (see
 (defun jdee-bookmark-prompt (&optional prompt)
   (let ((default (car jdee-bookmark-history)))
     (setq prompt (or prompt
-		     (format "Class%s"
-			     (if default
-				 (format " (default %s): " default)
-			       ": "))))
+                     (format "Class%s"
+                             (if default
+                                 (format " (default %s): " default)
+                               ": "))))
     (completing-read prompt
-		     (mapcar #'car jdee-bookmark-class-bookmarks)
-		     nil t nil 'jdee-bookmark-history
-		     (car jdee-bookmark-history))))
+                     (mapcar #'car jdee-bookmark-class-bookmarks)
+                     nil t nil 'jdee-bookmark-history
+                     (car jdee-bookmark-history))))
 
 (defun jdee-bookmark-class (key)
   (cdr (assoc key jdee-bookmark-class-bookmarks)))
@@ -80,10 +80,10 @@ Function `jdee-find-class-source' is used to visit these Java source files (see
   (jdee-assert-mode)
   (setq fq-class (or fq-class (jdee-parse-get-buffer-class)))
   (message (format "Adding bookmark `%s' as class `%s'"
-		   key fq-class))
+                   key fq-class))
   (customize-save-variable 'jdee-bookmark-class-bookmarks
-			   (append jdee-bookmark-class-bookmarks
-				   (list (cons key fq-class)))))
+                           (append jdee-bookmark-class-bookmarks
+                                   (list (cons key fq-class)))))
 
 ;;;###autoload
 (defun jdee-bookmark-list ()
@@ -92,18 +92,18 @@ Function `jdee-find-class-source' is used to visit these Java source files (see
   ;; a more dynamnic display is needed, like what's currently in bookmark.el
   ;; would be nice
   (let ((max-name-len (apply #'max
-			     (mapcar #'(lambda (arg)
-					 (length (car arg)))
-				     jdee-bookmark-class-bookmarks))))
+                             (mapcar #'(lambda (arg)
+                                         (length (car arg)))
+                                     jdee-bookmark-class-bookmarks))))
     (with-current-buffer (get-buffer-create "*JDEE Bookmarks*")
       (setq buffer-read-only nil)
       (erase-buffer)
       (dolist (entry jdee-bookmark-class-bookmarks)
-	(insert (format "%s:%s%s\n"
-			(car entry)
-			(make-string (+ 1 (- max-name-len
-					     (length (car entry)))) ? )
-			(cdr entry))))
+        (insert (format "%s:%s%s\n"
+                        (car entry)
+                        (make-string (+ 1 (- max-name-len
+                                             (length (car entry)))) ? )
+                        (cdr entry))))
       (setq buffer-read-only t)
       (set-buffer-modified-p nil)
       (display-buffer (current-buffer)))))

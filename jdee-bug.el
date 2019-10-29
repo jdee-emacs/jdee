@@ -87,10 +87,10 @@ executable used to run the debugger itself."
 This defaults to java on Unix platforms and javaw on Windows platforms"
   :group 'jdee-bug
   :type '(list
-	  (radio-button-choice
-	  (const "java")
-	  (const "javaw")
-	  (const "java_g"))))
+          (radio-button-choice
+          (const "java")
+          (const "javaw")
+          (const "java_g"))))
 
 (defcustom jdee-bug-raise-frame-p t
   "*Raise frame when a breakpoint is hit."
@@ -109,8 +109,8 @@ the value of this variable. If you are running JDK 1.2, you must also
 specifiy the options  -Xnoagent and -Djava.compiler=NONE."
   :group 'jdee-bug
   :type '(cons
-	  (boolean :tag "Prompt for")
-	  (string :tag "Address")))
+          (boolean :tag "Prompt for")
+          (string :tag "Address")))
 
 (defcustom jdee-bug-server-shmem-name (cons t "JDEbug")
   "*Shared memory name under which the debugger listens for apps
@@ -121,8 +121,8 @@ the value of this variable. If you are running JDK 1.2, you must also
 specifiy the options  -Xnoagent and -Djava.compiler=NONE."
   :group 'jdee-bug
   :type '(cons
-	  (boolean :tag "Prompt for")
-	  (string :tag "Name")))
+          (boolean :tag "Prompt for")
+          (string :tag "Name")))
 
 
 (defcustom jdee-bug-debugger-host-address system-name
@@ -145,9 +145,9 @@ a local host: 127.0.0.1 ."
 "*Breakpoints to be set for the current project."
   :group 'jdee-bug
   :type '(repeat
-	  (cons :tag "Break at"
-	   (string :tag "File Name")
-	   (integer :tag "Line Number"))))
+          (cons :tag "Break at"
+           (string :tag "File Name")
+           (integer :tag "Line Number"))))
 
 
 (defcustom jdee-bug-breakpoint-cursor-colors (cons "cyan" "brown")
@@ -155,13 +155,13 @@ a local host: 127.0.0.1 ."
 breakpoint cursor."
   :group 'jdee-bug
   :type '(cons
-	  (string :tag "Foreground Color")
-	  (string :tag "Background Color"))
+          (string :tag "Foreground Color")
+          (string :tag "Background Color"))
   :set '(lambda (sym val)
-	  (make-face 'jdee-bug-breakpoint-cursor)
-	  (set-face-foreground 'jdee-bug-breakpoint-cursor (car val))
-	  (set-face-background 'jdee-bug-breakpoint-cursor (cdr val))
-	  (set-default sym val)))
+          (make-face 'jdee-bug-breakpoint-cursor)
+          (set-face-foreground 'jdee-bug-breakpoint-cursor (car val))
+          (set-face-background 'jdee-bug-breakpoint-cursor (cdr val))
+          (set-default sym val)))
 
 
 (defgroup jdee-bug-window nil
@@ -194,356 +194,356 @@ consuming and slows down stepping through the code."
 (defvar jdee-bug-menu-spec
   (list "JDEbug"
 
-	["Step Over"
-	 jdee-bug-step-over
-	 (jdee-dbs-target-process-steppable-p)]
+        ["Step Over"
+         jdee-bug-step-over
+         (jdee-dbs-target-process-steppable-p)]
 
-	["Step Into"
-	 jdee-bug-step-into
-	 (jdee-dbs-target-process-steppable-p)]
+        ["Step Into"
+         jdee-bug-step-into
+         (jdee-dbs-target-process-steppable-p)]
 
-	["Step Into All"
-	 jdee-bug-step-into-all
-	 (jdee-dbs-target-process-steppable-p)]
+        ["Step Into All"
+         jdee-bug-step-into-all
+         (jdee-dbs-target-process-steppable-p)]
 
-	["Step Out"
-	 jdee-bug-step-out
-	 (jdee-dbs-target-process-steppable-p)]
+        ["Step Out"
+         jdee-bug-step-out
+         (jdee-dbs-target-process-steppable-p)]
 
-	["Run"
-	 jdee-debug
-	 :active                    t
-	 :included                  (null (jdee-dbs-debugger-running-p)) ]
+        ["Run"
+         jdee-debug
+         :active                    t
+         :included                  (null (jdee-dbs-debugger-running-p)) ]
 
-	["Continue"
-	 jdee-bug-continue
-	 :active                    (jdee-dbs-target-process-runnable-p)
-	 :included                  (jdee-dbs-debugger-running-p)        ]
+        ["Continue"
+         jdee-bug-continue
+         :active                    (jdee-dbs-target-process-runnable-p)
+         :included                  (jdee-dbs-debugger-running-p)        ]
 
-	["Exit Debugger"
-	 jdee-bug-exit
-	 (jdee-dbs-debugger-running-p)]
+        ["Exit Debugger"
+         jdee-bug-exit
+         (jdee-dbs-debugger-running-p)]
 
-	"-"
-	;; Added by lea
-	["Toggle Breakpoint"
-	 jdee-bug-toggle-breakpoint t]
-	["Set Conditional Breakpoint"
-	 jdee-bug-set-conditional-breakpoint nil]
-	["Break on exception"
-	 jdee-bug-break-on-exception
-	 :active (and
-		  (jdee-dbs-debugger-running-p)
-		  (jdee-dbs-get-target-process))]
-	["Save Breakpoints"
-	 jdee-bug-save-breakpoints nil]
-	(list
-	 "Watch for Field"
+        "-"
+        ;; Added by lea
+        ["Toggle Breakpoint"
+         jdee-bug-toggle-breakpoint t]
+        ["Set Conditional Breakpoint"
+         jdee-bug-set-conditional-breakpoint nil]
+        ["Break on exception"
+         jdee-bug-break-on-exception
+         :active (and
+                  (jdee-dbs-debugger-running-p)
+                  (jdee-dbs-get-target-process))]
+        ["Save Breakpoints"
+         jdee-bug-save-breakpoints nil]
+        (list
+         "Watch for Field"
 
-	 ["Access"
-	  jdee-bug-watch-field-access
-	  :style    nil
-	  :active   (and
-		     (jdee-dbs-debugger-running-p)
-		     (jdee-dbs-get-target-process))]
-
-
-	 ["Modification"
-	  jdee-bug-watch-field-modification
-	  :style   nil
-	  :active  (and
-		    (jdee-dbs-debugger-running-p)
-		    (jdee-dbs-get-target-process))]
-
-	 ["Cancel"
-	  jdee-bug-cancel-watch
-	  :style     nil
-	  :active    (and
-		      (jdee-dbs-debugger-running-p)
-		      (jdee-dbs-get-target-process)
-		      (slot-boundp
-		       (jdee-dbs-get-target-process)
-		       'watch-req))]
-
-	 )
-
-	(list
-	 "Trace"
-
-	 ["Class Prep..."
-	  jdee-bug-trace-class-prep
-	  :style    nil
-	  :active	 (and
-			  (jdee-dbs-debugger-running-p)
-			  (jdee-dbs-get-target-process))]
-
-	 ["Class Unload..."
-	  jdee-bug-trace-class-unload
-	  :style    nil
-	  :active	 (and
-			  (jdee-dbs-debugger-running-p)
-			  (jdee-dbs-get-target-process))]
+         ["Access"
+          jdee-bug-watch-field-access
+          :style    nil
+          :active   (and
+                     (jdee-dbs-debugger-running-p)
+                     (jdee-dbs-get-target-process))]
 
 
-	 ["Method Entry..."
-	  jdee-bug-trace-method-entry
-	  :style    nil
-	  :active	 (and
-			  (jdee-dbs-debugger-running-p)
-			  (jdee-dbs-get-target-process))]
+         ["Modification"
+          jdee-bug-watch-field-modification
+          :style   nil
+          :active  (and
+                    (jdee-dbs-debugger-running-p)
+                    (jdee-dbs-get-target-process))]
 
-	 ["Method Exit..."
-	  jdee-bug-trace-method-exit
-	  :style    nil
-	  :active	 (and
-			  (jdee-dbs-debugger-running-p)
-			  (jdee-dbs-get-target-process))]
+         ["Cancel"
+          jdee-bug-cancel-watch
+          :style     nil
+          :active    (and
+                      (jdee-dbs-debugger-running-p)
+                      (jdee-dbs-get-target-process)
+                      (slot-boundp
+                       (jdee-dbs-get-target-process)
+                       'watch-req))]
 
-	 ["Exceptions..."
-	  jdee-bug-trace-exceptions
-	  :style    nil
-	  :active	 (and
-			  (jdee-dbs-debugger-running-p)
-			  (jdee-dbs-get-target-process))]
+         )
+
+        (list
+         "Trace"
+
+         ["Class Prep..."
+          jdee-bug-trace-class-prep
+          :style    nil
+          :active         (and
+                          (jdee-dbs-debugger-running-p)
+                          (jdee-dbs-get-target-process))]
+
+         ["Class Unload..."
+          jdee-bug-trace-class-unload
+          :style    nil
+          :active         (and
+                          (jdee-dbs-debugger-running-p)
+                          (jdee-dbs-get-target-process))]
 
 
-	 ["Cancel..."
-	  jdee-bug-cancel-trace
-	  :style     nil
-	  :active    (and
-		      (jdee-dbs-debugger-running-p)
-		      (jdee-dbs-get-target-process)
-		      (slot-boundp
-		       (jdee-dbs-get-target-process)
-		       'trace-req))]
+         ["Method Entry..."
+          jdee-bug-trace-method-entry
+          :style    nil
+          :active         (and
+                          (jdee-dbs-debugger-running-p)
+                          (jdee-dbs-get-target-process))]
 
-	 )
+         ["Method Exit..."
+          jdee-bug-trace-method-exit
+          :style    nil
+          :active         (and
+                          (jdee-dbs-debugger-running-p)
+                          (jdee-dbs-get-target-process))]
 
-	"-"
+         ["Exceptions..."
+          jdee-bug-trace-exceptions
+          :style    nil
+          :active         (and
+                          (jdee-dbs-debugger-running-p)
+                          (jdee-dbs-get-target-process))]
 
-	(list
-	 "Display"
 
-	 ["Loaded Classes"
-	  jdee-bug-display-loaded-classes
-	  (and
-	   (jdee-dbs-debugger-running-p)
-	   (jdee-dbs-get-target-process))]
+         ["Cancel..."
+          jdee-bug-cancel-trace
+          :style     nil
+          :active    (and
+                      (jdee-dbs-debugger-running-p)
+                      (jdee-dbs-get-target-process)
+                      (slot-boundp
+                       (jdee-dbs-get-target-process)
+                       'trace-req))]
 
-	 ["Object Monitors"
-	  jdee-bug-show-object-monitors
-	  (and
-	   (jdee-dbs-debugger-running-p)
-	   (jdee-dbs-get-target-process))]
+         )
 
-	 ["Path Info"
-	  jdee-bug-display-path-info
-	  (and
-	   (jdee-dbs-debugger-running-p)
-	   (jdee-dbs-get-target-process))]
-	 )
+        "-"
 
-	["Display Variable At Point"
-	 jdee-bug-display-variable
-	 (and
+        (list
+         "Display"
+
+         ["Loaded Classes"
+          jdee-bug-display-loaded-classes
+          (and
+           (jdee-dbs-debugger-running-p)
+           (jdee-dbs-get-target-process))]
+
+         ["Object Monitors"
+          jdee-bug-show-object-monitors
+          (and
+           (jdee-dbs-debugger-running-p)
+           (jdee-dbs-get-target-process))]
+
+         ["Path Info"
+          jdee-bug-display-path-info
+          (and
+           (jdee-dbs-debugger-running-p)
+           (jdee-dbs-get-target-process))]
+         )
+
+        ["Display Variable At Point"
+         jdee-bug-display-variable
+         (and
           (jdee-dbs-debugger-running-p)
           (jdee-dbs-get-target-process))]
 
-	["Evaluate Expression"
-	 jdee-bug-evaluate-expression
-	 (and
-	  (jdee-dbs-debugger-running-p)
-	  (jdee-dbs-get-target-process))]
+        ["Evaluate Expression"
+         jdee-bug-evaluate-expression
+         (and
+          (jdee-dbs-debugger-running-p)
+          (jdee-dbs-get-target-process))]
 
-	(list
-	 "Stack"
-	 `["Enable"
-	   jdee-bug-toggle-stack-info
-	   :enable t
-	   :style radio
-	   :selected jdee-bug-stack-info]
-	 ["Up"
-	  jdee-bug-up-stack
-	  (and
-	   (jdee-dbs-target-process-steppable-p)
-	   (let* ((process (jdee-dbs-get-target-process))
-		  (stack-max
-		   (if (slot-boundp process 'stack)
-		       (1- (length (oref process stack)))
-		     0))
-		  (stack-ptr (oref process stack-ptr)))
-	     (< stack-ptr stack-max)))]
+        (list
+         "Stack"
+         `["Enable"
+           jdee-bug-toggle-stack-info
+           :enable t
+           :style radio
+           :selected jdee-bug-stack-info]
+         ["Up"
+          jdee-bug-up-stack
+          (and
+           (jdee-dbs-target-process-steppable-p)
+           (let* ((process (jdee-dbs-get-target-process))
+                  (stack-max
+                   (if (slot-boundp process 'stack)
+                       (1- (length (oref process stack)))
+                     0))
+                  (stack-ptr (oref process stack-ptr)))
+             (< stack-ptr stack-max)))]
 
-	 ["Down"
-	  jdee-bug-down-stack
-	  (and
-	   (jdee-dbs-target-process-steppable-p)
-	   (let* ((process (jdee-dbs-get-target-process))
-		  (stack-ptr (oref process stack-ptr)))
-	     (> stack-ptr 0)))]
+         ["Down"
+          jdee-bug-down-stack
+          (and
+           (jdee-dbs-target-process-steppable-p)
+           (let* ((process (jdee-dbs-get-target-process))
+                  (stack-ptr (oref process stack-ptr)))
+             (> stack-ptr 0)))]
 
-	 )
-	(list
-	 "Thread"
+         )
+        (list
+         "Thread"
 
-	 ["Suspend"
-	  jdee-bug-suspend-thread
-	  (and
-	   (jdee-dbs-debugger-running-p)
-	   (jdee-dbs-get-target-process))]
+         ["Suspend"
+          jdee-bug-suspend-thread
+          (and
+           (jdee-dbs-debugger-running-p)
+           (jdee-dbs-get-target-process))]
 
 
-	 ["Resume"
-	  jdee-bug-resume-thread
-	  (and
-	   (jdee-dbs-debugger-running-p)
-	   (jdee-dbs-get-target-process))]
+         ["Resume"
+          jdee-bug-resume-thread
+          (and
+           (jdee-dbs-debugger-running-p)
+           (jdee-dbs-get-target-process))]
 
-	 ["Interrupt"
-	  jdee-bug-interrupt-thread
-	  (and
-	   (jdee-dbs-debugger-running-p)
-	   (jdee-dbs-get-target-process))]
+         ["Interrupt"
+          jdee-bug-interrupt-thread
+          (and
+           (jdee-dbs-debugger-running-p)
+           (jdee-dbs-get-target-process))]
 
-	 ["Stop"
-	  jdee-bug-stop-thread
-	  (and
-	   (jdee-dbs-debugger-running-p)
-	   (jdee-dbs-get-target-process))]
+         ["Stop"
+          jdee-bug-stop-thread
+          (and
+           (jdee-dbs-debugger-running-p)
+           (jdee-dbs-get-target-process))]
 
                                         ; ["Show Thread Info"
                                         ;   jdee-bug-thread-show-thread-info nil]
-	 )
+         )
 
-	(list
-	 "Processes"
-	 ["Start Debugger"
-	  jdee-bug-start-debugger
-	  (not (jdee-dbs-debugger-running-p))]
+        (list
+         "Processes"
+         ["Start Debugger"
+          jdee-bug-start-debugger
+          (not (jdee-dbs-debugger-running-p))]
 
-	 ["Launch Process"
-	  jdee-bug-launch-process
-	  (jdee-dbs-debugger-running-p)]
+         ["Launch Process"
+          jdee-bug-launch-process
+          (jdee-dbs-debugger-running-p)]
 
-	 ["Suspend Process"
-	  jdee-bug-suspend-process
-	  (let ((process (jdee-dbs-get-target-process)))
-	    (and
-	     (jdee-dbs-debugger-running-p)
-	     process
-	     (not (oref process suspendedp))))]
+         ["Suspend Process"
+          jdee-bug-suspend-process
+          (let ((process (jdee-dbs-get-target-process)))
+            (and
+             (jdee-dbs-debugger-running-p)
+             process
+             (not (oref process suspendedp))))]
 
-	 ["Resume Process"
-	  jdee-bug-resume-process
-	  (let ((process (jdee-dbs-get-target-process)))
-	    (and
-	     (jdee-dbs-debugger-running-p)
-	     process
-	     (oref process suspendedp)))]
+         ["Resume Process"
+          jdee-bug-resume-process
+          (let ((process (jdee-dbs-get-target-process)))
+            (and
+             (jdee-dbs-debugger-running-p)
+             process
+             (oref process suspendedp)))]
 
-	 ["Finish Process"
-	  jdee-bug-finish-process
-	  (let ((process (jdee-dbs-get-target-process)))
-	    (and
-	     (jdee-dbs-debugger-running-p)
-	     process
-	     (not (oref process attachedp))))]
+         ["Finish Process"
+          jdee-bug-finish-process
+          (let ((process (jdee-dbs-get-target-process)))
+            (and
+             (jdee-dbs-debugger-running-p)
+             process
+             (not (oref process attachedp))))]
 
-	 "-"
+         "-"
 
-	 (list
-	  "Attach Process"
-	  ["Via Shared Memory"
-	   jdee-bug-attach-via-shared-memory
-	   (and
-	    (eq system-type 'windows-nt)
-	    (jdee-dbs-debugger-running-p))]
+         (list
+          "Attach Process"
+          ["Via Shared Memory"
+           jdee-bug-attach-via-shared-memory
+           (and
+            (eq system-type 'windows-nt)
+            (jdee-dbs-debugger-running-p))]
 
-	  ["On Local Host"
-	   jdee-bug-attach-local-host
-	   (jdee-dbs-debugger-running-p)]
+          ["On Local Host"
+           jdee-bug-attach-local-host
+           (jdee-dbs-debugger-running-p)]
 
-	  ["On Remote Host"
-	   jdee-bug-attach-remote-host
-	   (jdee-dbs-debugger-running-p)]
-	  )
+          ["On Remote Host"
+           jdee-bug-attach-remote-host
+           (jdee-dbs-debugger-running-p)]
+          )
 
-	 (list
-	  "Listen on"
-	  ["Shared Memory"
-	   jdee-bug-listen-shmem
-	   (and
-	    (eq system-type 'windows-nt)
-	    (jdee-dbs-debugger-running-p))]
+         (list
+          "Listen on"
+          ["Shared Memory"
+           jdee-bug-listen-shmem
+           (and
+            (eq system-type 'windows-nt)
+            (jdee-dbs-debugger-running-p))]
 
-	  ["Socket"
-	   jdee-bug-listen-socket
-	   (jdee-dbs-debugger-running-p)]
-	  )
+          ["Socket"
+           jdee-bug-listen-socket
+           (jdee-dbs-debugger-running-p)]
+          )
 
-	 ["Detach Process"
-	  jdee-bug-detach-process
-	  (let ((process (jdee-dbs-get-target-process)))
-	    (and
-	     (jdee-dbs-debugger-running-p)
-	     process
-	     (oref process attachedp)))]
+         ["Detach Process"
+          jdee-bug-detach-process
+          (let ((process (jdee-dbs-get-target-process)))
+            (and
+             (jdee-dbs-debugger-running-p)
+             process
+             (oref process attachedp)))]
 
 
-	 "-"
+         "-"
 
-	 ["Set Target Process"
-	  jdee-bug-set-target-process
-	  (> (jdee-dbs-proc-set-get-size
-	      jdee-dbs-the-process-registry)
-	     0)]
+         ["Set Target Process"
+          jdee-bug-set-target-process
+          (> (jdee-dbs-proc-set-get-size
+              jdee-dbs-the-process-registry)
+             0)]
 
-	 ["Show Processes"
-	  jdee-bug-set-show-processes nil]
+         ["Show Processes"
+          jdee-bug-set-show-processes nil]
 
-	 ["Remove Dead Processes"
-	  jdee-bug-remove-dead-processes
-	  (oref jdee-dbs-the-process-morgue proc-alist)]
+         ["Remove Dead Processes"
+          jdee-bug-remove-dead-processes
+          (oref jdee-dbs-the-process-morgue proc-alist)]
 
-	 )
-	(list
-	 "Show Buffer"
+         )
+        (list
+         "Show Buffer"
 
-	 ["Locals"
-	  jdee-bug-show-locals-buf
-	  (and
-	   (jdee-dbs-debugger-running-p)
-	   (jdee-dbs-get-target-process))]
+         ["Locals"
+          jdee-bug-show-locals-buf
+          (and
+           (jdee-dbs-debugger-running-p)
+           (jdee-dbs-get-target-process))]
 
-	 ["CLI"
-	  jdee-bug-show-cli-buf
-	  (and
-	   (jdee-dbs-debugger-running-p)
-	   (jdee-dbs-get-target-process))]
+         ["CLI"
+          jdee-bug-show-cli-buf
+          (and
+           (jdee-dbs-debugger-running-p)
+           (jdee-dbs-get-target-process))]
 
-	 ["Threads"
-	  jdee-bug-show-threads-buf
-	  (and
-	   (jdee-dbs-debugger-running-p)
-	   (jdee-dbs-get-target-process))]
-	 )
-	["Show Debug Frame"
-	 jdee-bug-show-debug-frame
-	 (and (jdee-dbs-debugger-running-p)
-	      (jdee-dbs-get-target-process))]
-	"-"
-	["Preferences"
-	 jdee-bug-show-preferences t]
-	"-"
-	["Help"
-	 jdee-bug-help t]
-	)
+         ["Threads"
+          jdee-bug-show-threads-buf
+          (and
+           (jdee-dbs-debugger-running-p)
+           (jdee-dbs-get-target-process))]
+         )
+        ["Show Debug Frame"
+         jdee-bug-show-debug-frame
+         (and (jdee-dbs-debugger-running-p)
+              (jdee-dbs-get-target-process))]
+        "-"
+        ["Preferences"
+         jdee-bug-show-preferences t]
+        "-"
+        ["Help"
+         jdee-bug-help t]
+        )
   "JDEbug menu specification")
 
 (defvar jdee-bug-mode-map
   (let ((km (make-sparse-keymap)))
     (easy-menu-define jdee-bug-menu km "JDEbug Minor Mode Menu"
-		      jdee-bug-menu-spec)
+                      jdee-bug-menu-spec)
     km)
   "Keymap for JDEbug minor mode.")
 
@@ -556,11 +556,11 @@ consuming and slows down stepping through the code."
 ;; (fmakunbound 'jdee-bug-key-bindings)
 (defcustom jdee-bug-key-bindings
   (list (cons "[?\C-c ?\C-z ?\C-s]" 'jdee-bug-step-over)
-	(cons "[?\C-c ?\C-z ?\C-x]" 'jdee-bug-step-into)
-	(cons "[?\C-c ?\C-z ?\C-a]" 'jdee-bug-step-into-all)
-	(cons "[?\C-c ?\C-z ?\C-w]" 'jdee-bug-step-out)
-	(cons "[?\C-c ?\C-z ?\C-c]" 'jdee-bug-continue)
-	(cons "[?\C-c ?\C-z ?\C-b]" 'jdee-bug-toggle-breakpoint))
+        (cons "[?\C-c ?\C-z ?\C-x]" 'jdee-bug-step-into)
+        (cons "[?\C-c ?\C-z ?\C-a]" 'jdee-bug-step-into-all)
+        (cons "[?\C-c ?\C-z ?\C-w]" 'jdee-bug-step-out)
+        (cons "[?\C-c ?\C-z ?\C-c]" 'jdee-bug-continue)
+        (cons "[?\C-c ?\C-z ?\C-b]" 'jdee-bug-toggle-breakpoint))
   "*Specifies key bindings for JDEbug.
 The value of this variable is an association list. The car of
 each element specifies a key sequence. The cdr specifies
@@ -571,40 +571,40 @@ bound, type C-q C-s in the key field in the customization buffer.
 You can use the notation [f1], [f2], etc., to specify function keys."
   :group 'jdee-bug
   :type '(repeat
-	  (cons :tag "Key binding"
-	   (string :tag "Key")
-	   (function :tag "Command")))
+          (cons :tag "Key binding"
+           (string :tag "Key")
+           (function :tag "Command")))
   :set '(lambda (sym val)
-	  ;; Unmap existing key bindings
-	  (if (and
-	       (boundp 'jdee-bug-key-bindings)
-	       jdee-bug-key-bindings)
-	      (mapc
-	       (lambda (binding)
-		 (let ((key (car binding))
-		       (fcn (cdr binding)))
-		   (if (string-match "\\[.+]"key)
-		       (setq key (car (read-from-string key))))
-		   (define-key jdee-bug-mode-map key nil)))
-	       jdee-bug-key-bindings))
-	  ;; Map new key bindings.
-	  (mapc
-	   (lambda (binding)
-	     (let ((key (car binding))
-		   (fcn (cdr binding)))
-	       (if (string-match "\\[.+]"key)
-		   (setq key (car (read-from-string key))))
-	       (define-key jdee-bug-mode-map key fcn)))
-	   val)
-	  (set-default sym val)))
+          ;; Unmap existing key bindings
+          (if (and
+               (boundp 'jdee-bug-key-bindings)
+               jdee-bug-key-bindings)
+              (mapc
+               (lambda (binding)
+                 (let ((key (car binding))
+                       (fcn (cdr binding)))
+                   (if (string-match "\\[.+]"key)
+                       (setq key (car (read-from-string key))))
+                   (define-key jdee-bug-mode-map key nil)))
+               jdee-bug-key-bindings))
+          ;; Map new key bindings.
+          (mapc
+           (lambda (binding)
+             (let ((key (car binding))
+                   (fcn (cdr binding)))
+               (if (string-match "\\[.+]"key)
+                   (setq key (car (read-from-string key))))
+               (define-key jdee-bug-mode-map key fcn)))
+           val)
+          (set-default sym val)))
 
 
 (defun jdee-bug-step-over ()
   "Advances the process to the next line in the current method."
   (interactive)
   (let* ((process (jdee-dbs-get-target-process))
-	 (cmd
-	  (jdee-dbs-step "step over" :process process)))
+         (cmd
+          (jdee-dbs-step "step over" :process process)))
     (jdee-dbs-cmd-exec cmd)))
 
 (defun jdee-bug-step-into ()
@@ -612,24 +612,24 @@ You can use the notation [f1], [f2], etc., to specify function keys."
    belongs to the java, javax, or sun packages."
   (interactive)
   (let* ((process (jdee-dbs-get-target-process))
-	 (cmd
-	  (jdee-dbs-step "step into" :process process :step-type "into")))
+         (cmd
+          (jdee-dbs-step "step into" :process process :step-type "into")))
     (jdee-dbs-cmd-exec cmd)))
 
 (defun jdee-bug-step-into-all ()
   "Advances the process into the function invoked at point."
   (interactive)
   (let* ((process (jdee-dbs-get-target-process))
-	 (cmd
-	  (jdee-dbs-step "step into" :process process :step-type "into-all")))
+         (cmd
+          (jdee-dbs-step "step into" :process process :step-type "into-all")))
     (jdee-dbs-cmd-exec cmd)))
 
 (defun jdee-bug-step-out ()
   "Advances the process to the next line in the invoking method."
   (interactive)
   (let* ((process (jdee-dbs-get-target-process))
-	 (cmd
-	  (jdee-dbs-step "step into" :process process :step-type "out")))
+         (cmd
+          (jdee-dbs-step "step into" :process process :step-type "out")))
     (jdee-dbs-cmd-exec cmd)))
 
 
@@ -637,9 +637,9 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   "Runs the target process. Execution continues from the current breakpoint."
   (interactive)
   (let* ((process (jdee-dbs-get-target-process))
-	 (run (jdee-dbs-run-process
-	       (format "run %d" (oref process id))
-		  :process process)))
+         (run (jdee-dbs-run-process
+               (format "run %d" (oref process id))
+                  :process process)))
     (oset process startupp nil)
     (oset process suspendedp nil)
     (oset process steppablep nil)
@@ -652,17 +652,17 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   (interactive)
   (if (jdee-dbs-debugger-running-p)
       (progn
-	(mapc
-	 (lambda (assoc-x)
-	   (let* ((process (cdr assoc-x))
-		  (finish-cmd (jdee-dbs-finish-process
-			       (format "finish %d" (oref process id))
-			       :process process))
-		  (result (jdee-dbs-cmd-exec finish-cmd)))
-	     (jdee-dbs-proc-move-to-morgue process)))
-	 (oref jdee-dbs-the-process-registry proc-alist))
-	(slot-makeunbound jdee-dbs-the-process-registry :target-process)
-	(jdee-dbs-debugger-quit jdee-dbs-the-debugger))
+        (mapc
+         (lambda (assoc-x)
+           (let* ((process (cdr assoc-x))
+                  (finish-cmd (jdee-dbs-finish-process
+                               (format "finish %d" (oref process id))
+                               :process process))
+                  (result (jdee-dbs-cmd-exec finish-cmd)))
+             (jdee-dbs-proc-move-to-morgue process)))
+         (oref jdee-dbs-the-process-registry proc-alist))
+        (slot-makeunbound jdee-dbs-the-process-registry :target-process)
+        (jdee-dbs-debugger-quit jdee-dbs-the-debugger))
     (error "Debugger is not running.")))
 
 
@@ -671,43 +671,43 @@ You can use the notation [f1], [f2], etc., to specify function keys."
  (lambda ()
    (if (buffer-file-name)
        (let ((this-file (file-name-nondirectory (buffer-file-name))))
-	 (mapc
-	  (lambda (spec)
-	    (let* ((file (car spec))
-		   (line (cdr spec))
-		   (bp (jdee-db-find-breakpoint file line)))
-	      (when (not bp)
-		(setq jdee-db-breakpoint-id-counter (1+ jdee-db-breakpoint-id-counter))
-		(setq bp
-		      (jdee-db-breakpoint
-		       (format "breakpoint%d" jdee-db-breakpoint-id-counter)
-		       :id jdee-db-breakpoint-id-counter
-		       :file file
-		       :line line))
-		(jdee-db-breakpoints-add bp))
-	      (if (string-match file this-file)
-		  (jdee-db-mark-breakpoint-specified file line))))
-	  jdee-bug-saved-breakpoints)))))
+         (mapc
+          (lambda (spec)
+            (let* ((file (car spec))
+                   (line (cdr spec))
+                   (bp (jdee-db-find-breakpoint file line)))
+              (when (not bp)
+                (setq jdee-db-breakpoint-id-counter (1+ jdee-db-breakpoint-id-counter))
+                (setq bp
+                      (jdee-db-breakpoint
+                       (format "breakpoint%d" jdee-db-breakpoint-id-counter)
+                       :id jdee-db-breakpoint-id-counter
+                       :file file
+                       :line line))
+                (jdee-db-breakpoints-add bp))
+              (if (string-match file this-file)
+                  (jdee-db-mark-breakpoint-specified file line))))
+          jdee-bug-saved-breakpoints)))))
 
 
 (defun jdee-bug-set-breakpoint()
   "Sets a breakpoint at the current line in the current buffer."
   (interactive)
   (let* ((file (buffer-file-name))
-	 (line (jdee-get-line-at-point))
-	 (bp (jdee-db-find-breakpoint file line))
-	 (proc (jdee-dbs-get-target-process)))
+         (line (jdee-get-line-at-point))
+         (bp (jdee-db-find-breakpoint file line))
+         (proc (jdee-dbs-get-target-process)))
     (unless bp
       (setq bp (jdee-db-spec-breakpoint))
       (oset bp line line)
       (jdee-db-breakpoints-add bp))
     (if (and bp proc)
-	(let* ((set-breakpoint (jdee-dbs-set-breakpoint
-				"set breakpoint"
-				:process proc
-				:breakpoint bp))
-	       (result (jdee-dbs-cmd-exec set-breakpoint)))
-	  (message "Breakpoint set at line %d in class %s." line file)))))
+        (let* ((set-breakpoint (jdee-dbs-set-breakpoint
+                                "set breakpoint"
+                                :process proc
+                                :breakpoint bp))
+               (result (jdee-dbs-cmd-exec set-breakpoint)))
+          (message "Breakpoint set at line %d in class %s." line file)))))
 
 
 (defun jdee-bug-set-conditional-breakpoint ()
@@ -725,18 +725,18 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   "Clear the breakpoint at the current line in the current buffer."
   (interactive)
   (let* ((file (buffer-file-name))
-	 (line (jdee-get-line-at-point))
-	 (bp (jdee-db-find-breakpoint file line))
-	 (proc (jdee-dbs-get-target-process)))
+         (line (jdee-get-line-at-point))
+         (bp (jdee-db-find-breakpoint file line))
+         (proc (jdee-dbs-get-target-process)))
     (if (and bp proc)
-	(let* ((clear-breakpoint
-		(jdee-dbs-clear-breakpoint
-		 "clear breakpoint"
-		 :process proc
-		 :breakpoint bp))
-	       (result (jdee-dbs-cmd-exec clear-breakpoint)))))
+        (let* ((clear-breakpoint
+                (jdee-dbs-clear-breakpoint
+                 "clear breakpoint"
+                 :process proc
+                 :breakpoint bp))
+               (result (jdee-dbs-cmd-exec clear-breakpoint)))))
     (if bp
-	(jdee-db-delete-breakpoint bp))))
+        (jdee-db-delete-breakpoint bp))))
 
 ;; test by lea
 
@@ -751,16 +751,16 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   (interactive)
 
   (assert (equal major-mode 'jdee-mode)
-	  nil "You can only toggle a breakpoint within jdee-mode")
+          nil "You can only toggle a breakpoint within jdee-mode")
 
   (assert (jdee-db-src-dir-matches-file-p (buffer-file-name))
-	  nil "The current buffer is not in the source path.  See `jdee-sourcepath' for more information.")
+          nil "The current buffer is not in the source path.  See `jdee-sourcepath' for more information.")
 
   (let*  ((file (buffer-file-name))
-	  (line (jdee-get-line-at-point))
-	  (bp (jdee-db-find-breakpoint file line)))
+          (line (jdee-get-line-at-point))
+          (bp (jdee-db-find-breakpoint file line)))
     (if bp
-	(jdee-bug-clear-breakpoint)
+        (jdee-bug-clear-breakpoint)
       (jdee-bug-set-breakpoint))))
 
 
@@ -784,22 +784,22 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 
 (defclass jdee-bug-trace-methods-dialog (efc-dialog)
   ((trace-type               :initarg :trace-type
-			     :type string
-			     :initform "entry"
-			     :documentation
-			     "Values may be entry or exit.")
+                             :type string
+                             :initform "entry"
+                             :documentation
+                             "Values may be entry or exit.")
    (thread-restriction-field :initarg :thread-restriction-field
-			     :documentation
-			     "Text field that contains thread restriction.")
+                             :documentation
+                             "Text field that contains thread restriction.")
    (suspend-policy-field     :initarg :suspend-policy-field
-			     :documentation
-			     "Text field that specifies the thread suspension policy.")
+                             :documentation
+                             "Text field that specifies the thread suspension policy.")
    (class-inclusion-field    :initarg :class-inclusion-field
-			     :documentation
-			     "Specifies class inclusion filters.")
+                             :documentation
+                             "Specifies class inclusion filters.")
    (class-exclusion-field    :initarg :class-exclusion-field
-			     :documentation
-			     "Specifies class exclusion filters.")
+                             :documentation
+                             "Specifies class exclusion filters.")
    )
   "Class of trace methods dialogs."
 )
@@ -811,84 +811,84 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   (call-next-method)
 
   (assert (or (string= (oref this trace-type) "entry")
-	      (string= (oref this trace-type) "exit")))
+              (string= (oref this trace-type) "exit")))
 )
 
 
 (defmethod efc-dialog-create ((this jdee-bug-trace-methods-dialog))
 
   (widget-insert (concat "Trace method "
-			 (oref this trace-type)
-			 "\n\n"))
+                         (oref this trace-type)
+                         "\n\n"))
 
   (oset this thread-restriction-field
-	(widget-create
-	 'editable-field
-	 :format "  %t:  %v\n  %h \n\n"
-	 :size 40
-	 :tag "Thread restriction"
-	 :doc "Restrict trace to the specified thread."))
+        (widget-create
+         'editable-field
+         :format "  %t:  %v\n  %h \n\n"
+         :size 40
+         :tag "Thread restriction"
+         :doc "Restrict trace to the specified thread."))
 
   (oset this suspend-policy-field
-	(widget-create
-	 '(choice
-	   :tag "Thread Suspension Policy"
-	   :value "none"
-	   :format "  %t: %[Options%] %v  %h\n\n"
-	   :doc "Specify which thread to suspend on method entry or exit."
-	   (const "all")
-	   (const "thread")
-	   (const "none"))))
+        (widget-create
+         '(choice
+           :tag "Thread Suspension Policy"
+           :value "none"
+           :format "  %t: %[Options%] %v  %h\n\n"
+           :doc "Specify which thread to suspend on method entry or exit."
+           (const "all")
+           (const "thread")
+           (const "none"))))
 
 
   (oset this class-inclusion-field
-	(widget-create
-	 '(editable-list
-	   :format "  %t:\n  %i\n%v  %h\n\n"
-	   :entry-format "  %i %d %v\n"
-	   :tag "Class inclusion filters"
-	   :doc "Regular expressions that specify classes whose methods should be traced."
-	   (string
-	    :format "%t: %v"
-	    :size 40
-	    :tag "Filter"))))
+        (widget-create
+         '(editable-list
+           :format "  %t:\n  %i\n%v  %h\n\n"
+           :entry-format "  %i %d %v\n"
+           :tag "Class inclusion filters"
+           :doc "Regular expressions that specify classes whose methods should be traced."
+           (string
+            :format "%t: %v"
+            :size 40
+            :tag "Filter"))))
 
     (oset this class-exclusion-field
-	(widget-create
-	 '(editable-list
-	   :format "  %t:\n  %i\n%v  %h\n\n"
-	   :entry-format "  %i %d %v\n"
-	   :tag "Class exclusion filters"
-	   :doc "Regular expressions that specify classes whose methods should not be traced."
-	   (string
-	    :format "%t: %v"
-	    :size 40
-	    :tag "Filter"))))
+        (widget-create
+         '(editable-list
+           :format "  %t:\n  %i\n%v  %h\n\n"
+           :entry-format "  %i %d %v\n"
+           :tag "Class exclusion filters"
+           :doc "Regular expressions that specify classes whose methods should not be traced."
+           (string
+            :format "%t: %v"
+            :size 40
+            :tag "Filter"))))
   )
 
 (defmethod efc-dialog-ok ((this jdee-bug-trace-methods-dialog))
   (let* ((thread-restriction (widget-value (oref this thread-restriction-field)))
-	 (thread-suspension-policy (widget-value (oref this suspend-policy-field)))
-	 (class-inclusion-filters (widget-value (oref this class-inclusion-field)))
-	 (class-exclusion-filters (widget-value (oref this class-exclusion-field)))
-	 (process (jdee-dbs-get-target-process))
-	 (request (jdee-dbs-trace-methods-request "trace methods request"
-						 :trace-type (oref this trace-type)))
-	 (cmd  (jdee-dbs-trace-methods
-		"trace methods command"
-		:process process :trace-request request)))
+         (thread-suspension-policy (widget-value (oref this suspend-policy-field)))
+         (class-inclusion-filters (widget-value (oref this class-inclusion-field)))
+         (class-exclusion-filters (widget-value (oref this class-exclusion-field)))
+         (process (jdee-dbs-get-target-process))
+         (request (jdee-dbs-trace-methods-request "trace methods request"
+                                                 :trace-type (oref this trace-type)))
+         (cmd  (jdee-dbs-trace-methods
+                "trace methods command"
+                :process process :trace-request request)))
 
     (if (and thread-restriction (not (string= thread-restriction "")))
-	(oset request :thread-restriction thread-restriction))
+        (oset request :thread-restriction thread-restriction))
 
     (if (and thread-suspension-policy (not (string= thread-suspension-policy "")))
-	(oset request :suspend-policy thread-suspension-policy))
+        (oset request :suspend-policy thread-suspension-policy))
 
     (if class-inclusion-filters
-	(oset request :inclusion-filters class-inclusion-filters))
+        (oset request :inclusion-filters class-inclusion-filters))
 
     (if class-exclusion-filters
-	(oset request :exclusion-filters class-exclusion-filters))
+        (oset request :exclusion-filters class-exclusion-filters))
 
     (jdee-dbs-cmd-exec cmd)
     (call-next-method)))
@@ -904,7 +904,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   "Displays the trace method exit dialog."
   (interactive)
   (let ((dialog (jdee-bug-trace-methods-dialog
-		 "trace method exit dialog" :trace-type "exit")))
+                 "trace method exit dialog" :trace-type "exit")))
     (efc-dialog-show dialog)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -916,19 +916,19 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 
 (defclass jdee-bug-trace-classes-dialog (efc-dialog)
   ((trace-type               :initarg :trace-type
-			     :type string
-			     :initform "preparation"
-			     :documentation
-			     "Values may be preparation or unloading.")
+                             :type string
+                             :initform "preparation"
+                             :documentation
+                             "Values may be preparation or unloading.")
    (suspend-policy-field     :initarg :suspend-policy-field
-			     :documentation
-			     "Text field that specifies the thread suspension policy.")
+                             :documentation
+                             "Text field that specifies the thread suspension policy.")
    (class-inclusion-field    :initarg :class-inclusion-field
-			     :documentation
-			     "Specifies class inclusion filters.")
+                             :documentation
+                             "Specifies class inclusion filters.")
    (class-exclusion-field    :initarg :class-exclusion-field
-			     :documentation
-			     "Specifies class exclusion filters.")
+                             :documentation
+                             "Specifies class exclusion filters.")
    )
   "Class of trace classes dialogs."
 )
@@ -940,72 +940,72 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   (call-next-method)
 
   (assert (or (string= (oref this trace-type) "preparation")
-	      (string= (oref this trace-type) "unloading")))
+              (string= (oref this trace-type) "unloading")))
 )
 
 
 (defmethod efc-dialog-create ((this jdee-bug-trace-classes-dialog))
 
   (widget-insert (concat "Trace class "
-			 (oref this trace-type)
-			 "\n\n"))
+                         (oref this trace-type)
+                         "\n\n"))
 
   (oset this suspend-policy-field
-	(widget-create
-	 '(choice
-	   :tag "Thread Suspension Policy"
-	   :value "none"
-	   :format "  %t: %[Options%] %v  %h\n\n"
-	   :doc "Specify which thread to suspend on class preparation or unloading."
-	   (const "all")
-	   (const "thread")
-	   (const "none"))))
+        (widget-create
+         '(choice
+           :tag "Thread Suspension Policy"
+           :value "none"
+           :format "  %t: %[Options%] %v  %h\n\n"
+           :doc "Specify which thread to suspend on class preparation or unloading."
+           (const "all")
+           (const "thread")
+           (const "none"))))
 
 
   (oset this class-inclusion-field
-	(widget-create
-	 '(editable-list
-	   :format "  %t:\n  %i\n%v  %h\n\n"
-	   :entry-format "  %i %d %v\n"
-	   :tag "Class inclusion filters"
-	   :doc "Regular expressions that specify classes whose preparation or unloading should be traced."
-	   (string
-	    :format "%t: %v"
-	    :size 40
-	    :tag "Filter"))))
+        (widget-create
+         '(editable-list
+           :format "  %t:\n  %i\n%v  %h\n\n"
+           :entry-format "  %i %d %v\n"
+           :tag "Class inclusion filters"
+           :doc "Regular expressions that specify classes whose preparation or unloading should be traced."
+           (string
+            :format "%t: %v"
+            :size 40
+            :tag "Filter"))))
 
     (oset this class-exclusion-field
-	(widget-create
-	 '(editable-list
-	   :format "  %t:\n  %i\n%v  %h\n\n"
-	   :entry-format "  %i %d %v\n"
-	   :tag "Class exclusion filters"
-	   :doc "Regular expressions that specify classes whose preparation or unloading should not be traced."
-	   (string
-	    :format "%t: %v"
-	    :size 40
-	    :tag "Filter"))))
+        (widget-create
+         '(editable-list
+           :format "  %t:\n  %i\n%v  %h\n\n"
+           :entry-format "  %i %d %v\n"
+           :tag "Class exclusion filters"
+           :doc "Regular expressions that specify classes whose preparation or unloading should not be traced."
+           (string
+            :format "%t: %v"
+            :size 40
+            :tag "Filter"))))
   )
 
 (defmethod efc-dialog-ok ((this jdee-bug-trace-classes-dialog))
   (let* ((thread-suspension-policy (widget-value (oref this suspend-policy-field)))
-	 (class-inclusion-filters (widget-value (oref this class-inclusion-field)))
-	 (class-exclusion-filters (widget-value (oref this class-inclusion-field)))
-	 (process (jdee-dbs-get-target-process))
-	 (request (jdee-dbs-trace-classes-request "trace classes request"
-						 :trace-type (oref this trace-type)))
-	 (cmd  (jdee-dbs-trace-classes
-		"trace classes command"
-		:process process :trace-request request)))
+         (class-inclusion-filters (widget-value (oref this class-inclusion-field)))
+         (class-exclusion-filters (widget-value (oref this class-inclusion-field)))
+         (process (jdee-dbs-get-target-process))
+         (request (jdee-dbs-trace-classes-request "trace classes request"
+                                                 :trace-type (oref this trace-type)))
+         (cmd  (jdee-dbs-trace-classes
+                "trace classes command"
+                :process process :trace-request request)))
 
     (if (and thread-suspension-policy (not (string= thread-suspension-policy "")))
-	(oset request :suspend-policy thread-suspension-policy))
+        (oset request :suspend-policy thread-suspension-policy))
 
     (if class-inclusion-filters
-	(oset request :inclusion-filters class-inclusion-filters))
+        (oset request :inclusion-filters class-inclusion-filters))
 
     (if class-exclusion-filters
-	(oset request :exclusion-filters class-exclusion-filters))
+        (oset request :exclusion-filters class-exclusion-filters))
 
     (jdee-dbs-cmd-exec cmd)
     (call-next-method)))
@@ -1021,7 +1021,7 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   "Displays the trace class unloading dialog."
   (interactive)
   (let ((dialog (jdee-bug-trace-classes-dialog
-		 "trace class unloading dialog" :trace-type "unloading")))
+                 "trace class unloading dialog" :trace-type "unloading")))
     (efc-dialog-show dialog)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1033,23 +1033,23 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 
 (defclass jdee-bug-trace-exceptions-dialog (efc-dialog)
   ((exception-class-field    :initarg :exception-class
-			     :documentation
-			     "Class of exception to trace.")
+                             :documentation
+                             "Class of exception to trace.")
    (trace-type-field         :initarg :trace-type
-			     :documentation
-			     "Values may be caught, uncaught, or both.")
+                             :documentation
+                             "Values may be caught, uncaught, or both.")
    (thread-restriction-field :initarg :thread-restriction-field
-			     :documentation
-			     "Text field that contains thread restriction.")
+                             :documentation
+                             "Text field that contains thread restriction.")
    (suspend-policy-field     :initarg :suspend-policy-field
-			     :documentation
-			     "Text field that specifies the thread suspension policy.")
+                             :documentation
+                             "Text field that specifies the thread suspension policy.")
    (class-inclusion-field    :initarg :class-inclusion-field
-			     :documentation
-			     "Specifies class inclusion filters.")
+                             :documentation
+                             "Specifies class inclusion filters.")
    (class-exclusion-field    :initarg :class-exclusion-field
-			     :documentation
-			     "Specifies class exclusion filters.")
+                             :documentation
+                             "Specifies class exclusion filters.")
    )
   "Defines a trace exception dialog."
 )
@@ -1068,96 +1068,96 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   (widget-insert (concat "Trace exception\n\n"))
 
   (oset this exception-class-field
-	(widget-create
-	 'editable-field
-	 :format "  %t:  %v\n  %h \n\n"
-	 :size 40
-	 :tag "Exception class"
-	 :doc "Name of class of exception to trace. May be a wild card pattern of the form *.name. This allows you to omit a package qualifier from a class name. For example, to trace occurences of java.io.IOException, specify *.IOException."))
+        (widget-create
+         'editable-field
+         :format "  %t:  %v\n  %h \n\n"
+         :size 40
+         :tag "Exception class"
+         :doc "Name of class of exception to trace. May be a wild card pattern of the form *.name. This allows you to omit a package qualifier from a class name. For example, to trace occurences of java.io.IOException, specify *.IOException."))
 
   (oset this trace-type-field
-	(widget-create
-	 '(choice
-	   :tag "Exception type"
-	   :value "both"
-	   :format "  %t: %[Options%] %v  %h\n\n"
-	   :doc "Specify the type of exception to trace."
-	   (const "caught")
-	   (const "uncaught")
-	   (const "both"))))
+        (widget-create
+         '(choice
+           :tag "Exception type"
+           :value "both"
+           :format "  %t: %[Options%] %v  %h\n\n"
+           :doc "Specify the type of exception to trace."
+           (const "caught")
+           (const "uncaught")
+           (const "both"))))
 
   (oset this thread-restriction-field
-	(widget-create
-	 'editable-field
-	 :format "  %t:  %v\n  %h \n\n"
-	 :size 40
-	 :tag "Thread restriction"
-	 :doc "Restrict trace to the specified thread."))
+        (widget-create
+         'editable-field
+         :format "  %t:  %v\n  %h \n\n"
+         :size 40
+         :tag "Thread restriction"
+         :doc "Restrict trace to the specified thread."))
 
   (oset this suspend-policy-field
-	(widget-create
-	 '(choice
-	   :tag "Thread Suspension Policy"
-	   :value "none"
-	   :format "  %t: %[Options%] %v  %h\n\n"
-	   :doc "Specify which thread to suspend on class preparation or unloading."
-	   (const "all")
-	   (const "thread")
-	   (const "none"))))
+        (widget-create
+         '(choice
+           :tag "Thread Suspension Policy"
+           :value "none"
+           :format "  %t: %[Options%] %v  %h\n\n"
+           :doc "Specify which thread to suspend on class preparation or unloading."
+           (const "all")
+           (const "thread")
+           (const "none"))))
 
 
   (oset this class-inclusion-field
-	(widget-create
-	 '(editable-list
-	   :format "  %t:\n  %i\n%v  %h\n\n"
-	   :entry-format "  %i %d %v\n"
-	   :tag "Class inclusion filters"
-	   :doc "Regular expressions that specify classes whose preparation or unloading should be traced."
-	   (string
-	    :format "%t: %v"
-	    :size 40
-	    :tag "Filter"))))
+        (widget-create
+         '(editable-list
+           :format "  %t:\n  %i\n%v  %h\n\n"
+           :entry-format "  %i %d %v\n"
+           :tag "Class inclusion filters"
+           :doc "Regular expressions that specify classes whose preparation or unloading should be traced."
+           (string
+            :format "%t: %v"
+            :size 40
+            :tag "Filter"))))
 
     (oset this class-exclusion-field
-	(widget-create
-	 '(editable-list
-	   :format "  %t:\n  %i\n%v  %h\n\n"
-	   :entry-format "  %i %d %v\n"
-	   :tag "Class exclusion filters"
-	   :doc "Regular expressions that specify classes whose preparation or unloading should not be traced."
-	   (string
-	    :format "%t: %v"
-	    :size 40
-	    :tag "Filter"))))
+        (widget-create
+         '(editable-list
+           :format "  %t:\n  %i\n%v  %h\n\n"
+           :entry-format "  %i %d %v\n"
+           :tag "Class exclusion filters"
+           :doc "Regular expressions that specify classes whose preparation or unloading should not be traced."
+           (string
+            :format "%t: %v"
+            :size 40
+            :tag "Filter"))))
   )
 
 (defmethod efc-dialog-ok ((this jdee-bug-trace-exceptions-dialog))
   (let* ((exception-class (widget-value (oref this exception-class-field)))
-	 (trace-type (widget-value (oref this trace-type-field)))
-	 (thread-restriction (widget-value (oref this thread-restriction-field)))
-	 (thread-suspension-policy (widget-value (oref this suspend-policy-field)))
-	 (class-inclusion-filters (widget-value (oref this class-inclusion-field)))
-	 (class-exclusion-filters (widget-value (oref this class-inclusion-field)))
-	 (process (jdee-dbs-get-target-process))
-	 (request (jdee-dbs-trace-exceptions-request
-		   "trace exceptions request"
-		   :exception-class exception-class
-		   :trace-type trace-type))
-	 (cmd  (jdee-dbs-trace-exceptions
-		"trace exceptions command"
-		:process process :trace-request request)))
+         (trace-type (widget-value (oref this trace-type-field)))
+         (thread-restriction (widget-value (oref this thread-restriction-field)))
+         (thread-suspension-policy (widget-value (oref this suspend-policy-field)))
+         (class-inclusion-filters (widget-value (oref this class-inclusion-field)))
+         (class-exclusion-filters (widget-value (oref this class-inclusion-field)))
+         (process (jdee-dbs-get-target-process))
+         (request (jdee-dbs-trace-exceptions-request
+                   "trace exceptions request"
+                   :exception-class exception-class
+                   :trace-type trace-type))
+         (cmd  (jdee-dbs-trace-exceptions
+                "trace exceptions command"
+                :process process :trace-request request)))
 
     (if (and thread-restriction (not (string= thread-restriction "")))
-	(oset request :thread-restriction thread-restriction))
+        (oset request :thread-restriction thread-restriction))
 
     (if (and thread-suspension-policy (not (string= thread-suspension-policy "")))
-	(oset request :suspend-policy thread-suspension-policy))
+        (oset request :suspend-policy thread-suspension-policy))
 
     (if class-inclusion-filters
-	(oset request :inclusion-filters class-inclusion-filters))
+        (oset request :inclusion-filters class-inclusion-filters))
 
     (if class-exclusion-filters
-	(oset request :exclusion-filters class-exclusion-filters))
+        (oset request :exclusion-filters class-exclusion-filters))
 
     (jdee-dbs-cmd-exec cmd)
     (call-next-method)))
@@ -1165,14 +1165,14 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 (defun jdee-bug-break-on-exception (exception-class)
   (interactive "sFully qualified exception: ")
   (let* ((process (jdee-dbs-get-target-process))
-	 (request (jdee-dbs-trace-exceptions-request
-		   "break on exceptions request"
-		   :exception-class exception-class
-		   :trace-type "both"
-		   :suspend-policy "all"))
-	 (cmd (jdee-dbs-trace-exceptions
-	       "break on exceptions command"
-	       :process process :trace-request request)))
+         (request (jdee-dbs-trace-exceptions-request
+                   "break on exceptions request"
+                   :exception-class exception-class
+                   :trace-type "both"
+                   :suspend-policy "all"))
+         (cmd (jdee-dbs-trace-exceptions
+               "break on exceptions command"
+               :process process :trace-request request)))
     (jdee-dbs-cmd-exec cmd)
     (jdee-dbs-proc-display-debug-message process "Use JDEbug->Trace->Cancel to remove this breakpoint")))
 
@@ -1195,55 +1195,55 @@ You can use the notation [f1], [f2], etc., to specify function keys."
 (defun jdee-bug-cancel-trace-request (process request)
   "Cancels a specified trace request on a specified process."
   (let ((cmd (jdee-dbs-cancel-trace "cancel trace" :process process
-				  :trace-request request)))
+                                  :trace-request request)))
     (jdee-dbs-cmd-exec cmd)))
 
 (defclass jdee-bug-cancel-trace-dialog (efc-dialog)
   ((process          :initarg :process
-		     :type jdee-dbs-proc)
+                     :type jdee-dbs-proc)
    (requests         :initarg :requests
-		     :type list)
+                     :type list)
    (check-boxes      :initarg :check-boxes))
 )
 
 (defmethod efc-dialog-create ((this jdee-bug-cancel-trace-dialog))
   (let ((items
-	 (mapcar
-	  (lambda (x)
-	    (let ((request (cdr x)))
-	      (list
-	       'const
-	       :format "%t %v  %d"
-	       :tag "Request"
-	       :doc
-	       (concat
-		(if (typep request 'jdee-dbs-trace-methods-request)
-		    (progn
-		      (concat
-		      (format "Trace method %s." (oref request trace-type))
-		      (if (slot-boundp request 'thread-restriction)
-			  (format " Thread restriction: %s."
-				  (oref request thread-restriction)))))
-		  (format "Trace class %s." (oref request trace-type)))
-		(if (slot-boundp request 'suspend-policy)
-		    (format " Suspend policy: %s." (oref request suspend-policy)))
-		(if (slot-boundp request 'inclusion-filters)
-		    (format " Inclusion filters: %s." (oref request inclusion-filters)))
-		(if (slot-boundp request 'exclusion-filters)
-		    (format " Exclusion filters: %s." (oref request exclusion-filters)))
-		)
-	       (car x))))
-	  (oref this requests))))
+         (mapcar
+          (lambda (x)
+            (let ((request (cdr x)))
+              (list
+               'const
+               :format "%t %v  %d"
+               :tag "Request"
+               :doc
+               (concat
+                (if (typep request 'jdee-dbs-trace-methods-request)
+                    (progn
+                      (concat
+                      (format "Trace method %s." (oref request trace-type))
+                      (if (slot-boundp request 'thread-restriction)
+                          (format " Thread restriction: %s."
+                                  (oref request thread-restriction)))))
+                  (format "Trace class %s." (oref request trace-type)))
+                (if (slot-boundp request 'suspend-policy)
+                    (format " Suspend policy: %s." (oref request suspend-policy)))
+                (if (slot-boundp request 'inclusion-filters)
+                    (format " Inclusion filters: %s." (oref request inclusion-filters)))
+                (if (slot-boundp request 'exclusion-filters)
+                    (format " Exclusion filters: %s." (oref request exclusion-filters)))
+                )
+               (car x))))
+          (oref this requests))))
 
   (widget-insert "Check the trace requests you want to cancel.\n\n")
 
   (oset this check-boxes
-	(widget-create
-	 (list
-	  'checklist
-	  :entry-format "  %b %v\n"
-	  :args items
-	   )))
+        (widget-create
+         (list
+          'checklist
+          :entry-format "  %b %v\n"
+          :args items
+           )))
   ))
 
 (defmethod efc-dialog-ok ((this jdee-bug-cancel-trace-dialog))
@@ -1251,10 +1251,10 @@ You can use the notation [f1], [f2], etc., to specify function keys."
   (mapc
    (lambda (id-x)
      (let ((request
-	    (cdr
-	     (cl-find-if
-	      (lambda (x) (= (car x) id-x))
-	     (oref this requests)))))
+            (cdr
+             (cl-find-if
+              (lambda (x) (= (car x) id-x))
+             (oref this requests)))))
      (jdee-bug-cancel-trace-request  (oref this process) request)))
    (widget-value (oref this check-boxes)))
   (call-next-method))
@@ -1269,15 +1269,15 @@ requests to cancel."
  (let* ((process (jdee-dbs-get-target-process)))
    (if process
        (if (slot-boundp process 'trace-req)
-	   (let ((trace-requests (oref process :trace-req)))
-	     (if (= (length trace-requests) 1)
-		 (jdee-bug-cancel-trace-request process (cdr (car trace-requests)))
-	       (let ((dialog
-		      (jdee-bug-cancel-trace-dialog "cancel trace dialog"
-						   :process process
-						   :requests trace-requests)))
-		 (efc-dialog-show dialog))))
-	 (error "The target process has no outstanding trace requests"))
+           (let ((trace-requests (oref process :trace-req)))
+             (if (= (length trace-requests) 1)
+                 (jdee-bug-cancel-trace-request process (cdr (car trace-requests)))
+               (let ((dialog
+                      (jdee-bug-cancel-trace-dialog "cancel trace dialog"
+                                                   :process process
+                                                   :requests trace-requests)))
+                 (efc-dialog-show dialog))))
+         (error "The target process has no outstanding trace requests"))
      (error "There is no active process."))))
 
 
@@ -1292,44 +1292,44 @@ requests to cancel."
 
 (defclass jdee-bug-watch-field-dialog (efc-dialog)
   ((watch-type                :initarg :watch-type
-			      :type string
-			      :initform "access"
-			      :documentation
-			      "Watch type: field access or modification.")
+                              :type string
+                              :initform "access"
+                              :documentation
+                              "Watch type: field access or modification.")
    (object-class              :initarg :object-class
-			      :type string
-			      :initform ""
-			      :documentation
-			      "Default value of class to watch.")
+                              :type string
+                              :initform ""
+                              :documentation
+                              "Default value of class to watch.")
    (field                     :initarg :field
-			      :type string
-			      :initform ""
-			      :documentation
-			      "Default value of the field to watch.")
+                              :type string
+                              :initform ""
+                              :documentation
+                              "Default value of the field to watch.")
    (object-class-widget       :initarg :object-class-widget
-			      :documentation
-			      "Widget specifying class of objects to watch.")
+                              :documentation
+                              "Widget specifying class of objects to watch.")
    (field-name-widget         :initarg :field-name-widget
-			      :documentation
-			      "Widget specify name of field to watch.")
+                              :documentation
+                              "Widget specify name of field to watch.")
    (expression-widget         :initarg :expression-widget
-			      :documentation
-			      "Widget specify watch restriction expression.")
+                              :documentation
+                              "Widget specify watch restriction expression.")
    (object-id-widget          :initarg :object-id-widget
-			      :documentation
-			      "Widget specify id of object to watch.")
+                              :documentation
+                              "Widget specify id of object to watch.")
    (thread-restriction-widget :initarg :thread-restriction-widget
-			      :documentation
-			      "Text field that contains thread restriction.")
+                              :documentation
+                              "Text field that contains thread restriction.")
    (suspend-policy-widget     :initarg :suspend-policy-widget
-			      :documentation
-			      "Text field that specifies the thread suspension policy.")
+                              :documentation
+                              "Text field that specifies the thread suspension policy.")
    (class-inclusion-widget    :initarg :class-inclusion-widget
-			      :documentation
-			     "Specifies class inclusion filters.")
+                              :documentation
+                             "Specifies class inclusion filters.")
    (class-exclusion-widget    :initarg :class-exclusion-widget
-			     :documentation
-			     "Specifies class exclusion filters.")
+                             :documentation
+                             "Specifies class exclusion filters.")
    )
   "Defines a watch field dialog."
 )
@@ -1348,122 +1348,122 @@ requests to cancel."
   (widget-insert (format "Watch for field %s\n\n" (oref this watch-type)))
 
   (oset this object-class-widget
-	(widget-create
-	 'editable-field
-	 :value (oref this object-class)
-	 :format "  %t:  %v\n  %h \n\n"
-	 :size 40
-	 :tag "Class"
-	 :doc "Class of object or objects to watch.
+        (widget-create
+         'editable-field
+         :value (oref this object-class)
+         :format "  %t:  %v\n  %h \n\n"
+         :size 40
+         :tag "Class"
+         :doc "Class of object or objects to watch.
 May be a wild card pattern of the form *.name. This allows you to omit a package qualifier from a class name. For example, to watch a field of java.io.IOException, specify *.IOException."))
 
 
   (oset this field-name-widget
-	(widget-create
-	 'editable-field
-	 :value (oref this field)
-	 :format "  %t:  %v\n  %h \n\n"
-	 :size 40
-	 :tag "Field name"
-	 :doc "Name of field to watch."))
+        (widget-create
+         'editable-field
+         :value (oref this field)
+         :format "  %t:  %v\n  %h \n\n"
+         :size 40
+         :tag "Field name"
+         :doc "Name of field to watch."))
 
   (oset this expression-widget
-	(widget-create
-	 'editable-field
-	 :format "  %t:  %v\n  %h \n\n"
-	 :size 40
-	 :tag "Watch expression"
-	 :doc "A boolean expression.
+        (widget-create
+         'editable-field
+         :format "  %t:  %v\n  %h \n\n"
+         :size 40
+         :tag "Watch expression"
+         :doc "A boolean expression.
 Execution of the process is suspended only if the expression is true. The expression can contain any variable that is in scope when a field changes."))
 
   (oset this object-id-widget
-	(widget-create
-	 'editable-field
-	 :format "  %t:  %v\n  %h \n\n"
-	 :size 40
-	 :tag "Object ID"
-	 :doc "ID of the object to watch."))
+        (widget-create
+         'editable-field
+         :format "  %t:  %v\n  %h \n\n"
+         :size 40
+         :tag "Object ID"
+         :doc "ID of the object to watch."))
 
   (oset this thread-restriction-widget
-	(widget-create
-	 'editable-field
-	 :format "  %t:  %v\n  %h \n\n"
-	 :size 40
-	 :tag "Thread restriction"
-	 :doc "Restrict watch to the specified thread."))
+        (widget-create
+         'editable-field
+         :format "  %t:  %v\n  %h \n\n"
+         :size 40
+         :tag "Thread restriction"
+         :doc "Restrict watch to the specified thread."))
 
   (oset this suspend-policy-widget
-	(widget-create
-	 '(choice
-	   :tag "Thread Suspension Policy"
-	   :value "all"
-	   :format "  %t: %[Options%] %v  %h\n\n"
-	   :doc "Specify which threads to suspend on field access or modification."
-	   (const "all")
-	   (const "thread")
-	   (const "none"))))
+        (widget-create
+         '(choice
+           :tag "Thread Suspension Policy"
+           :value "all"
+           :format "  %t: %[Options%] %v  %h\n\n"
+           :doc "Specify which threads to suspend on field access or modification."
+           (const "all")
+           (const "thread")
+           (const "none"))))
 
 
   (oset this class-inclusion-widget
-	(widget-create
-	 '(editable-list
-	   :format "  %t:\n  %i\n%v  %h\n\n"
-	   :entry-format "  %i %d %v\n"
-	   :tag "Class inclusion filters"
-	   :doc "Regular expressions that specify classes whose field should be watched."
-	   (string
-	    :format "%t: %v"
-	    :size 40
-	    :tag "Filter"))))
+        (widget-create
+         '(editable-list
+           :format "  %t:\n  %i\n%v  %h\n\n"
+           :entry-format "  %i %d %v\n"
+           :tag "Class inclusion filters"
+           :doc "Regular expressions that specify classes whose field should be watched."
+           (string
+            :format "%t: %v"
+            :size 40
+            :tag "Filter"))))
 
     (oset this class-exclusion-widget
-	(widget-create
-	 '(editable-list
-	   :format "  %t:\n  %i\n%v  %h\n\n"
-	   :entry-format "  %i %d %v\n"
-	   :tag "Class exclusion filters"
-	   :doc "Regular expressions that specify classes whose fields should not be watched."
-	   (string
-	    :format "%t: %v"
-	    :size 40
-	    :tag "Filter")))))
+        (widget-create
+         '(editable-list
+           :format "  %t:\n  %i\n%v  %h\n\n"
+           :entry-format "  %i %d %v\n"
+           :tag "Class exclusion filters"
+           :doc "Regular expressions that specify classes whose fields should not be watched."
+           (string
+            :format "%t: %v"
+            :size 40
+            :tag "Filter")))))
 
 (defmethod efc-dialog-ok ((this jdee-bug-watch-field-dialog))
   (let* ((obj-class (widget-value (oref this object-class-widget)))
-	 (field-name (widget-value (oref this field-name-widget)))
-	 (expression (widget-value (oref this expression-widget)))
-	 (object-id (widget-value (oref this object-id-widget)))
-	 (thread-restriction (widget-value (oref this thread-restriction-widget)))
-	 (thread-suspension-policy (widget-value (oref this suspend-policy-widget)))
-	 (class-inclusion-filters (widget-value (oref this class-inclusion-widget)))
-	 (class-exclusion-filters (widget-value (oref this class-inclusion-widget)))
-	 (process (jdee-dbs-get-target-process))
-	 (request (jdee-dbs-watch-field-request
-		   "watch field request"
-		   :watch-type (oref this watch-type)
-		   :object-class obj-class
-		   :field-name field-name))
-	 (cmd  (jdee-dbs-watch-field
-		"watch field command"
-		:process process :watch-request request)))
+         (field-name (widget-value (oref this field-name-widget)))
+         (expression (widget-value (oref this expression-widget)))
+         (object-id (widget-value (oref this object-id-widget)))
+         (thread-restriction (widget-value (oref this thread-restriction-widget)))
+         (thread-suspension-policy (widget-value (oref this suspend-policy-widget)))
+         (class-inclusion-filters (widget-value (oref this class-inclusion-widget)))
+         (class-exclusion-filters (widget-value (oref this class-inclusion-widget)))
+         (process (jdee-dbs-get-target-process))
+         (request (jdee-dbs-watch-field-request
+                   "watch field request"
+                   :watch-type (oref this watch-type)
+                   :object-class obj-class
+                   :field-name field-name))
+         (cmd  (jdee-dbs-watch-field
+                "watch field command"
+                :process process :watch-request request)))
 
     (if (and expression (not (string= expression "")))
-	(oset request :expression expression))
+        (oset request :expression expression))
 
     (if (and object-id (not (string= object-id "")))
-	(oset request :object-id object-id))
+        (oset request :object-id object-id))
 
     (if (and thread-restriction (not (string= thread-restriction "")))
-	(oset request :thread-restriction thread-restriction))
+        (oset request :thread-restriction thread-restriction))
 
     (if (and thread-suspension-policy (not (string= thread-suspension-policy "")))
-	(oset request :suspend-policy thread-suspension-policy))
+        (oset request :suspend-policy thread-suspension-policy))
 
     (if class-inclusion-filters
-	(oset request :inclusion-filters class-inclusion-filters))
+        (oset request :inclusion-filters class-inclusion-filters))
 
     (if class-exclusion-filters
-	(oset request :exclusion-filters class-exclusion-filters))
+        (oset request :exclusion-filters class-exclusion-filters))
 
     (jdee-dbs-cmd-exec cmd)
     (call-next-method)))
@@ -1474,12 +1474,12 @@ Execution of the process is suspended only if the expression is true. The expres
 field of an object or class of objects."
   (interactive)
   (let ((dialog
-	 (jdee-bug-watch-field-dialog
-	  "watch field dialog"
-	  :object-class (concat
-			 "*."
-			 (car (jdee-parse-get-innermost-class-at-point)))
-	  :field (thing-at-point 'symbol))))
+         (jdee-bug-watch-field-dialog
+          "watch field dialog"
+          :object-class (concat
+                         "*."
+                         (car (jdee-parse-get-innermost-class-at-point)))
+          :field (thing-at-point 'symbol))))
     (efc-dialog-show dialog)))
 
 (defun jdee-bug-watch-field-modification ()
@@ -1487,12 +1487,12 @@ field of an object or class of objects."
 field of an object or class of objects."
   (interactive)
   (let ((dialog (jdee-bug-watch-field-dialog
-		 "watch field dialog"
-		 :watch-type "modification"
-		 :object-class (concat
-				"*."
-				(car (jdee-parse-get-innermost-class-at-point)))
-		 :field (thing-at-point 'symbol))))
+                 "watch field dialog"
+                 :watch-type "modification"
+                 :object-class (concat
+                                "*."
+                                (car (jdee-parse-get-innermost-class-at-point)))
+                 :field (thing-at-point 'symbol))))
     (efc-dialog-show dialog)))
 
 
@@ -1505,48 +1505,48 @@ field of an object or class of objects."
 (defun jdee-bug-cancel-watch-request (process request)
   "Cancels a specified watch field request on a specified process."
   (let ((cmd (jdee-dbs-cancel-watch "cancel watch" :process process
-				  :watch-request request)))
+                                  :watch-request request)))
     (jdee-dbs-cmd-exec cmd)))
 
 (defclass jdee-bug-cancel-watch-dialog (efc-dialog)
   ((process          :initarg :process
-		     :type jdee-dbs-proc)
+                     :type jdee-dbs-proc)
    (requests         :initarg :requests
-		     :type list)
+                     :type list)
    (check-boxes      :initarg :check-boxes))
 )
 
 (defmethod efc-dialog-create ((this jdee-bug-cancel-watch-dialog))
   (let ((items
-	 (mapcar
-	  (lambda (x)
-	    (let ((request (cdr x)))
-	      (list
-	       'const
-	       :format "%t %v  %d"
-	       :tag "Request"
-	       :doc
-	       (concat
-		(format "Watch type: %s. Class: %s. Field: %s."
-		       (oref request watch-type)
-		       (oref request object-class)
-		       (oref request field-name))
-		(if (slot-boundp request 'object-id)
-		    (concat " Object id: " (oref request object-id) "."))
-		(if (slot-boundp request 'expression)
-		    (concat " Expression: " (oref request expression) ".")))
-	       (car x))))
-	  (oref this requests))))
+         (mapcar
+          (lambda (x)
+            (let ((request (cdr x)))
+              (list
+               'const
+               :format "%t %v  %d"
+               :tag "Request"
+               :doc
+               (concat
+                (format "Watch type: %s. Class: %s. Field: %s."
+                       (oref request watch-type)
+                       (oref request object-class)
+                       (oref request field-name))
+                (if (slot-boundp request 'object-id)
+                    (concat " Object id: " (oref request object-id) "."))
+                (if (slot-boundp request 'expression)
+                    (concat " Expression: " (oref request expression) ".")))
+               (car x))))
+          (oref this requests))))
 
   (widget-insert "Check the watch requests you want to cancel.\n\n")
 
   (oset this check-boxes
-	(widget-create
-	 (list
-	  'checklist
-	  :entry-format "  %b %v\n"
-	  :args items
-	   )))
+        (widget-create
+         (list
+          'checklist
+          :entry-format "  %b %v\n"
+          :args items
+           )))
   ))
 
 (defmethod efc-dialog-ok ((this jdee-bug-cancel-watch-dialog))
@@ -1554,10 +1554,10 @@ field of an object or class of objects."
   (mapc
    (lambda (id-x)
      (let ((request
-	    (cdr
-	     (cl-find-if
-	      (lambda (x) (= (car x) id-x))
-	     (oref this requests)))))
+            (cdr
+             (cl-find-if
+              (lambda (x) (= (car x) id-x))
+             (oref this requests)))))
      (jdee-bug-cancel-watch-request  (oref this process) request)))
    (widget-value (oref this check-boxes)))
   (call-next-method))
@@ -1572,30 +1572,30 @@ requests to cancel."
  (let* ((process (jdee-dbs-get-target-process)))
    (if process
        (if (slot-boundp process 'watch-req)
-	   (let ((watch-requests (oref process :watch-req)))
-	     (if (= (length watch-requests) 1)
-		 (jdee-bug-cancel-watch-request process (cdr (car watch-requests)))
-	       (let ((dialog
-		      (jdee-bug-cancel-watch-dialog "cancel watch dialog"
-						   :process process
-						   :requests watch-requests)))
-		 (efc-dialog-show dialog))))
-	 (error "The target process has no outstanding watch requests"))
+           (let ((watch-requests (oref process :watch-req)))
+             (if (= (length watch-requests) 1)
+                 (jdee-bug-cancel-watch-request process (cdr (car watch-requests)))
+               (let ((dialog
+                      (jdee-bug-cancel-watch-dialog "cancel watch dialog"
+                                                   :process process
+                                                   :requests watch-requests)))
+                 (efc-dialog-show dialog))))
+         (error "The target process has no outstanding watch requests"))
      (error "There is no active process."))))
 
 (defun jdee-make-frame-names-alist ()
   (let* ((current-frame (selected-frame))
-	 (falist
-	  (cons
-	   (cons (frame-parameter current-frame 'name)
-		 current-frame) nil))
-	 (frame (next-frame nil t)))
+         (falist
+          (cons
+           (cons (frame-parameter current-frame 'name)
+                 current-frame) nil))
+         (frame (next-frame nil t)))
     (while (not (eq frame current-frame))
       (progn
-	(setq falist (cons (cons
-			    (frame-parameter frame 'name)
-			    frame) falist))
-	(setq frame (next-frame frame t))))
+        (setq falist (cons (cons
+                            (frame-parameter frame 'name)
+                            frame) falist))
+        (setq frame (next-frame frame t))))
     falist))
 
 (defun jdee-bug-show-debug-frame ()
@@ -1608,46 +1608,46 @@ requests to cancel."
           (raise-frame existing-frame)
           (select-frame existing-frame))
       (let* ((process (jdee-dbs-get-target-process))
-	     (cli-buffer (when (slot-boundp process 'cli-buf)
+             (cli-buffer (when (slot-boundp process 'cli-buf)
                            (oref process cli-buf)))
-	     (locals-buffer (when (slot-boundp process 'locals-buf)
+             (locals-buffer (when (slot-boundp process 'locals-buf)
                               (oref process locals-buf)))
-	     (threads-buffer (when (slot-boundp process 'threads-buf)
+             (threads-buffer (when (slot-boundp process 'threads-buf)
                                (oref process threads-buf)))
-	     (msg-buffer (when (slot-boundp process 'msg-buf)
+             (msg-buffer (when (slot-boundp process 'msg-buf)
                            (oref process msg-buf)))
-	     (frame (make-frame '((name . "JDebug") (minibuffer . nil))))
-	     (height (/ (frame-height frame)
-			(cl-count-if 'identity
-				     (list cli-buffer
-					   locals-buffer
-					   threads-buffer
-					   msg-buffer))))
-	     (init-frame (selected-frame))
-	     (init-config (current-window-configuration))
-	     (prev-window))
-	(save-excursion
-	  (select-frame frame)
-	  ;; msg buffer should always be there, if not this could break
-	  (switch-to-buffer msg-buffer)
-	  (setq prev-window (get-buffer-window msg-buffer))
-	  (when locals-buffer
-	    (let ((locals-win (split-window prev-window height)))
-	      (setq prev-window locals-win)
-	      (when (not jdee-bug-local-variables)
-		(jdee-bug-toggle-local-variables)
-		(sleep-for 0 100))
-	      (set-window-buffer locals-win locals-buffer)))
-	  (when threads-buffer
-	    (let ((threads-win (split-window prev-window height)))
-	      (setq prev-window threads-win)
-	      (jdee-bug-show-threads)
-	      (set-window-buffer threads-win threads-buffer)))
-	  (when cli-buffer
-	    (let ((cli-win (split-window prev-window height)))
-	      (set-window-buffer cli-win cli-buffer)))
-	  (select-frame init-frame)
-	  (set-window-configuration init-config))))))
+             (frame (make-frame '((name . "JDebug") (minibuffer . nil))))
+             (height (/ (frame-height frame)
+                        (cl-count-if 'identity
+                                     (list cli-buffer
+                                           locals-buffer
+                                           threads-buffer
+                                           msg-buffer))))
+             (init-frame (selected-frame))
+             (init-config (current-window-configuration))
+             (prev-window))
+        (save-excursion
+          (select-frame frame)
+          ;; msg buffer should always be there, if not this could break
+          (switch-to-buffer msg-buffer)
+          (setq prev-window (get-buffer-window msg-buffer))
+          (when locals-buffer
+            (let ((locals-win (split-window prev-window height)))
+              (setq prev-window locals-win)
+              (when (not jdee-bug-local-variables)
+                (jdee-bug-toggle-local-variables)
+                (sleep-for 0 100))
+              (set-window-buffer locals-win locals-buffer)))
+          (when threads-buffer
+            (let ((threads-win (split-window prev-window height)))
+              (setq prev-window threads-win)
+              (jdee-bug-show-threads)
+              (set-window-buffer threads-win threads-buffer)))
+          (when cli-buffer
+            (let ((cli-win (split-window prev-window height)))
+              (set-window-buffer cli-win cli-buffer)))
+          (select-frame init-frame)
+          (set-window-configuration init-config))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1684,23 +1684,23 @@ any variables in scope in the program being debugged."
       (error "Empty expression."))
 
   (let* ((process (jdee-dbs-get-target-process))
-	 (state-info (oref process state-info))
-	 (thread-id (oref state-info thread-id))
-	 (evaluate-command
-	  (jdee-dbs-evaluate
-	   (format "Evaluate %s" expression)
-	   :process process
-	   :expression expression
-	   :thread-id thread-id))
-	 (result
-	  (jdee-dbs-cmd-exec evaluate-command)))
+         (state-info (oref process state-info))
+         (thread-id (oref state-info thread-id))
+         (evaluate-command
+          (jdee-dbs-evaluate
+           (format "Evaluate %s" expression)
+           :process process
+           :expression expression
+           :thread-id thread-id))
+         (result
+          (jdee-dbs-cmd-exec evaluate-command)))
     (if result
-	(let* ((type  (nth 0 result))
-	       (value (nth 1 result))
-	       (buf (get-buffer-create (concat "Expression: " expression))))
-	    (jdee-dbo-view-var-in-buf (jdee-dbs-objectify-value result)
-				     expression process t buf t)
-	    (pop-to-buffer buf (split-window nil (- (window-height) 4))))
+        (let* ((type  (nth 0 result))
+               (value (nth 1 result))
+               (buf (get-buffer-create (concat "Expression: " expression))))
+            (jdee-dbo-view-var-in-buf (jdee-dbs-objectify-value result)
+                                     expression process t buf t)
+            (pop-to-buffer buf (split-window nil (- (window-height) 4))))
       (message "Error: could not evaluate \"%s\"." expression))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1717,12 +1717,12 @@ any variables in scope in the program being debugged."
       (error "No target process or process is not suspended."))
 
   (let* ((process (jdee-dbs-get-target-process))
-	 (cmd
-	  (jdee-dbs-get-loaded-classes
-	   "get_loaded_classes"
-	   :process process))
-	 (result
-	  (jdee-dbs-cmd-exec cmd)))
+         (cmd
+          (jdee-dbs-get-loaded-classes
+           "get_loaded_classes"
+           :process process))
+         (result
+          (jdee-dbs-cmd-exec cmd)))
     (if (not result)
       (error "Could not get loaded classes."))))
 
@@ -1747,16 +1747,16 @@ button 2."
 
   (if (not jdee-bug-stack-info)
       (progn
-	(jdee-bug-toggle-stack-info)
-	(sleep-for 0 100)))
+        (jdee-bug-toggle-stack-info)
+        (sleep-for 0 100)))
 
   (let* ((process (jdee-dbs-get-target-process))
-	 (get-threads-command
-	  (jdee-dbs-get-threads
-	   "get_threads"
-	   :process process))
-	 (result
-	  (jdee-dbs-cmd-exec get-threads-command)))
+         (get-threads-command
+          (jdee-dbs-get-threads
+           "get_threads"
+           :process process))
+         (result
+          (jdee-dbs-cmd-exec get-threads-command)))
     (if (not result)
         (error "Could not get threads"))))
 
@@ -1781,12 +1781,12 @@ that currently owns the object and threads that are waiting to access the object
       (error "No target process or process is not suspended."))
 
   (let* ((process (jdee-dbs-get-target-process))
-	 (get-monitors-command
-	  (jdee-dbs-get-object-monitors
-	   "get_object_monitors"
-	   :process process :object-id object-id))
-	 (result
-	  (jdee-dbs-cmd-exec get-monitors-command)))))
+         (get-monitors-command
+          (jdee-dbs-get-object-monitors
+           "get_object_monitors"
+           :process process :object-id object-id))
+         (result
+          (jdee-dbs-cmd-exec get-monitors-command)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1803,12 +1803,12 @@ that currently owns the object and threads that are waiting to access the object
       (error "No target process or process is not suspended."))
 
   (let* ((process (jdee-dbs-get-target-process))
-	 (cmd
-	  (jdee-dbs-get-path-info
-	   "get_path_info"
-	   :process process))
-	 (result
-	  (jdee-dbs-cmd-exec cmd)))
+         (cmd
+          (jdee-dbs-get-path-info
+           "get_path_info"
+           :process process))
+         (result
+          (jdee-dbs-cmd-exec cmd)))
     (if (not result)
       (error "Could not get path info."))))
 
@@ -1840,20 +1840,20 @@ the thread at a breakpoint or step point."
 
   (if (not
        (let* ((process (jdee-dbs-get-target-process))
-	      (stack-max (1- (length (oref process stack))))
-	      (stack-ptr (oref process stack-ptr)))
-	 (< stack-ptr stack-max)))
+              (stack-max (1- (length (oref process stack))))
+              (stack-ptr (oref process stack-ptr)))
+         (< stack-ptr stack-max)))
       (error "The debugger is displaying the top of the stack."))
 
   (let* ((process (jdee-dbs-get-target-process))
-	 (state-info (oref process :state-info))
-	 (thread-id (oref state-info :thread-id))
-	 (stack (oref process stack))
-	 (stack-ptr (1+ (oref process stack-ptr)))
-	 (frame (nth stack-ptr stack))
-	 (class (nth 1 frame))
-	 (file (nth 2 frame))
-	 (line (nth 3 frame)))
+         (state-info (oref process :state-info))
+         (thread-id (oref state-info :thread-id))
+         (stack (oref process stack))
+         (stack-ptr (1+ (oref process stack-ptr)))
+         (frame (nth stack-ptr stack))
+         (class (nth 1 frame))
+         (file (nth 2 frame))
+         (line (nth 3 frame)))
 
     (oset process :stack-ptr stack-ptr)
     (jdee-db-set-debug-cursor class file line)
@@ -1876,19 +1876,19 @@ the thread at a breakpoint or step point."
       (error "The target process is not suspended at a breakpoint or steppoint."))
 
   (if (not (let* ((process (jdee-dbs-get-target-process))
-		  (stack-ptr (oref process stack-ptr)))
-	     (> stack-ptr 0)))
+                  (stack-ptr (oref process stack-ptr)))
+             (> stack-ptr 0)))
       (error "The debugger is displaying the bottom of the stack."))
 
   (let* ((process (jdee-dbs-get-target-process))
-	 (state-info (oref process :state-info))
-	 (thread-id (oref state-info :thread-id))
-	 (stack (oref process stack))
-	 (stack-ptr (1- (oref process stack-ptr)))
-	 (frame (nth stack-ptr stack))
-	 (class (nth 1 frame))
-	 (file (nth 2 frame))
-	 (line (nth 3 frame)))
+         (state-info (oref process :state-info))
+         (thread-id (oref state-info :thread-id))
+         (stack (oref process stack))
+         (stack-ptr (1- (oref process stack-ptr)))
+         (frame (nth stack-ptr stack))
+         (class (nth 1 frame))
+         (file (nth 2 frame))
+         (line (nth 3 frame)))
 
     (oset process :stack-ptr stack-ptr)
     (jdee-db-set-debug-cursor class file line)
@@ -1907,11 +1907,11 @@ Threads->Resume Thread (`jdee-bug-resume-thread') to resume the thread."
   (interactive
    "nThread ID: ")
   (let* ((process (jdee-dbs-get-target-process))
-	 (suspend-command
-	  (jdee-dbs-suspend-thread
-	       (format "suspend thread %d" thread-id)
-	       :process process
-	       :thread-id thread-id)))
+         (suspend-command
+          (jdee-dbs-suspend-thread
+               (format "suspend thread %d" thread-id)
+               :process process
+               :thread-id thread-id)))
     (jdee-dbs-cmd-exec suspend-command)))
 
 
@@ -1930,11 +1930,11 @@ the entire process."
   (interactive
    "nThread ID: ")
   (let* ((process (jdee-dbs-get-target-process))
-	 (resume-command
-	  (jdee-dbs-resume-thread
-	       (format "resume thread %d" thread-id)
-	       :process process
-	       :thread-id thread-id)))
+         (resume-command
+          (jdee-dbs-resume-thread
+               (format "resume thread %d" thread-id)
+               :process process
+               :thread-id thread-id)))
     (jdee-dbs-cmd-exec resume-command)))
 
 
@@ -1953,11 +1953,11 @@ running in the target process. Use Threads->Suspend Thread
   (interactive
    "nThread ID: ")
   (let* ((process (jdee-dbs-get-target-process))
-	 (interrupt-command
-	  (jdee-dbs-interrupt-thread
-	       (format "interrupt thread %d" thread-id)
-	       :process process
-	       :thread-id thread-id)))
+         (interrupt-command
+          (jdee-dbs-interrupt-thread
+               (format "interrupt thread %d" thread-id)
+               :process process
+               :thread-id thread-id)))
     (jdee-dbs-cmd-exec interrupt-command)))
 
 
@@ -1970,12 +1970,12 @@ to creae the exception object."
  (interactive
    "nThread ID: \nnException Id: ")
   (let* ((process (jdee-dbs-get-target-process))
-	 (stop-command
-	  (jdee-dbs-stop-thread
-	       (format "stop thread %d" thread-id)
-	       :process process
-	       :thread-id thread-id
-	       :exception-id exception-id)))
+         (stop-command
+          (jdee-dbs-stop-thread
+               (format "stop thread %d" thread-id)
+               :process process
+               :thread-id thread-id
+               :exception-id exception-id)))
     (jdee-dbs-cmd-exec stop-command)))
 
 (defun jdee-bug-jpda-installed-p ()
@@ -1988,10 +1988,10 @@ to creae the exception object."
     (error "jdee-bug-jpda-directory variable is not set.")
     nil)
    ((not (file-exists-p
-	  (expand-file-name "lib/jpda.jar" (jdee-normalize-path
-					    'jdee-bug-jpda-directory))))
+          (expand-file-name "lib/jpda.jar" (jdee-normalize-path
+                                            'jdee-bug-jpda-directory))))
     (error "Cannot find JPDA jar file at %s"
-	     (expand-file-name "lib/jpda.jar" jdee-bug-jpda-directory))
+             (expand-file-name "lib/jpda.jar" jdee-bug-jpda-directory))
     nil)
    (t
     t)))
@@ -2002,7 +2002,7 @@ to creae the exception object."
   (interactive)
   (if (not (jdee-dbs-debugger-running-p))
       (if (and (jdee-bug-jpda-installed-p)
-	   (jdee-dbs-debugger-start jdee-dbs-the-debugger))
+           (jdee-dbs-debugger-start jdee-dbs-the-debugger))
       (message "Debugger started successfully." )
       (message "Could not start debugger."))
     (message "Debugger is already started")))
@@ -2024,36 +2024,36 @@ to set another process as the target process."
   (interactive)
   (let* ((main-class (jdee-run-get-main-class)))
     (unless (and
-	     (jdee-dbs-proc-set-find jdee-dbs-the-process-registry
-				    :main-class main-class)
-	     (not (yes-or-no-p
-		   (format "An instance of %s is already running. Continue?" main-class))))
+             (jdee-dbs-proc-set-find jdee-dbs-the-process-registry
+                                    :main-class main-class)
+             (not (yes-or-no-p
+                   (format "An instance of %s is already running. Continue?" main-class))))
       (let* ((process
-	      (jdee-dbs-proc (format "process%d"
-				    (setq jdee-dbs-proc-counter
-					  (1+ jdee-dbs-proc-counter)))
-			    :id jdee-dbs-proc-counter :main-class main-class))
-	     (old-target (jdee-dbs-get-target-process))
-	     (launch (jdee-dbs-launch-process
-		      (format "Launch %s" main-class)
-		      :process process
-		      :vmexec (car jdee-bug-vm-executable)
-		      ;; :vmexec "xyz"
-		      ))
-	     (succeededp t))
-	(jdee-dbs-proc-set-add jdee-dbs-the-process-registry process)
-	(if (not (string= jdee-bug-jre-home ""))
-	    (oset launch :jre-home (jdee-normalize-path 'jdee-bug-jre-home)))
-	(oset jdee-dbs-the-process-registry :target-process process)
-	(when (not (jdee-dbs-cmd-exec launch))
-	  (jdee-dbs-proc-move-to-morgue process)
-	  (if old-target
-	      (oset jdee-dbs-the-process-registry :target-process old-target))
-	  (jdee-dbs-proc-set-state process "unknown")
-	  (jdee-dbs-proc-set-state-reason process "Error launching process.")
-	  (jdee-dbs-proc-set-add jdee-dbs-the-process-morgue process)
-	  (setq succeededp nil))
-	succeededp))))
+              (jdee-dbs-proc (format "process%d"
+                                    (setq jdee-dbs-proc-counter
+                                          (1+ jdee-dbs-proc-counter)))
+                            :id jdee-dbs-proc-counter :main-class main-class))
+             (old-target (jdee-dbs-get-target-process))
+             (launch (jdee-dbs-launch-process
+                      (format "Launch %s" main-class)
+                      :process process
+                      :vmexec (car jdee-bug-vm-executable)
+                      ;; :vmexec "xyz"
+                      ))
+             (succeededp t))
+        (jdee-dbs-proc-set-add jdee-dbs-the-process-registry process)
+        (if (not (string= jdee-bug-jre-home ""))
+            (oset launch :jre-home (jdee-normalize-path 'jdee-bug-jre-home)))
+        (oset jdee-dbs-the-process-registry :target-process process)
+        (when (not (jdee-dbs-cmd-exec launch))
+          (jdee-dbs-proc-move-to-morgue process)
+          (if old-target
+              (oset jdee-dbs-the-process-registry :target-process old-target))
+          (jdee-dbs-proc-set-state process "unknown")
+          (jdee-dbs-proc-set-state-reason process "Error launching process.")
+          (jdee-dbs-proc-set-add jdee-dbs-the-process-morgue process)
+          (setq succeededp nil))
+        succeededp))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -2068,26 +2068,26 @@ memory. This command works only on Windows."
   (interactive
    "sProcess name: ")
   (let* ((process
-	  (jdee-dbs-proc (format "process%d"
-				(setq jdee-dbs-proc-counter
-				      (1+ jdee-dbs-proc-counter)))
-			:id jdee-dbs-proc-counter :main-class process-name))
-	 (old-target (jdee-dbs-get-target-process))
-	 (attach (jdee-dbs-attach-shmem
-		  (format "Attach %s" process-name)
-		  :process process
-		  :process-name process-name)))
+          (jdee-dbs-proc (format "process%d"
+                                (setq jdee-dbs-proc-counter
+                                      (1+ jdee-dbs-proc-counter)))
+                        :id jdee-dbs-proc-counter :main-class process-name))
+         (old-target (jdee-dbs-get-target-process))
+         (attach (jdee-dbs-attach-shmem
+                  (format "Attach %s" process-name)
+                  :process process
+                  :process-name process-name)))
     (jdee-dbs-proc-set-add jdee-dbs-the-process-registry process)
     (oset jdee-dbs-the-process-registry :target-process process)
     (if (not (jdee-dbs-cmd-exec attach))
-	(progn
-	  (jdee-dbs-proc-move-to-morgue process)
-	  (if old-target
-	      (oset jdee-dbs-the-process-registry :target-process old-target))
-	  (jdee-dbs-proc-set-state process "unknown")
-	  (jdee-dbs-proc-set-state-reason process "Error launching process.")
-	  (jdee-dbs-proc-set-add jdee-dbs-the-process-morgue process)
-	  nil)
+        (progn
+          (jdee-dbs-proc-move-to-morgue process)
+          (if old-target
+              (oset jdee-dbs-the-process-registry :target-process old-target))
+          (jdee-dbs-proc-set-state process "unknown")
+          (jdee-dbs-proc-set-state-reason process "Error launching process.")
+          (jdee-dbs-proc-set-add jdee-dbs-the-process-morgue process)
+          nil)
       (jdee-bug-set-breakpoints process jdee-db-breakpoints))
     t))
 
@@ -2102,26 +2102,26 @@ to the process via a socket."
   (interactive
    "sProcess Port: ")
   (let* ((process
-	  (jdee-dbs-proc (format "process%d"
-				(setq jdee-dbs-proc-counter
-				      (1+ jdee-dbs-proc-counter)))
-			:id jdee-dbs-proc-counter :main-class process-port))
-	     (old-target (jdee-dbs-get-target-process))
-	     (attach (jdee-dbs-attach-socket
-		      (format "Attach %s" process-port)
-		      :process process
-		      :port process-port)))
+          (jdee-dbs-proc (format "process%d"
+                                (setq jdee-dbs-proc-counter
+                                      (1+ jdee-dbs-proc-counter)))
+                        :id jdee-dbs-proc-counter :main-class process-port))
+             (old-target (jdee-dbs-get-target-process))
+             (attach (jdee-dbs-attach-socket
+                      (format "Attach %s" process-port)
+                      :process process
+                      :port process-port)))
     (jdee-dbs-proc-set-add jdee-dbs-the-process-registry process)
     (oset jdee-dbs-the-process-registry :target-process process)
     (if (not (jdee-dbs-cmd-exec attach))
-	(progn
-	  (jdee-dbs-proc-move-to-morgue process)
-	  (if old-target
-	      (oset jdee-dbs-the-process-registry :target-process old-target))
-	  (jdee-dbs-proc-set-state process "unknown")
-	  (jdee-dbs-proc-set-state-reason process "Error launching process.")
-	  (jdee-dbs-proc-set-add jdee-dbs-the-process-morgue process)
-	  nil)
+        (progn
+          (jdee-dbs-proc-move-to-morgue process)
+          (if old-target
+              (oset jdee-dbs-the-process-registry :target-process old-target))
+          (jdee-dbs-proc-set-state process "unknown")
+          (jdee-dbs-proc-set-state-reason process "Error launching process.")
+          (jdee-dbs-proc-set-add jdee-dbs-the-process-morgue process)
+          nil)
       (jdee-bug-set-breakpoints process jdee-db-breakpoints))
     t))
 
@@ -2137,27 +2137,27 @@ to the process via a socket."
  (interactive
    "sHost: \nsProcess Port: ")
   (let* ((process
-	  (jdee-dbs-proc (format "process%d"
-				(setq jdee-dbs-proc-counter
-				      (1+ jdee-dbs-proc-counter)))
-			:id jdee-dbs-proc-counter :main-class process-port))
-	     (old-target (jdee-dbs-get-target-process))
-	     (attach (jdee-dbs-attach-socket
-		      (format "Attach %s" process-port)
-		      :process process
-		      :host process-host
-		      :port process-port)))
+          (jdee-dbs-proc (format "process%d"
+                                (setq jdee-dbs-proc-counter
+                                      (1+ jdee-dbs-proc-counter)))
+                        :id jdee-dbs-proc-counter :main-class process-port))
+             (old-target (jdee-dbs-get-target-process))
+             (attach (jdee-dbs-attach-socket
+                      (format "Attach %s" process-port)
+                      :process process
+                      :host process-host
+                      :port process-port)))
     (jdee-dbs-proc-set-add jdee-dbs-the-process-registry process)
     (oset jdee-dbs-the-process-registry :target-process process)
     (if (not (jdee-dbs-cmd-exec attach))
-	(progn
-	  (jdee-dbs-proc-move-to-morgue process)
-	  (if old-target
-	      (oset jdee-dbs-the-process-registry :target-process old-target))
-	  (jdee-dbs-proc-set-state process "unknown")
-	  (jdee-dbs-proc-set-state-reason process "Error launching process.")
-	  (jdee-dbs-proc-set-add jdee-dbs-the-process-morgue process)
-	  nil)
+        (progn
+          (jdee-dbs-proc-move-to-morgue process)
+          (if old-target
+              (oset jdee-dbs-the-process-registry :target-process old-target))
+          (jdee-dbs-proc-set-state process "unknown")
+          (jdee-dbs-proc-set-state-reason process "Error launching process.")
+          (jdee-dbs-proc-set-add jdee-dbs-the-process-morgue process)
+          nil)
       (jdee-bug-set-breakpoints process jdee-db-breakpoints))
     t))
 
@@ -2175,27 +2175,27 @@ to the process via a socket."
   (interactive
    (list
     (if (car jdee-bug-server-shmem-name)
-	(read-from-minibuffer "Name: "
-			      (car jdee-bug-server-shmem-name-history)
-			      nil nil
-			      'jdee-bug-server-shmem-name-history)
+        (read-from-minibuffer "Name: "
+                              (car jdee-bug-server-shmem-name-history)
+                              nil nil
+                              'jdee-bug-server-shmem-name-history)
       (cdr jdee-bug-server-shmem-name))))
   (let* ((process
-	  (jdee-dbs-proc (format "process%d"
-				(setq jdee-dbs-proc-counter
-				      (1+ jdee-dbs-proc-counter)))
-			:id jdee-dbs-proc-counter :main-class shmem-name))
-	     (old-target (jdee-dbs-get-target-process))
-	     (listen (jdee-dbs-listen-for-process
-		      (format "Listen %s" shmem-name)
-		      :process process
-		      :address shmem-name)))
+          (jdee-dbs-proc (format "process%d"
+                                (setq jdee-dbs-proc-counter
+                                      (1+ jdee-dbs-proc-counter)))
+                        :id jdee-dbs-proc-counter :main-class shmem-name))
+             (old-target (jdee-dbs-get-target-process))
+             (listen (jdee-dbs-listen-for-process
+                      (format "Listen %s" shmem-name)
+                      :process process
+                      :address shmem-name)))
     (jdee-dbs-proc-set-add jdee-dbs-the-process-registry process)
     (oset jdee-dbs-the-process-registry :target-process process)
     (when (not (jdee-dbs-cmd-exec listen))
       (jdee-dbs-proc-move-to-morgue process)
       (if old-target
-	  (oset jdee-dbs-the-process-registry :target-process old-target))
+          (oset jdee-dbs-the-process-registry :target-process old-target))
       (jdee-dbs-proc-set-state process "unknown")
       (jdee-dbs-proc-set-state-reason process "Error listening for process.")
       (jdee-dbs-proc-set-add jdee-dbs-the-process-morgue process)
@@ -2219,28 +2219,28 @@ listens on the socket specified by `jdee-bug-server-socket'."
   (interactive
    (list
     (if (car jdee-bug-server-socket)
-	(read-from-minibuffer "Socket: "
-			      (car jdee-bug-server-socket-history)
-			      nil nil
-			      'jdee-bug-server-socket-history)
+        (read-from-minibuffer "Socket: "
+                              (car jdee-bug-server-socket-history)
+                              nil nil
+                              'jdee-bug-server-socket-history)
       (cdr jdee-bug-server-socket))))
   (let* ((process
-	  (jdee-dbs-proc (format "process%d"
-				(setq jdee-dbs-proc-counter
-				      (1+ jdee-dbs-proc-counter)))
-			:id jdee-dbs-proc-counter :main-class socket))
-	     (old-target (jdee-dbs-get-target-process))
-	     (listen (jdee-dbs-listen-for-process
-		      (format "Listen %s" socket)
-		      :process process
-		      :address socket
-		      :transport "socket")))
+          (jdee-dbs-proc (format "process%d"
+                                (setq jdee-dbs-proc-counter
+                                      (1+ jdee-dbs-proc-counter)))
+                        :id jdee-dbs-proc-counter :main-class socket))
+             (old-target (jdee-dbs-get-target-process))
+             (listen (jdee-dbs-listen-for-process
+                      (format "Listen %s" socket)
+                      :process process
+                      :address socket
+                      :transport "socket")))
     (jdee-dbs-proc-set-add jdee-dbs-the-process-registry process)
     (oset jdee-dbs-the-process-registry :target-process process)
     (when (not (jdee-dbs-cmd-exec listen))
       (jdee-dbs-proc-move-to-morgue process)
       (if old-target
-	  (oset jdee-dbs-the-process-registry :target-process old-target))
+          (oset jdee-dbs-the-process-registry :target-process old-target))
       (jdee-dbs-proc-set-state process "unknown")
       (jdee-dbs-proc-set-state-reason process "Error listening for process.")
       (jdee-dbs-proc-set-add jdee-dbs-the-process-morgue process)
@@ -2272,8 +2272,8 @@ to run."
 use JDEbug->Threads->Suspend Thread (`jdee-bug-suspend-thread')."
   (interactive)
   (let* ((process (jdee-dbs-get-target-process))
-	 (suspend-command
-	  (jdee-dbs-suspend-thread "suspend process" :process process)))
+         (suspend-command
+          (jdee-dbs-suspend-thread "suspend process" :process process)))
     (jdee-dbs-cmd-exec suspend-command)))
 
 
@@ -2282,8 +2282,8 @@ use JDEbug->Threads->Suspend Thread (`jdee-bug-suspend-thread')."
 use JDEbug->Threads->Resume Thread (`jdee-bug-resume-thread')."
   (interactive)
   (let* ((process (jdee-dbs-get-target-process))
-	 (resume-command
-	  (jdee-dbs-resume-thread "resume process" :process process)))
+         (resume-command
+          (jdee-dbs-resume-thread "resume process" :process process)))
     (jdee-dbs-cmd-exec resume-command)))
 
 
@@ -2291,10 +2291,10 @@ use JDEbug->Threads->Resume Thread (`jdee-bug-resume-thread')."
   "Terminates the target process."
   (interactive)
   (let* ((process (jdee-dbs-get-target-process))
-	 (finish (jdee-dbs-finish-process
-		  (format "finish %d" (oref process id))
-		  :process process))
-	 (result (jdee-dbs-cmd-exec finish)))
+         (finish (jdee-dbs-finish-process
+                  (format "finish %d" (oref process id))
+                  :process process))
+         (result (jdee-dbs-cmd-exec finish)))
     (jdee-dbs-proc-move-to-morgue process)
     (slot-makeunbound jdee-dbs-the-process-registry :target-process)
     (jdee-dbs-proc-set-state-reason process "finish")))
@@ -2326,17 +2326,17 @@ This command splits the window and shows the locals buffer."
   (interactive)
   (if (not jdee-bug-local-variables)
       (progn
-	(jdee-bug-toggle-local-variables)
-	(sleep-for 0 100)))
+        (jdee-bug-toggle-local-variables)
+        (sleep-for 0 100)))
 
   (let* ((process (jdee-dbs-get-target-process))
-	 (locals-buf (oref process locals-buf))
-	 (source-window (selected-window))
-	 locals-window)
+         (locals-buf (oref process locals-buf))
+         (source-window (selected-window))
+         locals-window)
     (if (one-window-p)
-	(progn
-	  (setq locals-window (split-window source-window))
-	  (set-window-buffer locals-window locals-buf)))
+        (progn
+          (setq locals-window (split-window source-window))
+          (set-window-buffer locals-window locals-buf)))
     (set-window-buffer (next-window source-window) locals-buf)
     (select-window source-window)))
 
@@ -2344,13 +2344,13 @@ This command splits the window and shows the locals buffer."
   "Show the command-line interface (CLI) buffer of the target process."
   (interactive)
   (let* ((process (jdee-dbs-get-target-process))
-	(cli-buf (oref process cli-buf))
-	(source-window (selected-window))
-	cli-window)
+        (cli-buf (oref process cli-buf))
+        (source-window (selected-window))
+        cli-window)
     (if (one-window-p)
-	(progn
-	  (setq cli-window (split-window source-window))
-	  (set-window-buffer cli-window cli-buf)))
+        (progn
+          (setq cli-window (split-window source-window))
+          (set-window-buffer cli-window cli-buf)))
     (set-window-buffer (next-window source-window) cli-buf)
     (select-window source-window)))
 
@@ -2363,13 +2363,13 @@ This command splits the window and shows the locals buffer."
   (jdee-bug-show-threads)
 
   (let* ((process (jdee-dbs-get-target-process))
-	 (threads-buf (oref process threads-buf))
-	 (source-window (selected-window))
-	 threads-window)
+         (threads-buf (oref process threads-buf))
+         (source-window (selected-window))
+         threads-window)
     (if (one-window-p)
-	(progn
-	  (setq threads-window (split-window source-window))
-	  (set-window-buffer threads-window threads-buf)))
+        (progn
+          (setq threads-window (split-window source-window))
+          (set-window-buffer threads-window threads-buf)))
     (set-window-buffer (next-window source-window) threads-buf)
     (select-window source-window)))
 
@@ -2384,12 +2384,12 @@ This command splits the window and shows the locals buffer."
   (mapc
    (lambda (assoc-x)
      (let* ((breakpoint (cdr assoc-x))
-	    (set-breakpoint (jdee-dbs-set-breakpoint
-			     (format "set breakpoint%d"
-				     (oref breakpoint id))
-			     :process process
-			     :breakpoint breakpoint))
-	    (result (jdee-dbs-cmd-exec set-breakpoint)))))
+            (set-breakpoint (jdee-dbs-set-breakpoint
+                             (format "set breakpoint%d"
+                                     (oref breakpoint id))
+                             :process process
+                             :breakpoint breakpoint))
+            (result (jdee-dbs-cmd-exec set-breakpoint)))))
    breakpoints))
 
 ;;;###autoload
@@ -2402,22 +2402,22 @@ This command splits the window and shows the locals buffer."
       (jdee-dbs-debugger-start jdee-dbs-the-debugger))
   (if (jdee-dbs-debugger-running-p)
       (let ((result (jdee-bug-launch-process)))
-	(if result
-	    (let ((process (oref jdee-dbs-the-process-registry :target-process)))
-	      (jdee-bug-set-breakpoints process jdee-db-breakpoints)
-	      (setq result (jdee-bug-continue)))))))
+        (if result
+            (let ((process (oref jdee-dbs-the-process-registry :target-process)))
+              (jdee-bug-set-breakpoints process jdee-db-breakpoints)
+              (setq result (jdee-bug-continue)))))))
 
 (defun jdee-bug-help ()
   "Displays the JDEbug User's Guide."
   (interactive)
   (let* ((jdee-dir (jdee-find-jdee-doc-directory))
-	 (jdebug-help
-	  (if jdee-dir
-	      (expand-file-name "doc/html/jdebug-ug/jdebug-ug.html" jdee-dir))))
+         (jdebug-help
+          (if jdee-dir
+              (expand-file-name "doc/html/jdebug-ug/jdebug-ug.html" jdee-dir))))
     (if (and
-	 jdebug-help
-	 (file-exists-p jdebug-help))
-	(browse-url (concat "file://" (jdee-convert-cygwin-path jdebug-help)))
+         jdebug-help
+         (file-exists-p jdebug-help))
+        (browse-url (concat "file://" (jdee-convert-cygwin-path jdebug-help)))
       (signal 'error '("Cannot find JDEbug User's Guide.")))))
 
 (defun jdee-bug-keys ()
@@ -2431,15 +2431,15 @@ the value of the variable `jdee-bug-local-variables'"
   (interactive)
   (setq jdee-bug-local-variables (not jdee-bug-local-variables))
   (if (and jdee-dbo-current-process
-	   jdee-dbo-current-thread-id
-	   jdee-bug-local-variables)
+           jdee-dbo-current-thread-id
+           jdee-bug-local-variables)
       (jdee-dbo-update-locals-buf jdee-dbo-current-process
-				 jdee-dbo-current-thread-id 0)
+                                 jdee-dbo-current-thread-id 0)
     (save-excursion
       (if jdee-dbo-current-process
-	  (progn
-	    (set-buffer (oref jdee-dbo-current-process locals-buf))
-	    (kill-all-local-variables))))))
+          (progn
+            (set-buffer (oref jdee-dbo-current-process locals-buf))
+            (kill-all-local-variables))))))
 
 (defun jdee-bug-toggle-stack-info ()
   "Enables and disables the retrieval of stack info. It toggles the value
@@ -2447,16 +2447,16 @@ of the variable `jdee-bug-stack-info'"
   (interactive)
   (setq jdee-bug-stack-info (not jdee-bug-stack-info))
   (if (and jdee-dbo-current-process
-	   jdee-dbo-current-thread-id
-	   jdee-bug-stack-info)
+           jdee-dbo-current-thread-id
+           jdee-bug-stack-info)
       (jdee-dbo-update-stack jdee-dbo-current-process
-			    jdee-dbo-current-thread-id)
+                            jdee-dbo-current-thread-id)
     (save-excursion
       (if jdee-dbo-current-process
-	  (progn
-	    (set-buffer (oref jdee-dbo-current-process threads-buf))
-	    (kill-all-local-variables)
-	    (erase-buffer))))))
+          (progn
+            (set-buffer (oref jdee-dbo-current-process threads-buf))
+            (kill-all-local-variables)
+            (erase-buffer))))))
 
 (provide 'jdee-bug)
 

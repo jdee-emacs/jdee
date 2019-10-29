@@ -56,20 +56,20 @@ replacement.  This adds a `this.' to each replacment."
        (error "No region selected")
      (list (region-beginning) (region-end) current-prefix-arg)))
   (let ((case-fold-search nil)
-	(reg "\\(?:oa\\|[onbfs]\\)\\([A-Z]\\)\\([a-zA-Z0-9]+\\)"))
+        (reg "\\(?:oa\\|[onbfs]\\)\\([A-Z]\\)\\([a-zA-Z0-9]+\\)"))
     (save-excursion
       (save-restriction
-	(narrow-to-region start end)
-	(save-match-data
-	  (goto-char (point-min))
-	  (while (re-search-forward (concat "m_" reg) nil t)
-	    (replace-match (concat (and local-replacement-p "this.")
-				   (downcase (match-string 1))
-				   (match-string 2))))
-	  (goto-char (point-min))
-	  (while (re-search-forward (concat "\\<" reg "\\>") nil t)
-	    (replace-match (concat (downcase (match-string 1))
-				   (match-string 2)))))))))
+        (narrow-to-region start end)
+        (save-match-data
+          (goto-char (point-min))
+          (while (re-search-forward (concat "m_" reg) nil t)
+            (replace-match (concat (and local-replacement-p "this.")
+                                   (downcase (match-string 1))
+                                   (match-string 2))))
+          (goto-char (point-min))
+          (while (re-search-forward (concat "\\<" reg "\\>") nil t)
+            (replace-match (concat (downcase (match-string 1))
+                                   (match-string 2)))))))))
 
 (defun jdee-split-by-camel-notation (to-parse)
   "Parse tokens based on \(reverse) camel notation.
@@ -77,26 +77,26 @@ TO-PARSE is the string to parse."
   (if (or nil (= 0 (length to-parse)))
       nil
     (let ((last-cap 0)
-	  toks)
+          toks)
       (setq to-parse (append (vconcat to-parse) nil))
       (cl-flet ((upperp
-		 (pos)
-		 (if (<= pos 0)
-		     t
-		   (let ((char (elt to-parse pos)))
-		     (and (eq char (upcase char))))))
-		(handle
-		 (pos)
-		 (prog1
-		     (apply 'string (cl-subseq to-parse last-cap pos))
-		   (setq last-cap pos))))
-	(cl-do ((pos 0 (cl-incf pos)))
-	    ((> pos (1- (length to-parse))))
-	  (if (and (upperp pos)
-		   ;;(> (- pos last-cap) 2))
-		   (> (- pos last-cap) 0))
-	      (setq toks (append toks (cons (handle pos) nil)))))
-	(append toks (cons (handle (length to-parse)) nil))))))
+                 (pos)
+                 (if (<= pos 0)
+                     t
+                   (let ((char (elt to-parse pos)))
+                     (and (eq char (upcase char))))))
+                (handle
+                 (pos)
+                 (prog1
+                     (apply 'string (cl-subseq to-parse last-cap pos))
+                   (setq last-cap pos))))
+        (cl-do ((pos 0 (cl-incf pos)))
+            ((> pos (1- (length to-parse))))
+          (if (and (upperp pos)
+                   ;;(> (- pos last-cap) 2))
+                   (> (- pos last-cap) 0))
+              (setq toks (append toks (cons (handle pos) nil)))))
+        (append toks (cons (handle (length to-parse)) nil))))))
 
 (defconst jdee-camel-tok-skip-chars " \t\n().'\""
   "Characters used top a traveral of a reverse camel notation string." )
@@ -105,38 +105,38 @@ TO-PARSE is the string to parse."
   "Go to the beginning of a reverese camel case token."
   (interactive)
   (let ((space-regex (format "[%s]" jdee-camel-tok-skip-chars))
-	(n-space-regex (format "[^%s]" jdee-camel-tok-skip-chars))
-	start end reg toks)
+        (n-space-regex (format "[^%s]" jdee-camel-tok-skip-chars))
+        start end reg toks)
     (save-excursion
       (save-match-data
-	(if (and (> (point) (- 2 (point-min)))
-		 (save-excursion
-		   (forward-char -1)
-		   (looking-at space-regex)))
-	    (re-search-backward n-space-regex nil t))
-	(setq end (point))
-	(setq start (or (when (re-search-backward space-regex nil t)
-			  (forward-char 1)
-			  (point))
-			(point-min)))))
+        (if (and (> (point) (- 2 (point-min)))
+                 (save-excursion
+                   (forward-char -1)
+                   (looking-at space-regex)))
+            (re-search-backward n-space-regex nil t))
+        (setq end (point))
+        (setq start (or (when (re-search-backward space-regex nil t)
+                          (forward-char 1)
+                          (point))
+                        (point-min)))))
     (setq reg (buffer-substring start end)
-	  toks (jdee-split-by-camel-notation reg))
+          toks (jdee-split-by-camel-notation reg))
     (goto-char (- end (length (car (last toks)))))))
 
 (defun jdee-end-of-camel-tok ()
   "Go to the beginning of a reverese camel case token."
   (interactive)
   (let ((space-regex (format "[%s]" jdee-camel-tok-skip-chars))
-	(n-space-regex (format "[^%s]" jdee-camel-tok-skip-chars)))
+        (n-space-regex (format "[^%s]" jdee-camel-tok-skip-chars)))
     (if (looking-at space-regex) (re-search-forward n-space-regex))
     (let ((start (point))
-	  (end (or (save-excursion
-		     (save-match-data
-		       (re-search-forward space-regex nil t)))
-		   (point-max)))
-	  reg toks)
+          (end (or (save-excursion
+                     (save-match-data
+                       (re-search-forward space-regex nil t)))
+                   (point-max)))
+          reg toks)
       (setq reg (buffer-substring start end)
-	    toks (jdee-split-by-camel-notation reg))
+            toks (jdee-split-by-camel-notation reg))
       (goto-char (+ start (length (car toks)))))))
 
 (defun jdee-forward-camel-tok (arg)
@@ -172,7 +172,7 @@ back after the deletion.  This is usually something like
 
 DELIMITER the delimiter used to place between each camel token."
   (let ((toks (jdee-split-by-camel-notation
-	       (buffer-substring start end))))
+               (buffer-substring start end))))
     (save-excursion
       (delete-region start end)
       (goto-char start)
@@ -223,15 +223,15 @@ GETTERP, if non-nil, make it a getter, otherwise make it a setter.  If
 setter, otherwise, make a getter."
   (interactive (list (thing-at-point 'word) (not current-prefix-arg)))
   (let* ((toks (jdee-split-by-camel-notation member-name))
-	 (attr (apply 'concat
-		      (append (list (if getterp "get" "set")
-				    (capitalize (substring (car toks) 0 1))
-				    (substring (car toks) 1))
-			      (cdr toks)))))
+         (attr (apply 'concat
+                      (append (list (if getterp "get" "set")
+                                    (capitalize (substring (car toks) 0 1))
+                                    (substring (car toks) 1))
+                              (cdr toks)))))
     (if (called-interactively-p 'interactive)
-	(let ((bounds (bounds-of-thing-at-point 'word)))
-	  (delete-region (car bounds) (cdr bounds))
-	  (insert (concat attr "(" (if getterp ")")))))
+        (let ((bounds (bounds-of-thing-at-point 'word)))
+          (delete-region (car bounds) (cdr bounds))
+          (insert (concat attr "(" (if getterp ")")))))
     attr))
 
 (eval-after-load

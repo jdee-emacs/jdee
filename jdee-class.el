@@ -64,17 +64,17 @@ argument in the SPEC is the package to restrict processing to.
 \(fn (VAR [RESULT] [PACKAGE]) BODY...)"
 
   (let ((class-var-sym (car spec))
-	(old-dir-sym (cl-gensym "--with-all-class-files-old-dir"))
-	(normalized-path-sym (cl-gensym "--with-all-class-files-npath"))
-	(dir-sym (cl-gensym "--with-all-class-files-dir-sym"))
-	(dir2-sym (cl-gensym "--with-all-class-files-dir2-sym"))
-	(path-sym (cl-gensym "--with-all-class-files-path"))
-	(buf-sym (cl-gensym "--with-all-class-files-buf"))
-	(rec-descend (cl-gensym "--with-all-class-files-rec-descend"))
-	(process-files (cl-gensym "--with-all-class-files-process-files"))
-	(process-class (cl-gensym "--with-all-class-files-process-class"))
-	(child-path (cl-gensym "--with-all-class-files-child-path"))
-	(package (nth 2 spec)))
+        (old-dir-sym (cl-gensym "--with-all-class-files-old-dir"))
+        (normalized-path-sym (cl-gensym "--with-all-class-files-npath"))
+        (dir-sym (cl-gensym "--with-all-class-files-dir-sym"))
+        (dir2-sym (cl-gensym "--with-all-class-files-dir2-sym"))
+        (path-sym (cl-gensym "--with-all-class-files-path"))
+        (buf-sym (cl-gensym "--with-all-class-files-buf"))
+        (rec-descend (cl-gensym "--with-all-class-files-rec-descend"))
+        (process-files (cl-gensym "--with-all-class-files-process-files"))
+        (process-class (cl-gensym "--with-all-class-files-process-class"))
+        (child-path (cl-gensym "--with-all-class-files-child-path"))
+        (package (nth 2 spec)))
     `(labels ((,process-class (,class-var-sym)
                               (when (string-match "\.[Cc][Ll][Aa][Ss][Ss]$" ,class-var-sym)
                                 ,@body))
@@ -140,16 +140,16 @@ Example:(with-all-class-infos-when (info) (lambda (x)
  (some-pred-p x)) (do-stuff info))"
 
   (let ((parsed-class-sym (cl-gensym "--with-all-class-infos-pclasses"))
-	(class-file-sym (cl-gensym "--with-all-class-infos-cfile"))
-	(var-sym (car spec)))
+        (class-file-sym (cl-gensym "--with-all-class-infos-cfile"))
+        (var-sym (car spec)))
     `(let ((,parsed-class-sym '()))
        (with-all-class-files (,class-file-sym ,@(cdr spec))
-			     (when (and (not (jdee-class-path-in-classes-p ,class-file-sym ,parsed-class-sym))
-					(funcall ,pred ,class-file-sym))
-			       (let ((,var-sym (jdee-bytecode ,class-file-sym)))
-				 ,@body
-				 (add-to-list (quote ,parsed-class-sym)
-					      (jdee-bytecode-extract-classname info)))))
+                             (when (and (not (jdee-class-path-in-classes-p ,class-file-sym ,parsed-class-sym))
+                                        (funcall ,pred ,class-file-sym))
+                               (let ((,var-sym (jdee-bytecode ,class-file-sym)))
+                                 ,@body
+                                 (add-to-list (quote ,parsed-class-sym)
+                                              (jdee-bytecode-extract-classname info)))))
        ,(cadr spec))))
 
 (defmacro with-all-corresponding-class-infos (spec &rest body)
@@ -168,7 +168,7 @@ info, the package name of the source file, the source name of the source file, a
   "Returns true if the PATH looks like it represents a class in CLASSES"
   (jdee-class-partial-match-member
    (replace-regexp-in-string "\\.[Cc][Ll][Aa][Ss][Ss]$" ""
-			     (replace-regexp-in-string "/\\|\\$" "." path))
+                             (replace-regexp-in-string "/\\|\\$" "." path))
    classes))
 
 (defun jdee-class-partial-match-member (str list)
@@ -188,33 +188,33 @@ will not be."
 
 (defun jdee-class-get-all-classes-used-by-source (package source-file)
   (let ((primitives '("boolean" "int" "void" "float" "double"))
-	(classes '()))
+        (classes '()))
     (with-all-corresponding-class-infos (info package source-file classes)
-					;;a. super class type
-					(add-to-list 'classes (jdee-bytecode-extract-superclass info))
-					;;b. super interfaces type
-					(append-to-list 'classes (jdee-bytecode-extract-interfaces info))
-					;;c. types of declared fields
-					;;d. local variable types
-					;; (all called types should wrk for this...)
-					(append-to-list 'classes (mapcar (lambda(item) (caadr item))
-									 (jdee-bytecode-extract-method-calls info)))
-					;;e. method return type
-					;;f. method parameter type
-					(dolist (sig (jdee-bytecode-extract-method-signatures info))
-					  (when (and (nth 1 sig) (not (member (nth 1 sig) primitives)))
-					    (add-to-list 'classes (nth 1 sig)))
-					  (append-to-list 'classes
-							  (mapcar (lambda (c) (when (and c (not (member c primitives)) c)))
-								  (nth 2 sig))))
-					;;g. method exception types
-					(dolist (exceptions (mapcar (lambda (method-exceptions) (nth 1 method-exceptions))
-								    (jdee-bytecode-extract-thrown-exception-types info)))
-					  (append-to-list 'classes exceptions))
-					;;h. type of exceptions in 'catch' statements.
-					(dolist (exceptions (mapcar (lambda (method-exceptions) (nth 1 method-exceptions))
-								    (jdee-bytecode-extract-caught-exception-types info)))
-					  (append-to-list 'classes exceptions)))))
+                                        ;;a. super class type
+                                        (add-to-list 'classes (jdee-bytecode-extract-superclass info))
+                                        ;;b. super interfaces type
+                                        (append-to-list 'classes (jdee-bytecode-extract-interfaces info))
+                                        ;;c. types of declared fields
+                                        ;;d. local variable types
+                                        ;; (all called types should wrk for this...)
+                                        (append-to-list 'classes (mapcar (lambda(item) (caadr item))
+                                                                         (jdee-bytecode-extract-method-calls info)))
+                                        ;;e. method return type
+                                        ;;f. method parameter type
+                                        (dolist (sig (jdee-bytecode-extract-method-signatures info))
+                                          (when (and (nth 1 sig) (not (member (nth 1 sig) primitives)))
+                                            (add-to-list 'classes (nth 1 sig)))
+                                          (append-to-list 'classes
+                                                          (mapcar (lambda (c) (when (and c (not (member c primitives)) c)))
+                                                                  (nth 2 sig))))
+                                        ;;g. method exception types
+                                        (dolist (exceptions (mapcar (lambda (method-exceptions) (nth 1 method-exceptions))
+                                                                    (jdee-bytecode-extract-thrown-exception-types info)))
+                                          (append-to-list 'classes exceptions))
+                                        ;;h. type of exceptions in 'catch' statements.
+                                        (dolist (exceptions (mapcar (lambda (method-exceptions) (nth 1 method-exceptions))
+                                                                    (jdee-bytecode-extract-caught-exception-types info)))
+                                          (append-to-list 'classes exceptions)))))
 
 (provide 'jdee-class)
 

@@ -64,12 +64,12 @@ unavailable.")
 invocation."
   (or jdee-juci-has-proxy
       (and (not jdee-juci-checked-proxy)
-	   (condition-case nil
-	       (progn
-		 (setq jdee-juci-checked-proxy t)
-		 (jdee-jeval "java.lang.reflect.Proxy.class;")
-		 (setq jdee-juci-has-proxy t))
-	     (error (setq jdee-juci-has-proxy nil))))
+           (condition-case nil
+               (progn
+                 (setq jdee-juci-checked-proxy t)
+                 (jdee-jeval "java.lang.reflect.Proxy.class;")
+                 (setq jdee-juci-has-proxy t))
+             (error (setq jdee-juci-has-proxy nil))))
       (error "JDK version 1.3 or higher required for JUCI (needs java.lang.reflect.Proxy)")))
 
 (defun jdee-juci-invoke-java (java-class method-name &rest method-args)
@@ -87,9 +87,9 @@ method called `getStockPrice' (and an implementation in `TickerImpl'):
       public TickerImpl() {}
 
       public double getStockPrice(String symbol) {
-	  double price;
-	  // implementation details ...
-	  return price;
+          double price;
+          // implementation details ...
+          return price;
       }
   }
 
@@ -111,31 +111,31 @@ script is done by the function `jdee-juci-bshify-object'."
   (jdee-juci-check-proxy)
   (let ((cnt 0) converted-args arg-ptr)
     (jdee-juci-eval (concat jdee-juci-java-connection-name
-			   " = jde.juci.ConnectionFactory.getConnection("
-			   (jdee-juci-connection-class java-class)
-			   ", this, \""
-			   jdee-juci-java-connection-name "\");"))
+                           " = jde.juci.ConnectionFactory.getConnection("
+                           (jdee-juci-connection-class java-class)
+                           ", this, \""
+                           jdee-juci-java-connection-name "\");"))
     (condition-case err
-	(progn
-	  (jdee-juci-eval (concat jdee-juci-java-connection-name ".begin();"))
-	  (jdee-juci-setup-logger)
-	  (setq arg-ptr method-args)
-	  (while arg-ptr
-	    (setq converted-args (nconc converted-args
-					(list (jdee-juci-setup-method-arg (car arg-ptr) cnt))))
-	    (setq arg-ptr (cdr arg-ptr))
-	    (setq cnt (1+ cnt)))
-	  (if (null java-class)
-	      (jdee-juci-eval-r (concat jdee-juci-java-connection-name ".evalBshScript(\"" method-name
-				     "(" (mapconcat 'identity converted-args ",") ");\");"))
-	    (jdee-juci-eval-r (concat jdee-juci-java-connection-name "." method-name
-				   "(" (mapconcat 'identity converted-args ",") ");")))
-	  (jdee-juci-eval-r (concat jdee-juci-java-connection-name ".end();")))
+        (progn
+          (jdee-juci-eval (concat jdee-juci-java-connection-name ".begin();"))
+          (jdee-juci-setup-logger)
+          (setq arg-ptr method-args)
+          (while arg-ptr
+            (setq converted-args (nconc converted-args
+                                        (list (jdee-juci-setup-method-arg (car arg-ptr) cnt))))
+            (setq arg-ptr (cdr arg-ptr))
+            (setq cnt (1+ cnt)))
+          (if (null java-class)
+              (jdee-juci-eval-r (concat jdee-juci-java-connection-name ".evalBshScript(\"" method-name
+                                     "(" (mapconcat 'identity converted-args ",") ");\");"))
+            (jdee-juci-eval-r (concat jdee-juci-java-connection-name "." method-name
+                                   "(" (mapconcat 'identity converted-args ",") ");")))
+          (jdee-juci-eval-r (concat jdee-juci-java-connection-name ".end();")))
       (error
        (progn
-	 (jdee-log-msg "juci-invoke-java: error signaled %S" err)
-	 (jdee-juci-eval (concat jdee-juci-java-connection-name ".reset();"))
-	 (signal (car err) (cdr err)))))))
+         (jdee-log-msg "juci-invoke-java: error signaled %S" err)
+         (jdee-juci-eval (concat jdee-juci-java-connection-name ".reset();"))
+         (signal (car err) (cdr err)))))))
 
 (defun jdee-juci-invoke-script (script-name &rest script-args)
   "Invoke a Beanshell command script via JUCI, returning the result to
@@ -154,15 +154,15 @@ beanshell.  JUCI only allows at most a inter-boundary call stack of
 depth 2, i.e., elisp calls java/java calls elisp."
   (let (result arg-name)
     (condition-case err
-	(progn
-	  (setq result (eval form))
-	  (setq arg-name (jdee-juci-setup-method-arg result 0)))
+        (progn
+          (setq result (eval form))
+          (setq arg-name (jdee-juci-setup-method-arg result 0)))
       (error
        (setq arg-name "error")
        (jdee-juci-eval (concat arg-name " = new jde.juci.ElispError("
-			      (jdee-juci-bshify-object err) ");"))))
+                              (jdee-juci-bshify-object err) ");"))))
     (jdee-juci-eval (concat jdee-juci-java-connection-name
-			   ".pushResult(" arg-name ");"))))
+                           ".pushResult(" arg-name ");"))))
 
 (defun jdee-juci-connection-class (java-class)
   "Prepare the connection class argument to the JUCI
@@ -172,10 +172,10 @@ ConnectionFactory.getConnection() call."
     (concat java-class ".class"))
    ((listp java-class)
     (concat "new Class[] {"
-	    (mapconcat #'(lambda (cls)
-			   (concat cls ".class"))
-		       java-class ",")
-	    "}"))
+            (mapconcat #'(lambda (cls)
+                           (concat cls ".class"))
+                       java-class ",")
+            "}"))
    (t
     (error "java-class must be a string or a list of strings"))))
 
@@ -183,7 +183,7 @@ ConnectionFactory.getConnection() call."
   "Setup and save a JUCI java method argument inside of a beanshell
 variable.  Returns the name of the beanshell variable assigned to."
   (let ((arg-name (concat jdee-juci-java-connection-name "Arg"
-			  (number-to-string arg-num))))
+                          (number-to-string arg-num))))
     (jdee-juci-eval (concat arg-name " = " (jdee-juci-bshify-object arg) ";"))
     arg-name))
 
@@ -192,16 +192,16 @@ variable.  Returns the name of the beanshell variable assigned to."
 `jdee-juci-logger-filename' is non-nil."
   (if jdee-juci-logger-filename
       (jdee-juci-eval (concat jdee-juci-java-connection-name
-			     ".setLoggerFilename(\"" jdee-juci-logger-filename "\");"))))
+                             ".setLoggerFilename(\"" jdee-juci-logger-filename "\");"))))
 
 (defun jdee-juci-eval (expr &optional eval-return)
   "Evaluate a JUCI expression in the JDEE's beanshell."
   (let (result)
     (prog1
-	(setq result (jdee-jeval expr eval-return))
+        (setq result (jdee-jeval expr eval-return))
       (if eval-return
-	  (jdee-log-msg "juci-eval: %s produced result: %S" expr result)
-	(jdee-log-msg "juci-eval: %s" expr)))))
+          (jdee-log-msg "juci-eval: %s produced result: %S" expr result)
+        (jdee-log-msg "juci-eval: %s" expr)))))
 
 (defun jdee-juci-eval-r (expr)
   "Evaluate a JUCI expression in the JDEE's beanshell."
@@ -234,39 +234,39 @@ script.  Conversion of lisp types is done as follows:
     (concat "\"" (jdee-juci-escape-string arg) "\""))
    ((symbolp arg)
     (concat "new jde.juci.Symbol(\"" (symbol-name arg) "\")"))
-   ((and (consp arg)			; dotted-pair cons cell
-	 (not (consp (cdr arg))))
+   ((and (consp arg)                        ; dotted-pair cons cell
+         (not (consp (cdr arg))))
     (concat "new jde.juci.Cons("
-	    (jdee-juci-bshify-object (car arg)) ","
-	    (jdee-juci-bshify-object (cdr arg))
-	    ")"))
+            (jdee-juci-bshify-object (car arg)) ","
+            (jdee-juci-bshify-object (cdr arg))
+            ")"))
    ((sequencep arg)
     (concat "Arrays.asList(new Object[] {" (mapconcat 'jdee-juci-bshify-object arg ",") "})"))))
 
 (defun jdee-juci-escape-string (string)
   "Escape a string for transport across the JUCI boundary."
   (mapconcat #'(lambda (c)
-		 (cond
-		  ;; TODO: more escapes here?
-		  ((eq c ?\\)
-		   "\\\\")
-		  ((eq c ?\")
-		   "\\\"")
-		  ((eq c ?\')
-		   "\\\'")
-		  ((eq c ?\n)
-		   "\\n")
-		  ((eq c ?\t)
-		   "\\t")
-		  ((eq c ?\b)
-		   "\\b")
-		  ((eq c ?\f)
-		   "\\f")
-		  ((eq c ?\r)
-		   "\\r")
-		  (t
-		   (char-to-string c))))
-	     (string-to-list string) ""))
+                 (cond
+                  ;; TODO: more escapes here?
+                  ((eq c ?\\)
+                   "\\\\")
+                  ((eq c ?\")
+                   "\\\"")
+                  ((eq c ?\')
+                   "\\\'")
+                  ((eq c ?\n)
+                   "\\n")
+                  ((eq c ?\t)
+                   "\\t")
+                  ((eq c ?\b)
+                   "\\b")
+                  ((eq c ?\f)
+                   "\\f")
+                  ((eq c ?\r)
+                   "\\r")
+                  (t
+                   (char-to-string c))))
+             (string-to-list string) ""))
 
 
 
@@ -302,9 +302,9 @@ that EXPECTED is `equal' to ACTUAL.  Signal an error if not."
 that a FORM, when executed, produces an error.  If no error is
 signaled, then signal an error."
   `(condition-case nil
-       (let ((message-log-max))	;; quiet (message)
-	 ,form
-	 (error "No error generated.  %S" (or ,msg "")))
+       (let ((message-log-max))        ;; quiet (message)
+         ,form
+         (error "No error generated.  %S" (or ,msg "")))
      (error (message nil) t)))
 
 (defun jdee-juci-test-roundtrips ()

@@ -37,18 +37,18 @@
   "If non-nil the function to use for interactively querying options.
 If nil then the default efc custom-based dialogs will be used."
   :type '(choice :tag "Options Query Function"
-		 (const :tag "Dialog" efc-query-options-function-dialog)
-		 (const :tag "Mini-Buffer" efc-query-options-function-minibuf)
-		 (function :tag "Specify Function"
-			   efc-query-options-function-dialog))
+                 (const :tag "Dialog" efc-query-options-function-dialog)
+                 (const :tag "Mini-Buffer" efc-query-options-function-minibuf)
+                 (function :tag "Specify Function"
+                           efc-query-options-function-dialog))
   :group 'jdee)
 
 (defun efc-query-options-function-dialog (options prompt title history default)
   (let ((dialog
-	 (efc-option-dialog
-	  (or title "option dialog")
-	  :text (or prompt "Select option:")
-	  :options options)))
+         (efc-option-dialog
+          (or title "option dialog")
+          :text (or prompt "Select option:")
+          :options options)))
     (efc-dialog-show dialog)
     (oref dialog selection)))
 
@@ -56,10 +56,10 @@ If nil then the default efc custom-based dialogs will be used."
   (let (sel)
     ;; efc doesn't add the end colon
     (setq prompt (format "%s%s"
-			 (or prompt "Select option")
-			 (if default
-			     (format " (default %s): " default)
-			   ": ")))
+                         (or prompt "Select option")
+                         (if default
+                             (format " (default %s): " default)
+                           ": ")))
     (setq sel (completing-read prompt options nil t nil history default))
     (if (= (length sel) 0) (error "Input required"))
     sel))
@@ -73,18 +73,18 @@ If nil then the default efc custom-based dialogs will be used."
 
 (defclass efc-dialog ()
   ((title     :initarg :title
-	      :type string
-	      :initform "Dialog"
-	      :documentation
-	      "Title of dialog")
+              :type string
+              :initform "Dialog"
+              :documentation
+              "Title of dialog")
    (buf       :initarg :buf
-	      :type buffer
-	      :documentation
-	      "Dialog buffer")
+              :type buffer
+              :documentation
+              "Dialog buffer")
    (initbuf   :initarg :initbuf
-	      :type buffer
-	      :documentation
-	      "Buffer from which dialog was called.")
+              :type buffer
+              :documentation
+              "Buffer from which dialog was called.")
    )
   "Super class of EFC dialogs."
   )
@@ -156,19 +156,19 @@ default method kills the dialog buffer."
 
 (defclass efc-option-dialog (efc-dialog)
   ((options        :initarg :options
-		   :documentation
-		   "Options from from which to choose.")
+                   :documentation
+                   "Options from from which to choose.")
    (radio-buttons  :initarg :radio-buttons
-		   :documentation
-		   "Buttons for selecting options.")
+                   :documentation
+                   "Buttons for selecting options.")
    (text           :initarg :text
-		   :type string
-		   :initform "Select option."
-		   :documentation
-		   "Text to be inserted at top of dialog.")
+                   :type string
+                   :initform "Select option."
+                   :documentation
+                   "Text to be inserted at top of dialog.")
    (selection      :initarg :selection
-		   :documentation
-		   "Option chosen by the user."))
+                   :documentation
+                   "Option chosen by the user."))
    "This dialog allows a user to choose one of a set of OPTIONS by clicking
 a radio button next to the option. The dialog sets SELECTION to the option
 chosen by the user when the user selects the OK button on the dialog. This
@@ -182,16 +182,16 @@ dialog uses recursive edit to emulate a modal dialog.")
   (widget-insert (oref this text))
   (widget-insert "\n\n")
   (oset this radio-buttons
-	(widget-create
-	 (list
-	  'radio-button-choice
-	  :value (car (oref this options))
-	  :dialog this
-	  :notify (lambda (button &rest ignore)
-		    (efc-dialog-ok (widget-get button :dialog)))
-	  :args (mapcar
-		 (lambda (x) (list 'item x))
-		 (oref this options)))))
+        (widget-create
+         (list
+          'radio-button-choice
+          :value (car (oref this options))
+          :dialog this
+          :notify (lambda (button &rest ignore)
+                    (efc-dialog-ok (widget-get button :dialog)))
+          :args (mapcar
+                 (lambda (x) (list 'item x))
+                 (oref this options)))))
   (widget-insert "\n"))
 
 (defmethod efc-dialog-show ((this efc-option-dialog))
@@ -209,8 +209,8 @@ an option or canceled the dialog. See `efc-dialog-ok' and
 dialog. Sets the :selection field of THIS to the option chosen by the
 user, kills the dialog buffer, and exits recursive-edit mode."
   (oset this
-	selection
-	(widget-value (oref this radio-buttons)))
+        selection
+        (widget-value (oref this radio-buttons)))
   (delete-window)
   (set-buffer (oref this initbuf))
   (pop-to-buffer (oref this initbuf))
@@ -238,10 +238,10 @@ and then exits recursive edit mode."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass efc-multi-option-dialog (efc-option-dialog)
   ((build-message :initarg :text
-		  :type string
-		  :initform "Building Dialog"
-		  :documentation
-		  "Warning message while building dialog, as this can be slow"))
+                  :type string
+                  :initform "Building Dialog"
+                  :documentation
+                  "Warning message while building dialog, as this can be slow"))
   "Provides a dialog with several sets of OPTIONS.
 The dialog sets SELECTION to the options selected by the user.")
 
@@ -255,31 +255,31 @@ The dialog sets SELECTION to the options selected by the user.")
   (widget-insert "\n\n")
   ;; use radio buttons slot as list of radio buttons rather than.
   (oset this radio-buttons
-	(mapcar
-	 (lambda(list)
-	   (prog1
-	       (widget-create
-		(list
-		 'radio-button-choice
-		 :value
-		 (efc-multi-option-dialog-default this list)
-		 :args (mapcar
-			(lambda (x)
-			  (list 'item x))
-			list)))
-	     (widget-insert "\n")))
-	 (efc-multi-option-dialog-sort this
-				       (oref this options))))
+        (mapcar
+         (lambda(list)
+           (prog1
+               (widget-create
+                (list
+                 'radio-button-choice
+                 :value
+                 (efc-multi-option-dialog-default this list)
+                 :args (mapcar
+                        (lambda (x)
+                          (list 'item x))
+                        list)))
+             (widget-insert "\n")))
+         (efc-multi-option-dialog-sort this
+                                       (oref this options))))
   (widget-insert "\n")
   (message "%s...done" (oref this text)))
 
 (defmethod efc-dialog-ok((this efc-multi-option-dialog))
   ;; set the selection up as a list rather a simple result
   (oset this selection
-	(mapcar
-	 (lambda(widget)
-	   (widget-value widget))
-	 (oref this radio-buttons)))
+        (mapcar
+         (lambda(widget)
+           (widget-value widget))
+         (oref this radio-buttons)))
   (delete-window)
   (set-buffer (oref this initbuf))
   (pop-to-buffer (oref this initbuf))
@@ -296,9 +296,9 @@ The dialog sets SELECTION to the options selected by the user.")
   "Sort the options."
   ;; sort the ones with the most options first...
   (sort list
-	(lambda(a b)
-	  (> (length a)
-	     (length b)))))
+        (lambda(a b)
+          (> (length a)
+             (length b)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -309,22 +309,22 @@ The dialog sets SELECTION to the options selected by the user.")
 
 (defclass efc-compiler ()
   ((name             :initarg :name
-		     :type string
-		     :documentation "Compiler name.")
+                     :type string
+                     :documentation "Compiler name.")
    (buffer           :initarg :buffer
-		     :type buffer
-		     :documentation
-		     "Compilation buffer")
+                     :type buffer
+                     :documentation
+                     "Compilation buffer")
    (window           :initarg :window
-		     :type window
-		     :documentation
-		     "Window that displays the compilation buffer.")
+                     :type window
+                     :documentation
+                     "Window that displays the compilation buffer.")
    (exec-path        :initarg :exec-path
-		     :type string
-		     :documentation "Path of compiler executable.")
+                     :type string
+                     :documentation "Path of compiler executable.")
    (comp-finish-fcn  :initarg :comp-finish-fcn
-		     :type function
-		     :documentation "\
+                     :type function
+                     :documentation "\
 A list of function to invoke at end of compilation.  Each
 function is called with two arguments: the compilation buffer,
 and a string describing how the process finished."))
@@ -334,15 +334,15 @@ and a string describing how the process finished."))
   "Create a buffer to display the output of a compiler process."
   (save-excursion
     (let ((buf (get-buffer-create (format "*%s*" (oref this name))))
-	  (error-regexp-alist compilation-error-regexp-alist)
-	  (enter-regexp-alist (if (boundp 'compilation-enter-directory-regexp-alist)
-				  compilation-enter-directory-regexp-alist))
-	  (leave-regexp-alist (if (boundp 'compilation-leave-directory-regexp-alist)
-				  compilation-leave-directory-regexp-alist))
-	  (file-regexp-alist (if (boundp 'compilation-file-regexp-alist)
-				 compilation-file-regexp-alist))
-	  (error-message "No further errors")
-	  (thisdir default-directory))
+          (error-regexp-alist compilation-error-regexp-alist)
+          (enter-regexp-alist (if (boundp 'compilation-enter-directory-regexp-alist)
+                                  compilation-enter-directory-regexp-alist))
+          (leave-regexp-alist (if (boundp 'compilation-leave-directory-regexp-alist)
+                                  compilation-leave-directory-regexp-alist))
+          (file-regexp-alist (if (boundp 'compilation-file-regexp-alist)
+                                 compilation-file-regexp-alist))
+          (error-message "No further errors")
+          (thisdir default-directory))
 
       (oset this :buffer buf)
 
@@ -351,17 +351,17 @@ and a string describing how the process finished."))
       ;; Make sure a compiler process is not
       ;; already running.
       (let ((compiler-proc (get-buffer-process (current-buffer))))
-	(if compiler-proc
-	    (if (or (not (eq (process-status compiler-proc) 'run))
-		    (yes-or-no-p
+        (if compiler-proc
+            (if (or (not (eq (process-status compiler-proc) 'run))
+                    (yes-or-no-p
                      (format "A %s process is running; kill it?" (oref this name))))
-		(condition-case ()
-		    (progn
-		      (interrupt-process compiler-proc)
-		      (sit-for 1)
-		      (delete-process compiler-proc))
-		  (error nil))
-	      (error "Cannot have two processes in `%s' at once"
+                (condition-case ()
+                    (progn
+                      (interrupt-process compiler-proc)
+                      (sit-for 1)
+                      (delete-process compiler-proc))
+                  (error nil))
+              (error "Cannot have two processes in `%s' at once"
                      (buffer-name)))))
 
       ;; In case the compiler buffer is current, make sure we get the global
@@ -377,9 +377,9 @@ and a string describing how the process finished."))
       (setq buffer-read-only nil)
 
       (if (boundp 'compilation-error-message)
-	  (set (make-local-variable 'compilation-error-message) error-message))
+          (set (make-local-variable 'compilation-error-message) error-message))
       (set (make-local-variable 'compilation-error-regexp-alist)
-	   error-regexp-alist)
+           error-regexp-alist)
 
       (dolist (elt `((compilation-enter-directory-regexp-alist
                       ,enter-regexp-alist)
@@ -391,12 +391,12 @@ and a string describing how the process finished."))
             (set (make-local-variable (car elt)) (cl-second elt))))
 
       (if (slot-boundp this 'comp-finish-fcn)
-	  (set (make-local-variable 'compilation-finish-functions)
-	       (oref this comp-finish-fcn)))
+          (set (make-local-variable 'compilation-finish-functions)
+               (oref this comp-finish-fcn)))
 
       (if (boundp 'compilation-directory-stack)
-	  (setq default-directory thisdir
-		compilation-directory-stack (list default-directory))))))
+          (setq default-directory thisdir
+                compilation-directory-stack (list default-directory))))))
 
 (defmethod get-args ((this efc-compiler))
   "Get a list of command-line arguments to pass to the
@@ -417,32 +417,32 @@ compiler process.")
       (funcall compilation-process-setup-function))
 
   (let* ((outbuf (oref this :buffer))
-	 (executable-path (oref this exec-path))
-	 (args (get-args this)))
+         (executable-path (oref this exec-path))
+         (args (get-args this)))
 
     (with-current-buffer outbuf
 
       (insert (format "cd %s\n" default-directory))
 
       (insert (concat
-	       executable-path
-	       " "
-	       (mapconcat 'identity args " ")
-	       "\n\n"))
+               executable-path
+               " "
+               (mapconcat 'identity args " ")
+               "\n\n"))
 
       (let* ((process-environment (cons "EMACS=t" process-environment))
-	     (w32-quote-process-args ?\")
-	     (win32-quote-process-args ?\") ;; XEmacs
-	     (proc (apply 'start-process
-			  (downcase mode-name)
-			  outbuf
-			  executable-path
-			  args)))
-	(set-process-sentinel proc 'compilation-sentinel)
-	(set-process-filter proc 'compilation-filter)
-	(set-marker (process-mark proc) (point) outbuf)
-	(setq compilation-in-progress
-	      (cons proc compilation-in-progress)))
+             (w32-quote-process-args ?\")
+             (win32-quote-process-args ?\") ;; XEmacs
+             (proc (apply 'start-process
+                          (downcase mode-name)
+                          outbuf
+                          executable-path
+                          args)))
+        (set-process-sentinel proc 'compilation-sentinel)
+        (set-process-filter proc 'compilation-filter)
+        (set-marker (process-mark proc) (point) outbuf)
+        (setq compilation-in-progress
+              (cons proc compilation-in-progress)))
 
       (set-buffer-modified-p nil)
       (setq compilation-last-buffer (oref this :buffer)))))
@@ -456,9 +456,9 @@ compiler process.")
 
 (defclass efc-collection ()
   ((elem-type :initarg :elem-type
-	      :type (or null symbol)
-	      :initform nil
-	      :documentation "Type of element that this collection contains."))
+              :type (or null symbol)
+              :initform nil
+              :documentation "Type of element that this collection contains."))
   "A collection of objects. The collection can be either homogeneous, i.e.,
 composed of elements of one type, or heterogeneous. The ELEM-TYPE property of
 a heterogeneous collection is nil.")
@@ -469,7 +469,7 @@ type-compatible with a collection if the collection is heterogeneous or
 the item's type is the same as the collection's element type."
   (let ((element-type (oref this elem-type)))
     (or (eq element-type nil)
-	(cl-typep item element-type))))
+        (cl-typep item element-type))))
 
 (defmethod efc-coll-iterator ((this efc-collection))
   "Returns an iterator for this collection."
@@ -527,9 +527,9 @@ is an object of efc-visitor class."
 
 (defclass efc-list (efc-collection)
   ((items  :initarg :items
-	   :type list
-	   :initform nil
-	   :documentation "List of items."))
+           :type list
+           :initform nil
+           :documentation "List of items."))
   "List of items.")
 
 (defmethod initialize-instance ((this efc-list) &rest fields)
@@ -541,7 +541,7 @@ is an object of efc-visitor class."
   (if (efc-coll-type-compatible-p this item)
       (oset this items (append (oref this items) (list item)))
     (error "Tried to add an item of type %s to a list of items of type %s"
-	   (type-of item) (oref this elem-type))))
+           (type-of item) (oref this elem-type))))
 
 (defmethod efc-coll-iterator ((this efc-list))
   "Return an iterator for this list."
@@ -563,10 +563,10 @@ is an object of efc-visitor class."
 
 (defclass efc-list-iterator (efc-iterator)
   ((list-obj :initarg :list-obj
-	     :type efc-list
-	     :documentation "List that this iterator iterates.")
+             :type efc-list
+             :documentation "List that this iterator iterates.")
    (list     :type list
-	     :documentation "Lisp list."))
+             :documentation "Lisp list."))
   "Iterates over a list.")
 
 (defmethod initialize-instance ((this efc-list-iterator) &rest fields)
@@ -583,7 +583,7 @@ is an object of efc-visitor class."
 (defmethod efc-iter-next ((this efc-list-iterator))
   "Get next item in the list."
   (let* ((list (oref this list))
-	 (next (car list)))
+         (next (car list)))
     (oset this list (cdr list))
     next))
 
@@ -649,7 +649,7 @@ already contain the item."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass efc-hash-table (efc-collection)
   ((table :type hash-table
-	  :documentation "Lisp table object."))
+          :documentation "Lisp table object."))
   "Hash table.")
 
 
@@ -663,7 +663,7 @@ already contain the item."
   (if (efc-coll-type-compatible-p this value)
       (puthash key value (oref this table))
     (error "Tried to add an item of type %s to a hash table of items of type %s"
-	   (type-of value) (oref this elem-type))))
+           (type-of value) (oref this elem-type))))
 
 (defmethod efc-coll-get ((this efc-hash-table) key)
   "Get an item from the table."
@@ -682,11 +682,11 @@ of efc-visitor class."
   (efc-list-iterator
    "hash table iterator"
    :list-obj (let (values)
-	       (maphash
-		(lambda (key value)
-		  (setq values (append values (list value))))
-		(oref this table))
-	       values)))
+               (maphash
+                (lambda (key value)
+                  (setq values (append values (list value))))
+                (oref this table))
+               values)))
 
 (provide 'efc)
 

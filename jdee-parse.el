@@ -88,7 +88,7 @@ size."
   "The end of the region where the last completion was inserted.")
 
 (defvar jdee-parse-primitive-types '("byte" "char" "double" "float"
-				    "int" "long" "short" "boolean")
+                                    "int" "long" "short" "boolean")
   "Primitive Java types.")
 
 (defvar jdee-parse-attempted-to-import nil
@@ -100,14 +100,14 @@ the type of a class could not be found an it tried to import it")
   (rx
    (1+              ;; A Java symbol comprises one or more of the following:
     (char (?A . ?Z)   ;;   - upper case characters
-	  (?a . ?z)   ;;   - lower case characters
-	  (?0 . ?9)   ;;   - digits
-	  "[]"        ;;   - square brackets
-	  "?"         ;;   - question mark
-	  "_"         ;;   - underscore
-	  "."         ;;   - period
-	  (160 . 255) ;;   - accented characters
-	  )))
+          (?a . ?z)   ;;   - lower case characters
+          (?0 . ?9)   ;;   - digits
+          "[]"        ;;   - square brackets
+          "?"         ;;   - question mark
+          "_"         ;;   - underscore
+          "."         ;;   - period
+          (160 . 255) ;;   - accented characters
+          )))
   "Regular expression that matches any Java symbol.")
 
 (defun jdee-parse-java-name-parts-re (&optional sep)
@@ -151,8 +151,8 @@ match `jdee-auto-parse-max-buffer-size' threshold."
   "Return non-nil if the JDE should automatically reparse the buffer."
   (and jdee-auto-parse-enable
        (or
-	(<= jdee-auto-parse-max-buffer-size 0)
-	(< (buffer-size) jdee-auto-parse-max-buffer-size))))
+        (<= jdee-auto-parse-max-buffer-size 0)
+        (< (buffer-size) jdee-auto-parse-max-buffer-size))))
 
 (eval-when-compile
   (defsubst jdee-auto-parse-delay ()
@@ -172,43 +172,43 @@ replaced by that range.  See also `semantic-change-hooks'."
     (setq jdee-parse-buffer-needs-reparse-p t)
     (when (jdee-parse-should-auto-parse-buffer-p)
       (if (timerp jdee-auto-parse-buffer-timer)
-	  (let ((rem (jdee-auto-parse-delay)))
-	    (cond
-	     ((< rem 0)
-	      ;; Timer has expired, re-schedule a new auto-parse.
-	      (cancel-timer jdee-auto-parse-buffer-timer)
-	      (setq jdee-auto-parse-buffer-timer nil))
-	     ((< rem 2) ;; less that 2 secs. before auto-parse
-	      ;; The auto-parse task is about to be triggered when
-	      ;; this change occurs, so it is delayed to let finish
-	      ;; typing before re-parsing.
-	      (timer-inc-time jdee-auto-parse-buffer-timer
-			      10) ;; wait 10 secs. more.
-	      (message "Auto parse delayed...")))))
+          (let ((rem (jdee-auto-parse-delay)))
+            (cond
+             ((< rem 0)
+              ;; Timer has expired, re-schedule a new auto-parse.
+              (cancel-timer jdee-auto-parse-buffer-timer)
+              (setq jdee-auto-parse-buffer-timer nil))
+             ((< rem 2) ;; less that 2 secs. before auto-parse
+              ;; The auto-parse task is about to be triggered when
+              ;; this change occurs, so it is delayed to let finish
+              ;; typing before re-parsing.
+              (timer-inc-time jdee-auto-parse-buffer-timer
+                              10) ;; wait 10 secs. more.
+              (message "Auto parse delayed...")))))
       ;; Schedule a new auto-parse task.
       (or (timerp jdee-auto-parse-buffer-timer)
-	  (setq jdee-auto-parse-buffer-timer
-		(run-with-timer
-		 jdee-auto-parse-buffer-interval
-		 nil
-		 #'jdee-parse-after-buffer-changed))))))
+          (setq jdee-auto-parse-buffer-timer
+                (run-with-timer
+                 jdee-auto-parse-buffer-interval
+                 nil
+                 #'jdee-parse-after-buffer-changed))))))
 
 (defun jdee-parse-buffer-contains-multiple-classes-p ()
   "Return non-nil if buffer contains multiple class definitions."
   (let* ((top-level-classes
-	  (semantic-brute-find-tag-by-class
-	   'type
-	   (semantic-fetch-tags)))
-	 (top-level-class-count (length top-level-classes)))
+          (semantic-brute-find-tag-by-class
+           'type
+           (semantic-fetch-tags)))
+         (top-level-class-count (length top-level-classes)))
     (or
      (>  top-level-class-count 1)
      (and
       (= top-level-class-count 1)
       (let* ((inner-class-parts (semantic-tag-type-members (car top-level-classes)))
-	     (inner-classes
-	      (semantic-brute-find-tag-by-class
-	       'type inner-class-parts)))
-	(>= (length inner-classes) 1))))))
+             (inner-classes
+              (semantic-brute-find-tag-by-class
+               'type inner-class-parts)))
+        (>= (length inner-classes) 1))))))
 
 
 (defvar jdee-parse-buffer-contains-multiple-classes-p nil
@@ -223,15 +223,15 @@ when the cache is cleared.
 See also `semantic-after-toplevel-cache-change-hook'."
   (if (jdee-parse-should-auto-parse-buffer-p)
       (setq jdee-parse-buffer-needs-reparse-p nil
-	    jdee-auto-parse-buffer-timer
-	    (and (timerp jdee-auto-parse-buffer-timer)
-		 (cancel-timer jdee-auto-parse-buffer-timer)
-		 nil)))
+            jdee-auto-parse-buffer-timer
+            (and (timerp jdee-auto-parse-buffer-timer)
+                 (cancel-timer jdee-auto-parse-buffer-timer)
+                 nil)))
   (if (car tokens)
       (setq jdee-parse-buffer-contains-multiple-classes-p
-	    (jdee-parse-buffer-contains-multiple-classes-p)
-	    jdee-parse-the-method-map
-	    (jdee-parse-method-map "Method map"))))
+            (jdee-parse-buffer-contains-multiple-classes-p)
+            jdee-parse-the-method-map
+            (jdee-parse-method-map "Method map"))))
 
 (defun jdee-parse-update-after-partial-parse (tokens)
   "Hook run after Semantic updated the token cache.
@@ -256,47 +256,47 @@ moved also."
   (if (eq class-regexp 'first)
       (setq class-regexp ".*")
     (if (or (null class-regexp) (= 0 (length class-regexp)))
-	(let* ((class-name (car (jdee-parse-get-innermost-class-at-point))))
-	  (if (null class-name) (error "point is not in a class definition"))
-	  (setq class-regexp (regexp-quote class-name)))))
+        (let* ((class-name (car (jdee-parse-get-innermost-class-at-point))))
+          (if (null class-name) (error "point is not in a class definition"))
+          (setq class-regexp (regexp-quote class-name)))))
 
   (let* ((tokens (semantic-fetch-tags))
-	 (classes (semantic-brute-find-tag-by-class 'type tokens))
-	 class-parts pos)
+         (classes (semantic-brute-find-tag-by-class 'type tokens))
+         class-parts pos)
 
     (setq pos
-	  (save-excursion
-	    (save-match-data)
-	    (block outter
-	      (dolist (class classes)
-		;; Commented out this form because the variable is never
-		;; used, causes a compile error, and I don't know it's purpose.
-		;; (setq token-class-regexp (semantic-tag-name class))
-		(when (or (null class-regexp)
-			  (string-match class-regexp
-					(semantic-tag-name class)))
-		  (let ((class-parts (semantic-tag-type-members class)))
+          (save-excursion
+            (save-match-data)
+            (block outter
+              (dolist (class classes)
+                ;; Commented out this form because the variable is never
+                ;; used, causes a compile error, and I don't know it's purpose.
+                ;; (setq token-class-regexp (semantic-tag-name class))
+                (when (or (null class-regexp)
+                          (string-match class-regexp
+                                        (semantic-tag-name class)))
+                  (let ((class-parts (semantic-tag-type-members class)))
 
-		    (setq pos (semantic-tag-start class))
+                    (setq pos (semantic-tag-start class))
 
-		    (if (not (numberp pos))
-			(error (concat "invalid token start, probably because "
-				       "not semantic bovinated top level")))
+                    (if (not (numberp pos))
+                        (error (concat "invalid token start, probably because "
+                                       "not semantic bovinated top level")))
 
-		    (goto-char pos)
+                    (goto-char pos)
 
-		    (if (not (search-forward "{" nil t))
-			(error "invalid class, can't find next `{'"))
+                    (if (not (search-forward "{" nil t))
+                        (error "invalid class, can't find next `{'"))
 
-		    (return-from outter (point))))))))
+                    (return-from outter (point))))))))
     (if (and (not no-move-point) pos) (goto-char pos))
     pos))
 
 
 (defun jdee-parse-get-nth-member (&optional class-name modifiers
-					   member-name-regexp
-					   elt goto-start-p
-					   compare-method)
+                                           member-name-regexp
+                                           elt goto-start-p
+                                           compare-method)
   "Return the point at the Nth class member (field) with given criteria.  The
 first match that is a subset of the modifiers give is choosen.
 
@@ -314,68 +314,68 @@ MODIFIERS creteria as an exact match or subset.  This defaults to `subset'."
   (if (null member-name-regexp) (setq member-name-regexp ".*"))
 
   (let* ((tokens (semantic-fetch-tags))
-	 (classes (semantic-brute-find-tag-by-class 'type tokens))
-	 cmp-fn vars var-parts var-name var-modifiers i)
+         (classes (semantic-brute-find-tag-by-class 'type tokens))
+         cmp-fn vars var-parts var-name var-modifiers i)
 
     (setq cmp-fn
-	  (cond ((or (null compare-method)
-		     (eq 'subset compare-method))
-		 #'(lambda (modifiers var-modifiers)
-		     (cl-subsetp modifiers var-modifiers :test 'equal)
-		     ))
-		((eq 'equal compare-method)
-		 #'(lambda (modifiers var-modifiers)
-		       (let ((m (copy-tree modifiers))
-			     (v (copy-tree var-modifiers)))
-			 (setq m (sort m 'string<)
-			       v (sort v 'string<))
-			 (equal m v)
-			 )))
-		(t (error "compare-method `%S' not supported"
-			  compare-method))))
+          (cond ((or (null compare-method)
+                     (eq 'subset compare-method))
+                 #'(lambda (modifiers var-modifiers)
+                     (cl-subsetp modifiers var-modifiers :test 'equal)
+                     ))
+                ((eq 'equal compare-method)
+                 #'(lambda (modifiers var-modifiers)
+                       (let ((m (copy-tree modifiers))
+                             (v (copy-tree var-modifiers)))
+                         (setq m (sort m 'string<)
+                               v (sort v 'string<))
+                         (equal m v)
+                         )))
+                (t (error "compare-method `%S' not supported"
+                          compare-method))))
 
     (save-excursion
       (save-match-data
-	(block outter
-	  (dolist (class classes)
-	    ;; commented out this line because the variable is never bound
-	    ;; nor used and I don't understand it's purpose. Paul Kinnucan.
-	    ;; (setq token-class-name (semantic-tag-name class))
-	    (when (or (null class-name)
-		      (string-equal class-name (semantic-tag-name class)))
+        (block outter
+          (dolist (class classes)
+            ;; commented out this line because the variable is never bound
+            ;; nor used and I don't understand it's purpose. Paul Kinnucan.
+            ;; (setq token-class-name (semantic-tag-name class))
+            (when (or (null class-name)
+                      (string-equal class-name (semantic-tag-name class)))
 
-	      (setq var-parts (semantic-tag-type-members class)
-		    vars (semantic-brute-find-tag-by-class
-			  'variable var-parts)
-		    i 0)
+              (setq var-parts (semantic-tag-type-members class)
+                    vars (semantic-brute-find-tag-by-class
+                          'variable var-parts)
+                    i 0)
 
-	      (setq vars
-		    (mapcar
-		     #'(lambda (variable)
-			 (setq var-modifiers
-			       (if modifiers
-				   (semantic-tag-modifiers variable)))
-			 (if (or (and (null var-modifiers) (null modifiers))
-				 (funcall cmp-fn modifiers var-modifiers))
-			     variable)) vars))
+              (setq vars
+                    (mapcar
+                     #'(lambda (variable)
+                         (setq var-modifiers
+                               (if modifiers
+                                   (semantic-tag-modifiers variable)))
+                         (if (or (and (null var-modifiers) (null modifiers))
+                                 (funcall cmp-fn modifiers var-modifiers))
+                             variable)) vars))
 
-	      (setq vars (remove nil vars))
+              (setq vars (remove nil vars))
 
-	      (setq elt (cond ((not elt) 0)
-			      ((< elt 0) (+ (length vars) elt))
-			      (t elt)))
+              (setq elt (cond ((not elt) 0)
+                              ((< elt 0) (+ (length vars) elt))
+                              (t elt)))
 
-	      (dolist (variable vars)
+              (dolist (variable vars)
 
-		(setq var-name (semantic-tag-name variable))
+                (setq var-name (semantic-tag-name variable))
 
-		(when (and (= elt i)
-			   (string-match member-name-regexp var-name))
-		  (goto-char (if goto-start-p (semantic-tag-start variable)
-			       (semantic-tag-end variable)))
-		  (return-from outter (point)) )
+                (when (and (= elt i)
+                           (string-match member-name-regexp var-name))
+                  (goto-char (if goto-start-p (semantic-tag-start variable)
+                               (semantic-tag-end variable)))
+                  (return-from outter (point)) )
 
-		(setq i (1+ i))))))))))
+                (setq i (1+ i))))))))))
 
 
 
@@ -385,12 +385,12 @@ The optional parameter `tag' can be a semantic tag, which is
 then used as the current class instead of the result of `semantic-current-tag'."
   (let ((curtag (or tag (semantic-current-tag))))
     (remove nil
-	    (mapcar
-	     (lambda (member)
-	       (if (semantic-tag-of-class-p member 'variable)
-		   member
-		 nil))
-	     (semantic-tag-type-members curtag)))))
+            (mapcar
+             (lambda (member)
+               (if (semantic-tag-of-class-p member 'variable)
+                   member
+                 nil))
+             (semantic-tag-type-members curtag)))))
 
 (defun jdee-parse-get-member-functions (&optional tag)
   "Get all member functions of the current class as a semantic tag list.
@@ -398,9 +398,9 @@ The optional parameter `tag' can be a semantic tag, which is
 then used as the current class instead of the result of `semantic-current-tag'."
   (let ((curtag (or tag (semantic-current-tag))))
     (remove nil
-	    (mapcar
-	     (lambda (member) (if (semantic-tag-of-class-p member 'function) member nil))
-	     (semantic-tag-type-members curtag)))))
+            (mapcar
+             (lambda (member) (if (semantic-tag-of-class-p member 'function) member nil))
+             (semantic-tag-type-members curtag)))))
 
 (defun jdee-parse-get-serializable-members (&optional tag)
   "Get all serializable member variables of the current class as a semantic tag list.
@@ -408,35 +408,35 @@ The optional parameter `tag' can be a semantic tag, which is
 then used as the current class instead of the result of `semantic-current-tag'."
   (let ((curtag (or tag (semantic-current-tag))))
     (remove nil
-	    (mapcar
-	     (lambda (member)
-	       (let ((is-variable (semantic-tag-of-class-p member 'variable))
-		     (modifiers (semantic-tag-modifiers member)))
-		 (if (and is-variable (not (or (member "static" modifiers)
-					       (member "transient" modifiers))))
-		     member
-		      nil)))
-	     (semantic-tag-type-members curtag)))))
+            (mapcar
+             (lambda (member)
+               (let ((is-variable (semantic-tag-of-class-p member 'variable))
+                     (modifiers (semantic-tag-modifiers member)))
+                 (if (and is-variable (not (or (member "static" modifiers)
+                                               (member "transient" modifiers))))
+                     member
+                      nil)))
+             (semantic-tag-type-members curtag)))))
 
 (defun jdee-parse-member-is-scalar (tag)
   "Check if tag is of a scalar type"
   (not (or (string-match "\\[.*\\]" (semantic-tag-name tag))
-	   (string-match "\\[.*\\]" (semantic-tag-type tag)))))
+           (string-match "\\[.*\\]" (semantic-tag-type tag)))))
 
 (defun jdee-parse-member-is-primitive (tag)
   "Check if tag is of primitive type"
   (and (or (semantic-tag-of-type-p tag "byte")
-	   (semantic-tag-of-type-p tag "char")
-	   (semantic-tag-of-type-p tag "short")
-	   (semantic-tag-of-type-p tag "boolean")
-	   (semantic-tag-of-type-p tag "int")
-	   (semantic-tag-of-type-p tag "long"))
+           (semantic-tag-of-type-p tag "char")
+           (semantic-tag-of-type-p tag "short")
+           (semantic-tag-of-type-p tag "boolean")
+           (semantic-tag-of-type-p tag "int")
+           (semantic-tag-of-type-p tag "long"))
        (jdee-parse-member-is-scalar tag)))
 
 (defun jdee-parse-member-is-float (tag)
   "Check if tag is of a floating point type"
   (and (or (semantic-tag-of-type-p tag "float")
-	   (semantic-tag-of-type-p tag "double")))
+           (semantic-tag-of-type-p tag "double")))
   (jdee-parse-member-is-scalar tag))
 
 (defun jdee-parse-compare-member-types (a b)
@@ -444,21 +444,21 @@ then used as the current class instead of the result of `semantic-current-tag'."
 lower, so that they are returned at the head of the list. This ensures they will be
 processed first and the more costly complex types later."
   (or (and (jdee-parse-member-is-primitive a)
-	   (not (jdee-parse-member-is-primitive b)))
+           (not (jdee-parse-member-is-primitive b)))
       (and (jdee-parse-member-is-float a)
-	   (not (or (jdee-parse-member-is-primitive b)
-		    (jdee-parse-member-is-float b))))
+           (not (or (jdee-parse-member-is-primitive b)
+                    (jdee-parse-member-is-float b))))
       (and (jdee-parse-member-is-scalar a)
-	   (not (or (jdee-parse-member-is-primitive b)
-		    (jdee-parse-member-is-float b)
-		    (jdee-parse-member-is-scalar b))))))
+           (not (or (jdee-parse-member-is-primitive b)
+                    (jdee-parse-member-is-float b)
+                    (jdee-parse-member-is-scalar b))))))
 
 (defun jdee-parse-get-package-name ()
   "Gets the name of the package in which the Java source file in the
 current buffer resides."
   (let ((packages (semantic-brute-find-tag-by-class 'package (current-buffer))))
     (if (and (listp packages) (eq (length packages) 1))
-	(semantic-tag-name (car packages)))))
+        (semantic-tag-name (car packages)))))
 
 (defun jdee-parse-get-package-from-name (class-name)
   "Gets the package portion of a qualified class name."
@@ -466,7 +466,7 @@ current buffer resides."
    class-name 0
    (let ((pos  (cl-position ?. class-name :from-end t)))
      (if pos
-	 pos
+         pos
        0))))
 
 ;;FIXME: remove in favor of jdee-parse-get-package-name
@@ -475,8 +475,8 @@ current buffer resides."
   (save-excursion
     (goto-char (point-min))
     (if (re-search-forward "^[ \t]*\\<\\(package\\) +\\([^ \t\n]*\\) *;" (point-max) t)
-	(concat (buffer-substring-no-properties (match-beginning 2) (match-end 2))
-		"."))))
+        (concat (buffer-substring-no-properties (match-beginning 2) (match-end 2))
+                "."))))
 
 (defun jdee-parse-get-unqualified-name (name)
   "Gets the last name in a qualified name."
@@ -486,18 +486,18 @@ current buffer resides."
 (defun jdee-parse-get-super-class-at-point ()
   (condition-case err
       (let ((superClass "Object")
-	    (class-re "extends[ \t]+\\([a-zA-z]+[a-zA-Z0-9._]*\\).*[ \n]*"))
-	(save-excursion
-	  (let ((open-brace-pos
-		 (scan-lists (point) -1 1)))
-	    (when open-brace-pos
-	      (goto-char open-brace-pos)
-	      (when (re-search-backward class-re (point-min) t)
-		(looking-at class-re)
-		(setq superClass (buffer-substring-no-properties
-				  (match-beginning 1)
-				  (match-end 1)))))))
-	superClass)
+            (class-re "extends[ \t]+\\([a-zA-z]+[a-zA-Z0-9._]*\\).*[ \n]*"))
+        (save-excursion
+          (let ((open-brace-pos
+                 (scan-lists (point) -1 1)))
+            (when open-brace-pos
+              (goto-char open-brace-pos)
+              (when (re-search-backward class-re (point-min) t)
+                (looking-at class-re)
+                (setq superClass (buffer-substring-no-properties
+                                  (match-beginning 1)
+                                  (match-end 1)))))))
+        superClass)
     (error)))
 
 (defconst jdee-parse-class-mod-re
@@ -519,37 +519,37 @@ Returns a list constisting of the result of
 all modifieres of the class.
 Returns nil, if no class could be found."
   (let ((class (jdee-parse-get-innermost-class-at-point))
-	(mod-or-ws-re (concat "\\(" jdee-parse-class-mod-re
-			      "\\|" jdee-parse-java-comment-or-ws-re
-			      "\\)\\="))
-	(case-fold-search)
-	(modifiers))
+        (mod-or-ws-re (concat "\\(" jdee-parse-class-mod-re
+                              "\\|" jdee-parse-java-comment-or-ws-re
+                              "\\)\\="))
+        (case-fold-search)
+        (modifiers))
     (if class
-	(save-excursion
-	  (goto-char (cdr class))
-	  (while (re-search-backward mod-or-ws-re (point-min) t)
-	    (progn
-	      (if (looking-at jdee-parse-class-mod-re)
-		  (setq modifiers
-			(cons (match-string-no-properties 0) modifiers)))))
-	  (setq modifiers (cons class modifiers))))
+        (save-excursion
+          (goto-char (cdr class))
+          (while (re-search-backward mod-or-ws-re (point-min) t)
+            (progn
+              (if (looking-at jdee-parse-class-mod-re)
+                  (setq modifiers
+                        (cons (match-string-no-properties 0) modifiers)))))
+          (setq modifiers (cons class modifiers))))
     modifiers))
 
 (defconst jdee-parse-class-decl-re
   (concat "^"
-	  ;; comments, string literals, keywords, identifier,
-	  ;; assignment operator or open parenthese:
-	  "\\(?:" jdee-parse-java-comment-or-ws-re "\\|[a-zA-Z0-9_.=(]\\)*"
-	  ;; keyword before classname:
-	  "\\<\\(class\\|enum\\|interface\\|new\\)"
-	  "\\(?:" jdee-parse-java-comment-or-ws-re "\\)+"
-	  ;; package part of superclass of anonymous class:
-	  "\\(?:[a-zA-Z0-9_]+\\.\\)*"
-	  ;; classname:
-	  "\\([a-zA-Z0-9_]+\\)"
-	  ;; everything between classname and curly brace:
-	  "\\(?:" jdee-parse-java-comment-or-ws-re "\\|[a-zA-Z0-9_.,()<>]\\)*"
-	  "\\=")
+          ;; comments, string literals, keywords, identifier,
+          ;; assignment operator or open parenthese:
+          "\\(?:" jdee-parse-java-comment-or-ws-re "\\|[a-zA-Z0-9_.=(]\\)*"
+          ;; keyword before classname:
+          "\\<\\(class\\|enum\\|interface\\|new\\)"
+          "\\(?:" jdee-parse-java-comment-or-ws-re "\\)+"
+          ;; package part of superclass of anonymous class:
+          "\\(?:[a-zA-Z0-9_]+\\.\\)*"
+          ;; classname:
+          "\\([a-zA-Z0-9_]+\\)"
+          ;; everything between classname and curly brace:
+          "\\(?:" jdee-parse-java-comment-or-ws-re "\\|[a-zA-Z0-9_.,()<>]\\)*"
+          "\\=")
   "Regular expression matching class declarations before point.
 Point must be at opening curly brace of class.
 It matches interfaces, named and anonymous classes.")
@@ -568,43 +568,43 @@ Returns nil, if point is not in a class."
   (semantic-refresh-tags-safe)
   (let ((left-paren-pos (c-parse-state)))
     (if left-paren-pos
-	(save-excursion
-	  (catch 'class-found
-	    (let ((left-paren-index 0)
-		  (left-paren-count (length left-paren-pos)))
-	      (while (< left-paren-index left-paren-count)
-		(let ((paren-pos (nth left-paren-index left-paren-pos)))
-		  (unless (consp paren-pos)
-		    (goto-char paren-pos)
-		    (when (looking-at "{")
-		      (let* ((search-end-pos
-			      (if (< left-paren-index (1- left-paren-count))
-				  (let ((pos (nth (1+ left-paren-index) left-paren-pos)))
-				    (if (consp pos)
-					(cdr pos)
-				      pos))
-				(point-min)))
-			     (case-fold-search nil)
-			     (class-pos (re-search-backward jdee-parse-class-decl-re search-end-pos t)))
-			(if class-pos
-			    (throw
-			     'class-found
-			     (cons (match-string-no-properties 2)
-				   (match-beginning 1))))))))
-		(setq left-paren-index (1+ left-paren-index)))))))))
+        (save-excursion
+          (catch 'class-found
+            (let ((left-paren-index 0)
+                  (left-paren-count (length left-paren-pos)))
+              (while (< left-paren-index left-paren-count)
+                (let ((paren-pos (nth left-paren-index left-paren-pos)))
+                  (unless (consp paren-pos)
+                    (goto-char paren-pos)
+                    (when (looking-at "{")
+                      (let* ((search-end-pos
+                              (if (< left-paren-index (1- left-paren-count))
+                                  (let ((pos (nth (1+ left-paren-index) left-paren-pos)))
+                                    (if (consp pos)
+                                        (cdr pos)
+                                      pos))
+                                (point-min)))
+                             (case-fold-search nil)
+                             (class-pos (re-search-backward jdee-parse-class-decl-re search-end-pos t)))
+                        (if class-pos
+                            (throw
+                             'class-found
+                             (cons (match-string-no-properties 2)
+                                   (match-beginning 1))))))))
+                (setq left-paren-index (1+ left-paren-index)))))))))
 
 (defun jdee-parse-get-class-at-point ()
   (let ((class-info (jdee-parse-get-innermost-class-at-point))
-	class-name)
+        class-name)
     (while class-info
       (let ((name (car class-info))
-	    (pos (cdr class-info)))
-	(if (not class-name)
-	    (setq class-name name)
-	  (setq class-name (concat name "." class-name)))
-	(save-excursion
-	  (goto-char pos)
-	  (setq class-info (jdee-parse-get-innermost-class-at-point)))))
+            (pos (cdr class-info)))
+        (if (not class-name)
+            (setq class-name name)
+          (setq class-name (concat name "." class-name)))
+        (save-excursion
+          (goto-char pos)
+          (setq class-info (jdee-parse-get-innermost-class-at-point)))))
     class-name))
 
 (defun jdee-parse-get-classes-at-point ()
@@ -633,14 +633,14 @@ is in inner class B of A."
 Return the selection."
   (condition-case err
       (let ((names (jdee-backend-get-qualified-name class)))
-	(if names
-	    (if (> (length names) 1)
-		(efc-query-options
-		 names
-		 (or prompt "Select class.")
-		 "Class Name Dialog")
-	      (car names))
-	  (error "Cannot find class %s on the current classpath." class)))
+        (if names
+            (if (> (length names) 1)
+                (efc-query-options
+                 names
+                 (or prompt "Select class.")
+                 "Class Name Dialog")
+              (car names))
+          (error "Cannot find class %s on the current classpath." class)))
     (error
      (message "%s" (error-message-string err)))))
 
@@ -651,7 +651,7 @@ QUALIFIER is the symbol's qualifier. For example, suppose the name at
 point is
 
      int i = error.msg.length()
-		   ^
+                   ^
 In this case, this function returns (cons \"error.msg\" \"length\").
 This function works only for qualified names that do not contain
 white space. It returns null if there is no qualified name at point."
@@ -659,18 +659,18 @@ white space. It returns null if there is no qualified name at point."
     (when symbol-at-point
        (thing-at-point-looking-at "[^ \n\t();,:+<]+") ;; add < to prevent like "Map<String"
       (let ((qualified-name
-	     (buffer-substring-no-properties
-	      (match-beginning 0)
-	      (match-end 0))))
-	(string-match "\\(.+[.]\\)*\\([^.]+\\)" qualified-name)
-	(let ((qualifier (if (match-beginning 1)
-			     (substring qualified-name
-					(match-beginning 1) (match-end 1))))
-	      (name (substring qualified-name
-			       (match-beginning 2) (match-end 2))))
-	  (if qualifier
-	      (setq qualifier (substring qualifier 0 (1- (length qualifier)))))
-	  (cons qualifier name))))))
+             (buffer-substring-no-properties
+              (match-beginning 0)
+              (match-end 0))))
+        (string-match "\\(.+[.]\\)*\\([^.]+\\)" qualified-name)
+        (let ((qualifier (if (match-beginning 1)
+                             (substring qualified-name
+                                        (match-beginning 1) (match-end 1))))
+              (name (substring qualified-name
+                               (match-beginning 2) (match-end 2))))
+          (if qualifier
+              (setq qualifier (substring qualifier 0 (1- (length qualifier)))))
+          (cons qualifier name))))))
 
 
 ;;;###autoload
@@ -684,21 +684,21 @@ If called interactively, add the name in the mini-buffer."
   (interactive (list (not current-prefix-arg)))
   (if (eq major-mode 'jdee-mode)
       (let ((package-name (jdee-parse-get-package-name))
-	    (class-name (file-name-sans-extension
-			 (file-name-nondirectory (buffer-file-name)))))
-	(if (and (not no-package-p) package-name)
-	    (setq class-name (concat package-name "." class-name)))
-	(when (called-interactively-p 'interactive)
-	  (kill-new class-name)
-	  (message (format "Copied `%s'" class-name)))
-	class-name)
+            (class-name (file-name-sans-extension
+                         (file-name-nondirectory (buffer-file-name)))))
+        (if (and (not no-package-p) package-name)
+            (setq class-name (concat package-name "." class-name)))
+        (when (called-interactively-p 'interactive)
+          (kill-new class-name)
+          (message (format "Copied `%s'" class-name)))
+        class-name)
     (error "Not a Java source buffer.")))
 
 
 (defun jdee-parse-get-buffer-unqualified-class ()
   "Get the class name from the buffer filename"
   (file-name-sans-extension (file-name-nondirectory
-			     (or (buffer-file-name) "Object.java"))))
+                             (or (buffer-file-name) "Object.java"))))
 
 ;;;TODO: is the same as jdee-parse-get-buffer-class?
 (defun jdee-parse-fqn ()
@@ -734,15 +734,15 @@ Return the fully qualified name."
   (rx
    (1+              ;; A Java symbol comprises one or more of the following:
     (char (?A . ?Z)   ;;   - upper case characters
-	  (?a . ?z)   ;;   - lower case characters
-	  (?0 . ?9)   ;;   - digits
-	  "[]"        ;;   - square brackets
-	  "?"         ;;   - question mark
-	  "<,> \t\n\r";;   - java1.5 generic support
-	  "_"         ;;   - underscore
-	  "."         ;;   - period
-	  (160 . 255) ;;   - accented characters
-	  )))
+          (?a . ?z)   ;;   - lower case characters
+          (?0 . ?9)   ;;   - digits
+          "[]"        ;;   - square brackets
+          "?"         ;;   - question mark
+          "<,> \t\n\r";;   - java1.5 generic support
+          "_"         ;;   - underscore
+          "."         ;;   - period
+          (160 . 255) ;;   - accented characters
+          )))
 "Regular expression that matches any Java symbol declare.")
 
 (defun jdee-parse-valid-declaration-at (point varname)
@@ -752,37 +752,37 @@ for the VARNAME variable."
     (goto-char point)
     (let ((case-fold-search nil)) ;; Why case-insensitive?
       (if (or
-	   (looking-at (concat "\\(" jdee-parse-java-symbol-declare-re "\\)[ \t\n\r]+"
-			      (jdee-parse-double-backslashes varname)
-			      "[]?[ \t\n\r]*[),;=]"))
+           (looking-at (concat "\\(" jdee-parse-java-symbol-declare-re "\\)[ \t\n\r]+"
+                              (jdee-parse-double-backslashes varname)
+                              "[]?[ \t\n\r]*[),;=]"))
 
-	   ;; Handle case where varname is part of a list declaration, e.g.,
-	   ;;
-	   ;;   String a, b, c;
-	   ;;
-	   (looking-at (concat "\\(" jdee-parse-java-symbol-declare-re "\\)[ \t\n\r]+"
-			       "\\(" jdee-parse-java-symbol-re "[ \t\n\r]*,[ \t\n\r]*\\)*"
-			      (jdee-parse-double-backslashes varname)
-			      "[]?[ \t\n\r]*[,;]"))
-	   ;; Parse jdk1.5 for (Type val : collection) {
-	   (looking-at (concat "\\(" jdee-parse-java-symbol-declare-re "\\)[ \t\n\r]+"
-			       varname "[ \t\n\r]*:")))  ;[ \t\n\r]*"
-			       ;"\\(" jdee-parse-java-symbol-re "[,{} \t\n\r]*\\)+" ")")))
-	  (let ((type (match-string 1))
-		(type-pos (match-beginning 1)))
-	    (goto-char type-pos)
-	    ;;  Check for following case.
-	    ;;     Object table
-	    ;;    //representing objects after all updates.
-	    ;;    table = new Truc();
-	    ;;    table.
-	    ;;  Avoid false hit on updates.
-	    (if (not (or
-		      (jdee-parse-comment-or-quoted-p)
-		      (string= type "instanceof")
-		      (string= type "return")))
-		type))
-	nil))))
+           ;; Handle case where varname is part of a list declaration, e.g.,
+           ;;
+           ;;   String a, b, c;
+           ;;
+           (looking-at (concat "\\(" jdee-parse-java-symbol-declare-re "\\)[ \t\n\r]+"
+                               "\\(" jdee-parse-java-symbol-re "[ \t\n\r]*,[ \t\n\r]*\\)*"
+                              (jdee-parse-double-backslashes varname)
+                              "[]?[ \t\n\r]*[,;]"))
+           ;; Parse jdk1.5 for (Type val : collection) {
+           (looking-at (concat "\\(" jdee-parse-java-symbol-declare-re "\\)[ \t\n\r]+"
+                               varname "[ \t\n\r]*:")))  ;[ \t\n\r]*"
+                               ;"\\(" jdee-parse-java-symbol-re "[,{} \t\n\r]*\\)+" ")")))
+          (let ((type (match-string 1))
+                (type-pos (match-beginning 1)))
+            (goto-char type-pos)
+            ;;  Check for following case.
+            ;;     Object table
+            ;;    //representing objects after all updates.
+            ;;    table = new Truc();
+            ;;    table.
+            ;;  Avoid false hit on updates.
+            (if (not (or
+                      (jdee-parse-comment-or-quoted-p)
+                      (string= type "instanceof")
+                      (string= type "return")))
+                type))
+        nil))))
 
 (defun jdee-parse-declared-type-of (name)
   "Find in the current buffer the java type of the variable NAME.  The
@@ -801,11 +801,11 @@ the containing/outer class of the declared type."
       ;; now check for qualifying identifier. Note: reuses
       ;; jdee-parse-qualified-name-at-point for simplicity, not efficiency
       (if found
-	  (let (qualname)
-	    (goto-char foundpt)
-	    (setq qualname (jdee-parse-qualified-name-at-point))
-	    (setq qualifier (car qualname))
-	    (setq res (cdr qualname))))
+          (let (qualname)
+            (goto-char foundpt)
+            (setq qualname (jdee-parse-qualified-name-at-point))
+            (setq qualifier (car qualname))
+            (setq res (cdr qualname))))
 
       (cons res qualifier))))
 
@@ -822,93 +822,93 @@ could be found."
 
       ;; Search backward in the buffer.
       (while (and (not found)
-		  (search-backward name nil t))
-	(setq pos (point))
+                  (search-backward name nil t))
+        (setq pos (point))
     (setq lastpos (point))
 
-	;; Position point at the start of the type
-	;; symbol in the declaration, e.g.,
-	;;
-	;;  String s;
-	;;  ^
-	(backward-word 1)
+        ;; Position point at the start of the type
+        ;; symbol in the declaration, e.g.,
+        ;;
+        ;;  String s;
+        ;;  ^
+        (backward-word 1)
 
-	;; Handle case where declaration declares
-	;; a list of symbols, e.g.,
-	;;
-	;;  String a, b, c;
-	;;
-	;; In this case, back over any entries in
-	;; the list ahead of name.
-	(while (looking-at symbol-list-entry-re)
+        ;; Handle case where declaration declares
+        ;; a list of symbols, e.g.,
+        ;;
+        ;;  String a, b, c;
+        ;;
+        ;; In this case, back over any entries in
+        ;; the list ahead of name.
+        (while (looking-at symbol-list-entry-re)
       (setq lastpos (point))
-	  (backward-word 1))
+          (backward-word 1))
     ;;  List<String, List<String>> a;
     ;;                    ^
     ;; In this case, back over any entries between < and >
     (let ((try-count 0)
-	  (max-try-count 20))
+          (max-try-count 20))
       (while (and
-	      (< try-count max-try-count)
-	      (not
-	       (= (cl-count ?< (buffer-substring (point) lastpos))
-		  (cl-count ?> (buffer-substring (point) lastpos)))))
-	(setq try-count (1+ try-count))
-	(backward-word 1)))
+              (< try-count max-try-count)
+              (not
+               (= (cl-count ?< (buffer-substring (point) lastpos))
+                  (cl-count ?> (buffer-substring (point) lastpos)))))
+        (setq try-count (1+ try-count))
+        (backward-word 1)))
 
 
-	(setq resname (jdee-parse-valid-declaration-at (point) name))
-	(setq foundpt (point))
-	(goto-char pos)
-	(forward-char -1)
-	(if (and resname
-		 (not (jdee-parse-keywordp resname)))
-	    (setq found t)))
+        (setq resname (jdee-parse-valid-declaration-at (point) name))
+        (setq foundpt (point))
+        (goto-char pos)
+        (forward-char -1)
+        (if (and resname
+                 (not (jdee-parse-keywordp resname)))
+            (setq found t)))
 
       (unless found
 
-	;; Not found backward in buffer. Try looking forward.
-	(goto-char orgpt)
+        ;; Not found backward in buffer. Try looking forward.
+        (goto-char orgpt)
 
-	(while (and (not found)
-		    (search-forward name nil t))
-	  (setq pos (point))
+        (while (and (not found)
+                    (search-forward name nil t))
+          (setq pos (point))
       (setq lastpos (point))
-	  (backward-word 2)
+          (backward-word 2)
 
-	  (while (looking-at symbol-list-entry-re)
-	(setq lastpos (point))
-	    (backward-word 1))
+          (while (looking-at symbol-list-entry-re)
+        (setq lastpos (point))
+            (backward-word 1))
 
     ;;  List<String, List<String>> a;
     ;;                    ^
     ;; In this case, back over any entries between < and >
       (let ((try-count 0)
-	    (max-try-count 20))
-	(while (and
-		(< try-count max-try-count)
-		(not
-		 (= (cl-count ?< (buffer-substring (point) lastpos))
-		    (cl-count ?> (buffer-substring (point) lastpos)))))
-	  (setq try-count (1+ try-count))
-	  (backward-word 1)))
+            (max-try-count 20))
+        (while (and
+                (< try-count max-try-count)
+                (not
+                 (= (cl-count ?< (buffer-substring (point) lastpos))
+                    (cl-count ?> (buffer-substring (point) lastpos)))))
+          (setq try-count (1+ try-count))
+          (backward-word 1)))
 
-	  (setq resname (jdee-parse-valid-declaration-at (point) name))
-	  (setq foundpt (point))
-	  (goto-char pos)
-	  (forward-char 1)
-	  (if (and resname
-		   (not (jdee-parse-keywordp resname)))
-	      (setq found t))))
+          (setq resname (jdee-parse-valid-declaration-at (point) name))
+          (setq foundpt (point))
+          (goto-char pos)
+          (forward-char 1)
+          (if (and resname
+                   (not (jdee-parse-keywordp resname)))
+              (setq found t))))
 
       (if found foundpt nil))))
 
 
 (defun jdee-display-parse-error (error)
   (let* ((parser-buffer-name "*Java Parser*")
-	 (buf (get-buffer parser-buffer-name)))
+         (buf (get-buffer parser-buffer-name)))
     (if (not buf)
-	(setq buf (get-buffer-create parser-buffer-name)))
+        (setq buf (get-buffer-create parser-buffer-name)))
     (set-buffer buf)
     (erase-buffer)
     (insert error)
@@ -933,50 +933,50 @@ fast."
   (let ((parse-error
          (jdee-backend-parse-file (buffer-file-name))))
     (if parse-error
-	(jdee-display-parse-error parse-error)
+        (jdee-display-parse-error parse-error)
       (message "Parsed %s successfully" (buffer-name)))))
 
 (defun jdee-parse-comment-or-quoted-p ()
   "Returns t if point is in a comment or a quoted string,
 otherwise nil."
   (let* ((state (save-excursion
-		  (parse-partial-sexp (point-min) (point)))))
+                  (parse-partial-sexp (point-min) (point)))))
     (if (or (nth 3 state)
-	    (nth 4 state))
-	t)))
+            (nth 4 state))
+        t)))
 
 (defun jdee-parse--search-class (class pos)
   ;; Define an internal function that recursively searches a class
   ;; and its subclasses for a method containing point.
   (let* ((class-name       (semantic-tag-name class))
-	 (class-parts      (semantic-tag-type-members class))
-	 (class-subclasses (semantic-brute-find-tag-by-class 'type class-parts))
-	 (class-methods    (semantic-brute-find-tag-by-class 'function class-parts)))
+         (class-parts      (semantic-tag-type-members class))
+         (class-subclasses (semantic-brute-find-tag-by-class 'type class-parts))
+         (class-methods    (semantic-brute-find-tag-by-class 'function class-parts)))
 
     ;; Is point in a method of a subclass of this class?
     (loop for subclass in class-subclasses do
-	  (jdee-parse--search-class subclass pos))
+          (jdee-parse--search-class subclass pos))
 
     ;; Is point in any of the methods of this class?
     (loop for method in class-methods do
-	  (let* ((method-name  (semantic-tag-name method))
-		 (method-start (semantic-tag-start method))
-		 (method-end   (semantic-tag-end method)))
-	    (when (and (>= pos method-start)
-		       (<= pos method-end))
-	      (throw 'found (cons (cons class-name method-name)
-				  (cons method-start method-end))))))))
+          (let* ((method-name  (semantic-tag-name method))
+                 (method-start (semantic-tag-start method))
+                 (method-end   (semantic-tag-end method)))
+            (when (and (>= pos method-start)
+                       (<= pos method-end))
+              (throw 'found (cons (cons class-name method-name)
+                                  (cons method-start method-end))))))))
 
 (defun jdee-parse-get-method-at-point (&optional position)
   "Gets the method at POSITION, if specified, otherwise at point.
 Returns (CLASS_NAME . METHOD_NAME) if the specified position is
 in a method; otherwise, nil."
   (let* ((pos (if position position (point)))
-	 (tokens (semantic-fetch-tags))
-	 (classes (semantic-brute-find-tag-by-class 'type tokens)))
+         (tokens (semantic-fetch-tags))
+         (classes (semantic-brute-find-tag-by-class 'type tokens)))
     (catch 'found
       (loop for class in classes
-	    do (jdee-parse--search-class class pos)))))
+            do (jdee-parse--search-class class pos)))))
 
 (defclass jdee-parse-method-map (jdee-avl-tree)
   ()
@@ -990,24 +990,24 @@ in a method; otherwise, nil."
 
 (defun jdee-parse--add-methods (method-map class)
   (let* ((class-name       (semantic-tag-name class))
-	 (class-parts      (semantic-tag-type-members class))
-	 (class-subclasses (semantic-brute-find-tag-by-class 'type class-parts))
-	 (class-methods    (semantic-brute-find-tag-by-class 'function class-parts)))
+         (class-parts      (semantic-tag-type-members class))
+         (class-subclasses (semantic-brute-find-tag-by-class 'type class-parts))
+         (class-methods    (semantic-brute-find-tag-by-class 'function class-parts)))
 
     ;; Add methods of subclasses
     (loop for subclass in class-subclasses do
-	  (jdee-parse--add-methods method-map subclass))
+          (jdee-parse--add-methods method-map subclass))
 
     ;; Add methods of this class?
     (loop for method in class-methods do
-	  (let* ((method-name  (semantic-tag-name method))
-		 (method-start (semantic-tag-start method))
-		 (method-end   (semantic-tag-end method)))
-	    (jdee-avl-tree-add
-	     method-map
-	     (cons
-	      (cons class-name method-name)
-	      (cons method-start method-end)))))))
+          (let* ((method-name  (semantic-tag-name method))
+                 (method-start (semantic-tag-start method))
+                 (method-end   (semantic-tag-end method)))
+            (jdee-avl-tree-add
+             method-map
+             (cons
+              (cons class-name method-name)
+              (cons method-start method-end)))))))
 
 (defmethod initialize-instance ((this jdee-parse-method-map) &rest fields)
   "Constructor for method map."
@@ -1018,9 +1018,9 @@ in a method; otherwise, nil."
   (call-next-method)
 
   (let* ((tokens (semantic-fetch-tags))
-	 (classes (semantic-brute-find-tag-by-class 'type tokens)))
+         (classes (semantic-brute-find-tag-by-class 'type tokens)))
     (loop for class in classes do
-	  (jdee-parse--add-methods this class))))
+          (jdee-parse--add-methods this class))))
 
 (defmethod jdee-parse-method-map-get-method-at ((this jdee-parse-method-map) &optional pos)
   "Get the method at POS, if specified, otherwise, at point."
@@ -1035,16 +1035,16 @@ in a method; otherwise, nil."
 (defun jdee-current-buffer-exact-name-match-p (tag)
   (and (tag-exact-match-p tag)
        (equal (buffer-file-name (window-buffer (selected-window)))
-	      (file-of-tag))))
+              (file-of-tag))))
 
 (defun jdee-etags-recognize-tags-table () ; see etags-recognize-tags-table
   (let ((recognized (etags-recognize-tags-table)))
     (if recognized
-	;; prefer exact match in current buffer to other files
-	(setq find-tag-tag-order '(jdee-current-buffer-exact-name-match-p
-				   tag-exact-file-name-match-p
-				   tag-exact-match-p
-				   ))
+        ;; prefer exact match in current buffer to other files
+        (setq find-tag-tag-order '(jdee-current-buffer-exact-name-match-p
+                                   tag-exact-file-name-match-p
+                                   tag-exact-match-p
+                                   ))
       recognized)))
 
 (defun jdee-parse-java-variable-at-point ()
@@ -1076,30 +1076,30 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
       ;;                      ^              ^
       (setq curcar (char-before))
       (if curcar
-	  (progn
-	    (while (null found)
-	      (cond
-	       ((or (and (>= curcar ?a) (<= curcar ?z)) ; a-z
-		    (and (>= curcar ?A) (<= curcar ?Z)) ; A-z
-		    (and (>= curcar ?0) (<= curcar ?9))
-		    (>= curcar 127)
-		    (member curcar '(?$ ?_ ?\\))) ;; _ \
-		(forward-char -1))
-	       ((eq ?. curcar)
-		(setq dot-offset 1)
-		(if (eq ?\) (char-before (- (point) 1)))
-		    (progn
-		      (forward-char -2)
-		      (setq first-paren (point))
-		      (setq second-paren (jdee-parse-match-paren-position))
-		      (setq offset (+ (- first-paren second-paren) 1))
-		      (forward-char 2)
-		      (setq found (point)))
-		  (setq found (point))))
-	       (t
-		(setq found (point))))
-	      (setq curcar (char-before)))
-	    (setq intermediate-point found)
+          (progn
+            (while (null found)
+              (cond
+               ((or (and (>= curcar ?a) (<= curcar ?z)) ; a-z
+                    (and (>= curcar ?A) (<= curcar ?Z)) ; A-z
+                    (and (>= curcar ?0) (<= curcar ?9))
+                    (>= curcar 127)
+                    (member curcar '(?$ ?_ ?\\))) ;; _ \
+                (forward-char -1))
+               ((eq ?. curcar)
+                (setq dot-offset 1)
+                (if (eq ?\) (char-before (- (point) 1)))
+                    (progn
+                      (forward-char -2)
+                      (setq first-paren (point))
+                      (setq second-paren (jdee-parse-match-paren-position))
+                      (setq offset (+ (- first-paren second-paren) 1))
+                      (forward-char 2)
+                      (setq found (point)))
+                  (setq found (point))))
+               (t
+                (setq found (point))))
+              (setq curcar (char-before)))
+            (setq intermediate-point found)
 
         ;; Back up past any white space.  This lets completion work when
         ;; continuing onto a new-line.
@@ -1107,19 +1107,19 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
         (skip-syntax-backward " >")
 
 
-	   ;; Now move point to the beginning of the expression, e.g.,
-	    ;; from
-	    ;;
-	    ;;  obj.f1.ge
-	    ;;        ^
-	    ;; to
-	    ;;
-	    ;;  obj.f1.ge
-	    ;; ^
-	    ;; Note that if we did not find a dot, (e.g., new Widget), we are
-	    ;; already at the beginning of the text part of the expression.
-	    (progn
-	      (setq curcar (char-before))
+           ;; Now move point to the beginning of the expression, e.g.,
+            ;; from
+            ;;
+            ;;  obj.f1.ge
+            ;;        ^
+            ;; to
+            ;;
+            ;;  obj.f1.ge
+            ;; ^
+            ;; Note that if we did not find a dot, (e.g., new Widget), we are
+            ;; already at the beginning of the text part of the expression.
+            (progn
+              (setq curcar (char-before))
           (when (> dot-offset 0)
             (while (or (and (>= curcar ?a) (<= curcar ?z))
                        (and (>= curcar ?A) (<= curcar ?Z))
@@ -1145,44 +1145,44 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
               (forward-char -1)
               (setq curcar (char-before))))
 
-	      (setq beg-point (point))
-	      (set-marker jdee-parse-current-beginning intermediate-point)
-	      (set-marker jdee-parse-current-end original-point)
-	      (setq middle-point (- intermediate-point dot-offset offset))
-	      (setq first-part
-		    (buffer-substring-no-properties beg-point middle-point))
-	      (setq first-part (jdee-parse-isolate-to-parse first-part))
+              (setq beg-point (point))
+              (set-marker jdee-parse-current-beginning intermediate-point)
+              (set-marker jdee-parse-current-end original-point)
+              (setq middle-point (- intermediate-point dot-offset offset))
+              (setq first-part
+                    (buffer-substring-no-properties beg-point middle-point))
+              (setq first-part (jdee-parse-isolate-to-parse first-part))
 
-	      ;;replacing newline by empty strings new lines seems to break the
-	      ;;beanshell
-	      (while (string-match "\n" first-part)
-		(setq first-part (replace-match "" nil nil first-part)))
+              ;;replacing newline by empty strings new lines seems to break the
+              ;;beanshell
+              (while (string-match "\n" first-part)
+                (setq first-part (replace-match "" nil nil first-part)))
 
-	      ;;replacing extra spaces for "". This done to reduce the space
-	      ;;that the completion title takes
-	      (while (string-match " " first-part)
-		(setq first-part (replace-match "" nil nil first-part)))
+              ;;replacing extra spaces for "". This done to reduce the space
+              ;;that the completion title takes
+              (while (string-match " " first-part)
+                (setq first-part (replace-match "" nil nil first-part)))
 
-	      (setq second-part
-		    (buffer-substring-no-properties
-		     intermediate-point original-point-before-ws))
+              (setq second-part
+                    (buffer-substring-no-properties
+                     intermediate-point original-point-before-ws))
 
           (while (string-match "\\s-\\|\\s>" second-part)
             (setq second-part (replace-match "" nil nil second-part)))
 
-	      ;;Checking for casting
-	      ;; ((Object) obj).ge
-	      ;; FIXME can't work ok for generic type, eg: ((List<String>) obj).ge
-	      (if (and (not cast-type)
-		       (string= first-part "")
-		       (eq (char-before (+ 1 middle-point)) ?\()
-		       (eq (char-before (+ 2 middle-point)) ?\())
-		  (save-excursion
-		    (goto-char (+ middle-point 1))
-		    (setq first-paren (point))
-		    (setq second-paren (jdee-parse-match-paren-position))
-		    (setq cast-type (buffer-substring-no-properties
-				     (+ 1 first-paren) second-paren))))
+              ;;Checking for casting
+              ;; ((Object) obj).ge
+              ;; FIXME can't work ok for generic type, eg: ((List<String>) obj).ge
+              (if (and (not cast-type)
+                       (string= first-part "")
+                       (eq (char-before (+ 1 middle-point)) ?\()
+                       (eq (char-before (+ 2 middle-point)) ?\())
+                  (save-excursion
+                    (goto-char (+ middle-point 1))
+                    (setq first-paren (point))
+                    (setq second-paren (jdee-parse-match-paren-position))
+                    (setq cast-type (buffer-substring-no-properties
+                                     (+ 1 first-paren) second-paren))))
 
           ;; If the parsed region is just white-space, move the start of the
           ;; region to the end of the region to preserve the whitespace
@@ -1191,54 +1191,54 @@ at point. This function would return the list (\"obj.f1\" \"ge\")."
                                                               jdee-parse-current-end))
             (setq jdee-parse-current-beginning jdee-parse-current-end))
 
-	      (if cast-type
+              (if cast-type
               (progn
                 (setq jdee-parse-casting t)
                 (list cast-type second-part))
             (progn
               (setq jdee-parse-casting nil)
               (list first-part second-part))))
-	    )))))
+            )))))
 
 (defun jdee-parse-isolate-to-parse (s)
   "Returns the right expression that needs completion in S."
   (let* ((index (length s)) stop (paren 0) curcar final-string
-	 (inside-quotes nil))
+         (inside-quotes nil))
     (while (and (> index 0)
-		(not stop))
+                (not stop))
       (setq index (1- index))
       (setq curcar (aref s index))
       (cond
        ((eq ?\" curcar);;Checking if we are inside double quotes
-	(if (not (eq ?\\ (aref s (max 0 (1- index))))) ;;if the quote is not escape
-	    (setq inside-quotes (not inside-quotes))))
+        (if (not (eq ?\\ (aref s (max 0 (1- index))))) ;;if the quote is not escape
+            (setq inside-quotes (not inside-quotes))))
        ((eq ?\) curcar)
-	(if (not inside-quotes)
-	    (setq paren (1+ paren))))
+        (if (not inside-quotes)
+            (setq paren (1+ paren))))
        ((eq ?\( curcar)
-	(if (not inside-quotes)
-	    (setq paren (1- paren)))))
+        (if (not inside-quotes)
+            (setq paren (1- paren)))))
       (if (or (< paren 0)
-	      (and (eq curcar ?\,) (<= paren 0)))
-	  (setq stop t)))
+              (and (eq curcar ?\,) (<= paren 0)))
+          (setq stop t)))
     (if stop
-	(setq index (1+ index)))
+        (setq index (1+ index)))
     (setq final-string (substring s index))
     (if (and (not (string= final-string ""))
-	     (string= "(" (substring final-string 0 1)))
-	(let* ((closing-paren (string-match ")" final-string))
-	       (closing (string-match ")." final-string (+ 1 closing-paren))))
-	  (setq final-string
-		(concat (substring final-string 2 closing-paren)
-			"."
-			(substring final-string (+ closing 2))))))
+             (string= "(" (substring final-string 0 1)))
+        (let* ((closing-paren (string-match ")" final-string))
+               (closing (string-match ")." final-string (+ 1 closing-paren))))
+          (setq final-string
+                (concat (substring final-string 2 closing-paren)
+                        "."
+                        (substring final-string (+ closing 2))))))
     final-string))
 (defun jdee-parse-match-paren-position ()
   "Returns the position of the parenthesis match"
   (let ((current (point))
-	match)
+        match)
     (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
-	  ((looking-at "\\s\)") (forward-char 1) (backward-list 1)))
+          ((looking-at "\\s\)") (forward-char 1) (backward-list 1)))
     (setq match (point))
     (goto-char current)
     match))
@@ -1284,182 +1284,182 @@ For example: 000F or 123f."
 Java type name, e.g., int."
   (if expr
       (let ((class-at-point (jdee-parse-get-class-at-point))
-	    (super-at-point (jdee-parse-get-super-class-at-point))
-	    qualified-name chop-pos temp answer)
-	(setq answer
-	      (cond
-	       ((jdee--parse-integer-p expr) "int")
-	       ((jdee--parse-long-p expr) "long")
-	       ((jdee--parse-double-p expr) "double")
-	       ((jdee--parse-float-p expr) "float")
-	       ((jdee--parse-boolean-p expr) "boolean")
-	       ((jdee--parse-char-p expr) "char")
-	       ((jdee--parse-string-p expr) "java.lang.String")
-	       ;; If it's "this", we return the class name of the class we code in
-	       ((and class-at-point (string= "this" expr))
-		(jdee-parse-get-qualified-name class-at-point t))
-	       ;; If it's "super", we return the super class
-	       ;;name of the class we code in
-	       ((and super-at-point (string= "super" expr))
-		(jdee-parse-get-qualified-name super-at-point t))
-	       ;;if it's a class name, done
-	       ((setq qualified-name (jdee-parse-get-qualified-name expr t))
-		qualified-name)
+            (super-at-point (jdee-parse-get-super-class-at-point))
+            qualified-name chop-pos temp answer)
+        (setq answer
+              (cond
+               ((jdee--parse-integer-p expr) "int")
+               ((jdee--parse-long-p expr) "long")
+               ((jdee--parse-double-p expr) "double")
+               ((jdee--parse-float-p expr) "float")
+               ((jdee--parse-boolean-p expr) "boolean")
+               ((jdee--parse-char-p expr) "char")
+               ((jdee--parse-string-p expr) "java.lang.String")
+               ;; If it's "this", we return the class name of the class we code in
+               ((and class-at-point (string= "this" expr))
+                (jdee-parse-get-qualified-name class-at-point t))
+               ;; If it's "super", we return the super class
+               ;;name of the class we code in
+               ((and super-at-point (string= "super" expr))
+                (jdee-parse-get-qualified-name super-at-point t))
+               ;;if it's a class name, done
+               ((setq qualified-name (jdee-parse-get-qualified-name expr t))
+                qualified-name)
 
-	       ;;check if it's an inner class
-	       ((and expr
-		     class-at-point
-		     (string= "this.this" expr)
-		     (setq qualified-name (jdee-parse-get-inner-class
-					   class-at-point)))
-		qualified-name)
+               ;;check if it's an inner class
+               ((and expr
+                     class-at-point
+                     (string= "this.this" expr)
+                     (setq qualified-name (jdee-parse-get-inner-class
+                                           class-at-point)))
+                qualified-name)
 
-	       (t
-		(let (to-complete
-		      (last-char
-		       (aref expr (- (length expr) 1 ))))
-		  ;; If it ends with a parenthesis
-		  (cond
-		   ((eq last-char ?\))
-		    (let* ((result
-			    (jdee-parse-isolate-before-matching-of-last-car
-			     expr))
-			   (temp (if (not (string= "this.this" result))
-				     (jdee-parse-split-by-dots result)))
-			   to-complete)
-		      (if temp
-			  (jdee-parse-find-completion-for-pair temp)
-			;;we need exact completion here
-			(jdee-parse-find-completion-for-pair
-			 (list "this" result) nil jdee-complete-private))
+               (t
+                (let (to-complete
+                      (last-char
+                       (aref expr (- (length expr) 1 ))))
+                  ;; If it ends with a parenthesis
+                  (cond
+                   ((eq last-char ?\))
+                    (let* ((result
+                            (jdee-parse-isolate-before-matching-of-last-car
+                             expr))
+                           (temp (if (not (string= "this.this" result))
+                                     (jdee-parse-split-by-dots result)))
+                           to-complete)
+                      (if temp
+                          (jdee-parse-find-completion-for-pair temp)
+                        ;;we need exact completion here
+                        (jdee-parse-find-completion-for-pair
+                         (list "this" result) nil jdee-complete-private))
 
-		      ;;if the previous did not work try only result
-		      (if (not jdee-complete-current-list)
-			  (jdee-parse-find-completion-for-pair (list result "")))
+                      ;;if the previous did not work try only result
+                      (if (not jdee-complete-current-list)
+                          (jdee-parse-find-completion-for-pair (list result "")))
 
-		      ;;if the previous did not work try again
-		      (setq qualified-name
-			    (jdee-parse-get-qualified-name result t))
-		      (if qualified-name
-			  qualified-name
-			(if jdee-complete-current-list
-			    (progn
-			      (setq to-complete
-				    (car (car jdee-complete-current-list)))
-			      (setq chop-pos (+ 3 (string-match " : " to-complete)))
-			      (let* ((space-pos (string-match " " to-complete chop-pos))
-				     (uqname (if space-pos (substring to-complete chop-pos space-pos)
-					       (substring to-complete chop-pos))))
-				uqname))))))
+                      ;;if the previous did not work try again
+                      (setq qualified-name
+                            (jdee-parse-get-qualified-name result t))
+                      (if qualified-name
+                          qualified-name
+                        (if jdee-complete-current-list
+                            (progn
+                              (setq to-complete
+                                    (car (car jdee-complete-current-list)))
+                              (setq chop-pos (+ 3 (string-match " : " to-complete)))
+                              (let* ((space-pos (string-match " " to-complete chop-pos))
+                                     (uqname (if space-pos (substring to-complete chop-pos space-pos)
+                                               (substring to-complete chop-pos))))
+                                uqname))))))
 
-		   ;;if it's an array
-		   ((eq last-char ?\])
-		    (let ((temp (jdee-parse-eval-type-of
-				 (jdee-parse-isolate-before-matching-of-last-car
-				  expr))))
-		      (jdee-parse-get-component-type-of-array-class temp)))
+                   ;;if it's an array
+                   ((eq last-char ?\])
+                    (let ((temp (jdee-parse-eval-type-of
+                                 (jdee-parse-isolate-before-matching-of-last-car
+                                  expr))))
+                      (jdee-parse-get-component-type-of-array-class temp)))
 
-		   ;;we look for atoms if expr is splittable by dots
-		   ((setq temp (if (not (string= "this.this" expr))
-				   (jdee-parse-split-by-dots expr)))
-		    ;;we need exact completion here
-		    (jdee-parse-find-completion-for-pair temp t)
-		    (if jdee-complete-current-list
-			(progn
-			  (setq to-complete (car (car
-						  jdee-complete-current-list)))
-			  (setq chop-pos (+ 3 (string-match " : " to-complete)))
-			  (let* ((space-pos (string-match " " to-complete chop-pos))
-				 (uqname (if space-pos (substring to-complete chop-pos space-pos)
-					   (substring to-complete chop-pos))))
-			    (jdee-parse-get-qualified-name uqname)))
+                   ;;we look for atoms if expr is splittable by dots
+                   ((setq temp (if (not (string= "this.this" expr))
+                                   (jdee-parse-split-by-dots expr)))
+                    ;;we need exact completion here
+                    (jdee-parse-find-completion-for-pair temp t)
+                    (if jdee-complete-current-list
+                        (progn
+                          (setq to-complete (car (car
+                                                  jdee-complete-current-list)))
+                          (setq chop-pos (+ 3 (string-match " : " to-complete)))
+                          (let* ((space-pos (string-match " " to-complete chop-pos))
+                                 (uqname (if space-pos (substring to-complete chop-pos space-pos)
+                                           (substring to-complete chop-pos))))
+                            (jdee-parse-get-qualified-name uqname)))
 
-		      nil))
-		   (t
-		    ;; See if it's declared somewhere in this buffer.
-		    (let (parsed-type result result-qualifier)
-		      (setq parsed-type (jdee-parse-declared-type-of expr))
-		      (setq result (car parsed-type))
-		      (setq result-qualifier (cdr parsed-type))
+                      nil))
+                   (t
+                    ;; See if it's declared somewhere in this buffer.
+                    (let (parsed-type result result-qualifier)
+                      (setq parsed-type (jdee-parse-declared-type-of expr))
+                      (setq result (car parsed-type))
+                      (setq result-qualifier (cdr parsed-type))
 
-		      (if result
-			  (let ((count 0) type)
-			    (while (string-match ".*\\[\\]" result)
-			      (setq result (substring result 0
-						      (- (length result) 2)))
-			      (setq count (1+ count)))
+                      (if result
+                          (let ((count 0) type)
+                            (while (string-match ".*\\[\\]" result)
+                              (setq result (substring result 0
+                                                      (- (length result) 2)))
+                              (setq count (1+ count)))
 
-			    (let (work)
-			      (setq type
-				    (cond
+                            (let (work)
+                              (setq type
+                                    (cond
                                      ;; handle primitive types, e.g., int
-				     ((member result jdee-parse-primitive-types)
-				      result)
+                                     ((member result jdee-parse-primitive-types)
+                                      result)
                                      ;; quickly make sure fully qualified name
-				     ;;doesn't exist
-				     ((and result-qualifier
-					   (jdee-parse-class-exists
-					    (setq work (concat result-qualifier
-							       "."
-							       result))))
-				      work)
-				     ;; then check for inner classes
-				     ((setq work
-					    (jdee-parse-get-inner-class-name
-					     result result-qualifier))
-				      work)
+                                     ;;doesn't exist
+                                     ((and result-qualifier
+                                           (jdee-parse-class-exists
+                                            (setq work (concat result-qualifier
+                                                               "."
+                                                               result))))
+                                      work)
+                                     ;; then check for inner classes
+                                     ((setq work
+                                            (jdee-parse-get-inner-class-name
+                                             result result-qualifier))
+                                      work)
                                      ;; otherwise use unqualified class name
-				     (t
-				      (jdee-parse-get-qualified-name result
+                                     (t
+                                      (jdee-parse-get-qualified-name result
                                                                      t)))))
 
-			    (if type
-				(progn
-				  (while (> count 0)
-				    (setq type (concat type "[]"))
-				    (setq count (1- count)))
-				  (jdee-parse-transform-array-classes-names
-				   type))
-			      (if (y-or-n-p
-				   (format (concat "Could not find type of %s"
-						   " Attempt to import %s? ")
-					   expr result))
-				  (progn
-				    ;; import
-				    (jdee-import-find-and-import result)
-				    ;; recursive call of eval-type-of
-				    (jdee-parse-eval-type-of expr))
-				(error "Could not find type of %s" result))))
-			(if (and jdee-parse-casting
-				 (null jdee-parse-attempted-to-import)
-				 (y-or-n-p
-				  (format (concat "Could not find type of %s"
-						  " Attempt to import %s? ")
-					  expr expr)))
-			    (progn
-			      (setq jdee-parse-attempted-to-import t)
-			      (setq jdee-parse-casting nil)
-			      (jdee-import-find-and-import expr)
-			      (jdee-parse-eval-type-of expr))
-			  (progn
-			    (setq jdee-parse-attempted-to-import nil)
-			    nil))))))))))
-	answer)))
+                            (if type
+                                (progn
+                                  (while (> count 0)
+                                    (setq type (concat type "[]"))
+                                    (setq count (1- count)))
+                                  (jdee-parse-transform-array-classes-names
+                                   type))
+                              (if (y-or-n-p
+                                   (format (concat "Could not find type of %s"
+                                                   " Attempt to import %s? ")
+                                           expr result))
+                                  (progn
+                                    ;; import
+                                    (jdee-import-find-and-import result)
+                                    ;; recursive call of eval-type-of
+                                    (jdee-parse-eval-type-of expr))
+                                (error "Could not find type of %s" result))))
+                        (if (and jdee-parse-casting
+                                 (null jdee-parse-attempted-to-import)
+                                 (y-or-n-p
+                                  (format (concat "Could not find type of %s"
+                                                  " Attempt to import %s? ")
+                                          expr expr)))
+                            (progn
+                              (setq jdee-parse-attempted-to-import t)
+                              (setq jdee-parse-casting nil)
+                              (jdee-import-find-and-import expr)
+                              (jdee-parse-eval-type-of expr))
+                          (progn
+                            (setq jdee-parse-attempted-to-import nil)
+                            nil))))))))))
+        answer)))
 
 (defun jdee-parse-convert-args-to-types (args)
   "Converts something like this (10, 10) to (int, int)"
   (let* ((answer "(")
-	 (first-time t)
-	 (temp (substring args 1 (- (length args) 1)));;Striping the parens
-	 (lst (split-string temp ", ?"))
-	 tmp)
+         (first-time t)
+         (temp (substring args 1 (- (length args) 1)));;Striping the parens
+         (lst (split-string temp ", ?"))
+         tmp)
     (while lst
       (setq tmp (car lst))
       (if (not first-time)
-	  (setq answer (concat answer ", "))
-	(setq first-time nil))
+          (setq answer (concat answer ", "))
+        (setq first-time nil))
       (setq answer (concat answer
-			   (jdee-parse-eval-type-of tmp)))
+                           (jdee-parse-eval-type-of tmp)))
       (setq lst (cdr lst)))
     (setq answer (concat answer ")"))
     answer))
@@ -1470,33 +1470,33 @@ Java type name, e.g., int."
       (setq name (substring name 0 (- (length name) 2 )))
       (setq result (concat "[" result)))
     (if result
-	(progn
-	  (cond
-	   ((string= name "byte")
-	    (setq result (concat result "B")))
-	   ((string= name "char")
-	    (setq result (concat result "C")))
-	   ((string= name "double")
-	    (setq result (concat result "D")))
-	   ((string= name "float")
-	    (setq result (concat result "F")))
-	   ((string= name "int")
-	    (setq result (concat result "I")))
-	   ((string= name "long")
-	    (setq result (concat result "J")))
-	   ((string= name "short")
-	    (setq result (concat result "S")))
-	   ((string= name "boolean")
-	    (setq result (concat result "Z")))
-	   (t
-	    (setq result (concat result "L" name ";"))))
-	  result)
+        (progn
+          (cond
+           ((string= name "byte")
+            (setq result (concat result "B")))
+           ((string= name "char")
+            (setq result (concat result "C")))
+           ((string= name "double")
+            (setq result (concat result "D")))
+           ((string= name "float")
+            (setq result (concat result "F")))
+           ((string= name "int")
+            (setq result (concat result "I")))
+           ((string= name "long")
+            (setq result (concat result "J")))
+           ((string= name "short")
+            (setq result (concat result "S")))
+           ((string= name "boolean")
+            (setq result (concat result "Z")))
+           (t
+            (setq result (concat result "L" name ";"))))
+          result)
       name)))
 
 (defun jdee-parse-get-component-type-of-array-class (name)
   (if (string= "[" (substring name 0 1))
       (let ((result (jdee-backend-get-component-type-name name)))
-	(substring result 0 (- (length result) 1)))
+        (substring result 0 (- (length result) 1)))
     name))
 
 ;; Modified `jdee-parse-import-list' to use semantic parser table
@@ -1512,16 +1512,16 @@ For example:
   : (jdee-split-import-token \"test\")
   > (\"test.\" . \"*\")"
   (let* ((import      (semantic-tag-name token))
-	 (match-point (string-match "\\." import))
-	 split-point)
+         (match-point (string-match "\\." import))
+         split-point)
     (while match-point
       (setq split-point (1+ match-point)
-	    match-point (string-match "\\." import split-point)))
+            match-point (string-match "\\." import split-point)))
     (if split-point
-	(list (substring import 0 split-point)
-	      (substring import split-point))
+        (list (substring import 0 split-point)
+              (substring import split-point))
       (list (concat import ".")
-	    "*"))))
+            "*"))))
 
 (defun jdee-parse-import-list ()
   "Return the list of Java packages declared in the current buffer.
@@ -1529,20 +1529,20 @@ It uses the semantic parser table to find the 'package' and 'import'
 statements. It implicitly adds the java.lang.* package. See also
 `jdee-split-import-token'."
   (let* ((tokens   (semantic-fetch-tags))
-	 (packages (semantic-brute-find-tag-by-class 'package tokens))
-	 (imports  (semantic-brute-find-tag-by-class 'include tokens))
-	 lst)
+         (packages (semantic-brute-find-tag-by-class 'package tokens))
+         (imports  (semantic-brute-find-tag-by-class 'include tokens))
+         lst)
     (setq lst (append
-	       (mapcar (function
-			(lambda (token)
-			  (list
-			   (concat (semantic-tag-name token) ".")
-			   "*")))
-		       packages)
-	      (mapcar 'jdee-split-import-token
-		       imports)))
+               (mapcar (function
+                        (lambda (token)
+                          (list
+                           (concat (semantic-tag-name token) ".")
+                           "*")))
+                       packages)
+              (mapcar 'jdee-split-import-token
+                       imports)))
     (or (member "java.lang.*" lst)
-	(setq lst (append lst '(("java.lang." "*")))))
+        (setq lst (append lst '(("java.lang." "*")))))
     lst))
 
 ;; Contributed by Charles Hart <cfhart@Z-TEL.com>
@@ -1559,22 +1559,22 @@ try importing the class"
   (if (jdee-parse-class-exists name)
       name
     (let ((importlist (jdee-parse-import-list))
-	  shortname fullname tmp result)
+          shortname fullname tmp result)
       (while (and importlist (null result))
-	(setq tmp (car importlist))
-	(setq shortname (car (cdr tmp)))
-	(setq fullname (concat (car tmp) name))
-	(cond
-	 ((and (string= "*" shortname) (jdee-parse-class-exists fullname))
-	  (setq result fullname))
-	 ((string= name shortname)
-	  (setq result fullname))
-	 (t
-	  (setq importlist (cdr importlist)))))
+        (setq tmp (car importlist))
+        (setq shortname (car (cdr tmp)))
+        (setq fullname (concat (car tmp) name))
+        (cond
+         ((and (string= "*" shortname) (jdee-parse-class-exists fullname))
+          (setq result fullname))
+         ((string= name shortname)
+          (setq result fullname))
+         (t
+          (setq importlist (cdr importlist)))))
       (if (and (null result) import)
-	  (progn
-	    (jdee-import-find-and-import name t)
-	    (setq result (jdee-parse-get-qualified-name name))))
+          (progn
+            (jdee-import-find-and-import name t)
+            (setq result (jdee-parse-get-qualified-name name))))
       result)))
 
 ;; Contributed by Charles Hart <cfhart@Z-TEL.com>
@@ -1583,15 +1583,15 @@ try importing the class"
   classpath, nil otherwise."
   (if (stringp name)
       (progn
-	;; Replace double quotes by empty strings.
-	;; Double quotes seems to break the beanshell.
-	(while (string-match "\"" name)
-	  (setq name (replace-match "" nil nil name)))
+        ;; Replace double quotes by empty strings.
+        ;; Double quotes seems to break the beanshell.
+        (while (string-match "\"" name)
+          (setq name (replace-match "" nil nil name)))
 
-	;; Replace back slashes by empty strings.\
-	;; Back slashes causes Beeanshell problems
-	(while (string-match "\\\\" name)
-	  (setq name (replace-match "" nil nil name)))
+        ;; Replace back slashes by empty strings.\
+        ;; Back slashes causes Beeanshell problems
+        (while (string-match "\\\\" name)
+          (setq name (replace-match "" nil nil name)))
 
         (jdee-backend-class-exists-p name))))
 
@@ -1601,9 +1601,9 @@ and qualifer. The name and the qualifier are then use as arguments
 to the function `jdee-parse-get-inner-class-name'"
   (let (name qualifier (pos (string-match "\\." expr)))
     (if pos
-	(progn
-	  (setq name (substring expr (+ 1 pos)))
-	  (setq qualifier (substring expr 0 pos))))
+        (progn
+          (setq name (substring expr (+ 1 pos)))
+          (setq qualifier (substring expr 0 pos))))
     (jdee-parse-get-inner-class-name name qualifier)))
 
 ;; Tries to divine inner class via the following algorithm:
@@ -1625,99 +1625,99 @@ searched.  Returns nil if not found; a fully qualified inner class name
 otherwise."
   (let (class-name this-full-class-name result)
     (setq this-full-class-name (jdee-parse-get-qualified-name
-				(jdee-parse-get-class-at-point)))
+                                (jdee-parse-get-class-at-point)))
     (cond
      (qualifier
       (let ((work (concat qualifier "$" name)))
-	(setq work (subst-char-in-string ?. ?\$ work))
+        (setq work (subst-char-in-string ?. ?\$ work))
 
-	;; check against this$D$C$B$A
-	(setq class-name (concat this-full-class-name "$" work))
-	(if (not (jdee-parse-class-exists class-name))
-	    (let (dot-count index first-part remaining-part)
-	      (setq class-name nil)
+        ;; check against this$D$C$B$A
+        (setq class-name (concat this-full-class-name "$" work))
+        (if (not (jdee-parse-class-exists class-name))
+            (let (dot-count index first-part remaining-part)
+              (setq class-name nil)
 
-	      ;; check against D$C$B$A (default and imported)
-	      (print "Zero dots" (get-buffer "*scratch*"))
-	      (setq class-name (jdee-parse-get-qualified-name work))
+              ;; check against D$C$B$A (default and imported)
+              (print "Zero dots" (get-buffer "*scratch*"))
+              (setq class-name (jdee-parse-get-qualified-name work))
 
-	      ;; check remaining semi-qualified variants
-	      (setq dot-count 1)
-	      (while (and (null class-name)
-			  (setq index (string-match "\\$" work)))
+              ;; check remaining semi-qualified variants
+              (setq dot-count 1)
+              (while (and (null class-name)
+                          (setq index (string-match "\\$" work)))
 
-		(setq first-part (substring work 0 index))
-		(setq remaining-part (if (< index (length work))
-					 (substring work (+ 1 index))
-				       nil))
-		(cond
-		 ;; check against C$B$A on class D
-		 ((= 1 dot-count)
-		  (setq class-name (jdee-parse-get-qualified-name
-				    first-part))
-		  (if (not (null class-name))
-		      (progn
-			(setq class-name (concat class-name
-						 "$"
-						 remaining-part))
-			(if (null (jdee-parse-class-exists class-name))
-			    (setq class-name nil)))))
+                (setq first-part (substring work 0 index))
+                (setq remaining-part (if (< index (length work))
+                                         (substring work (+ 1 index))
+                                       nil))
+                (cond
+                 ;; check against C$B$A on class D
+                 ((= 1 dot-count)
+                  (setq class-name (jdee-parse-get-qualified-name
+                                    first-part))
+                  (if (not (null class-name))
+                      (progn
+                        (setq class-name (concat class-name
+                                                 "$"
+                                                 remaining-part))
+                        (if (null (jdee-parse-class-exists class-name))
+                            (setq class-name nil)))))
 
-		 ;; just check if it exists (ignoring imports)
-		 (t
-		  (setq class-name (concat first-part "." remaining-part))
-		  (if (null (jdee-parse-class-exists class-name))
-		      ;; lastly check if it exists in this package
-		      (progn
-			(setq class-name (concat (jdee-parse-get-package-name)
-						 "."
-						 work))
-			(if (not (jdee-parse-class-exists class-name))
-			    (setq class-name nil))))))
+                 ;; just check if it exists (ignoring imports)
+                 (t
+                  (setq class-name (concat first-part "." remaining-part))
+                  (if (null (jdee-parse-class-exists class-name))
+                      ;; lastly check if it exists in this package
+                      (progn
+                        (setq class-name (concat (jdee-parse-get-package-name)
+                                                 "."
+                                                 work))
+                        (if (not (jdee-parse-class-exists class-name))
+                            (setq class-name nil))))))
 
-		(setq work (concat first-part "." remaining-part))
-		(setq dot-count (1+ dot-count)))
+                (setq work (concat first-part "." remaining-part))
+                (setq dot-count (1+ dot-count)))
 
-	      class-name))))
+              class-name))))
 
      ;=; otherwise, no qualifier...check against this$D
      ((jdee-parse-class-exists (setq class-name
-				    (concat this-full-class-name "$" name)))
+                                    (concat this-full-class-name "$" name)))
       class-name))))
 
 ;; Can this function be reimplemented to use regular expressions?
 (defun jdee-parse-isolate-before-matching-of-last-car (s)
   "Returns the right expression that needs completion in S."
   (let* (final-string (index (length s)) stop (paren 0) (bracket 0) curcar
-		      (inside-quotes nil))
+                      (inside-quotes nil))
     (while (and (> index 0)
-		(not stop))
+                (not stop))
       (setq index (- index 1))
       (setq curcar (aref s index))
       (cond
        ((eq ?\" curcar);;Checking if we are inside double quotes
-	(if (not (eq ?\\ (aref s (- index 1))));;if the quote is not escape
-	    (setq inside-quotes (not inside-quotes))))
+        (if (not (eq ?\\ (aref s (- index 1))));;if the quote is not escape
+            (setq inside-quotes (not inside-quotes))))
        ((eq ?\) curcar)
-	(if (not inside-quotes)
-	    (setq paren (1+ paren))))
+        (if (not inside-quotes)
+            (setq paren (1+ paren))))
        ((eq ?\( curcar)
-	(if (not inside-quotes)
-	    (setq paren (1- paren))))
+        (if (not inside-quotes)
+            (setq paren (1- paren))))
        ((eq ?\] curcar)
-	(if (not inside-quotes)
-	    (setq bracket (1+ bracket))))
+        (if (not inside-quotes)
+            (setq bracket (1+ bracket))))
        ((eq ?\[ curcar)
-	(if (not inside-quotes)
-	    (setq bracket (1- bracket)))))
+        (if (not inside-quotes)
+            (setq bracket (1- bracket)))))
       (if (and (= paren 0)
-	       (= bracket 0))
-	  (setq stop t)))
+               (= bracket 0))
+          (setq stop t)))
     (setq final-string (substring s 0 index))
     (if (and (string= "" final-string)
-	     (string= "((" (substring s 0 2)))
-	(let ((closing-paren (string-match ")" s)))
-	  (setq final-string (substring s 2 closing-paren))))
+             (string= "((" (substring s 0 2)))
+        (let ((closing-paren (string-match ")" s)))
+          (setq final-string (substring s 2 closing-paren))))
     final-string))
 
 (defun jdee-parse-split-by-dots (s)
@@ -1729,7 +1729,7 @@ otherwise."
     nil))
 
 (defun jdee-parse-find-completion-for-pair (pair &optional exact-completion
-						access-level)
+                                                access-level)
   (jdee-complete-find-completion-for-pair pair exact-completion access-level))
 
 (defun jdee-parse-keywordp (variable)
@@ -1750,43 +1750,43 @@ codeing standard).
 
 The first two elements of the list are `nil' if CLASSNAME isn't fully qualifed."
   (cl-flet* ((is-first-cap
-	      (str)
-	      (unless (= 0 (length str))
-		(let ((char (substring str 0 1)))
-		  (string= char (upcase char)))))
-	     (is-all-cap
-	      (str)
-	      (string= str (upcase str)))
-	     (parse-at-point
-	      (classname)
-	      (let ((nopkgclass classname)
-		    end-pos fq pkg)
-		(when (> (length classname) 0)
-		  (setq end-pos (cl-position ?. classname :from-end t))
-		  (if end-pos
-		      (setq fq classname
-			    pkg (substring fq 0 end-pos)
-			    classname (substring fq (1+ end-pos))))
-		  (when (and (> (length nopkgclass) 0)
-			     (is-first-cap classname))
-		    ;; either a class can be all caps with a package behind it
-		    ;; (i.e. com.google.gwt.core.client.GWT) or it can be class
-		    ;; with a constant in front of it (i.e. Color.WHITE), currently
-		    ;; support the latter instead of kludging this now
-		    ;; --PL 2010-06-30
-		    (if (and (> (length classname) 1)
-			     (is-all-cap classname))
-			;; looks like <class>.<sym> (i.e. Color.WHITE)
-			nil
-		      (list fq pkg classname)))))))
+              (str)
+              (unless (= 0 (length str))
+                (let ((char (substring str 0 1)))
+                  (string= char (upcase char)))))
+             (is-all-cap
+              (str)
+              (string= str (upcase str)))
+             (parse-at-point
+              (classname)
+              (let ((nopkgclass classname)
+                    end-pos fq pkg)
+                (when (> (length classname) 0)
+                  (setq end-pos (cl-position ?. classname :from-end t))
+                  (if end-pos
+                      (setq fq classname
+                            pkg (substring fq 0 end-pos)
+                            classname (substring fq (1+ end-pos))))
+                  (when (and (> (length nopkgclass) 0)
+                             (is-first-cap classname))
+                    ;; either a class can be all caps with a package behind it
+                    ;; (i.e. com.google.gwt.core.client.GWT) or it can be class
+                    ;; with a constant in front of it (i.e. Color.WHITE), currently
+                    ;; support the latter instead of kludging this now
+                    ;; --PL 2010-06-30
+                    (if (and (> (length classname) 1)
+                             (is-all-cap classname))
+                        ;; looks like <class>.<sym> (i.e. Color.WHITE)
+                        nil
+                      (list fq pkg classname)))))))
     (if (eq classname 'point)
-	;; TODO: a fully qualified class name looks like a file name
-	;; (i.e. [a-zA-Z.])  but this need to be refined to use the Sun Java
-	;; standards of class name parsing
-	(or (let ((thing-at-point-file-name-chars "-~/[:alnum:]_.${}#%:"))
-	      (parse-at-point (thing-at-point 'filename)))
-	    (parse-at-point (thing-at-point 'word))
-	    (parse-at-point (thing-at-point 'symbol)))
+        ;; TODO: a fully qualified class name looks like a file name
+        ;; (i.e. [a-zA-Z.])  but this need to be refined to use the Sun Java
+        ;; standards of class name parsing
+        (or (let ((thing-at-point-file-name-chars "-~/[:alnum:]_.${}#%:"))
+              (parse-at-point (thing-at-point 'filename)))
+            (parse-at-point (thing-at-point 'word))
+            (parse-at-point (thing-at-point 'symbol)))
       (parse-at-point classname))))
 
 (provide 'jdee-parse)

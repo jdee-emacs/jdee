@@ -38,122 +38,122 @@ a total count could be passed to be displayed, as well as the number of
 processed files."
   (interactive)
   (cl-flet ((perc2x2 (a b)
-		     (format "%.1f" (* 100(/ (float a) (float b))))))
+                     (format "%.1f" (* 100(/ (float a) (float b))))))
     (let* ((fname (buffer-file-name))
-	   (result (if count count (jdee-stat-count-loc)))
-	   (total (nth 0 result))
-	   (comment (nth 1 result))
-	   (javadoc (nth 2 result))
-	   (blank (nth 3 result))
-	   (code (- total (+ comment javadoc blank)))
-	   (code-perc (perc2x2 code total))
-	   (doc-perc (perc2x2 comment total))
-	   (jdoc-perc (perc2x2 javadoc total))
-	   (blank-perc (perc2x2 blank total)))
+           (result (if count count (jdee-stat-count-loc)))
+           (total (nth 0 result))
+           (comment (nth 1 result))
+           (javadoc (nth 2 result))
+           (blank (nth 3 result))
+           (code (- total (+ comment javadoc blank)))
+           (code-perc (perc2x2 code total))
+           (doc-perc (perc2x2 comment total))
+           (jdoc-perc (perc2x2 javadoc total))
+           (blank-perc (perc2x2 blank total)))
       (with-output-to-temp-buffer "LOC Report"
-	(princ "Lines of Code Report\n\n")
-	(if (and count total-files)
-	    (princ (format "Total files:  %d\n" total-files))
-	  (progn
-	    (princ (format "File name: %s\n" fname))
-	    (princ (format "File date: %s\n" (format-time-string "%D" (nth 5 (file-attributes fname)))))))
-	(princ "------------------- \n")
-	(princ (format "Code lines:    %d (%s%%)\n" code code-perc))
-	(princ (format "Javadoc lines: %d (%s%%)\n" javadoc jdoc-perc))
-	(princ (format "Comment lines: %d (%s%%)\n" comment doc-perc))
-	(princ (format "Blank lines:   %d (%s%%)\n" blank blank-perc))
-	(princ (format "Total lines:   %d  \n" total))
-	(princ "")))))
+        (princ "Lines of Code Report\n\n")
+        (if (and count total-files)
+            (princ (format "Total files:  %d\n" total-files))
+          (progn
+            (princ (format "File name: %s\n" fname))
+            (princ (format "File date: %s\n" (format-time-string "%D" (nth 5 (file-attributes fname)))))))
+        (princ "------------------- \n")
+        (princ (format "Code lines:    %d (%s%%)\n" code code-perc))
+        (princ (format "Javadoc lines: %d (%s%%)\n" javadoc jdoc-perc))
+        (princ (format "Comment lines: %d (%s%%)\n" comment doc-perc))
+        (princ (format "Blank lines:   %d (%s%%)\n" blank blank-perc))
+        (princ (format "Total lines:   %d  \n" total))
+        (princ "")))))
 
 
 (defun jdee-stat-parse-token-out-of-quote (token line)
   (let (result)
      ;;;Does the line contain '//'?
     (if (string-match token line)
-	 ;;;if so, does it contain '"'
-	(if (not (string-match "\"" line ))
-	     ;;;no! Ok, it's a comment
-	    (setq result t)
-	   ;;;yes!? so, we've got to parse to see if '//' exists without enclosing quote
-	  (let (
-		;;;we split the line in '"' delimited parts
-		(to-parse (split-string line "\""))
-		(temp "")
-		(count-even 0))
-	    ;;;we consider the even numbered parts of split
-	    ;;;to see if the contain a'//'
-	    ;;;if so, this is a doc line
-	    (while temp
-	      (setq temp (nth count-even to-parse))
-	      (if temp
-		  (if (string-match token temp)
-		      (progn
-			(setq result t)
-			(setq temp nil))))
-	      (setq count-even (+ 2  count-even))))))
+         ;;;if so, does it contain '"'
+        (if (not (string-match "\"" line ))
+             ;;;no! Ok, it's a comment
+            (setq result t)
+           ;;;yes!? so, we've got to parse to see if '//' exists without enclosing quote
+          (let (
+                ;;;we split the line in '"' delimited parts
+                (to-parse (split-string line "\""))
+                (temp "")
+                (count-even 0))
+            ;;;we consider the even numbered parts of split
+            ;;;to see if the contain a'//'
+            ;;;if so, this is a doc line
+            (while temp
+              (setq temp (nth count-even to-parse))
+              (if temp
+                  (if (string-match token temp)
+                      (progn
+                        (setq result t)
+                        (setq temp nil))))
+              (setq count-even (+ 2  count-even))))))
     result))
 
 (defun jdee-stat-count-loc ()
   "Counts the code, comments, javadoc, and blank lines in the current buffer.
 Returns the counts in a list: (TOTAL-LINES COMMENT-LINES JAVADOC-LINES BLANK-LINES)."
   (let ((count 0)
-	(line "")
-	(javadoc-count 0)
-	(comment-count 0)
-	(blank-count 0)
-	in-javadoc
-	in-comment
-	(test-b t)
-	start
-	end)
+        (line "")
+        (javadoc-count 0)
+        (comment-count 0)
+        (blank-count 0)
+        in-javadoc
+        in-comment
+        (test-b t)
+        start
+        end)
     (save-excursion
       (goto-char (point-min))
       (while test-b
-	(beginning-of-line 1)
-	(setq start (point))
-	(end-of-line 1)
-	(setq end (point))
-	(setq line (buffer-substring start end))
-	(setq count (+ 1 count))
+        (beginning-of-line 1)
+        (setq start (point))
+        (end-of-line 1)
+        (setq end (point))
+        (setq line (buffer-substring start end))
+        (setq count (+ 1 count))
 
       ;;;To match a blank line, we search the pattern representing an empty line
       ;;;or a line that just contains spaces
-	(if (string-match "^ *$" line)
-	    (setq blank-count (+ 1 blank-count) ))
+        (if (string-match "^ *$" line)
+            (setq blank-count (+ 1 blank-count) ))
 
       ;;;To match a comment line, we search the pattern '//'
       ;;;but we must disgard the '//' patterns enclosed in a pair of quote '"'
-	(if (jdee-stat-parse-token-out-of-quote "//" line)
-	    (setq comment-count (+ 1 comment-count)))
+        (if (jdee-stat-parse-token-out-of-quote "//" line)
+            (setq comment-count (+ 1 comment-count)))
 
       ;;;To match a comment block start, we search the pattern '/*' and exclude those of type '/**'
       ;;;but we must disgard the '/*' patterns enclosed in a pair of quote '"'
-	(if (and
-	     (jdee-stat-parse-token-out-of-quote "/\\*" line)
-	     (not (jdee-stat-parse-token-out-of-quote "/\\*\\*" line)))
-	    (setq in-comment t))
+        (if (and
+             (jdee-stat-parse-token-out-of-quote "/\\*" line)
+             (not (jdee-stat-parse-token-out-of-quote "/\\*\\*" line)))
+            (setq in-comment t))
 
       ;;;To match a javadoc block start, we search the pattern '/**'
       ;;;but we must disgard the '/**' patterns enclosed in a pair of quote '"'
-	(if (jdee-stat-parse-token-out-of-quote "/\\*\\*" line)
-	    (setq in-javadoc t))
+        (if (jdee-stat-parse-token-out-of-quote "/\\*\\*" line)
+            (setq in-javadoc t))
 
       ;;;To match a block end, we search the pattern '*/'
       ;;;but we must disgard the '*/' patterns enclosed in a pair of quote '"'
-	(if (jdee-stat-parse-token-out-of-quote "\\*/" line)
-	    (progn
-	      (if in-javadoc
-		  (setq javadoc-count (+ 1 javadoc-count)))
-	      (if in-comment
-		  (setq comment-count (+ 1 comment-count)))
-	      (setq in-javadoc nil)
-	      (setq in-comment nil)))
-	(if in-javadoc
-	    (setq javadoc-count (+ 1 javadoc-count)))
-	(if in-comment
-	    (setq comment-count (+ 1 comment-count)))
-	(if (not (= (forward-line 1) 0))
-	    (setq test-b nil))))
+        (if (jdee-stat-parse-token-out-of-quote "\\*/" line)
+            (progn
+              (if in-javadoc
+                  (setq javadoc-count (+ 1 javadoc-count)))
+              (if in-comment
+                  (setq comment-count (+ 1 comment-count)))
+              (setq in-javadoc nil)
+              (setq in-comment nil)))
+        (if in-javadoc
+            (setq javadoc-count (+ 1 javadoc-count)))
+        (if in-comment
+            (setq comment-count (+ 1 comment-count)))
+        (if (not (= (forward-line 1) 0))
+            (setq test-b nil))))
     (list count comment-count javadoc-count blank-count)))
 
 ;;;###autoload
@@ -174,9 +174,9 @@ containing a java file contained in dir. It returns a list containing
 two elements, a list of the number of code lines, comment lines,
 javadoc lines and blank lines and the number fo files."
   (let* ((directories (jdee-stat-get-directories dir))
-	 (count (jdee-stat-loc-count-directory dir))
-	 (current-count (car count))
-	 (number-of-files (cadr count)))
+         (count (jdee-stat-loc-count-directory dir))
+         (current-count (car count))
+         (number-of-files (cadr count)))
     (while directories
       (setq count (jdee-stat-loc-count-directories (car directories)))
       (setq current-count (jdee-stat-add current-count (car count)))
@@ -188,12 +188,12 @@ javadoc lines and blank lines and the number fo files."
   "Returns a list of the subdirectories in dir."
   (let (result)
     (apply 'nconc
-	   (mapcar (function
-		    (lambda (file)
-		      (if (and (not (string= (substring file -1) "."))
-			       (file-directory-p file))
-			  (setq result (append result (list file))))))
-		   (directory-files dir t nil t)))
+           (mapcar (function
+                    (lambda (file)
+                      (if (and (not (string= (substring file -1) "."))
+                               (file-directory-p file))
+                          (setq result (append result (list file))))))
+                   (directory-files dir t nil t)))
     result))
 
 ;;;###autoload
@@ -214,8 +214,8 @@ contained in dir. It returns a list containing two elements,
 a list of the number of code lines, comment lines,
 javadoc lines and blank lines and the number fo files."
   (let* ((files (directory-files dir t (wildcard-to-regexp "*.java") t))
-	 (number-of-files (length files))
-	 (count (list 0 0 0 0)))
+         (number-of-files (length files))
+         (count (list 0 0 0 0)))
     (while files
       (switch-to-buffer (find-file-noselect (car files) nil t))
       (setq count (jdee-stat-add count (jdee-stat-count-loc)))
@@ -230,9 +230,9 @@ the third the number of javadoc lines, and fourth the number of
 blank lines. It adds the respective elements in each list and returns another
 list of four elements."
   (list (+ (nth 0 count) (nth 0 count2))
-	(+ (nth 1 count) (nth 1 count2))
-	(+ (nth 2 count) (nth 2 count2))
-	(+ (nth 3 count) (nth 3 count2))))
+        (+ (nth 1 count) (nth 1 count2))
+        (+ (nth 2 count) (nth 2 count2))
+        (+ (nth 3 count) (nth 3 count2))))
 
 ;; Register and initialize the customization variables defined
 ;; by this package.

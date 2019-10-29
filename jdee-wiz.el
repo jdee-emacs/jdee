@@ -53,10 +53,10 @@
     (save-excursion
       (goto-char (point-max))
       (when (re-search-backward package-re (point-min) t)
-	(looking-at package-re)
-	(buffer-substring-no-properties
-	 (match-beginning 1)
-	 (match-end 1))))))
+        (looking-at package-re)
+        (buffer-substring-no-properties
+         (match-beginning 1)
+         (match-end 1))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -73,36 +73,36 @@ extends clause is updated"
   (interactive
    "sEnter interface: ")
   (let (keyword
-	(interface
-	 (jdee-wiz-get-unqualified-name interface-name)))
+        (interface
+         (jdee-wiz-get-unqualified-name interface-name)))
     (if extends
-	(setq keyword "extends")
+        (setq keyword "extends")
       (setq keyword "implements"))
     (save-excursion
       (let* ((class-re "class[ \t]+\\([a-zA-z]+[a-zA-Z0-9._]*\\).*[ \n]*")
-	     (open-brace-pos
-	      (ignore-errors (scan-lists (point) -1 1)))
-	     (class-name-end-pos
-	      (when open-brace-pos
-		(goto-char open-brace-pos)
-		(when (re-search-backward class-re (point-min) t)
-		  (looking-at class-re)
-		  (match-end 1))))
-	     (implements-keyword-end-pos
-	      (when (and open-brace-pos class-name-end-pos)
-		(goto-char open-brace-pos)
-		(if (re-search-backward keyword class-name-end-pos t)
-		    (match-end 0)))))
-	(if implements-keyword-end-pos
-	    (progn
-	      (goto-char implements-keyword-end-pos)
-	      (insert (concat " " interface ",")))
-	  (when class-name-end-pos
-	    (goto-char (- open-brace-pos 1))
-	    (if (looking-at " {")
-		(delete-char 1)  ;; if we don't delete, we end up with 2 spaces
-	      (forward-char))
-	    (insert (concat " " keyword " " interface " "))))))))
+             (open-brace-pos
+              (ignore-errors (scan-lists (point) -1 1)))
+             (class-name-end-pos
+              (when open-brace-pos
+                (goto-char open-brace-pos)
+                (when (re-search-backward class-re (point-min) t)
+                  (looking-at class-re)
+                  (match-end 1))))
+             (implements-keyword-end-pos
+              (when (and open-brace-pos class-name-end-pos)
+                (goto-char open-brace-pos)
+                (if (re-search-backward keyword class-name-end-pos t)
+                    (match-end 0)))))
+        (if implements-keyword-end-pos
+            (progn
+              (goto-char implements-keyword-end-pos)
+              (insert (concat " " interface ",")))
+          (when class-name-end-pos
+            (goto-char (- open-brace-pos 1))
+            (if (looking-at " {")
+                (delete-char 1)  ;; if we don't delete, we end up with 2 spaces
+              (forward-char))
+            (insert (concat " " keyword " " interface " "))))))))
 
 (defun jdee-dollar-name (name)
   "Convert pkg[.Outer].Inner[$Inner] to pkg[.Outer]$Inner[$Inner]"
@@ -115,10 +115,10 @@ extends clause is updated"
           (jdee-backend-make-interface-expr interface-name)))
     (if code
         (let ((required-imports (jdee-backend-get-interface-imports)))
-	  (eval code)			;error may be thrown if bad intf name
-	  (if required-imports
-	      (jdee-import-insert-imports-into-buffer required-imports t))
-	  (jdee-wiz-update-implements-clause interface-name)))))
+          (eval code)                        ;error may be thrown if bad intf name
+          (if required-imports
+              (jdee-import-insert-imports-into-buffer required-imports t))
+          (jdee-wiz-update-implements-clause interface-name)))))
 
 (defun jdee-wiz-gen-implementation-methods (gen-list)
   "Executes the given list of generation statements. Generation statements
@@ -127,12 +127,12 @@ subsequent method(s) or invocations of `jdee-wiz-gen-method'."
   (let ((items gen-list))
     (while (car items)
       (let ((to-end (- (point-max) (point))))
-	(if (stringp (car items))
-	    (progn
-	      (tempo-save-named 'comment-line (car items))
-	      (jdee-gen-section-comment))
-	  (eval (car items)))
-	(goto-char (- (point-max) to-end)))
+        (if (stringp (car items))
+            (progn
+              (tempo-save-named 'comment-line (car items))
+              (jdee-gen-section-comment))
+          (eval (car items)))
+        (goto-char (- (point-max) to-end)))
       (setq items (cdr items)))))
 
 (defun jdee-wiz-implement-interface-internal (interface-name)
@@ -143,15 +143,15 @@ set, otherwise the CLASSPATH environment variable."
    "sInterface name: ")
   (let ((names (jdee-backend-get-qualified-name interface-name)))
     (if names
-	(if (> (length names) 1)
-	    (jdee-wiz-generate-interface
-	     (efc-query-options
-	      names
-	      "Select interface to implement."
-	      "Class Name dialog"))
-	  (jdee-wiz-generate-interface (car names)))
+        (if (> (length names) 1)
+            (jdee-wiz-generate-interface
+             (efc-query-options
+              names
+              "Select interface to implement."
+              "Class Name dialog"))
+          (jdee-wiz-generate-interface (car names)))
       (error "Cannot find interface %s on the current classpath."
-	     interface-name))))
+             interface-name))))
 
 (defun jdee-wiz-implement-interface (interface-name)
   "*Generate a skeleton implementation of a specified interface.
@@ -171,8 +171,8 @@ more information."
    "sInterface name: ")
   (condition-case err
       (let ((pos (point)))
-	(jdee-wiz-implement-interface-internal interface-name)
-	(jdee-wiz-indent pos))
+        (jdee-wiz-implement-interface-internal interface-name)
+        (jdee-wiz-indent pos))
     (error
      (message "%s" (error-message-string err)))))
 
@@ -187,19 +187,19 @@ and fire every method of all listeners registered. It creates a data structure
 to store the listeners too."
   (condition-case err
       (let* ((pos (point))
-	     (code (jdee-backend-make-event-source-expr
+             (code (jdee-backend-make-event-source-expr
                     event-listener-interface-name)))
-	(if code
-	    (let ((required-imports
+        (if code
+            (let ((required-imports
                    (jdee-backend-get-event-source-imports)))
-	      (message "%s" "evaluating")
-	      (eval code)
-	      (message "%s" "eval done")
-	      (jdee-wiz-indent pos)
-	      (if required-imports
-		  (jdee-import-insert-imports-into-buffer required-imports t)
-		(message "%s" "no imports"))
-	      )))
+              (message "%s" "evaluating")
+              (eval code)
+              (message "%s" "eval done")
+              (jdee-wiz-indent pos)
+              (if required-imports
+                  (jdee-import-insert-imports-into-buffer required-imports t)
+                (message "%s" "no imports"))
+              )))
     (error
      (message "%s" (error-message-string err)))))
 
@@ -211,12 +211,12 @@ subsequent method(s) or invocations of `jdee-wiz-gen-listener-registry',
   (let ((items gen-list))
     (while (car items)
       (let ((to-end (- (point-max) (point))))
-	(if (stringp (car items))
-	    (progn
-	      (tempo-save-named 'comment-line (car items))
-	      (jdee-gen-section-comment))
-	  (eval (car items)))
-	(goto-char (- (point-max) to-end)))
+        (if (stringp (car items))
+            (progn
+              (tempo-save-named 'comment-line (car items))
+              (jdee-gen-section-comment))
+          (eval (car items)))
+        (goto-char (- (point-max) to-end)))
       (setq items (cdr items))
       ))
   )
@@ -251,14 +251,14 @@ set, otherwise the CLASSPATH environment variable."
    "sListener Interface name: ")
   (condition-case err
       (let ((names (jdee-backend-get-qualified-name interface-name)))
-	(if names
-	    (if (> (length names) 1)
-		(jdee-wiz-generate-event-source
-		 (efc-query-options names
-				    "Select interface to implement."
-				    "class name dialog"))
-	      (jdee-wiz-generate-event-source (car names)))
-	  (error "Cannot find listener interface %s on the current classpath." interface-name)))
+        (if names
+            (if (> (length names) 1)
+                (jdee-wiz-generate-event-source
+                 (efc-query-options names
+                                    "Select interface to implement."
+                                    "class name dialog"))
+              (jdee-wiz-generate-event-source (car names)))
+          (error "Cannot find listener interface %s on the current classpath." interface-name)))
     (error
      (message "%s" (error-message-string err)))))
 
@@ -308,63 +308,63 @@ NOTE: this command works only if the overriding class
 
   (condition-case err
       (let* ((super-class (jdee-parse-get-super-class-at-point))
-	     (qualified-super-class
-	      (jdee-parse-get-qualified-name super-class t))
-	     (classinfo
-	      (jdee-complete-get-classinfo qualified-super-class jdee-complete-protected))
-	     pair pos class-name qualified-class-name method-name)
-	(setq pair
-	      (assoc
-	       (completing-read "Method to overwrite: " classinfo nil t)
-	       classinfo))
+             (qualified-super-class
+              (jdee-parse-get-qualified-name super-class t))
+             (classinfo
+              (jdee-complete-get-classinfo qualified-super-class jdee-complete-protected))
+             pair pos class-name qualified-class-name method-name)
+        (setq pair
+              (assoc
+               (completing-read "Method to overwrite: " classinfo nil t)
+               classinfo))
 
-	(if (not pair)
-	    (error "No method specified for completion."))
+        (if (not pair)
+            (error "No method specified for completion."))
 
-	(setq pos (string-match " : " (car pair)))
-	(setq method-name
-	      (if pos
-		  (substring (car pair) 0 pos)
-		(cdr pair)))
+        (setq pos (string-match " : " (car pair)))
+        (setq method-name
+              (if pos
+                  (substring (car pair) 0 pos)
+                (cdr pair)))
 
-	(setq class-name
+        (setq class-name
               (jdee-parse-get-super-class-at-point))
-	(setq qualified-class-name
+        (setq qualified-class-name
               (jdee-parse-get-qualified-name class-name t))
-	(setq pos (string-match "(" method-name))
+        (setq pos (string-match "(" method-name))
 
-	(if qualified-super-class
-	    (let ((signatures (jdee-backend-get-candidate-signatures
+        (if qualified-super-class
+            (let ((signatures (jdee-backend-get-candidate-signatures
                                qualified-class-name
                                (substring method-name 0 pos))))
-	      (jdee-wiz-override-method-internal method-name
+              (jdee-wiz-override-method-internal method-name
                                                  signatures))
-	  (error "Cannot find parent class %s" super-class)))
+          (error "Cannot find parent class %s" super-class)))
     (error
      (message "%s" (error-message-string err)))))
 
 
 (defun jdee-wiz-override-method-internal (selected-method methods)
   (let* ((selected-method-args (jdee-wiz-number-of-arguments selected-method))
-	 (pos (point))
-	 (variant 0) skeleton required-imports
-	 (index 0))
+         (pos (point))
+         (variant 0) skeleton required-imports
+         (index 0))
     (while methods
       (if (jdee-wiz-check-signatures selected-method (car methods))
-	  (progn
-	    (setq variant index)
-	    (setq methods nil))
-	(progn
-	  (setq index (+ 1 index))
-	  (setq methods (cdr methods)))))
+          (progn
+            (setq variant index)
+            (setq methods nil))
+        (progn
+          (setq index (+ 1 index))
+          (setq methods (cdr methods)))))
 
     (jdee-backend-make-method-skeleton-expr (int-to-string variant))
     (setq required-imports (jdee-backend-get-method-override-imports))
     (if required-imports
-	(jdee-import-insert-imports-into-buffer required-imports t))))
+        (jdee-import-insert-imports-into-buffer required-imports t))))
 
 (defun jdee-wiz-gen-method (modifiers return-type name parameters exceptions
-				     default-body)
+                                     default-body)
   "Generates a method by setting the tempo named tags and
 invoking `jdee-gen-method'. This method is usually
 called by an expression generated in the beanshell."
@@ -384,12 +384,12 @@ subsequent method(s) or invocations of `jdee-wiz-gen-method'."
   (let ((items gen-list))
     (while (car items)
       (let ((to-end (- (point-max) (point))))
-	(if (stringp (car items))
-	    (progn
-	      (tempo-save-named 'comment-line (car items))
-	      (jdee-gen-section-comment))
-	  (eval (car items)))
-	(goto-char (- (point-max) to-end)))
+        (if (stringp (car items))
+            (progn
+              (tempo-save-named 'comment-line (car items))
+              (jdee-gen-section-comment))
+          (eval (car items)))
+        (goto-char (- (point-max) to-end)))
       (setq items (cdr items))
       ))
   )
@@ -408,16 +408,16 @@ subsequent method(s) or invocations of `jdee-wiz-gen-method'."
   "Returns the number of arguments in this signature"
   (let (pos (number-of-arguments 0))
     (if (string-match "()" signature)
-	number-of-arguments
+        number-of-arguments
       (if (not (string-match "," signature))
-	  (setq number-of-arguments (+ 1 number-of-arguments))
-	(progn
-	  (setq number-of-arguments 1)
-	  (while (string-match "," signature)
-	    (setq pos (string-match "," signature))
-	    (setq number-of-arguments (+ 1 number-of-arguments))
-	    (setq signature (substring signature (+ pos 1)))))))
-	  number-of-arguments))
+          (setq number-of-arguments (+ 1 number-of-arguments))
+        (progn
+          (setq number-of-arguments 1)
+          (while (string-match "," signature)
+            (setq pos (string-match "," signature))
+            (setq number-of-arguments (+ 1 number-of-arguments))
+            (setq signature (substring signature (+ pos 1)))))))
+          number-of-arguments))
 
 (defun jdee-wiz-indent (pos)
   "Indents the just inserted region without moving
@@ -435,8 +435,8 @@ the cursor"
   (let* ((class
           (or class-name
               (read-from-minibuffer "Class: " (thing-at-point 'symbol))))
-	 (fq-class-name
-	  (jdee-parse-select-qualified-class-name class)))
+         (fq-class-name
+          (jdee-parse-select-qualified-class-name class)))
     (if fq-class-name
         (jdee-backend-browse-class fq-class-name))))
 
@@ -464,24 +464,24 @@ function's documentation for more information."
    "sDelegee name: ")
   (condition-case err
       (let* ((pos (point))
-	     (start nil)
-	     (class-name
-	      (or (jdee-parse-get-qualified-name
-		   (car (jdee-parse-declared-type-of delegee)) t)
-		  (read-string (concat "Enter fully qualified class name of "
-				       delegee ": "))))
-	     (code (jdee-backend-make-delegator-methods delegee class-name)))
-	(if code
-	    (let ((required-imports (jdee-backend-get-delegate-imports)))
-	      (font-lock-mode -1)
-	      (setq start (point))
-	      (eval code)
-	      ;;indenting the new code
-	      (jdee-wiz-indent pos)
-	      (if required-imports
-		  (jdee-import-insert-imports-into-buffer required-imports t))
-	      (font-lock-mode)
-	      )))
+             (start nil)
+             (class-name
+              (or (jdee-parse-get-qualified-name
+                   (car (jdee-parse-declared-type-of delegee)) t)
+                  (read-string (concat "Enter fully qualified class name of "
+                                       delegee ": "))))
+             (code (jdee-backend-make-delegator-methods delegee class-name)))
+        (if code
+            (let ((required-imports (jdee-backend-get-delegate-imports)))
+              (font-lock-mode -1)
+              (setq start (point))
+              (eval code)
+              ;;indenting the new code
+              (jdee-wiz-indent pos)
+              (if required-imports
+                  (jdee-import-insert-imports-into-buffer required-imports t))
+              (font-lock-mode)
+              )))
     (error
      (message "%s" (error-message-string err)))))
 
@@ -493,13 +493,13 @@ function's documentation for more information."
   "*Generate a skeleton implementation of a specified abstract class."
   (condition-case err
       (let* ((code (jdee-backend-maket-abstract-class-expr class-name)))
-	(if code
-	    (let ((required-imports
+        (if code
+            (let ((required-imports
                    (jdee-backend-get-abstract-class-imports)))
-	      (eval code)
-	      (if required-imports
-		  (jdee-import-insert-imports-into-buffer required-imports t))
-	      (jdee-wiz-update-implements-clause class-name t))))
+              (eval code)
+              (if required-imports
+                  (jdee-import-insert-imports-into-buffer required-imports t))
+              (jdee-wiz-update-implements-clause class-name t))))
     (message "%s" (error-message-string err))))
 
 (defun jdee-wiz-extend-abstract-class-internal (class-name)
@@ -510,14 +510,14 @@ set, otherwise the CLASSPATH environment variable."
    "sAbstract classname: ")
   (condition-case err
       (let ((names (jdee-backend-get-qualified-name class-name)))
-	(if names
-	    (if (> (length names) 1)
-		(jdee-wiz-generate-abstract-class
-		 (efc-query-options names nil
-				    "class name dialog"))
-	      (jdee-wiz-generate-abstract-class (car names)))
-	  (message "Cannot find abstract class %s on the current classpath."
-		   class-name)))
+        (if names
+            (if (> (length names) 1)
+                (jdee-wiz-generate-abstract-class
+                 (efc-query-options names nil
+                                    "class name dialog"))
+              (jdee-wiz-generate-abstract-class (car names)))
+          (message "Cannot find abstract class %s on the current classpath."
+                   class-name)))
     (message "%s" (error-message-string err))))
 
 (defun jdee-wiz-extend-abstract-class (class-name)
@@ -559,10 +559,10 @@ public String get(String argName)"
 
 (defcustom jdee-wiz-get-javadoc-template
   (list "/**"
-	"* Gets the value of %n"
-	"*"
-	"* @return the value of %n"
-	"*/")
+        "* Gets the value of %n"
+        "*"
+        "* @return the value of %n"
+        "*/")
   "Template used by `jdee-wiz-get-set-method' to add the javadoc
 to a get method. The %n are replaced by the variable name and
 %t by the variable."
@@ -571,10 +571,10 @@ to a get method. The %n are replaced by the variable name and
 
 (defcustom jdee-wiz-set-javadoc-template
   (list "/**"
-	"* Sets the value of %n"
-	"*"
-	"* @param %p Value to assign to this.%n"
-	"*/")
+        "* Sets the value of %n"
+        "*"
+        "* @param %p Value to assign to this.%n"
+        "*/")
   "Template used by `jdee-wiz-get-set-method' to add the javadoc to a
 set method. The %n are replaced by the variable name, %t by the variable
 type and %p for the argument name. In most cases %n and %p are the same
@@ -606,10 +606,10 @@ It will take everything after the first capitalize letter. A nil value will use
 the variable name as it is defined in the buffer."
   :group 'jdee-wiz
   :type '(cons (string :tag "Enter either the prefix or postfix")
-	       (radio-button-choice (const "Prefix")
-				    (const "Postfix")
-				    (const "Everything after the first upcase letter")
-				    (const nil))))
+               (radio-button-choice (const "Prefix")
+                                    (const "Postfix")
+                                    (const "Everything after the first upcase letter")
+                                    (const nil))))
 
 (defcustom jdee-wiz-get-set-methods-include (list "Both")
   "Use this variable to set what methods `jdee-wiz-get-set-methods' will
@@ -617,8 +617,8 @@ insert in the buffer. The options are get methods only, set methods only,
  and both."
   :group 'jdee-wiz
   :type '(list (radio-button-choice (const "Get only")
-				    (const "Set only")
-				    (const "Both"))))
+                                    (const "Set only")
+                                    (const "Both"))))
 
 (defcustom jdee-wiz-get-set-static-members t
   "If on (nonnil), `jdee-wiz-get-set-methods' generates getter/setter methods for
@@ -632,10 +632,10 @@ get and set methods are going to be inserted by
 `jdee-wiz-get-set-methods'"
   :group 'jdee-wiz
   :type '(list (radio-button-choice
-		(const "Get followed by set for each field")
-		(const "Set followed by get for each field")
-		(const "All get methods followed by all set methods")
-		(const "All set methods followed by all get methods"))))
+                (const "Get followed by set for each field")
+                (const "Set followed by get for each field")
+                (const "All get methods followed by all set methods")
+                (const "All set methods followed by all get methods"))))
 
 (defun jdee-wiz-downcase-initials (obj)
   "It downcase the first letter of obj"
@@ -645,15 +645,15 @@ get and set methods are going to be inserted by
   "Recurse through all the tokens in `tokens' looking for
 the tokens of `class-name', returns nil if no token are found"
   (let ((parts (jdee-wiz-get-class-parts-helper class-name tokens))
-	temp-parts inner-classes)
+        temp-parts inner-classes)
     (if (not parts)
-	(while tokens
-	  (setq temp-parts (semantic-tag-type-members (car tokens)))
-	  (setq inner-classes (semantic-brute-find-tag-by-class 'type temp-parts))
-	  (setq parts (jdee-wiz-get-class-parts class-name inner-classes))
-	  (if parts
-	      (setq tokens nil)
-	    (setq tokens (cdr tokens)))))
+        (while tokens
+          (setq temp-parts (semantic-tag-type-members (car tokens)))
+          (setq inner-classes (semantic-brute-find-tag-by-class 'type temp-parts))
+          (setq parts (jdee-wiz-get-class-parts class-name inner-classes))
+          (if parts
+              (setq tokens nil)
+            (setq tokens (cdr tokens)))))
     parts))
 
 (defun jdee-wiz-get-class-parts-helper (class-name tokens)
@@ -664,9 +664,9 @@ return otherwise"
     (while tokens
       (setq current-class (car tokens))
       (if (string= class-name (semantic-tag-name current-class))
-	  (progn
-	    (setq parts (semantic-tag-type-members current-class))
-	    (setq tokens nil)))
+          (progn
+            (setq parts (semantic-tag-type-members current-class))
+            (setq tokens nil)))
       (setq tokens (cdr tokens)))
     parts))
 
@@ -676,12 +676,12 @@ current buffer. Functions are semantic tokens for the functions
 defined in the current buffer."
   (or (member
        (concat
-	"get"
-	(upcase-initials (jdee-wiz-get-name name))) functions)
+        "get"
+        (upcase-initials (jdee-wiz-get-name name))) functions)
       (member
        (concat
-	"is"
-	(upcase-initials (jdee-wiz-get-name name))) functions)))
+        "is"
+        (upcase-initials (jdee-wiz-get-name name))) functions)))
 
 (defun jdee-wiz-set-member-p (name functions)
   "Returns t if the variable name has a set method defined in the current buffer.
@@ -693,28 +693,28 @@ Functions are semantic tokens for the functions defined in the current buffer."
 defined in the current buffer."
   (interactive)
   (let* ((include (car jdee-wiz-get-set-methods-include))
-	 ;;Indicates if both get and set should be inserted
-	 (bothp (string= "Both" include))
-	 ;;only get methods should be inserted
-	 (get-onlyp (string= "Get only" include))
-	 ;;only set methods should be inserted
-	 (set-onlyp (string= "Set only" include))
-	 (order (car jdee-wiz-get-set-methods-order))
-	 (get-firstp
-	  (or (string= "All get methods followed by all set methods" order)
-	      (string= "Get followed by set for each field" order)))
-	 (class (jdee-parse-get-class-at-point));;class name
-	 (classes (split-string class "\\."))
-	 (class-name (nth (- (length classes) 1) classes))
-	 (tokens (semantic-fetch-tags));;buffer tokens
-	 (type (semantic-brute-find-tag-by-class 'type tokens));;class tokens
-	 (parts (jdee-wiz-get-class-parts class-name type))
-	 (variables (semantic-brute-find-tag-by-class 'variable parts));;declared variables
-	 ;;non public variables
-	 (non-public-variables (jdee-wiz-filter-variables-by-typemodifier variables))
-	 (functions (semantic-brute-find-tag-by-class 'function parts));;functions
-	 (set-get-functions (jdee-wiz-get-get-set-methods functions));;get,set,is functions
-	 var name staticp finalp report temp pos)
+         ;;Indicates if both get and set should be inserted
+         (bothp (string= "Both" include))
+         ;;only get methods should be inserted
+         (get-onlyp (string= "Get only" include))
+         ;;only set methods should be inserted
+         (set-onlyp (string= "Set only" include))
+         (order (car jdee-wiz-get-set-methods-order))
+         (get-firstp
+          (or (string= "All get methods followed by all set methods" order)
+              (string= "Get followed by set for each field" order)))
+         (class (jdee-parse-get-class-at-point));;class name
+         (classes (split-string class "\\."))
+         (class-name (nth (- (length classes) 1) classes))
+         (tokens (semantic-fetch-tags));;buffer tokens
+         (type (semantic-brute-find-tag-by-class 'type tokens));;class tokens
+         (parts (jdee-wiz-get-class-parts class-name type))
+         (variables (semantic-brute-find-tag-by-class 'variable parts));;declared variables
+         ;;non public variables
+         (non-public-variables (jdee-wiz-filter-variables-by-typemodifier variables))
+         (functions (semantic-brute-find-tag-by-class 'function parts));;functions
+         (set-get-functions (jdee-wiz-get-get-set-methods functions));;get,set,is functions
+         var name staticp finalp report temp pos)
 
     (setq
      report
@@ -739,129 +739,129 @@ defined in the current buffer."
       (setq
        report
        (concat
-	report
-	(format
-	 "%-60.60s"
-	 (concat
-	  type " " name " "
-	  (and (semantic-tag-modifiers var)
-	       ;; only if some modifiers are present
-	       ;; print them
-	       (format "%s" (semantic-tag-modifiers var)))))))
+        report
+        (format
+         "%-60.60s"
+         (concat
+          type " " name " "
+          (and (semantic-tag-modifiers var)
+               ;; only if some modifiers are present
+               ;; print them
+               (format "%s" (semantic-tag-modifiers var)))))))
 
       (setq report (concat report "\t"))
 
       ;;order in which the methods should be inserted
       (cond ((string= "Get followed by set for each field" order)
-	     ;;get method followed by its set method
-	     ;;getting the get method if it does not exist in the buffer
-	     (if (not (jdee-wiz-get-member-p name set-get-functions))
-		 (if (and (or bothp get-onlyp)
-			  (or (not staticp) jdee-wiz-get-set-static-members))
-		     (progn
-		       (insert (jdee-wiz-get-get-method type name staticp class))
-		       (setq report (concat report "[Added  ]")))
-		   (setq report (concat report "[Skipped]")))
-	       (setq report (concat report "[Exists ]")))
+             ;;get method followed by its set method
+             ;;getting the get method if it does not exist in the buffer
+             (if (not (jdee-wiz-get-member-p name set-get-functions))
+                 (if (and (or bothp get-onlyp)
+                          (or (not staticp) jdee-wiz-get-set-static-members))
+                     (progn
+                       (insert (jdee-wiz-get-get-method type name staticp class))
+                       (setq report (concat report "[Added  ]")))
+                   (setq report (concat report "[Skipped]")))
+               (setq report (concat report "[Exists ]")))
 
-	     (setq report (concat report "\t"))
+             (setq report (concat report "\t"))
 
-	     ;;getting the set method if it does not exist in the buffer
-	     (if (and (not finalp);; it is final - can not have a setter
-		      (not (jdee-wiz-set-member-p name set-get-functions)))
-		 (if (and (or bothp set-onlyp)
-			  (or (not staticp) jdee-wiz-get-set-static-members))
-		     (progn
-		       (insert (jdee-wiz-get-set-method type name staticp class))
-		       (setq report (concat report "[Added  ]")))
-		   (setq report (concat report "[Skipped]")))
-	       (if (jdee-wiz-set-member-p name set-get-functions)
-		   (setq report (concat report "[Exists ]"))
-		 (if finalp
-		     (setq report (concat report "[N/A    ]"))))))
-	    ;;set method followed by its get method
-	    ((string= "Set followed by get for each field" order)
-	     ;;getting the set method if it does not exist in the buffer
-	     (if (and (not finalp);; it is final - can not have a setter
-		      (not (jdee-wiz-set-member-p name set-get-functions)))
-		 (if (and (or bothp set-onlyp)
-			  (or (not staticp) jdee-wiz-get-set-static-members))
-		     (progn
-		       (insert (jdee-wiz-get-set-method type name staticp class))
-		       (setq report (concat report "[Added  ]")))
-		   (setq report (concat report "[Skipped]")))
-	       (if (jdee-wiz-set-member-p name set-get-functions)
-		   (setq report (concat report "[Exists ]"))
-		 (if finalp
-		     (setq report (concat report "[N/A    ]")))))
+             ;;getting the set method if it does not exist in the buffer
+             (if (and (not finalp);; it is final - can not have a setter
+                      (not (jdee-wiz-set-member-p name set-get-functions)))
+                 (if (and (or bothp set-onlyp)
+                          (or (not staticp) jdee-wiz-get-set-static-members))
+                     (progn
+                       (insert (jdee-wiz-get-set-method type name staticp class))
+                       (setq report (concat report "[Added  ]")))
+                   (setq report (concat report "[Skipped]")))
+               (if (jdee-wiz-set-member-p name set-get-functions)
+                   (setq report (concat report "[Exists ]"))
+                 (if finalp
+                     (setq report (concat report "[N/A    ]"))))))
+            ;;set method followed by its get method
+            ((string= "Set followed by get for each field" order)
+             ;;getting the set method if it does not exist in the buffer
+             (if (and (not finalp);; it is final - can not have a setter
+                      (not (jdee-wiz-set-member-p name set-get-functions)))
+                 (if (and (or bothp set-onlyp)
+                          (or (not staticp) jdee-wiz-get-set-static-members))
+                     (progn
+                       (insert (jdee-wiz-get-set-method type name staticp class))
+                       (setq report (concat report "[Added  ]")))
+                   (setq report (concat report "[Skipped]")))
+               (if (jdee-wiz-set-member-p name set-get-functions)
+                   (setq report (concat report "[Exists ]"))
+                 (if finalp
+                     (setq report (concat report "[N/A    ]")))))
 
-	     (setq report (concat report "\t"))
+             (setq report (concat report "\t"))
 
-	     ;;getting the get method if it does not exist in the buffer
-	     (if (not (jdee-wiz-get-member-p name set-get-functions))
-		 (if (and (or bothp get-onlyp)
-			  (or (not staticp) jdee-wiz-get-set-static-members))
-		     (progn
-		       (insert (jdee-wiz-get-get-method type name staticp class))
-		       (setq report (concat report "[Added  ]")))
-		   (setq report (concat report "[Skipped]")))
-	       (setq report (concat report "[Exists ]"))))
+             ;;getting the get method if it does not exist in the buffer
+             (if (not (jdee-wiz-get-member-p name set-get-functions))
+                 (if (and (or bothp get-onlyp)
+                          (or (not staticp) jdee-wiz-get-set-static-members))
+                     (progn
+                       (insert (jdee-wiz-get-get-method type name staticp class))
+                       (setq report (concat report "[Added  ]")))
+                   (setq report (concat report "[Skipped]")))
+               (setq report (concat report "[Exists ]"))))
 
-	    ;;all the get method first
-	    ((string= "All get methods followed by all set methods" order)
-	     ;;getting the get method if it does not exist in the buffer
-	     (if (not (jdee-wiz-get-member-p name set-get-functions))
-		 (if (and (or bothp get-onlyp)
-			  (or (not staticp) jdee-wiz-get-set-static-members))
-		     (progn
-		       (insert (jdee-wiz-get-get-method type name staticp class))
-		       (setq report (concat report "[Added  ]")))
-		   (setq report (concat report "[Skipped]")))
-	       (setq report (concat report "[Exists ]")))
+            ;;all the get method first
+            ((string= "All get methods followed by all set methods" order)
+             ;;getting the get method if it does not exist in the buffer
+             (if (not (jdee-wiz-get-member-p name set-get-functions))
+                 (if (and (or bothp get-onlyp)
+                          (or (not staticp) jdee-wiz-get-set-static-members))
+                     (progn
+                       (insert (jdee-wiz-get-get-method type name staticp class))
+                       (setq report (concat report "[Added  ]")))
+                   (setq report (concat report "[Skipped]")))
+               (setq report (concat report "[Exists ]")))
 
-	     (setq report (concat report "\t"))
+             (setq report (concat report "\t"))
 
-	     ;;getting the set method if it does not exist in the buffer
-	     (if (and (not finalp);; it is final - can not have a setter
-		      (not (jdee-wiz-set-member-p name set-get-functions)))
-		 (if (and (or bothp set-onlyp)
-			  (or (not staticp) jdee-wiz-get-set-static-members))
-		     (progn
-		       (setq temp (concat temp (jdee-wiz-get-set-method type name staticp class)))
-		       (setq report (concat report "[Added  ]")))
-		   (setq report (concat report "[Skipped]")))
-	       (if (jdee-wiz-set-member-p name set-get-functions)
-		   (setq report (concat report "[Exists ]"))
-		 (if finalp
-		     (setq report (concat report "[N/A    ]"))))))
+             ;;getting the set method if it does not exist in the buffer
+             (if (and (not finalp);; it is final - can not have a setter
+                      (not (jdee-wiz-set-member-p name set-get-functions)))
+                 (if (and (or bothp set-onlyp)
+                          (or (not staticp) jdee-wiz-get-set-static-members))
+                     (progn
+                       (setq temp (concat temp (jdee-wiz-get-set-method type name staticp class)))
+                       (setq report (concat report "[Added  ]")))
+                   (setq report (concat report "[Skipped]")))
+               (if (jdee-wiz-set-member-p name set-get-functions)
+                   (setq report (concat report "[Exists ]"))
+                 (if finalp
+                     (setq report (concat report "[N/A    ]"))))))
 
-	    ;;all the set method first
-	    ((string= "All set methods followed by all get methods" order)
-	     ;;getting the set method if it does not exist in the buffer
-	     (if (and (not finalp);; it is final - can not have a setter
-		      (not (jdee-wiz-set-member-p name set-get-functions)))
-		 (if (and (or bothp set-onlyp)
-			  (or (not staticp) jdee-wiz-get-set-static-members))
-		     (progn
-		       (insert (jdee-wiz-get-set-method type name staticp class))
-		       (setq report (concat report "[Added  ]")))
-		   (setq report (concat report "[Skipped]")))
-	       (if (jdee-wiz-set-member-p name set-get-functions)
-		   (setq report (concat report "[Exists ]"))
-		 (if finalp
-		     (setq report (concat report "[N/A    ]")))))
+            ;;all the set method first
+            ((string= "All set methods followed by all get methods" order)
+             ;;getting the set method if it does not exist in the buffer
+             (if (and (not finalp);; it is final - can not have a setter
+                      (not (jdee-wiz-set-member-p name set-get-functions)))
+                 (if (and (or bothp set-onlyp)
+                          (or (not staticp) jdee-wiz-get-set-static-members))
+                     (progn
+                       (insert (jdee-wiz-get-set-method type name staticp class))
+                       (setq report (concat report "[Added  ]")))
+                   (setq report (concat report "[Skipped]")))
+               (if (jdee-wiz-set-member-p name set-get-functions)
+                   (setq report (concat report "[Exists ]"))
+                 (if finalp
+                     (setq report (concat report "[N/A    ]")))))
 
-	     (setq report (concat report "\t"))
+             (setq report (concat report "\t"))
 
-	     ;;getting the get method if it does not exist in the buffer
-	     (if (not (jdee-wiz-get-member-p name set-get-functions))
-		 (if (and (or bothp get-onlyp)
-			  (or (not staticp) jdee-wiz-get-set-static-members))
-		     (progn
-		       (setq temp (concat temp (jdee-wiz-get-get-method type name staticp class)))
-		       (setq report (concat report "[Added  ]")))
-		   (setq report (concat report "[Skipped]")))
-	       (setq report (concat report "[Exists ]")))))
+             ;;getting the get method if it does not exist in the buffer
+             (if (not (jdee-wiz-get-member-p name set-get-functions))
+                 (if (and (or bothp get-onlyp)
+                          (or (not staticp) jdee-wiz-get-set-static-members))
+                     (progn
+                       (setq temp (concat temp (jdee-wiz-get-get-method type name staticp class)))
+                       (setq report (concat report "[Added  ]")))
+                   (setq report (concat report "[Skipped]")))
+               (setq report (concat report "[Exists ]")))))
 
       (setq report (concat report "\n"))
 
@@ -870,8 +870,8 @@ defined in the current buffer."
     (setq pos (point))
     (if temp (insert temp))
     (if jdee-wiz-show-report
-	(with-output-to-temp-buffer (concat "*jdee-wiz-get-set-methods report for " class "*")
-	  (princ report)))
+        (with-output-to-temp-buffer (concat "*jdee-wiz-get-set-methods report for " class "*")
+          (princ report)))
     ;;indenting the new code
     (jdee-wiz-indent pos)))
 
@@ -882,9 +882,9 @@ defined in the current buffer."
       (setq token (car tokens))
       (setq name (semantic-tag-name token))
       (if (or (string-match "^get" name)
-	      (string-match "^set" name)
-	      (string-match "^is" name))
-	  (setq filtered-methods (append filtered-methods (list name))))
+              (string-match "^set" name)
+              (string-match "^is" name))
+          (setq filtered-methods (append filtered-methods (list name))))
       (setq tokens (cdr tokens)))
     filtered-methods))
 
@@ -896,7 +896,7 @@ protected modifiers"
       (setq token (car tokens))
       (setq modifiers (semantic-tag-modifiers token))
       (if (not (member "public" modifiers))
-	  (setq filtered-tokens (append filtered-tokens (list token))))
+          (setq filtered-tokens (append filtered-tokens (list token))))
       (setq tokens (cdr tokens)))
     filtered-tokens))
 
@@ -906,36 +906,36 @@ method templates. For Example if the variable is \"_Name\" and the variable
 `jdee-wiz-get-set-variable-convention' is set to prefix _ this method will
 return \"Name\"."
   (let (answer
-	(cfs case-fold-search)
-	(fix (car jdee-wiz-get-set-variable-convention))
-	(convention (cdr jdee-wiz-get-set-variable-convention)))
+        (cfs case-fold-search)
+        (fix (car jdee-wiz-get-set-variable-convention))
+        (convention (cdr jdee-wiz-get-set-variable-convention)))
     (setq case-fold-search nil)
     (cond ((not convention)
-	   (setq answer variable))
-	  ((string= "Prefix" convention)
-	   (progn
-	     (if fix
-		 (let ((pos (string-match (concat "^" fix) variable)))
-		   (if pos
-		       (setq answer (substring variable (+ pos (length fix))))
-		     (setq answer variable)))
-	       (setq answer variable))))
-	  ((string= "Postfix" convention)
-	   (progn
-	     (if fix
-		 (let ((pos (string-match (concat fix "$") variable)))
-		   (if pos
-		       (setq answer (substring variable 0 pos))
-		     (setq answer variable)))
-	       (setq answer variable))))
-	  (t
-	   (let ((pos (string-match "[A-Z]." variable)))
-	     (if pos
-		 (let ((ans (substring variable pos)))
-		   (if ans
-		       (setq answer ans)
-		     (setq answer variable)))
-	       (setq answer variable)))))
+           (setq answer variable))
+          ((string= "Prefix" convention)
+           (progn
+             (if fix
+                 (let ((pos (string-match (concat "^" fix) variable)))
+                   (if pos
+                       (setq answer (substring variable (+ pos (length fix))))
+                     (setq answer variable)))
+               (setq answer variable))))
+          ((string= "Postfix" convention)
+           (progn
+             (if fix
+                 (let ((pos (string-match (concat fix "$") variable)))
+                   (if pos
+                       (setq answer (substring variable 0 pos))
+                     (setq answer variable)))
+               (setq answer variable))))
+          (t
+           (let ((pos (string-match "[A-Z]." variable)))
+             (if pos
+                 (let ((ans (substring variable pos)))
+                   (if ans
+                       (setq answer ans)
+                     (setq answer variable)))
+               (setq answer variable)))))
     (setq case-fold-search cfs)
     answer))
 
@@ -943,32 +943,32 @@ return \"Name\"."
 (defun jdee-wiz-get-get-method(type name &optional staticp class-name)
   "Returns a string representing a get method"
   (let ((filtered-name (jdee-wiz-get-name name))
-	get (javadoc "") temp temp2)
+        get (javadoc "") temp temp2)
     (setq
      get
      (concat
       "\n"
       (if jdee-wiz-include-javadoc
-	  (progn
-	    (setq temp2 jdee-wiz-get-javadoc-template)
-	    (while temp2
-	      (setq temp (car temp2))
-	      (while (string-match "%n" temp)
-		(setq
-		 temp
-		 (replace-match
-		  (jdee-wiz-downcase-initials filtered-name) nil nil temp)))
-	      (while (string-match "%t" temp)
-		(setq temp (replace-match type nil nil temp)))
-	      (setq javadoc (concat javadoc temp "\n"))
-	      (setq temp2 (cdr temp2)))
-	    javadoc))
+          (progn
+            (setq temp2 jdee-wiz-get-javadoc-template)
+            (while temp2
+              (setq temp (car temp2))
+              (while (string-match "%n" temp)
+                (setq
+                 temp
+                 (replace-match
+                  (jdee-wiz-downcase-initials filtered-name) nil nil temp)))
+              (while (string-match "%t" temp)
+                (setq temp (replace-match type nil nil temp)))
+              (setq javadoc (concat javadoc temp "\n"))
+              (setq temp2 (cdr temp2)))
+            javadoc))
       (jdee-gen-method-signature
        (concat "public" (if staticp " static"))
        type
        (concat
-	(if (string= type "boolean") "is" "get")
-	(upcase-initials filtered-name))
+        (if (string= type "boolean") "is" "get")
+        (upcase-initials filtered-name))
        nil)
       (if jdee-gen-k&r "{" "\n{") "\n"
       "return " (if staticp (concat class-name ".") "this.")
@@ -978,12 +978,12 @@ return \"Name\"."
 (defun jdee-wiz-get-set-method(type name &optional staticp class-name)
   "Returns a string representing a set method"
   (let ((filtered-name (jdee-wiz-get-name name))
-	set (javadoc "") arg-name temp temp2)
+        set (javadoc "") arg-name temp temp2)
     (if jdee-wiz-get-set-variable-prefix
-	(setq
-	 arg-name
-	 (jdee-wiz-downcase-initials
-	  (concat jdee-wiz-get-set-variable-prefix (upcase-initials filtered-name))))
+        (setq
+         arg-name
+         (jdee-wiz-downcase-initials
+          (concat jdee-wiz-get-set-variable-prefix (upcase-initials filtered-name))))
       (setq arg-name (jdee-wiz-downcase-initials filtered-name)))
 
     (setq
@@ -991,21 +991,21 @@ return \"Name\"."
      (concat
       "\n"
       (if jdee-wiz-include-javadoc
-	  (progn
-	    (setq temp2 jdee-wiz-set-javadoc-template)
-	    (while temp2
-	      (setq temp (car temp2))
-	      (while (string-match "%n" temp)
-		(setq temp
-		      (replace-match
-		       (jdee-wiz-downcase-initials filtered-name) nil nil temp)))
-	      (while (string-match "%t" temp)
-		(setq temp (replace-match type nil nil temp)))
-	      (while (string-match "%p" temp)
-		(setq temp (replace-match arg-name nil nil temp)))
-	      (setq javadoc (concat javadoc temp "\n"))
-	      (setq temp2 (cdr temp2)))
-	    javadoc))
+          (progn
+            (setq temp2 jdee-wiz-set-javadoc-template)
+            (while temp2
+              (setq temp (car temp2))
+              (while (string-match "%n" temp)
+                (setq temp
+                      (replace-match
+                       (jdee-wiz-downcase-initials filtered-name) nil nil temp)))
+              (while (string-match "%t" temp)
+                (setq temp (replace-match type nil nil temp)))
+              (while (string-match "%p" temp)
+                (setq temp (replace-match arg-name nil nil temp)))
+              (setq javadoc (concat javadoc temp "\n"))
+              (setq temp2 (cdr temp2)))
+            javadoc))
       (jdee-gen-method-signature
        (concat "public" (if staticp " static"))
        "void"
@@ -1083,30 +1083,30 @@ If `jdee-wiz-tostring-prefix' is defined, it is prepended to the string.
 If `jdee-wiz-tostring-postfix' is defined, it is appended to the string. "
  (interactive)
  (let* ((class-name
-	 (jdee-parse-get-unqualified-name
-	  (jdee-parse-get-class-at-point)))
-	(variables
-	 (semantic-brute-find-tag-by-class
-	  'variable
-	  (jdee-wiz-get-class-parts
-	   class-name
-	   (semantic-brute-find-tag-by-class
-	    'type
-	    (semantic-fetch-tags)
-	    ))))
-	(method
-	 (concat
-	  "/**\n"
-	  " * {@inheritDoc}\n"
-	  " */\n"
-	  ;; respect coding style - by yoonforh 2004-05-10 01:34:02
-	  "public String toString()"
-	  (if jdee-gen-k&r " {\n" "\n{\n")
-	  "final int sbSize = " jdee-wiz-tostring-stringbuffer-size  ";\n"
-	  "final String variableSeparator = " jdee-wiz-tostring-variable-separator ";\n"
-	  "final StringBuffer sb = new StringBuffer(sbSize);\n\n"))
-	(prefix jdee-wiz-tostring-prefix)
-	(postfix jdee-wiz-tostring-postfix))
+         (jdee-parse-get-unqualified-name
+          (jdee-parse-get-class-at-point)))
+        (variables
+         (semantic-brute-find-tag-by-class
+          'variable
+          (jdee-wiz-get-class-parts
+           class-name
+           (semantic-brute-find-tag-by-class
+            'type
+            (semantic-fetch-tags)
+            ))))
+        (method
+         (concat
+          "/**\n"
+          " * {@inheritDoc}\n"
+          " */\n"
+          ;; respect coding style - by yoonforh 2004-05-10 01:34:02
+          "public String toString()"
+          (if jdee-gen-k&r " {\n" "\n{\n")
+          "final int sbSize = " jdee-wiz-tostring-stringbuffer-size  ";\n"
+          "final String variableSeparator = " jdee-wiz-tostring-variable-separator ";\n"
+          "final StringBuffer sb = new StringBuffer(sbSize);\n\n"))
+        (prefix jdee-wiz-tostring-prefix)
+        (postfix jdee-wiz-tostring-postfix))
 
    (setq variables (jdee-wiz-filter-variables-by-typemodifier variables))
 
@@ -1120,41 +1120,41 @@ If `jdee-wiz-tostring-postfix' is defined, it is appended to the string. "
       (delq
        nil
        (mapcar
-	(lambda (var)
-	  (let ((staticp
-		 (member
-		  "static"
-		  (semantic-tag-modifiers var))))
-	    (unless staticp var)))
-	variables))))
+        (lambda (var)
+          (let ((staticp
+                 (member
+                  "static"
+                  (semantic-tag-modifiers var))))
+            (unless staticp var)))
+        variables))))
 
    (while prefix
      (setq method (concat method "sb.append(" (car prefix) ");\n")
-	   prefix (cdr prefix)))
+           prefix (cdr prefix)))
 
    (while variables
      (let* ((var (car variables))
-	   (name (semantic-tag-name var))  ;;variable name
-	   (type (semantic-tag-type var))) ;;variable type i.e. boolean
+           (name (semantic-tag-name var))  ;;variable name
+           (type (semantic-tag-type var))) ;;variable type i.e. boolean
 
        (setq
-	method
-	(concat
-	 method
-	 "sb.append(\"" name "=\").append(" name ");\n"))
+        method
+        (concat
+         method
+         "sb.append(\"" name "=\").append(" name ");\n"))
 
        (if (> (length variables) 1)
-	   (setq method (concat method "sb.append(variableSeparator);\n")))
+           (setq method (concat method "sb.append(variableSeparator);\n")))
 
        (setq variables (cdr variables))))
 
    (while postfix
      (setq method (concat method "sb.append(" (car postfix) ");\n")
-	   postfix (cdr postfix)))
+           postfix (cdr postfix)))
 
    (setq method
-	 (concat
-	  method "\nreturn sb.toString();\n}\n"))
+         (concat
+          method "\nreturn sb.toString();\n}\n"))
 
    (insert method))
 

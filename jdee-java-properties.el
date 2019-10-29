@@ -163,13 +163,13 @@ BUFFER is the buffer to get the properties and defaults the current buffer."
     (save-excursion
       (if buffer (set-buffer buffer))
       (save-match-data
-	(goto-char (point-min))
-	(while (re-search-forward "^\\(.*?\\)=\\(.*\\)$" nil t)
-	  (let ((key (match-string 1))
-		(val (match-string 2)))
-	    (set-text-properties 0 (length key) nil key)
-	    (set-text-properties 0 (length val) nil val)
-	    (setq prop-alist (append prop-alist (list (cons key val))))))))
+        (goto-char (point-min))
+        (while (re-search-forward "^\\(.*?\\)=\\(.*\\)$" nil t)
+          (let ((key (match-string 1))
+                (val (match-string 2)))
+            (set-text-properties 0 (length key) nil key)
+            (set-text-properties 0 (length val) nil val)
+            (setq prop-alist (append prop-alist (list (cons key val))))))))
     prop-alist))
 
 ;;;###autoload

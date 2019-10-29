@@ -108,24 +108,24 @@ Choose Local from the menu to override the
 no classpath."
   :group 'jdee-run-options
   :type '(choice
-	  (const :menu-tag "Global" "global")
-	  (repeat :menu-tag "Local" (file :tag "Path"))
-	  (const :menu-tag "None" "none")))
+          (const :menu-tag "Global" "global")
+          (repeat :menu-tag "Local" (file :tag "Path"))
+          (const :menu-tag "None" "none")))
 
 (defcustom jdee-run-option-verbose (list nil nil nil)
   "*Print messages about the running process.
 The messages are printed in the run buffer."
   :group 'jdee-run-options
   :type '(list :indent 2
-	       (checkbox :format "\n  %[%v%] %h \n"
-			 :doc "Print classes loaded.
+               (checkbox :format "\n  %[%v%] %h \n"
+                         :doc "Print classes loaded.
 Prints a message in the run buffer each time a class is loaded.")
-	       (checkbox :format "%[%v%] %h \n"
-			 :doc "Print memory freed.
+               (checkbox :format "%[%v%] %h \n"
+                         :doc "Print memory freed.
 Prints a message in the run buffer each time the garbage collector
 frees memory.")
-	       (checkbox :format "%[%v%] %h \n"
-			 :doc "Print JNI info.
+               (checkbox :format "%[%v%] %h \n"
+                         :doc "Print JNI info.
 Prints JNI-related messages including information about which native
 methods have been linked and warnings about excessive creation of
 local references.")))
@@ -138,86 +138,86 @@ Property Name field; enter its value, for example, green, in the
 Property Value field. You can specify as many properties as you like."
   :group 'jdee-run-options
   :type '(repeat (cons :tag "Property"
-		  (string :tag "Name")
-		  (string :tag "Value"))))
+                  (string :tag "Name")
+                  (string :tag "Value"))))
 
 (defcustom jdee-run-option-heap-size (list
-				     (cons 1 "megabytes")
-				     (cons 16 "megabytes"))
+                                     (cons 1 "megabytes")
+                                     (cons 16 "megabytes"))
 "*Specify the initial and maximum size of the interpreter heap."
 :group 'jdee-run-options
 :type '(list
-	(cons (integer :tag "Start")
-	     (radio-button-choice (const "bytes")
-				  (const "kilobytes")
-				  (const "megabytes")
-				  (const "gigabytes")))
-	(cons (integer :tag "Max")
-	       (radio-button-choice (const "bytes")
-				    (const "kilobytes")
-				    (const "megabytes")
-				    (const "gigabytes")))))
+        (cons (integer :tag "Start")
+             (radio-button-choice (const "bytes")
+                                  (const "kilobytes")
+                                  (const "megabytes")
+                                  (const "gigabytes")))
+        (cons (integer :tag "Max")
+               (radio-button-choice (const "bytes")
+                                    (const "kilobytes")
+                                    (const "megabytes")
+                                    (const "gigabytes")))))
 
 (defcustom jdee-run-option-stack-size (list
-				      (cons 128 "kilobytes")
-				      (cons 400 "kilobytes"))
+                                      (cons 128 "kilobytes")
+                                      (cons 400 "kilobytes"))
   "*Specify size of the C and Java stacks."
   :group 'jdee-run-options
   :type '(list
-	  (cons (integer :tag "C Stack")
-	       (radio-button-choice (const "bytes")
-				    (const "kilobytes")
-				    (const "megabytes")
-				    (const "gigabytes")))
-	  (cons (integer :tag "Java Stack")
-	       (radio-button-choice (const "bytes")
-				    (const "kilobytes")
-				    (const "megabytes")
-				    (const "gigabytes")))))
+          (cons (integer :tag "C Stack")
+               (radio-button-choice (const "bytes")
+                                    (const "kilobytes")
+                                    (const "megabytes")
+                                    (const "gigabytes")))
+          (cons (integer :tag "Java Stack")
+               (radio-button-choice (const "bytes")
+                                    (const "kilobytes")
+                                    (const "megabytes")
+                                    (const "gigabytes")))))
 
 (defcustom jdee-run-option-garbage-collection (list t t)
   "*Specify garbage collection options."
   :group 'jdee-run-options
   :type '(list :indent 2
-	       (checkbox :format "%[%v%] %t \n"
-			 :tag "Collect garbage asynchronously.")
-	       (checkbox :format "%[%v%] %t \n"
-			 :tag "Collect unused classes.")))
+               (checkbox :format "%[%v%] %t \n"
+                         :tag "Collect garbage asynchronously.")
+               (checkbox :format "%[%v%] %t \n"
+                         :tag "Collect unused classes.")))
 
 (defcustom jdee-run-option-java-profile (cons nil "./java.prof")
   "*Enable Java profiling."
   :group 'jdee-run-options
   :type '(cons boolean
-	       (file :tag "File"
-		     :help-echo
+               (file :tag "File"
+                     :help-echo
 "Specify where to put profile results here.")))
 
 (defcustom jdee-run-option-heap-profile (cons nil
-						   (list "./java.hprof"
-							 5
-							 20
-							 "Allocation objects"))
+                                                   (list "./java.hprof"
+                                                         5
+                                                         20
+                                                         "Allocation objects"))
 "*Output heap profiling data."
   :group 'jdee-run-options
   :type '(cons boolean
-	       (list
-		(string :tag "Output File Path")
-		(integer :tag "Stack Trace Depth")
-		(integer :tag "Allocation Sites")
-		(radio-button-choice :format "%t \n%v"
-				     :tag "Sort output based on:"
-		 (const "Allocation objects")
-		 (const "Live objects")))))
+               (list
+                (string :tag "Output File Path")
+                (integer :tag "Stack Trace Depth")
+                (integer :tag "Allocation Sites")
+                (radio-button-choice :format "%t \n%v"
+                                     :tag "Sort output based on:"
+                 (const "Allocation objects")
+                 (const "Live objects")))))
 
 ;; (makunbound 'jdee-run-option-verify)
 (defcustom jdee-run-option-verify (list nil t)
   "*Verify classes."
   :group 'jdee-run-options
   :type '(list :indent 2
-	       (checkbox :format "%[%v%] %t \n"
-			 :tag "Executed code in all classes.")
-	       (checkbox :format "%[%v%] %t \n"
-			 :tag "Classes loaded by a classloader.")))
+               (checkbox :format "%[%v%] %t \n"
+                         :tag "Executed code in all classes.")
+               (checkbox :format "%[%v%] %t \n"
+                         :tag "Classes loaded by a classloader.")))
 
 ;; (makunbound 'jdee-run-option-boot-classpath)
 (defcustom jdee-run-option-boot-classpath nil
@@ -253,17 +253,17 @@ project file for the current project and replaces the period (.) with
 the path of the directory containing the project file."
   :group 'jdee-run-options
   :type '(choice
-	  :tag "Classpath Options"
-	  (const :tag "standard" nil)
-	  (cons :tag "custom" :inline nil
-		(choice
-		 :tag "Custom Mode"
-		 (const "append")
-		 (const "prepend")
-		 (const "replace"))
-		(repeat
-		 :tag "Classpath"
-		 (file :tag "Path")))))
+          :tag "Classpath Options"
+          (const :tag "standard" nil)
+          (cons :tag "custom" :inline nil
+                (choice
+                 :tag "Custom Mode"
+                 (const "append")
+                 (const "prepend")
+                 (const "replace"))
+                (repeat
+                 :tag "Classpath"
+                 (file :tag "Path")))))
 
 
 ;; (makunbound 'jdee-run-option-debug)
@@ -301,35 +301,35 @@ The \"Suspend\" option specifies whether the vm should suspend
 this process on startup."
   :group 'jdee-run-options
   :type  '(choice
-	   :tag "Debug Connection Options"
-	   (const :tag "No connect" nil)
-	   (list
-	    :tag "Connect"
-	    :inline nil
-	    (choice
-	     :tag "Mode"
-	     (const "Server")
-	     (const "Client"))
-	    (choice
-	     :tag "Data Transport"
-	     (const "Shared Memory")
-	     (const "Socket"))
-	    (choice
-	     :tag "Shared Memory Name"
-	     (const :menu-tag "Default" "javadebug")
-	     (string :menu-tag "Custom" :tag "Name"))
-	    (choice
-	     :tag "Socket Host"
-	     (const :menu-tag "Local" nil)
-	     (string :menu-tag "Remote" :tag "Name"))
-	    (choice
-	     :tag "Socket Port"
-	     (const :menu-tag "Default" "4444")
-	     (string :menu-tag "Custom" :tag "Address"))
-	    (choice
-	     :tag "Suspend?"
-	     (const :tag "No" nil)
-	     (const :tag "Yes" t)))))
+           :tag "Debug Connection Options"
+           (const :tag "No connect" nil)
+           (list
+            :tag "Connect"
+            :inline nil
+            (choice
+             :tag "Mode"
+             (const "Server")
+             (const "Client"))
+            (choice
+             :tag "Data Transport"
+             (const "Shared Memory")
+             (const "Socket"))
+            (choice
+             :tag "Shared Memory Name"
+             (const :menu-tag "Default" "javadebug")
+             (string :menu-tag "Custom" :tag "Name"))
+            (choice
+             :tag "Socket Host"
+             (const :menu-tag "Local" nil)
+             (string :menu-tag "Remote" :tag "Name"))
+            (choice
+             :tag "Socket Port"
+             (const :menu-tag "Default" "4444")
+             (string :menu-tag "Custom" :tag "Address"))
+            (choice
+             :tag "Suspend?"
+             (const :tag "No" nil)
+             (const :tag "Yes" t)))))
 
 (defcustom jdee-run-option-interpret-mode nil
   "Causes the vm to interpret all byte codes. By default VMs
@@ -361,8 +361,8 @@ are ignored."
   "Specify whether to use the Hotspot client or server vm."
   :group 'jdee-run-options
   :type  '(choice :tag "vm type"
-		  (const :tag "client"    client)
-		  (const :tag "server"    server)))
+                  (const :tag "client"    client)
+                  (const :tag "server"    server)))
 
 
 ;;(makunbound 'jdee-run-option-enable-assertions)
@@ -387,16 +387,16 @@ of the JDK that precedes version 1.4, which
 introduced assertions into Java."
   :group 'jdee-run-options
   :type '(choice :tag "Enable assertions"
-	      (const "Nowhere")
-	      (const "Everywhere")
-	      (cons :tag "Somewhere" :inline "Everywhere"
-		    (boolean :tag "In current directory")
-		    (repeat :tag "In the following locations"
-			    (cons :tag "Location"
-				  (choice :tag "Type"
-					  (const "package")
-					  (const "class"))
-				  (string :tag "Name"))))))
+              (const "Nowhere")
+              (const "Everywhere")
+              (cons :tag "Somewhere" :inline "Everywhere"
+                    (boolean :tag "In current directory")
+                    (repeat :tag "In the following locations"
+                            (cons :tag "Location"
+                                  (choice :tag "Type"
+                                          (const "package")
+                                          (const "class"))
+                                  (string :tag "Name"))))))
 
 ;;(makunbound 'jdee-run-option-disable-assertions)
 (defcustom jdee-run-option-disable-assertions "Nowhere"
@@ -418,16 +418,16 @@ of the JDK that precedes version 1.4, which
 introduced assertions into Java."
   :group 'jdee-run-options
   :type '(choice :tag "Disable assertions"
-	      (const "Nowhere")
-	      (const "Everywhere")
-	      (cons :tag "Somewhere" :inline "Everywhere"
-		    (boolean :tag "In current directory")
-		    (repeat :tag "In the following locations"
-			    (cons :tag "Location"
-				  (choice :tag "Type"
-					  (const "package")
-					  (const "class"))
-				  (string :tag "Name"))))))
+              (const "Nowhere")
+              (const "Everywhere")
+              (cons :tag "Somewhere" :inline "Everywhere"
+                    (boolean :tag "In current directory")
+                    (repeat :tag "In the following locations"
+                            (cons :tag "Location"
+                                  (choice :tag "Type"
+                                          (const "package")
+                                          (const "class"))
+                                  (string :tag "Name"))))))
 
 (defcustom jdee-run-option-enable-system-assertions nil
   "Enable assertions in system classes."
@@ -503,11 +503,11 @@ to the executable specified by `jdee-run-executable'."
   "Saves the value of the w32-start-process-show-window variable
 before evaluating body and restores the value afterwards."
   `(let ((win32-start-process-show-window t)
-	 (w32-start-process-show-window t)
-	 (w32-quote-process-args ?\")
-	 (win32-quote-process-args ?\") ;; XEmacs
-	 (windowed-process-io t)
-	 (process-connection-type nil))
+         (w32-start-process-show-window t)
+         (w32-quote-process-args ?\")
+         (win32-quote-process-args ?\") ;; XEmacs
+         (windowed-process-io t)
+         (process-connection-type nil))
      ,@body))
 
 (defun jdee-run-parse-args (s)
@@ -515,13 +515,13 @@ before evaluating body and restores the value afterwards."
 Any substring that is enclosed in single or double quotes or does not include
 whitespace is considered a parameter."
    (let ((n (string-match "[^\"' ][^ ]*\\|\"[^\"]*\"\\|'[^']*'" s))
-	(tok)
-	(tokens '()))
+        (tok)
+        (tokens '()))
      (while n
        (setq n (match-end 0))
        (setq tok (match-string 0 s))
        (if (string-match "[\"']\\([^\"']*\\)[\"']" tok)
-	   (setq tok (match-string 1 tok)))
+           (setq tok (match-string 1 tok)))
        (setq tokens (append tokens (list tok)))
        (setq n (string-match "[^\"' ][^ ]*\\|\"[^\"]*\"\\|'[^']*'" s n)))
      tokens))
@@ -529,11 +529,11 @@ whitespace is considered a parameter."
 (defun jdee-run-make-arg-string (args)
 "Converts a list of command-line arguments to a string of arguments."
   (let ((str "")
-	(n (length args))
-	(i 0))
+        (n (length args))
+        (i 0))
     (while (< i n)
       (if (not (string= str ""))
-	  (setq str (concat str " ")))
+          (setq str (concat str " ")))
       (setq str (concat str (nth i args)))
       (setq i (+ i 1)))
     str))
@@ -587,50 +587,50 @@ panel to specifying the applet document."
 
 (defclass jdee-run-vm ()
   ((version          :initarg :version
-		     :type string
-		     :initform ""
-		     :documentation
-		     "Java virtual machine version number.")
+                     :type string
+                     :initform ""
+                     :documentation
+                     "Java virtual machine version number.")
    (path             :initarg :path
-		     :type string
-		     :documentation
-		     "Path of the compiler executable.")
+                     :type string
+                     :documentation
+                     "Path of the compiler executable.")
    (buffer           :initarg :buffer
-		     :type buffer
-		     :documentation
-		     "Compilation buffer")
+                     :type buffer
+                     :documentation
+                     "Compilation buffer")
    (main-class        :initarg :main-class
-		     :type string
-		     :documentation
-		     "Name of main class."))
+                     :type string
+                     :documentation
+                     "Name of main class."))
     "Class of Java virtual machines.")
 
 (defmethod jdee-run-classpath-arg ((this jdee-run-vm))
   "Returns the classpath argument for this vm."
   (let ((classpath
-	 (if jdee-run-option-classpath
-	     (if (and (stringp jdee-run-option-classpath)
-		      (string= jdee-run-option-classpath "global"))
-		 jdee-global-classpath
-	       (unless (and (stringp jdee-run-option-classpath)
-			    (string= jdee-run-option-classpath "none"))
-		 jdee-run-option-classpath))))
-	(symbol
-	 (if (and jdee-run-option-classpath
-		  (stringp jdee-run-option-classpath)
-		  (string= jdee-run-option-classpath "global"))
-	     'jdee-global-classpath
-	   'jdee-run-option-classpath)))
+         (if jdee-run-option-classpath
+             (if (and (stringp jdee-run-option-classpath)
+                      (string= jdee-run-option-classpath "global"))
+                 jdee-global-classpath
+               (unless (and (stringp jdee-run-option-classpath)
+                            (string= jdee-run-option-classpath "none"))
+                 jdee-run-option-classpath))))
+        (symbol
+         (if (and jdee-run-option-classpath
+                  (stringp jdee-run-option-classpath)
+                  (string= jdee-run-option-classpath "global"))
+             'jdee-global-classpath
+           'jdee-run-option-classpath)))
     (if classpath
-	(list
-	 "-classpath"
-	 (jdee-build-classpath
-	  classpath symbol)))))
+        (list
+         "-classpath"
+         (jdee-build-classpath
+          classpath symbol)))))
 
 (defmethod jdee-run-classic-mode-arg ((this jdee-run-vm))
   "Get classic-mode option>"
     (if jdee-run-classic-mode-vm
-	(list "-classic")))
+        (list "-classic")))
 
 
 (defmethod jdee-run-property-args ((this jdee-run-vm))
@@ -643,74 +643,74 @@ panel to specifying the applet document."
 (defmethod jdee-run-heap-size-args ((this jdee-run-vm))
    "Get heap size arguments."
     (let* ((memory-unit-abbrevs
-	    (list (cons "bytes" "")
-	       (cons "kilobytes" "k")
-	       (cons "megabytes" "m")
-	       (cons "gigabytes" "g")))
-	   (start-cons (nth 0 jdee-run-option-heap-size))
-	   (start-size (format "%d%s" (car start-cons)
-			       (cdr (assoc (cdr start-cons)
-				      memory-unit-abbrevs))))
-	   (max-cons (nth 1 jdee-run-option-heap-size))
-	   (max-size (format "%d%s" (car max-cons)
-			     (cdr (assoc (cdr max-cons)
-				    memory-unit-abbrevs)))))
+            (list (cons "bytes" "")
+               (cons "kilobytes" "k")
+               (cons "megabytes" "m")
+               (cons "gigabytes" "g")))
+           (start-cons (nth 0 jdee-run-option-heap-size))
+           (start-size (format "%d%s" (car start-cons)
+                               (cdr (assoc (cdr start-cons)
+                                      memory-unit-abbrevs))))
+           (max-cons (nth 1 jdee-run-option-heap-size))
+           (max-size (format "%d%s" (car max-cons)
+                             (cdr (assoc (cdr max-cons)
+                                    memory-unit-abbrevs)))))
       (append
        (if (not (string= start-size "1m"))
-	   (list (concat "-Xms" start-size)))
+           (list (concat "-Xms" start-size)))
        (if (not (string= max-size "16m"))
-	  (list (concat "-Xmx" max-size))))))
+          (list (concat "-Xmx" max-size))))))
 
 (defmethod jdee-run-stack-size-args ((this jdee-run-vm))
   "Get stack size arguments."
     (let* ((memory-unit-abbrevs
-	    (list (cons "bytes" "")
-	       (cons "kilobytes" "k")
-	       (cons "megabytes" "m")
-	       (cons "gigabytes" "g")))
-	   (c-cons (nth 0 jdee-run-option-stack-size))
-	   (c-size (format "%d%s" (car c-cons)
-			   (cdr (assoc (cdr c-cons)
-				       memory-unit-abbrevs))))
-	   (java-cons (nth 1 jdee-run-option-stack-size))
-	   (java-size (format "%d%s" (car java-cons)
-			     (cdr (assoc (cdr java-cons)
-				    memory-unit-abbrevs)))))
+            (list (cons "bytes" "")
+               (cons "kilobytes" "k")
+               (cons "megabytes" "m")
+               (cons "gigabytes" "g")))
+           (c-cons (nth 0 jdee-run-option-stack-size))
+           (c-size (format "%d%s" (car c-cons)
+                           (cdr (assoc (cdr c-cons)
+                                       memory-unit-abbrevs))))
+           (java-cons (nth 1 jdee-run-option-stack-size))
+           (java-size (format "%d%s" (car java-cons)
+                             (cdr (assoc (cdr java-cons)
+                                    memory-unit-abbrevs)))))
       (append
        (if (not (string= c-size "128k"))
-	   (list (concat "-Xss" c-size)))
+           (list (concat "-Xss" c-size)))
        (if (not (string= java-size "400k"))
-	   (list (concat "-Xoss" java-size))))))
+           (list (concat "-Xoss" java-size))))))
 
 
 (defmethod jdee-run-java-profile-arg ((this jdee-run-vm))
    "Get Java profile option."
     (let ((profilep (car jdee-run-option-java-profile))
-	  (file (cdr jdee-run-option-java-profile)))
+          (file (cdr jdee-run-option-java-profile)))
       (if profilep
-	  (if (string= file "./java.prof")
-	      '("-Xprof")
-	    (list (concat "-Xprof:" file))))))
+          (if (string= file "./java.prof")
+              '("-Xprof")
+            (list (concat "-Xprof:" file))))))
 
 (defmethod jdee-run-heap-profile-arg ((this jdee-run-vm))
   "Get heap profile argument."
     (let* ((profilep (car jdee-run-option-heap-profile))
-	   (prof-options (cdr jdee-run-option-heap-profile))
-	   (file (nth 0 prof-options))
-	   (depth (nth 1 prof-options))
-	   (top (nth 2 prof-options))
-	   (sort
-	    (downcase (substring (nth 3 prof-options) 0 1))))
+           (prof-options (cdr jdee-run-option-heap-profile))
+           (file (nth 0 prof-options))
+           (depth (nth 1 prof-options))
+           (top (nth 2 prof-options))
+           (sort
+            (downcase (substring (nth 3 prof-options) 0 1))))
       (if profilep
-	  (if (and (string= file "./java.hprof")
-		   (equal depth 5)
-		   (equal top 20)
-		   (string= sort "a"))
-	      '("-Xhprof")
-	    (list
-	     (format
-	      "-Xhprof:file=%s,depth=%d,top=%d,sort=%s"
-	      file depth top sort))))))
+          (if (and (string= file "./java.hprof")
+                   (equal depth 5)
+                   (equal top 20)
+                   (string= sort "a"))
+              '("-Xhprof")
+            (list
+             (format
+              "-Xhprof:file=%s,depth=%d,top=%d,sort=%s"
+              file depth top sort))))))
 
 
 (defmethod jdee-run-vm-args ((this jdee-run-vm))
@@ -720,50 +720,50 @@ panel to specifying the applet document."
 
 (defmethod jdee-run-vm-launch ((this jdee-run-vm))
   (let ((run-buf-name (concat "*" (oref this :main-class) "*"))
-	(source-directory default-directory)
-	(working-directory (if (string= jdee-run-working-directory "")
-			       default-directory
-			     (jdee-normalize-path 'jdee-run-working-directory))))
+        (source-directory default-directory)
+        (working-directory (if (string= jdee-run-working-directory "")
+                               default-directory
+                             (jdee-normalize-path 'jdee-run-working-directory))))
     (if (not (comint-check-proc run-buf-name))
-	(let* ((run-buffer (get-buffer-create run-buf-name))
-	       (win32-p (eq system-type 'windows-nt))
-	       (prog (oref this :path))
-	       (prog-args (append
-			   (jdee-run-get-vm-args this)
-			   (if jdee-run-read-vm-args
-			       (jdee-run-parse-args
-				(read-from-minibuffer
-				 "Vm args: "
-				 (car jdee-run-interactive-vm-arg-history)
-				 nil nil
-				 'jdee-run-interactive-vm-arg-history)))
-			   (list (oref this :main-class))
-			   jdee-run-option-application-args
-			   (if jdee-run-read-app-args
-			       (jdee-run-parse-args
-				(read-from-minibuffer
-				 "Application args: "
-				 (car jdee-run-interactive-app-arg-history)
-				 nil nil
-				 'jdee-run-interactive-app-arg-history)))
-			   ))
-	       (command-string (concat prog " "
-				       (jdee-run-make-arg-string
-					prog-args)
-				       "\n\n")))
-	  (with-current-buffer run-buffer
-	    (erase-buffer)
-	    (cd working-directory)
-	    (insert (concat "cd " working-directory "\n"))
-	    (insert command-string)
-	    (jdee-run-mode))
-	  (save-w32-show-window
-	    (comint-exec run-buffer (oref this :main-class) prog nil prog-args))
-	  (pop-to-buffer run-buffer)
-	  (save-excursion
-	    (goto-char (point-min))
-	  (jdee-run-etrace-update-current-marker))
-	  (cd source-directory))
+        (let* ((run-buffer (get-buffer-create run-buf-name))
+               (win32-p (eq system-type 'windows-nt))
+               (prog (oref this :path))
+               (prog-args (append
+                           (jdee-run-get-vm-args this)
+                           (if jdee-run-read-vm-args
+                               (jdee-run-parse-args
+                                (read-from-minibuffer
+                                 "Vm args: "
+                                 (car jdee-run-interactive-vm-arg-history)
+                                 nil nil
+                                 'jdee-run-interactive-vm-arg-history)))
+                           (list (oref this :main-class))
+                           jdee-run-option-application-args
+                           (if jdee-run-read-app-args
+                               (jdee-run-parse-args
+                                (read-from-minibuffer
+                                 "Application args: "
+                                 (car jdee-run-interactive-app-arg-history)
+                                 nil nil
+                                 'jdee-run-interactive-app-arg-history)))
+                           ))
+               (command-string (concat prog " "
+                                       (jdee-run-make-arg-string
+                                        prog-args)
+                                       "\n\n")))
+          (with-current-buffer run-buffer
+            (erase-buffer)
+            (cd working-directory)
+            (insert (concat "cd " working-directory "\n"))
+            (insert command-string)
+            (jdee-run-mode))
+          (save-w32-show-window
+            (comint-exec run-buffer (oref this :main-class) prog nil prog-args))
+          (pop-to-buffer run-buffer)
+          (save-excursion
+            (goto-char (point-min))
+          (jdee-run-etrace-update-current-marker))
+          (cd source-directory))
       (message "An instance of %s is running." (oref this :main-class))
       (pop-to-buffer run-buf-name))))
 
@@ -782,11 +782,11 @@ panel to specifying the applet document."
 (defmethod jdee-run-verbose-arg ((this jdee-run-vm-1-1))
   "Set the verbose options."
     (let ((print-classes-loaded
-	   (nth 0 jdee-run-option-verbose))
-	  (print-memory-freed
-	   (nth 1 jdee-run-option-verbose))
-	  (print-jni-info
-	   (nth 2 jdee-run-option-verbose)))
+           (nth 0 jdee-run-option-verbose))
+          (print-memory-freed
+           (nth 1 jdee-run-option-verbose))
+          (print-jni-info
+           (nth 2 jdee-run-option-verbose)))
       (append
        (if print-classes-loaded (list "-verbose"))
        (if print-memory-freed (list "-verbosegc"))
@@ -795,26 +795,26 @@ panel to specifying the applet document."
 (defmethod jdee-run-gc-args ((this jdee-run-vm-1-1))
   "Get garbage collection arguments."
     (let ((no-gc-asynch (not
-			 (nth 0 jdee-run-option-garbage-collection)))
-	  (no-gc-classes (not
-			  (nth 1 jdee-run-option-garbage-collection))))
+                         (nth 0 jdee-run-option-garbage-collection)))
+          (no-gc-classes (not
+                          (nth 1 jdee-run-option-garbage-collection))))
       (append
        (if no-gc-asynch
-	  '("-noasyncgc"))
+          '("-noasyncgc"))
        (if no-gc-classes
-	   '("-noclassgc")))))
+           '("-noclassgc")))))
 
 (defmethod jdee-run-verify-args ((this jdee-run-vm-1-1))
   "Get verify arguments."
     (let ((verify-all (nth 0 jdee-run-option-verify))
-	  (verify-remote (nth 1 jdee-run-option-verify)))
+          (verify-remote (nth 1 jdee-run-option-verify)))
       (append
        (if verify-all
-	  '("-verify"))
+          '("-verify"))
        (if (and
-	   (not verify-all)
-	   (not verify-remote))
-	   '("-noverify")))))
+           (not verify-all)
+           (not verify-remote))
+           '("-noverify")))))
 
 (defmethod jdee-run-debug-args ((this jdee-run-vm-1-1))
   "Get arguments required to allow process to connect
@@ -858,21 +858,21 @@ to a debugger."
 (defmethod jdee-run-boot-classpath-arg ((this jdee-run-vm-1-2))
   "Returns the boot classpath argument for this vm."
   (if jdee-run-option-boot-classpath
-	(list
-	 (concat
-	  "-Xbootclasspath:"
-	  (jdee-build-classpath
-	   (cdr jdee-run-option-boot-classpath)
-	   'jdee-run-option-boot-classpath)))))
+        (list
+         (concat
+          "-Xbootclasspath:"
+          (jdee-build-classpath
+           (cdr jdee-run-option-boot-classpath)
+           'jdee-run-option-boot-classpath)))))
 
 (defmethod jdee-run-verbose-arg ((this jdee-run-vm-1-2))
   "Set the verbose options."
     (let ((print-classes-loaded
-	   (nth 0 jdee-run-option-verbose))
-	  (print-memory-freed
-	   (nth 1 jdee-run-option-verbose))
-	  (print-jni-info
-	   (nth 2 jdee-run-option-verbose)))
+           (nth 0 jdee-run-option-verbose))
+          (print-memory-freed
+           (nth 1 jdee-run-option-verbose))
+          (print-jni-info
+           (nth 2 jdee-run-option-verbose)))
       (append
        (if print-classes-loaded (list "-verbose:class"))
        (if print-memory-freed (list "-verbose:gc"))
@@ -881,14 +881,14 @@ to a debugger."
 (defmethod jdee-run-gc-args ((this jdee-run-vm-1-2))
   "Get garbage collection arguments."
     (let ((no-gc-asynch (not
-			 (nth 0 jdee-run-option-garbage-collection)))
-	  (no-gc-classes (not
-			  (nth 1 jdee-run-option-garbage-collection))))
+                         (nth 0 jdee-run-option-garbage-collection)))
+          (no-gc-classes (not
+                          (nth 1 jdee-run-option-garbage-collection))))
       (append
        (if no-gc-asynch
-	  '("-Xnoasyncgc"))
+          '("-Xnoasyncgc"))
        (if no-gc-classes
-	   '("-Xnoclassgc")))))
+           '("-Xnoclassgc")))))
 
 (defmethod jdee-run-debug-args ((this jdee-run-vm-1-2))
   "Get arguments required to allow process to connect
@@ -943,20 +943,20 @@ to a debugger."
   (if jdee-run-option-boot-classpath
       (list
        (concat
-	"-Xbootclasspath"
-	(let ((mode (car jdee-run-option-boot-classpath)))
-	  (cond
-	   ((string= mode "append")
-	    "/a:")
-	   ((string= mode "prepend")
-	    "/p:")
-	   ((string= mode "replace")
-	    ":")
-	   (t
-	    (error "Illegal custom classpath mode: %s"  mode))))
-	(jdee-build-classpath
-	 (cdr jdee-run-option-boot-classpath)
-	 'jdee-run-option-boot-classpath)))))
+        "-Xbootclasspath"
+        (let ((mode (car jdee-run-option-boot-classpath)))
+          (cond
+           ((string= mode "append")
+            "/a:")
+           ((string= mode "prepend")
+            "/p:")
+           ((string= mode "replace")
+            ":")
+           (t
+            (error "Illegal custom classpath mode: %s"  mode))))
+        (jdee-build-classpath
+         (cdr jdee-run-option-boot-classpath)
+         'jdee-run-option-boot-classpath)))))
 
 
 (defmethod jdee-run-debug-args ((this jdee-run-vm-1-3))
@@ -964,29 +964,29 @@ to a debugger."
 to a debugger."
   (if jdee-run-option-debug
       (let ((mode (nth 0 jdee-run-option-debug))
-	    (transport (nth 1 jdee-run-option-debug))
-	    (shared-mem-name (nth 2 jdee-run-option-debug))
-	    (socket-host (nth 3 jdee-run-option-debug))
-	    (socket-port (nth 4 jdee-run-option-debug))
-	    (suspend (nth 5 jdee-run-option-debug))
-	    (ms-windows (eq system-type 'windows-nt)))
-	(list "-Xdebug"
-	      (format
-	       "-Xrunjdwp:transport=%s,address=%s,server=%s,suspend=%s"
-	       (if (string= transport "Shared Memory")
-		   (if ms-windows
-		       "dt_shmem"
-		     (error "Shared memory transport is valid only on Windows."))
-		 "dt_socket")
-	       (if  (string= transport "Shared Memory")
-		   shared-mem-name
-		 (if (string= mode "Client")
-		     (if socket-host
-			 (concat socket-host ":" socket-port)
-		       socket-port)
-		   socket-port))
-	       (if (string= mode "Server") "y" "n")
-	       (if suspend "y" "n"))))))
+            (transport (nth 1 jdee-run-option-debug))
+            (shared-mem-name (nth 2 jdee-run-option-debug))
+            (socket-host (nth 3 jdee-run-option-debug))
+            (socket-port (nth 4 jdee-run-option-debug))
+            (suspend (nth 5 jdee-run-option-debug))
+            (ms-windows (eq system-type 'windows-nt)))
+        (list "-Xdebug"
+              (format
+               "-Xrunjdwp:transport=%s,address=%s,server=%s,suspend=%s"
+               (if (string= transport "Shared Memory")
+                   (if ms-windows
+                       "dt_shmem"
+                     (error "Shared memory transport is valid only on Windows."))
+                 "dt_socket")
+               (if  (string= transport "Shared Memory")
+                   shared-mem-name
+                 (if (string= mode "Client")
+                     (if socket-host
+                         (concat socket-host ":" socket-port)
+                       socket-port)
+                   socket-port))
+               (if (string= mode "Server") "y" "n")
+               (if suspend "y" "n"))))))
 
 (defmethod jdee-run-get-vm-args ((this jdee-run-vm-1-3))
   (append
@@ -1038,22 +1038,22 @@ to a debugger."
       (cond
        ((string= jdee-run-option-enable-assertions "Nowhere"))
        ((string= jdee-run-option-enable-assertions "Everywhere")
-	(setq args '("-ea")))
+        (setq args '("-ea")))
        (t
-	(error "Illegal enable assertions option: \"%s\"."
-	       jdee-run-option-enable-assertions))))
+        (error "Illegal enable assertions option: \"%s\"."
+               jdee-run-option-enable-assertions))))
      ((listp jdee-run-option-enable-assertions)
       (if (car jdee-run-option-enable-assertions)
-	  (setq args '("-ea:...")))
+          (setq args '("-ea:...")))
       (loop for location in (cdr jdee-run-option-enable-assertions) do
-	    (let ((type (car location))
-		  (name (cdr location)))
-	      (if (string= type "package")
-		  (setq name (concat name "...")))
-	      (setq args  (append args (list (concat "-ea:" name)))))))
+            (let ((type (car location))
+                  (name (cdr location)))
+              (if (string= type "package")
+                  (setq name (concat name "...")))
+              (setq args  (append args (list (concat "-ea:" name)))))))
      (t
       (error "Illegal enable assertions option: \"%s\"."
-		jdee-run-option-enable-assertions)))
+                jdee-run-option-enable-assertions)))
     args))
 
 
@@ -1065,22 +1065,22 @@ to a debugger."
       (cond
        ((string= jdee-run-option-disable-assertions "Nowhere"))
        ((string= jdee-run-option-disable-assertions "Everywhere")
-	(setq args '("-da")))
+        (setq args '("-da")))
        (t
-	(error "Illegal disable assertions option: \"%s\"."
-	       jdee-run-option-disable-assertions))))
+        (error "Illegal disable assertions option: \"%s\"."
+               jdee-run-option-disable-assertions))))
      ((listp jdee-run-option-disable-assertions)
       (if (car jdee-run-option-disable-assertions)
-	  (setq args '("-da:...")))
+          (setq args '("-da:...")))
       (loop for location in (cdr jdee-run-option-disable-assertions) do
-	    (let ((type (car location))
-		  (name (cdr location)))
-	      (if (string= type "package")
-		  (setq name (concat name "...")))
-	      (setq args  (append args (list (concat "-da:" name)))))))
+            (let ((type (car location))
+                  (name (cdr location)))
+              (if (string= type "package")
+                  (setq name (concat name "...")))
+              (setq args  (append args (list (concat "-da:" name)))))))
      (t
       (error "Illegal disable assertions option: \"%s\"."
-		jdee-run-option-disable-assertions)))
+                jdee-run-option-disable-assertions)))
     args))
 
 
@@ -1190,33 +1190,33 @@ to a debugger."
 (defun jdee-run-get-vm ()
   "Gets the vm for the current JDK."
   (let* ((jdk-version (jdee-java-version))
-	 (vm
-	  (cl-find-if
-	   (lambda (vm-x)
-	     (string-match
-	      (oref vm-x :version)
-	      (if jdk-version jdk-version "")))
-	   jdee-run-virtual-machines)))
+         (vm
+          (cl-find-if
+           (lambda (vm-x)
+             (string-match
+              (oref vm-x :version)
+              (if jdk-version jdk-version "")))
+           jdee-run-virtual-machines)))
     (if (not vm)
-	(setq vm (car jdee-run-virtual-machines)))
+        (setq vm (car jdee-run-virtual-machines)))
     (oset vm
-	  :path
-	  (let ((vm-path
-		 (substitute-in-file-name jdee-vm-path)))
-	    (if (string= vm-path "")
-		(jdee-get-jdk-prog (if (eq system-type 'windows-nt)
-				      'javaw 'java))
-	      (if (file-exists-p
-		   (if (and
-			(eq system-type 'windows-nt)
-			(not (string-match "[.]exe$" vm-path)))
-		       (concat vm-path ".exe")
-		     vm-path))
-		  vm-path
-		(if (executable-find vm-path)
-		    vm-path
-		  (error "Invalid vm path: %s"
-			 vm-path))))))
+          :path
+          (let ((vm-path
+                 (substitute-in-file-name jdee-vm-path)))
+            (if (string= vm-path "")
+                (jdee-get-jdk-prog (if (eq system-type 'windows-nt)
+                                      'javaw 'java))
+              (if (file-exists-p
+                   (if (and
+                        (eq system-type 'windows-nt)
+                        (not (string-match "[.]exe$" vm-path)))
+                       (concat vm-path ".exe")
+                     vm-path))
+                  vm-path
+                (if (executable-find vm-path)
+                    vm-path
+                  (error "Invalid vm path: %s"
+                         vm-path))))))
     vm))
 
 ;;;###autoload
@@ -1236,41 +1236,41 @@ interact with the program."
   (interactive "p")
   (if (equal major-mode 'jdee-mode)
       (if (string= jdee-run-executable "")
-	  (let ((vm (jdee-run-get-vm))
-		(read-app-args
-		 (or jdee-run-read-app-args
-		     (not (= prefix 1))))
-		(read-main-class
+          (let ((vm (jdee-run-get-vm))
+                (read-app-args
+                 (or jdee-run-read-app-args
+                     (not (= prefix 1))))
+                (read-main-class
                  (= prefix -1)))
-	    (oset
-	     vm
-	     :main-class
-	     (if read-main-class
-		 (read-from-minibuffer
-		  "Main class: "
-		  (concat (jdee-parse-get-package)
+            (oset
+             vm
+             :main-class
+             (if read-main-class
+                 (read-from-minibuffer
+                  "Main class: "
+                  (concat (jdee-parse-get-package)
                           (file-name-sans-extension
                            (file-name-nondirectory (buffer-file-name)))))
-	       (jdee-run-get-main-class)))
-	    (let ((jdee-run-read-app-args read-app-args))
-	      (jdee-run-vm-launch vm)))
-	(jdee-run-executable))
+               (jdee-run-get-main-class)))
+            (let ((jdee-run-read-app-args read-app-args))
+              (jdee-run-vm-launch vm)))
+        (jdee-run-executable))
     (error "The jdee-run command works only in a Java source buffer.")))
 
 (defun jdee-run-get-main-class ()
   "Gets the main class for the application to which the current
 source buffer belongs."
   (let ((main-class
-	 (if jdee-run-option-jar
-	     (jdee-normalize-path 'jdee-run-application-class)
+         (if jdee-run-option-jar
+             (jdee-normalize-path 'jdee-run-application-class)
            jdee-run-application-class)))
     (if (or
-	 (not main-class)
-	 (string= main-class ""))
-	(setq main-class
-	      (concat (jdee-parse-get-package)
-		      (file-name-sans-extension
-		       (file-name-nondirectory (buffer-file-name))))))
+         (not main-class)
+         (string= main-class ""))
+        (setq main-class
+              (concat (jdee-parse-get-package)
+                      (file-name-sans-extension
+                       (file-name-nondirectory (buffer-file-name))))))
     main-class))
 
 (defun jdee-run-main-class()
@@ -1296,48 +1296,48 @@ buffer belongs is running."
 
 (defun jdee-run-executable()
   (let* ((prog-path
-	  (jdee-normalize-path
-	   jdee-run-executable
-	   'jdee-run-executable))
-	 (prog-name (file-name-sans-extension
-		     (file-name-nondirectory
-		      prog-path)))
-	 (run-buf-name (concat "*" prog-name "*"))
-	 (source-directory default-directory)
-	 (working-directory (if (string= jdee-run-working-directory "")
-				default-directory
-			      (jdee-normalize-path 'jdee-run-working-directory))))
+          (jdee-normalize-path
+           jdee-run-executable
+           'jdee-run-executable))
+         (prog-name (file-name-sans-extension
+                     (file-name-nondirectory
+                      prog-path)))
+         (run-buf-name (concat "*" prog-name "*"))
+         (source-directory default-directory)
+         (working-directory (if (string= jdee-run-working-directory "")
+                                default-directory
+                              (jdee-normalize-path 'jdee-run-working-directory))))
     (if (not (comint-check-proc run-buf-name))
-	(let* ((w32-quote-process-args ?\")
-	       (win32-quote-process-args ?\") ;; XEmacs
-	       (run-buffer (get-buffer-create run-buf-name))
-	       (prog-args (append
-			   jdee-run-executable-args
-			   (if jdee-run-read-app-args
-			       (jdee-run-parse-args
-				(read-from-minibuffer
-				 "Application args: "
-				 nil
-				 nil nil
-				 '(jdee-run-interactive-app-arg-history . 1))))
-			   ))
-	       (command-string (concat jdee-run-executable " "
-				       (mapconcat (lambda (arg) arg)
-						  prog-args " ")
-				       "\n\n")))
-	  (with-current-buffer run-buffer
-	    (erase-buffer)
-	    (cd working-directory)
-	    (insert (concat "cd " working-directory "\n"))
-	    (insert command-string)
-	    (jdee-run-mode))
-	  (save-w32-show-window
-	   (comint-exec run-buffer prog-name prog-path nil prog-args))
-	  (pop-to-buffer run-buffer)
-	  (save-excursion
-	    (goto-char (point-min))
-	    (jdee-run-etrace-update-current-marker))
-	  (cd source-directory))
+        (let* ((w32-quote-process-args ?\")
+               (win32-quote-process-args ?\") ;; XEmacs
+               (run-buffer (get-buffer-create run-buf-name))
+               (prog-args (append
+                           jdee-run-executable-args
+                           (if jdee-run-read-app-args
+                               (jdee-run-parse-args
+                                (read-from-minibuffer
+                                 "Application args: "
+                                 nil
+                                 nil nil
+                                 '(jdee-run-interactive-app-arg-history . 1))))
+                           ))
+               (command-string (concat jdee-run-executable " "
+                                       (mapconcat (lambda (arg) arg)
+                                                  prog-args " ")
+                                       "\n\n")))
+          (with-current-buffer run-buffer
+            (erase-buffer)
+            (cd working-directory)
+            (insert (concat "cd " working-directory "\n"))
+            (insert command-string)
+            (jdee-run-mode))
+          (save-w32-show-window
+           (comint-exec run-buffer prog-name prog-path nil prog-args))
+          (pop-to-buffer run-buffer)
+          (save-excursion
+            (goto-char (point-min))
+            (jdee-run-etrace-update-current-marker))
+          (cd source-directory))
       (message "An instance of %s is running." prog-name)
       (pop-to-buffer run-buf-name))))
 
@@ -1358,20 +1358,20 @@ buffer belongs is running."
 (defun jdee-get-appletviewer-options ()
   (let (options)
     (if (not (string= jdee-appletviewer-option-encoding ""))
-	(setq options (list
-			"-encoding"
-			jdee-appletviewer-option-encoding)))
+        (setq options (list
+                        "-encoding"
+                        jdee-appletviewer-option-encoding)))
     (if jdee-appletviewer-option-vm-args
-	(let ((len (length jdee-appletviewer-option-vm-args))
-	      (n 0))
-	  (while (< n len)
-	    (setq options
-		  (nconc
-		   options
-		   (list
-		    (concat "-J"
-			    (nth n jdee-appletviewer-option-vm-args)))))
-	    (setq n (1+ n)))))
+        (let ((len (length jdee-appletviewer-option-vm-args))
+              (n 0))
+          (while (< n len)
+            (setq options
+                  (nconc
+                   options
+                   (list
+                    (concat "-J"
+                            (nth n jdee-appletviewer-option-vm-args)))))
+            (setq n (1+ n)))))
     options))
 
 (defun jdee-run-applet-exec (buffer name command startfile switches)
@@ -1380,7 +1380,7 @@ a command shell subprocess rather than as a subprocess of Emacs. This
 is necessary to avoid displaying a DOS window when starting a viewer
 under Windows."
   (with-current-buffer buffer
-    (let ((proc (get-buffer-process buffer)))	; Blast any old process.
+    (let ((proc (get-buffer-process buffer)))        ; Blast any old process.
       (if proc (delete-process proc)))
     ;; Crank up a new process
     (let ((proc (jdee-run-applet-exec-1 name buffer command switches)))
@@ -1398,54 +1398,54 @@ under Windows."
 
 (defun jdee-run-applet-exec-1 (name buffer command switches)
   (let ((w32-quote-process-args ?\")
-	(win32-quote-process-args ?\") ;; XEmacs
-	(process-environment
-	 (nconc
-	  ;; If using termcap, we specify `emacs' as the terminal type
-	  ;; because that lets us specify a width.
-	  ;; If using terminfo, we specify `dumb' because that is
-	  ;; a defined terminal type.  `emacs' is not a defined terminal type
-	  ;; and there is no way for us to define it here.
-	  ;; Some programs that use terminfo get very confused
-	  ;; if TERM is not a valid terminal type.
-	  (if (and (boundp 'system-uses-terminfo) system-uses-terminfo)
-	      (list "TERM=dumb"
-		    (format "COLUMNS=%d" (frame-width)))
-	    (list "TERM=emacs"
-		  (format "TERMCAP=emacs:co#%d:tc=unknown:" (frame-width))))
-	  (if (getenv "EMACS") nil (list "EMACS=t"))
-	  process-environment))
-	(default-directory
-	  (if (file-directory-p default-directory)
-	      default-directory
-	    "/")))
+        (win32-quote-process-args ?\") ;; XEmacs
+        (process-environment
+         (nconc
+          ;; If using termcap, we specify `emacs' as the terminal type
+          ;; because that lets us specify a width.
+          ;; If using terminfo, we specify `dumb' because that is
+          ;; a defined terminal type.  `emacs' is not a defined terminal type
+          ;; and there is no way for us to define it here.
+          ;; Some programs that use terminfo get very confused
+          ;; if TERM is not a valid terminal type.
+          (if (and (boundp 'system-uses-terminfo) system-uses-terminfo)
+              (list "TERM=dumb"
+                    (format "COLUMNS=%d" (frame-width)))
+            (list "TERM=emacs"
+                  (format "TERMCAP=emacs:co#%d:tc=unknown:" (frame-width))))
+          (if (getenv "EMACS") nil (list "EMACS=t"))
+          process-environment))
+        (default-directory
+          (if (file-directory-p default-directory)
+              default-directory
+            "/")))
     (apply 'start-process-shell-command name buffer command switches)))
 
 (defun jdee-run-applet-internal (doc)
   (let* ((doc-file-name (file-name-nondirectory doc))
-	 (doc-directory (file-name-directory doc))
-	 (doc-name (file-name-sans-extension doc-file-name))
-	 (run-buf-name (concat "*" doc-name "*")))
+         (doc-directory (file-name-directory doc))
+         (doc-name (file-name-sans-extension doc-file-name))
+         (run-buf-name (concat "*" doc-name "*")))
 
     (if (not (comint-check-proc run-buf-name))
-	(let* ((run-buffer (get-buffer-create run-buf-name))
-	       (win32-p (eq system-type 'windows-nt))
-	       (prog jdee-run-applet-viewer)
-	       (prog-args
-		(append (jdee-get-appletviewer-options)
-			(list doc-file-name)))
-	       (command-string (concat prog " "
-				       (jdee-run-make-arg-string
-					prog-args)
-				       "\n\n")))
-	  (with-current-buffer run-buffer
-	    (erase-buffer)
-	    (cd doc-directory)
-	    (insert (concat "cd " doc-directory "\n"))
-	    (insert command-string)
-	    (jdee-run-mode))
-	  (jdee-run-applet-exec run-buffer doc-name prog nil prog-args)
-	  (pop-to-buffer run-buffer))
+        (let* ((run-buffer (get-buffer-create run-buf-name))
+               (win32-p (eq system-type 'windows-nt))
+               (prog jdee-run-applet-viewer)
+               (prog-args
+                (append (jdee-get-appletviewer-options)
+                        (list doc-file-name)))
+               (command-string (concat prog " "
+                                       (jdee-run-make-arg-string
+                                        prog-args)
+                                       "\n\n")))
+          (with-current-buffer run-buffer
+            (erase-buffer)
+            (cd doc-directory)
+            (insert (concat "cd " doc-directory "\n"))
+            (insert command-string)
+            (jdee-run-mode))
+          (jdee-run-applet-exec run-buffer doc-name prog nil prog-args)
+          (pop-to-buffer run-buffer))
       (message "An instance of the applet in %s is running." doc-name)
       (pop-to-buffer run-buf-name))))
 
@@ -1456,7 +1456,7 @@ return (\"/a/b/c.html\") if it exists, else return (\"/a/b/c.htm\")
 if it exists, else return a list of all *.html files in /a/b/
 directory."
   (let ((basename (file-name-sans-extension (buffer-file-name)))
-	f)
+        f)
     (cond
      ((file-exists-p (setq f (concat basename ".html")))
       (list f))
@@ -1464,12 +1464,12 @@ directory."
       (list f))
      (t
       (cl-mapcan (lambda (file)
-		   (if (or
-			(string-match "[.]html$" file)
-			(string-match "[.]htm$" file))
-		       (list file)))
-		 (directory-files
-		  (file-name-directory (buffer-file-name)) t))))))
+                   (if (or
+                        (string-match "[.]html$" file)
+                        (string-match "[.]htm$" file))
+                       (list file)))
+                 (directory-files
+                  (file-name-directory (buffer-file-name)) t))))))
 
 
 
@@ -1497,20 +1497,20 @@ file."
      (list (read-file-name "Applet doc: " nil nil nil jdee-run-applet-last-doc))))
   (setq jdee-run-applet-last-doc doc)
   (let ((applet-doc (if (and jdee-run-applet-last-doc
-			     (not (string= jdee-run-applet-last-doc "")))
-			jdee-run-applet-last-doc
-		      (if (and jdee-run-applet-doc
-			       (not (string= jdee-run-applet-doc "")))
-			    jdee-run-applet-doc
-			  (car (jdee-run-find-html-files))))))
+                             (not (string= jdee-run-applet-last-doc "")))
+                        jdee-run-applet-last-doc
+                      (if (and jdee-run-applet-doc
+                               (not (string= jdee-run-applet-doc "")))
+                            jdee-run-applet-doc
+                          (car (jdee-run-find-html-files))))))
     (if applet-doc
-	(if (string-match "appletviewer" jdee-run-applet-viewer)
-	    (jdee-run-applet-internal applet-doc)
-	  (if (or
-	       (string= jdee-run-applet-viewer "")
-	       (string-match "browse-url" jdee-run-applet-viewer))
-	      (browse-url applet-doc)
-	    (jdee-run-applet-internal (concat default-directory applet-doc))))
+        (if (string-match "appletviewer" jdee-run-applet-viewer)
+            (jdee-run-applet-internal applet-doc)
+          (if (or
+               (string= jdee-run-applet-viewer "")
+               (string-match "browse-url" jdee-run-applet-viewer))
+              (browse-url applet-doc)
+            (jdee-run-applet-internal (concat default-directory applet-doc))))
       (signal 'error "Could not find html document to display applet."))))
 
 
@@ -1550,13 +1550,13 @@ A cons of two markers, location of the error and the location in the code.")
   "Update the `cdr' and the `car' of `jdee-run-etrace-current-marker' from its `car'.
 Here goes all the error message parsing."
   (let ((here (car jdee-run-etrace-current-marker))
-	(there (cdr jdee-run-etrace-current-marker))
-	(n (or next 0))
-	(re (concat " \\([a-zA-Z0-9_.]+\\.\\)?" ; package
-		     "\\([a-zA-Z0-9_$]+\\)" ; class
-		     "\\.<?[a-zA-Z0-9_]+>?" ; method
-		     "(\\([a-zA-Z0-9_]+\\)\\.java:" ; java file = public class
-		     "\\([0-9]+\\))"))); line number
+        (there (cdr jdee-run-etrace-current-marker))
+        (n (or next 0))
+        (re (concat " \\([a-zA-Z0-9_.]+\\.\\)?" ; package
+                     "\\([a-zA-Z0-9_$]+\\)" ; class
+                     "\\.<?[a-zA-Z0-9_]+>?" ; method
+                     "(\\([a-zA-Z0-9_]+\\)\\.java:" ; java file = public class
+                     "\\([0-9]+\\))"))); line number
     (with-current-buffer (marker-buffer here)
       (goto-char here)
       ;; In order to display the current match at the top of
@@ -1565,45 +1565,45 @@ Here goes all the error message parsing."
       ;; at the end of the line again, you will match the same error.
       ;; If n is 0 ensure that point is at the beggining
       (if (> n 0)
-	  (end-of-line)
-	(beginning-of-line))
+          (end-of-line)
+        (beginning-of-line))
 
       (if (>= n 0)
-	  (if (re-search-forward re nil t)
-	      (progn
-		;;setting the line at the beggining
-		;;so that it is the first line of the errors
-		(beginning-of-line)
-		(jdee-run-etrace-update-current-marker))
-	    (error "End of stack trace"))
-	(if (re-search-backward re nil t)
-	    (progn
-	      (jdee-run-etrace-update-current-marker))
-	  (error "Start of stack trace")))
+          (if (re-search-forward re nil t)
+              (progn
+                ;;setting the line at the beggining
+                ;;so that it is the first line of the errors
+                (beginning-of-line)
+                (jdee-run-etrace-update-current-marker))
+            (error "End of stack trace"))
+        (if (re-search-backward re nil t)
+            (progn
+              (jdee-run-etrace-update-current-marker))
+          (error "Start of stack trace")))
 ;;       (message "1: [%s]; 2: [%s]; 3: [%s]; 4: [%s]" (match-string 1)
 ;;                (match-string 2) (match-string 3) (match-string 4))
       (let* ((package (or (match-string 1) ""))
-	    (class (match-string 2))
-	    (file-name (match-string 3))
-	    (line (car (read-from-string (match-string 4))))
-	    (file (jdee-find-class-source-file (concat package file-name)))
-	    buf)
-	(condition-case err
-	    (progn
-	      (setq buf (if file (find-file-noselect file)))
-	      (set-buffer buf)
-	      (goto-char (point-min))
-	      (forward-line (1- line))
-	      (set-marker there (point) buf))
-	  (error err))))
+            (class (match-string 2))
+            (file-name (match-string 3))
+            (line (car (read-from-string (match-string 4))))
+            (file (jdee-find-class-source-file (concat package file-name)))
+            buf)
+        (condition-case err
+            (progn
+              (setq buf (if file (find-file-noselect file)))
+              (set-buffer buf)
+              (goto-char (point-min))
+              (forward-line (1- line))
+              (set-marker there (point) buf))
+          (error err))))
     jdee-run-etrace-current-marker))
 
 (defun jdee-run-etrace-goto (&optional next)
   "Display the current stack using `compilation-goto-locus'."
   (jdee-run-etrace-current-marker next)
   (compilation-goto-locus (car jdee-run-etrace-current-marker)
-			  (cdr jdee-run-etrace-current-marker)
-			  nil))
+                          (cdr jdee-run-etrace-current-marker)
+                          nil))
 
 (defun jdee-run-etrace-show-at-mouse (event)
   "Jump to the stack position at the mouse click.

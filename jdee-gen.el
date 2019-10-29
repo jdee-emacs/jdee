@@ -112,8 +112,8 @@ and Gradle \"src/test/java\" is standard path."
   "Delete any syntactical whitespace (including newlines)
 before point."
   (while (and (not (bobp))
-	      (or (bolp)
-		  (re-search-backward "\\s-\\=" nil t)))
+              (or (bolp)
+                  (re-search-backward "\\s-\\=" nil t)))
     (delete-char -1)))
 
 (defun jdee-gen-extract-ids-from-params (params)
@@ -122,9 +122,9 @@ ids and return as \"id1, id2, ...\"."
   (mapconcat
    (lambda (arg)
      (nth 1 (split-string
-	     (jdee-replace-in-string
-	      (jdee-replace-in-string arg "^[ \t\n\f\l]+" "")
-	      "[ \t\n\f\l]+$" ""))))
+             (jdee-replace-in-string
+              (jdee-replace-in-string arg "^[ \t\n\f\l]+" "")
+              "[ \t\n\f\l]+$" ""))))
    (split-string params "[,]") ", "))
 
 (defun jdee-gen-lookup-named (name)
@@ -137,14 +137,14 @@ Returns the data if NAME was found, and nil otherwise."
 of strings to a list of Lisp objects as required by
 tempo."
   (let ((template-string "")
-	(n (length strings))
-	(i 0))
+        (n (length strings))
+        (i 0))
     (while (< i n)
       (setq template-string
-	    (concat template-string (nth i strings) "\n"))
+            (concat template-string (nth i strings) "\n"))
       (setq i (1+ i)))
     (setq template-string
-	  (concat "'(" template-string ")"))
+          (concat "'(" template-string ")"))
     (eval (car (read-from-string template-string)))))
 
 (defcustom jdee-gen-buffer-boilerplate nil
@@ -168,20 +168,20 @@ specified by `jdee-gen-buffer-boilerplate'."
 variable `jdee-gen-buffer-boilerplate'."
   (if jdee-gen-buffer-boilerplate
       (let ((bp "")
-	    (n (length jdee-gen-buffer-boilerplate))
-	    (i 0))
-	(while (< i n)
-	  (setq bp
-		(concat bp (elt jdee-gen-buffer-boilerplate i) "\n"))
-	  (setq i (1+ i)))
-	bp)))
+            (n (length jdee-gen-buffer-boilerplate))
+            (i 0))
+        (while (< i n)
+          (setq bp
+                (concat bp (elt jdee-gen-buffer-boilerplate i) "\n"))
+          (setq i (1+ i)))
+        bp)))
 
 (defun jdee-gen-get-extend-class ()
   (let ((super-class (read-from-minibuffer "extends: ")))
     (if (not (string= super-class ""))
-	(progn
-	  (jdee-import-find-and-import super-class)
-	  (concat "extends " super-class " ")))))
+        (progn
+          (jdee-import-find-and-import super-class)
+          (concat "extends " super-class " ")))))
 
 (defcustom jdee-gen-final-arguments t
   "Specifies whether to add final modifiers to method arguments.
@@ -202,21 +202,21 @@ Note that anonymous classes are implicitly final."
   "Inserts the final modifier depending on `jdee-gen-final-arguments'."
   (if jdee-gen-final-arguments
       (let ((comma nil)
-	    (arg-list (split-string method-args ",")))
-	(setq method-args "")
-	(mapc
-	 (lambda (arg)
-	   (if (string-match "\\<final\\>" arg)
-	       (setq method-args (concat method-args comma arg))
-	     (setq method-args
-		   (concat method-args
-			   comma
-			   (if (string-match "^[ \t]" arg) " ")
-			   "final"
-			   (if (string-match "^[^ \t]" arg) " ")
-			   arg)))
-	   (setq comma ","))
-	 arg-list)))
+            (arg-list (split-string method-args ",")))
+        (setq method-args "")
+        (mapc
+         (lambda (arg)
+           (if (string-match "\\<final\\>" arg)
+               (setq method-args (concat method-args comma arg))
+             (setq method-args
+                   (concat method-args
+                           comma
+                           (if (string-match "^[ \t]" arg) " ")
+                           "final"
+                           (if (string-match "^[^ \t]" arg) " ")
+                           arg)))
+           (setq comma ","))
+         arg-list)))
   method-args)
 
 (defun jdee-gen-final-method-modifier (method-modifiers)
@@ -226,28 +226,28 @@ Note that anonymous classes are implicitly final."
     ;; Java Language specification, section 15.9.5.
     ;; http://java.sun.com/docs/books/jls/second_edition/html/classes.doc.html
     (unless (or (member "final" class-info) ; explicit final modifier?
-		(save-excursion
-		  (and class-info
-		       (goto-char (cdar class-info))
-		       (looking-at "new")))) ; anonymous class?
+                (save-excursion
+                  (and class-info
+                       (goto-char (cdar class-info))
+                       (looking-at "new")))) ; anonymous class?
       (if (and jdee-gen-final-methods
-	       (not (string-match "final" method-modifiers))
-	       (not (string-match "private" method-modifiers))
-	       (not (string-match "abstract" method-modifiers)))
-	  ;; Find correct position according to
-	  ;; Java Language specification, section 8.4.3.
-	  ;; http://java.sun.com/docs/books/jls/second_edition/html/classes.doc.html
-	  (let* ((pos (max (if (string-match "public" method-modifiers) (match-end 0) 0)
-			   (if (string-match "protected" method-modifiers) (match-end 0) 0)
-			   (if (string-match "static" method-modifiers) (match-end 0) 0)))
-		 (left (substring method-modifiers 0 pos))
-		 (right (substring method-modifiers pos)))
-	    (setq method-modifiers (concat
-			     left
-			     (if (> (length left) 0) " ")
-			     "final"
-			     (if (and (= (length left) 0) (> (length right) 0)) " ")
-			     right))))))
+               (not (string-match "final" method-modifiers))
+               (not (string-match "private" method-modifiers))
+               (not (string-match "abstract" method-modifiers)))
+          ;; Find correct position according to
+          ;; Java Language specification, section 8.4.3.
+          ;; http://java.sun.com/docs/books/jls/second_edition/html/classes.doc.html
+          (let* ((pos (max (if (string-match "public" method-modifiers) (match-end 0) 0)
+                           (if (string-match "protected" method-modifiers) (match-end 0) 0)
+                           (if (string-match "static" method-modifiers) (match-end 0) 0)))
+                 (left (substring method-modifiers 0 pos))
+                 (right (substring method-modifiers pos)))
+            (setq method-modifiers (concat
+                             left
+                             (if (> (length left) 0) " ")
+                             "final"
+                             (if (and (= (length left) 0) (> (length right) 0)) " ")
+                             right))))))
   method-modifiers)
 
 (defmacro jdee-gen-save-excursion (&rest body)
@@ -260,9 +260,9 @@ without having mutual interference of those templates.
 Returns nil."
   `(progn
      (let ((tempo-marks)
-	   (tempo-named-insertions)
-	   (tempo-region-start (make-marker))
-	   (tempo-region-stop (make-marker)))
+           (tempo-named-insertions)
+           (tempo-region-start (make-marker))
+           (tempo-region-stop (make-marker)))
        (progn ,@body))
      nil))
 
@@ -286,8 +286,8 @@ Removes indentation if the current line contains only whitespaces.
 The purpose of this function is to avoid trailing whitespaces
 in generated java code. Returns nil."
   (if (save-excursion
-	(beginning-of-line)
-	(looking-at "\\s-+$"))
+        (beginning-of-line)
+        (looking-at "\\s-+$"))
       (replace-match ""))
   (if (not (and (bolp) (eolp)))
       (c-indent-line))
@@ -304,9 +304,9 @@ Indentation and trailing whitespace of surrounding non-blank lines will stay unc
 Returns nil."
   (interactive "*")
   (if (or (bolp) (eolp)
-	  (save-excursion
-	    (beginning-of-line)
-	    (looking-at "\\s-*$")))
+          (save-excursion
+            (beginning-of-line)
+            (looking-at "\\s-*$")))
       (delete-region
        (+ (point) (skip-chars-backward " \t\n") (skip-chars-forward  " \t"))
        (+ (point) (skip-chars-forward  " \t\n") (skip-chars-backward " \t"))))
@@ -343,13 +343,13 @@ it sets this variable to nil. If INSERT-IMMEDIATELY is non-nil,
 and jdee-gen-interface-to-gen will be set to nil."
   (let ((interface (read-from-minibuffer "implements: ")))
     (if (not (string= interface ""))
-	(progn
-	  (setq jdee-gen-interface-to-gen
-		(cons (point-marker) interface))
-	  (if insert-immediately
-	      (progn
-		(jdee-gen-insert-interface-implementation)
-		(setq jdee-gen-interface-to-gen nil))))
+        (progn
+          (setq jdee-gen-interface-to-gen
+                (cons (point-marker) interface))
+          (if insert-immediately
+              (progn
+                (jdee-gen-insert-interface-implementation)
+                (setq jdee-gen-interface-to-gen nil))))
       (setq jdee-gen-interface-to-gen nil)))
   nil) ;; must return nil to prevent template insertion.
 
@@ -359,10 +359,10 @@ and inserts it in the current buffer at the location specified
 by the car of `jdee-gen-interface-to-gen'."
   (if jdee-gen-interface-to-gen
       (let ((ins-pos (marker-position (car jdee-gen-interface-to-gen)))
-	    (interface (cdr jdee-gen-interface-to-gen)))
-	(save-excursion
-	  (goto-char ins-pos)
-	  (jdee-wiz-implement-interface-internal interface)))))
+            (interface (cdr jdee-gen-interface-to-gen)))
+        (save-excursion
+          (goto-char ins-pos)
+          (jdee-wiz-implement-interface-internal interface)))))
 
 (defvar jdee-gen-package-name nil)
 
@@ -375,19 +375,19 @@ Ask the user for confirmation.  Also sets buffer local
 `jdee-gen-package-name'."
   (require 'jdee-package)
   (let* ((package-dir (jdee-package-get-package-directory))
-	 (suggested-package-name
+         (suggested-package-name
           (or package
               (if (or
                    (string= package-dir jdee-package-unknown-package-name)
                    (string= package-dir ""))
                   nil
                 (jdee-package-convert-directory-to-package package-dir))))
-	 (package-name
+         (package-name
           (or jdee-gen-package-name
               (read-from-minibuffer "Package: " suggested-package-name))))
     (if (and
-	 package-name
-	 (not (string= package-name "")))
+         package-name
+         (not (string= package-name "")))
         (progn
           (set (make-local-variable 'jdee-gen-package-name) package-name)
           (format "package %s;\n\n" package-name)))))
@@ -399,11 +399,11 @@ For example, if set to a single space [\" \"], then a generated method might
 look like:
 
     void setXxxx () {
-		^
+                ^
 If not set, the same generated method would look like:
 
     void setXxxx() {
-		^
+                ^
 Note: According to the Java Code Convention [section 6.4], this value should
       be the empty string."
   :group 'jdee-gen
@@ -417,11 +417,11 @@ For example, if set to a single space [\" \"], then a generated method might
 look like:
 
     void setXxxx( boolean newValue ) {
-		 ^                ^
+                 ^                ^
 If not set, the same generated method would look like:
 
     void setXxxx(boolean newValue) {
-		 ^              ^
+                 ^              ^
 Note: According to the Java Code Convention [section 6.4], this value should
       be the empty string."
   :group 'jdee-gen
@@ -434,11 +434,11 @@ argument list for a method call or definition.  For example, if set to
 a single space [\" \"], then a generated method might look like:
 
     void setXxxx(boolean newValue) {
-				  ^
+                                  ^
 If not set, the same generated method would look like:
 
     void setXxxx(boolean newValue){
-				  ^
+                                  ^
 Note: According to the Java Code Convention [section 6.4], this value should
       be a single space."
   :group 'jdee-gen
@@ -514,27 +514,27 @@ as well as the corresponding padding, whitespace and/or Java keywords."
   (if (> (length type) 0) ; ordinary method?
       (setq access (jdee-gen-final-method-modifier access)))
   (let ((sig
-	 (concat
-	  (if (> (length access) 0)
-	      (concat access " ")
-	    ());; if no access (e.g. "public static"), then nothing
-	  (if (> (length type) 0)
-	      (concat type " ")
-	    ());; if no type (e.g. "boolean" or "void"), then nothing
-	  name
-	  jdee-gen-method-signature-padding-1
-	  "("
-	  (if (> (length arglist) 0)
-	      (concat jdee-gen-method-signature-padding-2 (jdee-gen-final-argument-modifier arglist)
-		      jdee-gen-method-signature-padding-2 )
-	    ())
-	  ")"
-	  (if (> (length throwslist) 0)
-	      (concat " throws " throwslist)
-	    ())
-	  (if jdee-gen-k&r
-	      jdee-gen-method-signature-padding-3
-	    ()))))
+         (concat
+          (if (> (length access) 0)
+              (concat access " ")
+            ());; if no access (e.g. "public static"), then nothing
+          (if (> (length type) 0)
+              (concat type " ")
+            ());; if no type (e.g. "boolean" or "void"), then nothing
+          name
+          jdee-gen-method-signature-padding-1
+          "("
+          (if (> (length arglist) 0)
+              (concat jdee-gen-method-signature-padding-2 (jdee-gen-final-argument-modifier arglist)
+                      jdee-gen-method-signature-padding-2 )
+            ())
+          ")"
+          (if (> (length throwslist) 0)
+              (concat " throws " throwslist)
+            ())
+          (if jdee-gen-k&r
+              jdee-gen-method-signature-padding-3
+            ()))))
     sig))
 
 (defcustom jdee-gen-class-create-constructor t
@@ -546,8 +546,8 @@ as well as the corresponding padding, whitespace and/or Java keywords."
   "*If non-nil, generate constructor for `jdee-gen-class-buffer'."
   :group 'jdee-gen
   :type  '(choice
-	   (const :tag "Prompt for package" jdee-gen-get-package-statement)
-	   (const :tag "Package updates automatically" jdee-package-update)))
+           (const :tag "Prompt for package" jdee-gen-get-package-statement)
+           (const :tag "Package updates automatically" jdee-package-update)))
 
 ;;(makunbound 'jdee-gen-class-buffer-template)
 (defcustom jdee-gen-class-buffer-template
@@ -598,16 +598,16 @@ command `jdee-gen-class', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (tempo-define-template "java-class-buffer-template"
-				 (jdee-gen-read-template val)
-				 nil
-				 "Insert a generic Java class buffer skeleton.")
-	  (defalias 'jdee-gen-class
-	    (list 'lambda (list)
-		  (list 'interactive)
-		  (list 'tempo-template-java-class-buffer-template)
-		  (list 'jdee-gen-insert-interface-implementation)))
-	  (set-default sym val)))
+          (tempo-define-template "java-class-buffer-template"
+                                 (jdee-gen-read-template val)
+                                 nil
+                                 "Insert a generic Java class buffer skeleton.")
+          (defalias 'jdee-gen-class
+            (list 'lambda (list)
+                  (list 'interactive)
+                  (list 'tempo-template-java-class-buffer-template)
+                  (list 'jdee-gen-insert-interface-implementation)))
+          (set-default sym val)))
 
 ;;;###autoload
 (defun jdee-gen-class-buffer (file)
@@ -649,15 +649,15 @@ command `jdee-gen-interface', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (tempo-define-template "java-interface-buffer-template"
-				 (jdee-gen-read-template val)
-				 nil
-				 "Insert a generic Java interface buffer skeleton.")
-	  (defalias 'jdee-gen-interface
-	    (list 'lambda (list)
-		  (list 'interactive)
-		  (list 'tempo-template-java-interface-buffer-template)))
-	  (set-default sym val)))
+          (tempo-define-template "java-interface-buffer-template"
+                                 (jdee-gen-read-template val)
+                                 nil
+                                 "Insert a generic Java interface buffer skeleton.")
+          (defalias 'jdee-gen-interface
+            (list 'lambda (list)
+                  (list 'interactive)
+                  (list 'tempo-template-java-interface-buffer-template)))
+          (set-default sym val)))
 
 ;;;###autoload
 (defun jdee-gen-interface-buffer (file)
@@ -709,12 +709,12 @@ command `jdee-gen-console', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-console
-	    (tempo-define-template "java-console-buffer-template"
-				   (jdee-gen-read-template val)
-				   nil
-				   "Insert skeleton for a new Java console buffer"))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-console
+            (tempo-define-template "java-console-buffer-template"
+                                   (jdee-gen-read-template val)
+                                   nil
+                                   "Insert skeleton for a new Java console buffer"))
+          (set-default sym val)))
 
 ;;;###autoload
 (defun jdee-gen-console-buffer (file)
@@ -727,14 +727,14 @@ It then moves the point to the location to the constructor."
 
 (defun jdee-gen-deep-clone-copies ()
   (let* ((class-tag (semantic-current-tag))
-	 (class-name (semantic-tag-name class-tag))
-	 (members (sort (jdee-parse-get-serializable-members class-tag)
-			'jdee-parse-compare-member-types)))
+         (class-name (semantic-tag-name class-tag))
+         (members (sort (jdee-parse-get-serializable-members class-tag)
+                        'jdee-parse-compare-member-types)))
     (apply #' append '(l)
-	      (mapcar #'(lambda (elt)
-			  (let ((e (car elt)))
-			    (list (format "if (%s != null) ret.%s = %s.clone();" e e e) '> 'n)))
-		      members))))
+              (mapcar #'(lambda (elt)
+                          (let ((e (car elt)))
+                            (list (format "if (%s != null) ret.%s = %s.clone();" e e e) '> 'n)))
+                      members))))
 
 (defcustom jdee-gen-deep-clone-catch-exception t
   "*Whether or not to catch CloneNotSupportedException."
@@ -824,13 +824,13 @@ command `jdee-gen-deep-clone', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-deep-clone
-	    (tempo-define-template
-	     "java-deep-clone-method"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Create a deep clone method at the current point."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-deep-clone
+            (tempo-define-template
+             "java-deep-clone-method"
+             (jdee-gen-read-template val)
+             nil
+             "Create a deep clone method at the current point."))
+          (set-default sym val)))
 
 ;; TO DO: Add support for style that puts member declarations at the bottom
 ;; of a class.
@@ -854,12 +854,12 @@ NO-MOVE-POINT if nil move the point, either way, we return the position.
 "
   (if (stringp modifiers) (setq modifiers (split-string modifiers ",")))
   (let* ((pair (jdee-parse-get-innermost-class-at-point))
-	 (class-name (if pair (car pair)))
-	 pos)
+         (class-name (if pair (car pair)))
+         pos)
     (if (null pair) (error "point is not in a class definition"))
     (semantic-fetch-tags)
     (setq pos (jdee-parse-get-nth-member class-name modifiers
-					nil -1 nil 'subset))
+                                        nil -1 nil 'subset))
 
     (if (null pos) (setq pos (jdee-parse-get-top-of-class class-name)))
     (if (and pos (not no-move-to-point)) (goto-char pos))
@@ -950,13 +950,13 @@ command `jdee-gen-get-set', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-get-set
-	    (tempo-define-template
-	     "java-get-set-pair"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert variable at the top of the class and get-set method pair at point."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-get-set
+            (tempo-define-template
+             "java-get-set-pair"
+             (jdee-gen-read-template val)
+             nil
+             "Insert variable at the top of the class and get-set method pair at point."))
+          (set-default sym val)))
 
 (defalias 'jdee-gen-property 'jdee-gen-get-set)
 
@@ -1009,13 +1009,13 @@ command `jdee-gen-bean', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-bean
-	    (tempo-define-template
-	     "java-bean-template"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Create a Java bean."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-bean
+            (tempo-define-template
+             "java-bean-template"
+             (jdee-gen-read-template val)
+             nil
+             "Create a Java bean."))
+          (set-default sym val)))
 
 ;;;###autoload
 (defun jdee-gen-bean-buffer (file)
@@ -1046,13 +1046,13 @@ Setting this variable defines a template instantiation command
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-hibernate-pojo-equals-method
-	    (tempo-define-template
-	     "java-hibernate-pojo-equals-method"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Create an equals method at the current point."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-hibernate-pojo-equals-method
+            (tempo-define-template
+             "java-hibernate-pojo-equals-method"
+             (jdee-gen-read-template val)
+             nil
+             "Create an equals method at the current point."))
+          (set-default sym val)))
 
 ;(makunbound 'jdee-gen-hibernate-pojo-template)
 (defcustom jdee-gen-hibernate-pojo-buffer-template
@@ -1094,13 +1094,13 @@ Setting this variable defines a template instantiation command
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-hibernate-pojo
-	    (tempo-define-template
-	     "java-hibernate-pojo-buffer-template"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Create an equals method at the current point."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-hibernate-pojo
+            (tempo-define-template
+             "java-hibernate-pojo-buffer-template"
+             (jdee-gen-read-template val)
+             nil
+             "Create an equals method at the current point."))
+          (set-default sym val)))
 
 (defcustom jdee-gen-jfc-app-buffer-template
   (list
@@ -1309,12 +1309,12 @@ command `jdee-gen-jfc-app', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-jfc-app
-	    (tempo-define-template "java-jfc-app-buffer-template"
-				   (jdee-gen-read-template val)
-				   nil
-				   "Insert skeleton for a JFC app buffer"))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-jfc-app
+            (tempo-define-template "java-jfc-app-buffer-template"
+                                   (jdee-gen-read-template val)
+                                   nil
+                                   "Insert skeleton for a JFC app buffer"))
+          (set-default sym val)))
 
 ;;;###autoload
 (defun jdee-gen-jfc-app-buffer (file)
@@ -1352,15 +1352,15 @@ It then moves the point to the location to the constructor."
     "\"\" 'n"
     "\"# Java Compiler Args\" 'n"
     "\"JAVACFLAGS := -bootclasspath $\\\(JAVA_HOME\\\)/jre/lib/rt.jar \\\\\" 'n"
-    "\"	-classpath $\\\(CLASSPATH\\\) \\\\\" 'n"
-    "\"	-sourcepath $\\\(SRCDIR\\\) \\\\\" 'n"
-    "\"	-d $\\\(OBJDIR\\\) \\\\\" 'n"
-    "\"	$\\\(JVM_OPTION\\\)\" 'n"
+    "\"        -classpath $\\\(CLASSPATH\\\) \\\\\" 'n"
+    "\"        -sourcepath $\\\(SRCDIR\\\) \\\\\" 'n"
+    "\"        -d $\\\(OBJDIR\\\) \\\\\" 'n"
+    "\"        $\\\(JVM_OPTION\\\)\" 'n"
     "\"\" 'n"
     "\"# Sources\" 'n"
     "\"SOURCES = $\\\(shell find $\\\(SRCDIR\\\) \\\\\" 'n"
-    "\"	-name *.java \\\\\" 'n"
-    "\"	$\\\(foreach x, $\\\(RES_EXT\\\), -o -name \\\"*.$\\\(x\\\)\\\"\\\) \\\\\" 'n"
+    "\"        -name *.java \\\\\" 'n"
+    "\"        $\\\(foreach x, $\\\(RES_EXT\\\), -o -name \\\"*.$\\\(x\\\)\\\"\\\) \\\\\" 'n"
     "\"\\\)\" 'n"
     "\"# Obj files\" 'n"
     "\"OBJS = $\\\(patsubst $\\\(SRCDIR\\\)/%, $\\\(OBJDIR\\\)/%, $\\\(patsubst %.java, %.class, $\\\(SOURCES\\\)\\\)\\\)\" 'n"
@@ -1373,33 +1373,33 @@ It then moves the point to the location to the constructor."
     "\"# Jar\" 'n"
     "\"jar : compile $\\\(PKG\\\)\" 'n"
     "\"$\\\(PKG\\\) : $\\\(OBJS\\\)\" 'n"
-    "\"	$\\\(JAR\\\) cf $\\\(PKG\\\) -C $\\\(OBJDIR\\\) .\" 'n"
+    "\"        $\\\(JAR\\\) cf $\\\(PKG\\\) -C $\\\(OBJDIR\\\) .\" 'n"
     "\"\" 'n"
     "\"# Compile\" 'n"
     "\"compile : $\\\(OBJDIR\\\) $\\\(OBJS\\\)\" 'n"
     "\"# Javac\" 'n"
     "\"$\\\(OBJDIR\\\)/%.class : $\\\(SRCDIR\\\)/%.java\" 'n"
-    "\"	@echo compile $<\" 'n"
-    "\"	@$\\\(JAVAC\\\) $\\\(JAVACFLAGS\\\) $<\" 'n"
+    "\"        @echo compile $<\" 'n"
+    "\"        @$\\\(JAVAC\\\) $\\\(JAVACFLAGS\\\) $<\" 'n"
     "\"ifneq \\\($\\\(OBJDIR\\\),$\\\(SRCDIR\\\)\\\)\" 'n"
     "\"# Resource file\" 'n"
     "\"$\\\(OBJDIR\\\)/% : $\\\(SRCDIR\\\)/%\" 'n"
-    "\"	@mkdir -p $\\\(dir $@\\\)\" 'n"
-    "\"	cp $< $@\" 'n"
+    "\"        @mkdir -p $\\\(dir $@\\\)\" 'n"
+    "\"        cp $< $@\" 'n"
     "\"endif\" 'n"
     "\"\" 'n"
     "\"\" 'n"
     "\"# Create obj directory\" 'n"
     "\"$\\\(OBJDIR\\\) :\" 'n"
-    "\"	mkdir -p $\\\(OBJDIR\\\)\" 'n"
+    "\"        mkdir -p $\\\(OBJDIR\\\)\" 'n"
     "\"\" 'n"
     "\"# Clean up\" 'n"
     "\"clean :\" 'n"
-    "\"	rm -fr $\\\(PKG\\\) \" 'n"
+    "\"        rm -fr $\\\(PKG\\\) \" 'n"
     "\"ifeq \\\($\\\(OBJDIR\\\),$\\\(SRCDIR\\\)\\\)\" 'n"
-    "\"	find $\\\(OBJDIR\\\) -name *.class -exec rm {} \\\\\;\" 'n"
+    "\"        find $\\\(OBJDIR\\\) -name *.class -exec rm {} \\\\\;\" 'n"
     "\"else\" 'n"
-    "\"	rm -fr $\\\(OBJDIR\\\) \" 'n"
+    "\"        rm -fr $\\\(OBJDIR\\\) \" 'n"
     "\"endif\" 'n"
     "\"\" 'n"
     "\"# Rebuild\" 'n"
@@ -1411,28 +1411,28 @@ Setting this variable defines a template instantiation command
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-makefile
-	    (tempo-define-template
-	     "jdee-makefile"
-	     (jdee-gen-read-template val)
-	     nil
-	     "insert makefile buffer."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-makefile
+            (tempo-define-template
+             "jdee-makefile"
+             (jdee-gen-read-template val)
+             nil
+             "insert makefile buffer."))
+          (set-default sym val)))
 
 (defun jdee-gen-makefile-buffer ()
   "Create a new Makefile buffer.
 This command a makefile for jde project using template generated by `jdee-gen-makefile'."
   (interactive)
   (let* ((default-directory
-	   (file-name-directory
-	    (if (string= jdee-current-project "")
-		(or (jdee-find-project-file ".") (expand-file-name "./prj.el"))
-	      jdee-current-project)))
-	 (file (read-file-name "Makefile " default-directory "Makefile")))
+           (file-name-directory
+            (if (string= jdee-current-project "")
+                (or (jdee-find-project-file ".") (expand-file-name "./prj.el"))
+              jdee-current-project)))
+         (file (read-file-name "Makefile " default-directory "Makefile")))
     (if (file-directory-p file)
-	(setq file (concat file "/Makefile")))
+        (setq file (concat file "/Makefile")))
     (when (or (not (file-exists-p file))
-	      (yes-or-no-p "Makefile exist, do you want to overwrite it? "))
+              (yes-or-no-p "Makefile exist, do you want to overwrite it? "))
       (find-file file)
       (makefile-mode)
       (delete-region (point-min) (point-max))
@@ -1515,33 +1515,33 @@ Setting this variable defines a template instantiation command
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-ant-buildfile
-	    (tempo-define-template
-	     "jdee-ant-buildfile"
-	     (jdee-gen-read-template val)
-	     nil
-	     "insert ant buildfile buffer."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-ant-buildfile
+            (tempo-define-template
+             "jdee-ant-buildfile"
+             (jdee-gen-read-template val)
+             nil
+             "insert ant buildfile buffer."))
+          (set-default sym val)))
 
 (defun jdee-gen-ant-buildfile-buffer ()
   "Create a new Makefile buffer.
 This command a makefile for jde project using template generated by `jdee-gen-ant-buildfile'."
   (interactive)
   (let* ((default-directory
-	   (file-name-directory
-	    (if (string= jdee-current-project "")
-		(or (jdee-find-project-file ".") (expand-file-name "./prj.el"))
-	      jdee-current-project)))
-	 (jdee-ant-buildfile (or (and (boundp 'jdee-ant-buildfile) jdee-ant-buildfile)
-			     "build.xml"))
-	 (file (read-file-name
-		(concat jdee-ant-buildfile " ")
-		default-directory
-		jdee-ant-buildfile)))
+           (file-name-directory
+            (if (string= jdee-current-project "")
+                (or (jdee-find-project-file ".") (expand-file-name "./prj.el"))
+              jdee-current-project)))
+         (jdee-ant-buildfile (or (and (boundp 'jdee-ant-buildfile) jdee-ant-buildfile)
+                             "build.xml"))
+         (file (read-file-name
+                (concat jdee-ant-buildfile " ")
+                default-directory
+                jdee-ant-buildfile)))
     (if (file-directory-p file)
-	(setq file (concat file "/" jdee-ant-buildfile)))
+        (setq file (concat file "/" jdee-ant-buildfile)))
     (when (or (not (file-exists-p file))
-	      (yes-or-no-p "Buildfile exist, do you want to overwrite it? "))
+              (yes-or-no-p "Buildfile exist, do you want to overwrite it? "))
       (find-file file)
       (delete-region (point-min) (point-max))
       (jdee-gen-ant-buildfile))))
@@ -1549,11 +1549,11 @@ This command a makefile for jde project using template generated by `jdee-gen-an
 
 (defcustom jdee-gen-buffer-templates
   (list (cons "Class" 'jdee-gen-class)
-	(cons "Interface" 'jdee-gen-interface)
-	(cons "Exception Class" 'jdee-gen-exception)
-	(cons "Console" 'jdee-gen-console)
-	(cons "Swing App" 'jdee-gen-jfc-app)
-	(cons "Unit Test" 'jdee-junit-test-class))
+        (cons "Interface" 'jdee-gen-interface)
+        (cons "Exception Class" 'jdee-gen-exception)
+        (cons "Console" 'jdee-gen-console)
+        (cons "Swing App" 'jdee-gen-jfc-app)
+        (cons "Unit Test" 'jdee-junit-test-class))
   "*Specifies available autocode templates for creating buffers.
 The value of this variable is an association list. The car of
 each element specifies the template's title. The cdr specifies
@@ -1562,20 +1562,20 @@ a command that inserts the template into a buffer. See the function
 insertion command."
   :group 'jdee-gen
   :type '(repeat
-	  (cons :tag "Template"
-		(string :tag "Title")
-		(function :tag "Command")))
+          (cons :tag "Template"
+                (string :tag "Title")
+                (function :tag "Command")))
   :set '(lambda (sym val)
-	  (let ((n (length val))
-		(i 0))
-	    (setq jdee-gen-buffer-template-names (list))
-	    (while (< i n)
-	      (setq jdee-gen-buffer-template-names
-		    (append
-		     jdee-gen-buffer-template-names
-		     (list (cons (car (nth i val)) (1+ i)))))
-	      (setq i (1+ i))))
-	  (set-default sym val)))
+          (let ((n (length val))
+                (i 0))
+            (setq jdee-gen-buffer-template-names (list))
+            (while (< i n)
+              (setq jdee-gen-buffer-template-names
+                    (append
+                     jdee-gen-buffer-template-names
+                     (list (cons (car (nth i val)) (1+ i)))))
+              (setq i (1+ i))))
+          (set-default sym val)))
 
 ;;;###autoload
 (defun jdee-gen-buffer (template file)
@@ -1584,7 +1584,7 @@ This command inserts the specified template at the beginning
 of the buffer."
   (interactive
    (list (completing-read "Template: " jdee-gen-buffer-template-names)
-	 (read-file-name "File: ")))
+         (read-file-name "File: ")))
   (find-file file)
   (funcall (cdr (assoc template jdee-gen-buffer-templates)))
   (goto-char (point-min))
@@ -1613,13 +1613,13 @@ comment to a source code section by code generating functions."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-section-comment
-	    (tempo-define-template
-	     "section comment"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert section comment."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-section-comment
+            (tempo-define-template
+             "section comment"
+             (jdee-gen-read-template val)
+             nil
+             "Insert section comment."))
+          (set-default sym val)))
 
 (defcustom jdee-gen-inner-class-template
   '(
@@ -1656,15 +1656,15 @@ comment to a source code section by code generating functions."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (tempo-define-template "java-inner-class"
-				 (jdee-gen-read-template val)
-				 nil
-				 "Insert inner class.")
-	  (defalias 'jdee-gen-inner-class-internal
-	    (list 'lambda (list)
-		  (list 'tempo-template-java-inner-class)
-		  (list 'jdee-gen-insert-interface-implementation)))
-	  (set-default sym val)))
+          (tempo-define-template "java-inner-class"
+                                 (jdee-gen-read-template val)
+                                 nil
+                                 "Insert inner class.")
+          (defalias 'jdee-gen-inner-class-internal
+            (list 'lambda (list)
+                  (list 'tempo-template-java-inner-class)
+                  (list 'jdee-gen-insert-interface-implementation)))
+          (set-default sym val)))
 
 (defun jdee-gen-inner-class ()
   (interactive)
@@ -1708,13 +1708,13 @@ command, `jdee-gen-action-listener', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-action-listener
-	    (tempo-define-template
-	     "java-action-listener"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert skeleton action listener."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-action-listener
+            (tempo-define-template
+             "java-action-listener"
+             (jdee-gen-read-template val)
+             nil
+             "Insert skeleton action listener."))
+          (set-default sym val)))
 
 (defcustom jdee-gen-window-listener-template
   '(
@@ -1842,13 +1842,13 @@ command, `jdee-gen-window-listener', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-window-listener
-	    (tempo-define-template
-	     "java-window-listener"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert skeleton window listener."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-window-listener
+            (tempo-define-template
+             "java-window-listener"
+             (jdee-gen-read-template val)
+             nil
+             "Insert skeleton window listener."))
+          (set-default sym val)))
 
 
 
@@ -1947,13 +1947,13 @@ command, `jdee-gen-mouse-listener', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-mouse-listener
-	    (tempo-define-template
-	     "java-mouse-listener"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert skeleton mouse listener."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-mouse-listener
+            (tempo-define-template
+             "java-mouse-listener"
+             (jdee-gen-read-template val)
+             nil
+             "Insert skeleton mouse listener."))
+          (set-default sym val)))
 
 (defcustom jdee-gen-mouse-motion-listener-template
   '(
@@ -2005,13 +2005,13 @@ command, `jdee-gen-mouse-motion-listener', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-mouse-motion-listener
-	    (tempo-define-template
-	     "java-mouse-motion-listener"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert skeleton mouse motion listener."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-mouse-motion-listener
+            (tempo-define-template
+             "java-mouse-motion-listener"
+             (jdee-gen-read-template val)
+             nil
+             "Insert skeleton mouse motion listener."))
+          (set-default sym val)))
 
 (defcustom jdee-gen-change-listener-template
   '(
@@ -2049,13 +2049,13 @@ command, `jdee-gen-change-listener', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-change-listener
-	    (tempo-define-template
-	     "java-change-listener"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert skeleton change listener."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-change-listener
+            (tempo-define-template
+             "java-change-listener"
+             (jdee-gen-read-template val)
+             nil
+             "Insert skeleton change listener."))
+          (set-default sym val)))
 
 
 (defcustom  jdee-gen-println
@@ -2067,13 +2067,13 @@ command, `jdee-gen-change-listener', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-println
-	    (tempo-define-template
-	     "println"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert println statement."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-println
+            (tempo-define-template
+             "println"
+             (jdee-gen-read-template val)
+             nil
+             "Insert println statement."))
+          (set-default sym val)))
 
 (defcustom  jdee-gen-beep
   '(
@@ -2084,13 +2084,13 @@ command, `jdee-gen-change-listener', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-beep
-	    (tempo-define-template
-	     "beep statement"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert beep statement."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-beep
+            (tempo-define-template
+             "beep statement"
+             (jdee-gen-read-template val)
+             nil
+             "Insert beep statement."))
+          (set-default sym val)))
 
 (defcustom  jdee-gen-property-change-support
   '(
@@ -2331,13 +2331,13 @@ command, `jdee-gen-change-listener', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-property-change-support
-	    (tempo-define-template
-	     "property change support template"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert property change support template."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-property-change-support
+            (tempo-define-template
+             "property change support template"
+             (jdee-gen-read-template val)
+             nil
+             "Insert property change support template."))
+          (set-default sym val)))
 
 (defcustom  jdee-gen-listener-registry
   '(
@@ -2410,13 +2410,13 @@ command, `jdee-gen-change-listener', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-listener-registry
-	    (tempo-define-template
-	     "listener registry template"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert listener registry template."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-listener-registry
+            (tempo-define-template
+             "listener registry template"
+             (jdee-gen-read-template val)
+             nil
+             "Insert listener registry template."))
+          (set-default sym val)))
 
 (defcustom  jdee-gen-event-source-fire-method-template
   '(
@@ -2475,13 +2475,13 @@ command, `jdee-gen-change-listener', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-event-source-fire-method
-	    (tempo-define-template
-	     "event source fire method template"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert event source fire method template."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-event-source-fire-method
+            (tempo-define-template
+             "event source fire method template"
+             (jdee-gen-read-template val)
+             nil
+             "Insert event source fire method template."))
+          (set-default sym val)))
 
 ;; (makunbound 'jdee-gen-enity-bean-template)
 (defcustom jdee-gen-entity-bean-template
@@ -2601,17 +2601,17 @@ command, `jdee-gen-change-listener', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-entity-bean
-	    (tempo-define-template
-	     "ejb-entity-bean"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Adds an implementation of the EJB Entity Bean interface to the
+          (defalias 'jdee-gen-entity-bean
+            (tempo-define-template
+             "ejb-entity-bean"
+             (jdee-gen-read-template val)
+             nil
+             "Adds an implementation of the EJB Entity Bean interface to the
 class in the current buffer at the current point in the buffer. Before invoking
 this command,  position point at the point in the buffer where you want the first
 Entity Bean method to appear. Use `jdee-ejb-entity-bean-buffer' to create a complete
 skeleton entity bean implementation from scratch."))
-	  (set-default sym val)))
+          (set-default sym val)))
 
 
 ;; (makunbound 'jdee-gen-session-bean-template)
@@ -2710,17 +2710,17 @@ skeleton entity bean implementation from scratch."))
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-session-bean
-	    (tempo-define-template
-	     "ejb-session-bean"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Adds an implementation of the EJB Session Bean interface to the
+          (defalias 'jdee-gen-session-bean
+            (tempo-define-template
+             "ejb-session-bean"
+             (jdee-gen-read-template val)
+             nil
+             "Adds an implementation of the EJB Session Bean interface to the
 class in the current buffer at the current point in the buffer. Before invoking
 this command,  position point at the point in the buffer where you want the first
 Session Bean method to appear. Use `jdee-ejb-session-bean-buffer' to create a complete
 skeleton session bean implementation from scratch."))
-	  (set-default sym val)))
+          (set-default sym val)))
 
 
 
@@ -2751,9 +2751,9 @@ the `jdee-gen-method-template'. The choices are
      is also being generated in the same run."
   :group 'jdee-gen
   :type '(choice
-	  (const :tag "Template" "template")
-	  (const :tag "Inherit Tag" "inherit")
-	  (const :tag "None" "none")))
+          (const :tag "Template" "template")
+          (const :tag "Inherit Tag" "inherit")
+          (const :tag "None" "none")))
 
 
 ;; (makunbound 'jdee-gen-method-template)
@@ -2802,13 +2802,13 @@ instantiation command, `jdee-gen-method', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-method
-	    (tempo-define-template
-	     "method"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Insert skeleton method."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-method
+            (tempo-define-template
+             "method"
+             (jdee-gen-read-template val)
+             nil
+             "Insert skeleton method."))
+          (set-default sym val)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -2824,14 +2824,14 @@ line, else on the next line before the comparison.  With
 `jdee-gen-equals-trailing-and-operators' set to nil:
 
     return (a == o.a)
-	&& (b == o.b)
-	&& (s == null ? o.s == null : s.equals(o.s));
+        && (b == o.b)
+        && (s == null ? o.s == null : s.equals(o.s));
 
 Or, with `jdee-gen-equals-trailing-and-operators' set to t:
 
     return (a == o.a) &&
-	(b == o.b) &&
-	(s == null ? o.s == null : s.equals(o.s));
+        (b == o.b) &&
+        (s == null ? o.s == null : s.equals(o.s));
 "
   :group 'jdee-gen
   :type 'boolean)
@@ -2843,14 +2843,14 @@ surrounded by parentheses.
 With `jdee-gen-equals-trailing-and-operators' set to nil:
 
     return ((a == o.a)
-	    && (b == o.b)
-	    && (s == null ? o.s == null : s.equals(o.s)));
+            && (b == o.b)
+            && (s == null ? o.s == null : s.equals(o.s)));
 
 Or, with `jdee-gen-equals-trailing-and-operators' set to t:
 
     return ((a == o.a) &&
-	    (b == o.b) &&
-	    (s == null ? o.s == null : s.equals(o.s)));
+            (b == o.b) &&
+            (s == null ? o.s == null : s.equals(o.s)));
 "
   :group 'jdee-gen
   :type 'boolean)
@@ -2877,13 +2877,13 @@ Setting this variable defines a template instantiation command
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-equals-method
-	    (tempo-define-template
-	     "java-equals-method"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Create an equals method at the current point."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-equals-method
+            (tempo-define-template
+             "java-equals-method"
+             (jdee-gen-read-template val)
+             nil
+             "Create an equals method at the current point."))
+          (set-default sym val)))
 
 ;;;###autoload
 (defun jdee-gen-equals-return (&optional parm-name var-name class super-method)
@@ -2902,77 +2902,77 @@ is then used instead of the result of `semantic-current-tag'.
 
 Example:
     class Bean {
-	int a;
-	long b;
-	String s;
+        int a;
+        long b;
+        String s;
     }
 
 Result:
     Bean o = (Bean) obj;
 
     return (a == o.a)
-	&& (b == o.b)
-	&& (s == null ? o.s == null : s.equals(o.s));
+        && (b == o.b)
+        && (s == null ? o.s == null : s.equals(o.s));
 
 Or, with `jdee-gen-equals-trailing-and-operators' set to t:
     Bean o = (Bean) obj;
 
     return (a == o.a) &&
-	(b == o.b) &&
-	(s == null ? o.s == null : s.equals(o.s));
+        (b == o.b) &&
+        (s == null ? o.s == null : s.equals(o.s));
 "
   (interactive)
   (let* ((parm (or parm-name "obj"))
-	 (var (or var-name "o"))
-	 (class-tag (or class (semantic-current-tag)))
-	 (class-name (semantic-tag-name class-tag))
-	 (members (sort (jdee-parse-get-serializable-members class-tag)
-			'jdee-parse-compare-member-types))
-	 (super (car (semantic-tag-type-superclasses class-tag)))
-	 (extends (and super (not (string= "Object" super)))))
+         (var (or var-name "o"))
+         (class-tag (or class (semantic-current-tag)))
+         (class-name (semantic-tag-name class-tag))
+         (members (sort (jdee-parse-get-serializable-members class-tag)
+                        'jdee-parse-compare-member-types))
+         (super (car (semantic-tag-type-superclasses class-tag)))
+         (extends (and super (not (string= "Object" super)))))
     (setq super-method (or super-method "equals"))
     (list 'l '>
-	  class-name " " var " = (" class-name ") " parm ";" '>'n '>'n
-	  "return "
-	  (if jdee-gen-equals-parens-around-expression "(")
-	  (if extends (list 'l (format "super.%s(" super-method) var ")")) '>
-	  (cons 'l (mapcar
-	      (lambda (tag)
-		(let ((name (semantic-tag-name tag))
-		      (type (semantic-tag-type tag)))
-		  (list 'l (if extends (jdee-gen-equals-add-and-operator)
-			     (setq extends t) nil)
-			(cond
-			 ;; primitive arrays
-			 ((and (string-match "\\`\\(byte\\|char\\|short\\|int\\|long\\|float\\|double\\|boolean\\)" type)
-			     (or (string-match "\\[.*\\]" name) (string-match "\\[.*\\]" type)))
-			  (let ((array (replace-regexp-in-string "\\[.*\\]" "" name)))
-			    (concat "java.util.Arrays.equals(" array ", " var "." array ")")))
+          class-name " " var " = (" class-name ") " parm ";" '>'n '>'n
+          "return "
+          (if jdee-gen-equals-parens-around-expression "(")
+          (if extends (list 'l (format "super.%s(" super-method) var ")")) '>
+          (cons 'l (mapcar
+              (lambda (tag)
+                (let ((name (semantic-tag-name tag))
+                      (type (semantic-tag-type tag)))
+                  (list 'l (if extends (jdee-gen-equals-add-and-operator)
+                             (setq extends t) nil)
+                        (cond
+                         ;; primitive arrays
+                         ((and (string-match "\\`\\(byte\\|char\\|short\\|int\\|long\\|float\\|double\\|boolean\\)" type)
+                             (or (string-match "\\[.*\\]" name) (string-match "\\[.*\\]" type)))
+                          (let ((array (replace-regexp-in-string "\\[.*\\]" "" name)))
+                            (concat "java.util.Arrays.equals(" array ", " var "." array ")")))
 
-			 ;; object arrays
-			 ((or (string-match "\\[.*\\]" name) (string-match "\\[.*\\]" type))
-			  (let ((array (replace-regexp-in-string "\\[.*\\]" "" name)))
-			    (concat "java.util.Arrays.deepEquals(" array ", " var "." array ")")))
+                         ;; object arrays
+                         ((or (string-match "\\[.*\\]" name) (string-match "\\[.*\\]" type))
+                          (let ((array (replace-regexp-in-string "\\[.*\\]" "" name)))
+                            (concat "java.util.Arrays.deepEquals(" array ", " var "." array ")")))
 
-			 ;; primitives
-			 ((or (semantic-tag-of-type-p tag "byte")
-			      (semantic-tag-of-type-p tag "char")
-			      (semantic-tag-of-type-p tag "short")
-			      (semantic-tag-of-type-p tag "int")
-			      (semantic-tag-of-type-p tag "long")
-			      (semantic-tag-of-type-p tag "boolean"))
-			  (concat "(" name " == " var "." name ")"))
+                         ;; primitives
+                         ((or (semantic-tag-of-type-p tag "byte")
+                              (semantic-tag-of-type-p tag "char")
+                              (semantic-tag-of-type-p tag "short")
+                              (semantic-tag-of-type-p tag "int")
+                              (semantic-tag-of-type-p tag "long")
+                              (semantic-tag-of-type-p tag "boolean"))
+                          (concat "(" name " == " var "." name ")"))
 
-			 ;; floating point; use epsilon?
-			 ((or (semantic-tag-of-type-p tag "float")
-			      (semantic-tag-of-type-p tag "double"))
-			  (concat "(" name " == " var "." name ")"))
+                         ;; floating point; use epsilon?
+                         ((or (semantic-tag-of-type-p tag "float")
+                              (semantic-tag-of-type-p tag "double"))
+                          (concat "(" name " == " var "." name ")"))
 
-			 ;; object references
-			 (t (concat "(" name " == null ? " var "." name " == null : "
-				    name ".equals(" var "." name "))" )))
-			'>))) members))
-	  (if jdee-gen-equals-parens-around-expression ")") ";")))
+                         ;; object references
+                         (t (concat "(" name " == null ? " var "." name " == null : "
+                                    name ".equals(" var "." name "))" )))
+                        '>))) members))
+          (if jdee-gen-equals-parens-around-expression ")") ";")))
 
 (defun jdee-gen-equals-add-and-operator ()
   (if jdee-gen-equals-trailing-and-operators
@@ -3008,13 +3008,13 @@ Setting this variable defines a template instantiation command
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-hashcode-method
-	    (tempo-define-template
-	     "java-hashcode-method"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Create a hashCode method at the current point."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-hashcode-method
+            (tempo-define-template
+             "java-hashcode-method"
+             (jdee-gen-read-template val)
+             nil
+             "Create a hashCode method at the current point."))
+          (set-default sym val)))
 
 (defvar jdee-gen-hashcode-primes
   '(11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97)
@@ -3027,7 +3027,7 @@ Setting this variable defines a template instantiation command
   "Get the next prime number"
   (let ((last jdee-gen-hashcode-current-prime))
     (setq jdee-gen-hashcode-current-prime (% (+ 1 last)
-					    (length jdee-gen-hashcode-primes)))
+                                            (length jdee-gen-hashcode-primes)))
     (int-to-string (nth last jdee-gen-hashcode-primes))))
 
 ;;;###autoload
@@ -3044,61 +3044,61 @@ then used instead of the result of `semantic-current-tag'.
 "
   (interactive)
   (let* ((var (or var-name "code"))
-	 (class-tag (or class (semantic-current-tag)))
-	 (members (sort (jdee-parse-get-serializable-members class-tag)
-			'jdee-parse-compare-member-types))
-	 (super (car (semantic-tag-type-superclasses class-tag)))
-	 (extends (and super (not (string= "Object" super)))))
+         (class-tag (or class (semantic-current-tag)))
+         (members (sort (jdee-parse-get-serializable-members class-tag)
+                        'jdee-parse-compare-member-types))
+         (super (car (semantic-tag-type-superclasses class-tag)))
+         (extends (and super (not (string= "Object" super)))))
     (list 'l "int " var " = "
-	  (if extends "super.hashCode()" (jdee-gen-hashcode-next-prime)) ";"
-	  '> 'n '> 'n
-	  (cons
-	   'l
-	   (mapcar
-	    (lambda (tag)
-	      (let ((name (semantic-tag-name tag))
-		    (type (semantic-tag-type tag)))
-		(list 'l var " = " var " * 37 + "
-		      (cond
-		       ;; arrays must be first
+          (if extends "super.hashCode()" (jdee-gen-hashcode-next-prime)) ";"
+          '> 'n '> 'n
+          (cons
+           'l
+           (mapcar
+            (lambda (tag)
+              (let ((name (semantic-tag-name tag))
+                    (type (semantic-tag-type tag)))
+                (list 'l var " = " var " * 37 + "
+                      (cond
+                       ;; arrays must be first
 
-		       ;; primitive arrays
-		       ((and (string-match "\\`\\(byte\\|char\\|short\\|int\\|long\\|float\\|double\\|boolean\\)" type)
-			     (or (string-match "\\[.*\\]" name) (string-match "\\[.*\\]" type)))
-			(let ((array (replace-regexp-in-string "\\[.*\\]" "" name)))
-			  (concat "java.util.Arrays.hashCode(" array ")")))
-		       ;; object arrays
-		       ((or (string-match "\\[.*\\]" name) (string-match "\\[\\]" type))
-			(let ((array (replace-regexp-in-string "\\[.*\\]" "" name)))
-			  (concat "java.util.Arrays.deepHashCode(" array ")")))
+                       ;; primitive arrays
+                       ((and (string-match "\\`\\(byte\\|char\\|short\\|int\\|long\\|float\\|double\\|boolean\\)" type)
+                             (or (string-match "\\[.*\\]" name) (string-match "\\[.*\\]" type)))
+                        (let ((array (replace-regexp-in-string "\\[.*\\]" "" name)))
+                          (concat "java.util.Arrays.hashCode(" array ")")))
+                       ;; object arrays
+                       ((or (string-match "\\[.*\\]" name) (string-match "\\[\\]" type))
+                        (let ((array (replace-regexp-in-string "\\[.*\\]" "" name)))
+                          (concat "java.util.Arrays.deepHashCode(" array ")")))
 
-		       ;; smaller types
-		       ((or (semantic-tag-of-type-p tag "byte")
-			    (semantic-tag-of-type-p tag "char")
-			    (semantic-tag-of-type-p tag "short"))
-			(concat "(int) " name))
-		       ;; integers
-		       ((semantic-tag-of-type-p tag "int") name)
-		       ((semantic-tag-of-type-p tag "long")
-			(concat "(int) (" name " ^ (" name " >> 32))" ))
-		       ;; booleans
-		       ((semantic-tag-of-type-p tag "boolean")
-			(concat "(" name " ? 1 : 0)"))
+                       ;; smaller types
+                       ((or (semantic-tag-of-type-p tag "byte")
+                            (semantic-tag-of-type-p tag "char")
+                            (semantic-tag-of-type-p tag "short"))
+                        (concat "(int) " name))
+                       ;; integers
+                       ((semantic-tag-of-type-p tag "int") name)
+                       ((semantic-tag-of-type-p tag "long")
+                        (concat "(int) (" name " ^ (" name " >> 32))" ))
+                       ;; booleans
+                       ((semantic-tag-of-type-p tag "boolean")
+                        (concat "(" name " ? 1 : 0)"))
 
-		       ;; floating point
-		       ((semantic-tag-of-type-p tag "float")
-			(concat "Float.floatToIntBits(" name ")" ))
-		       ((semantic-tag-of-type-p tag "double")
-			(concat "(int) (Double.doubleToLongBits(" name ") ^ (Double.doubleToLongBits(" name ") >> 32))" ))
+                       ;; floating point
+                       ((semantic-tag-of-type-p tag "float")
+                        (concat "Float.floatToIntBits(" name ")" ))
+                       ((semantic-tag-of-type-p tag "double")
+                        (concat "(int) (Double.doubleToLongBits(" name ") ^ (Double.doubleToLongBits(" name ") >> 32))" ))
 
 
-		       ;; object references
-		       (t
-			(concat "(" name " == null ? " (jdee-gen-hashcode-next-prime)
-				" : " name ".hashCode())"))) ";"
-		      '> 'n))) members))
-	  '> 'n
-	  "return " var ";")))
+                       ;; object references
+                       (t
+                        (concat "(" name " == null ? " (jdee-gen-hashcode-next-prime)
+                                " : " name ".hashCode())"))) ";"
+                      '> 'n))) members))
+          '> 'n
+          "return " var ";")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;_* toString method generator
@@ -3127,13 +3127,13 @@ command `jdee-gen-tostring-method', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-tostring-method
-	    (tempo-define-template
-	     "java-tostring-method"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Create an toString method at the current point."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-tostring-method
+            (tempo-define-template
+             "java-tostring-method"
+             (jdee-gen-read-template val)
+             nil
+             "Create an toString method at the current point."))
+          (set-default sym val)))
 
 ;;;###autoload
 (defun jdee-gen-tostring-return (&optional class)
@@ -3142,26 +3142,26 @@ java.lang.Object#toString function. This gets the member variables
 of the current class from semantic via `semantic-current-tag'."
   (interactive)
   (let* ((class-tag (or class (semantic-current-tag)))
-	 (class-name (semantic-tag-name class-tag))
-	 (members (jdee-parse-get-member-variables class-tag))
-	 (super (car (semantic-tag-type-superclasses class-tag)))
-	 (extends (and super (not (string= "Object" super))))
-	 (first t)
-	 (str-bld-type "StringBuilder"))
+         (class-name (semantic-tag-name class-tag))
+         (members (jdee-parse-get-member-variables class-tag))
+         (super (car (semantic-tag-type-superclasses class-tag)))
+         (extends (and super (not (string= "Object" super))))
+         (first t)
+         (str-bld-type "StringBuilder"))
     (list 'l '>
-	  (format "return new %s(" str-bld-type)
-	  (cons 'l (mapcar
-		    (lambda (tag)
-		      (let ((name (semantic-tag-name tag)))
-			(prog1
-			    (list 'l (concat (if (not first) ".append(")
-					     "\""
-					     (if (not first) ", "))
-				  name "=\" + " name ")"
-				  '> 'n)
-			  (setq first nil))))
-		    members))
-	  ".toString();")))
+          (format "return new %s(" str-bld-type)
+          (cons 'l (mapcar
+                    (lambda (tag)
+                      (let ((name (semantic-tag-name tag)))
+                        (prog1
+                            (list 'l (concat (if (not first) ".append(")
+                                             "\""
+                                             (if (not first) ", "))
+                                  name "=\" + " name ")"
+                                  '> 'n)
+                          (setq first nil))))
+                    members))
+          ".toString();")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;_* Generate all object methods
@@ -3267,15 +3267,15 @@ command `jdee-gen-exception', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (tempo-define-template "java-exception-buffer-template"
-				 (jdee-gen-read-template val)
-				 nil
-				 "Insert a generic Java exception buffer skeleton.")
-	  (defalias 'jdee-gen-exception
-	    (list 'lambda (list)
-		  (list 'interactive)
-		  (list 'tempo-template-java-exception-buffer-template)))
-	  (set-default sym val)))
+          (tempo-define-template "java-exception-buffer-template"
+                                 (jdee-gen-read-template val)
+                                 nil
+                                 "Insert a generic Java exception buffer skeleton.")
+          (defalias 'jdee-gen-exception
+            (list 'lambda (list)
+                  (list 'interactive)
+                  (list 'tempo-template-java-exception-buffer-template)))
+          (set-default sym val)))
 
 ;;;###autoload
 (defun jdee-gen-exception-buffer (file)
@@ -3289,23 +3289,23 @@ It then moves the point to the location of the first method."
 
 (defcustom jdee-gen-code-templates
   (list (cons "Get Set Pair" 'jdee-gen-get-set)
-	(cons "main method" 'jdee-gen-main)
-	(cons "toString Method (Apache)" 'jdee-gen-tostring-method)
-	(cons "Equals Method" 'jdee-gen-equals-method)
-	(cons "Hash Code Method" 'jdee-gen-hashcode-method)
-	(cons "Deep clone" 'jdee-gen-deep-clone)
-	(cons "Action Listener" 'jdee-gen-action-listener)
-	(cons "Change Listener" 'jdee-gen-change-listener)
-	(cons "Window Listener" 'jdee-gen-window-listener)
-	(cons "Mouse Listener" 'jdee-gen-mouse-listener)
-	(cons "Mouse Motion Listener" 'jdee-gen-mouse-motion-listener)
-	(cons "Inner Class" 'jdee-gen-inner-class)
-	(cons "println" 'jdee-gen-println)
-	(cons "beep" 'jdee-gen-beep)
-	(cons "property change support" 'jdee-gen-property-change-support)
-	(cons "EJB Entity Bean" 'jdee-gen-entity-bean)
-	(cons "EJB Session Bean" 'jdee-gen-session-bean)
-	)
+        (cons "main method" 'jdee-gen-main)
+        (cons "toString Method (Apache)" 'jdee-gen-tostring-method)
+        (cons "Equals Method" 'jdee-gen-equals-method)
+        (cons "Hash Code Method" 'jdee-gen-hashcode-method)
+        (cons "Deep clone" 'jdee-gen-deep-clone)
+        (cons "Action Listener" 'jdee-gen-action-listener)
+        (cons "Change Listener" 'jdee-gen-change-listener)
+        (cons "Window Listener" 'jdee-gen-window-listener)
+        (cons "Mouse Listener" 'jdee-gen-mouse-listener)
+        (cons "Mouse Motion Listener" 'jdee-gen-mouse-motion-listener)
+        (cons "Inner Class" 'jdee-gen-inner-class)
+        (cons "println" 'jdee-gen-println)
+        (cons "beep" 'jdee-gen-beep)
+        (cons "property change support" 'jdee-gen-property-change-support)
+        (cons "EJB Entity Bean" 'jdee-gen-entity-bean)
+        (cons "EJB Session Bean" 'jdee-gen-session-bean)
+        )
   "*Specifies available autocode templates.
 The value of this variable is an association list. The car of
 each element specifies a template name. The cdr specifies
@@ -3314,20 +3314,20 @@ a command that inserts the template into a buffer. See the function
 insertion command."
   :group 'jdee-gen
   :type '(repeat
-	  (cons :tag "Template"
-		(string :tag "Name")
-		(function :tag "Command")))
+          (cons :tag "Template"
+                (string :tag "Name")
+                (function :tag "Command")))
   :set '(lambda (sym val)
-	  (let ((n (length val))
-		(i 0))
-	    (setq jdee-gen-template-names (list))
-	    (while (< i n)
-	      (setq jdee-gen-template-names
-		    (append
-		     jdee-gen-template-names
-		     (list (cons (car (nth i val)) (1+ i)))))
-	      (setq i (1+ i))))
-	  (set-default sym val)))
+          (let ((n (length val))
+                (i 0))
+            (setq jdee-gen-template-names (list))
+            (while (< i n)
+              (setq jdee-gen-template-names
+                    (append
+                     jdee-gen-template-names
+                     (list (cons (car (nth i val)) (1+ i)))))
+              (setq i (1+ i))))
+          (set-default sym val)))
 
 (defun jdee-gen-code (name)
   "Insert the code template specified by NAME at point.
@@ -3380,10 +3380,10 @@ command, `jdee-gen-main', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (jdee-gen-define-abbrev-template
-	   "main"
-	   (jdee-gen-read-template val))
-	  (set-default sym val)))
+          (jdee-gen-define-abbrev-template
+           "main"
+           (jdee-gen-read-template val))
+          (set-default sym val)))
 
 (defcustom jdee-gen-cflow-enable t
   "Enables abbreviations for Java control flow constructs."
@@ -3433,10 +3433,10 @@ and then space. Note that abbrev mode must be enabled. See
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (jdee-gen-define-abbrev-template
-	   "if"
-	   (jdee-gen-read-template val))
-	  (set-default sym val)))
+          (jdee-gen-define-abbrev-template
+           "if"
+           (jdee-gen-read-template val))
+          (set-default sym val)))
 
 (defcustom jdee-gen-cflow-else
   '(
@@ -3454,10 +3454,10 @@ and then space. Note that abbrev mode must be enabled. See
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (jdee-gen-define-abbrev-template
-	   "else"
-	   (jdee-gen-read-template val))
-	  (set-default sym val)))
+          (jdee-gen-define-abbrev-template
+           "else"
+           (jdee-gen-read-template val))
+          (set-default sym val)))
 
 (defcustom jdee-gen-cflow-if-else
   '(
@@ -3486,10 +3486,10 @@ and then space. Note that abbrev mode must be enabled. See
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (jdee-gen-define-abbrev-template
-	   "ife"
-	   (jdee-gen-read-template val))
-	  (set-default sym val)))
+          (jdee-gen-define-abbrev-template
+           "ife"
+           (jdee-gen-read-template val))
+          (set-default sym val)))
 
 (defcustom jdee-gen-cflow-else-if
   '(
@@ -3509,10 +3509,10 @@ and then space. Note that abbrev mode must be enabled. See
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (jdee-gen-define-abbrev-template
-	   "eif"
-	   (jdee-gen-read-template val))
-	  (set-default sym val)))
+          (jdee-gen-define-abbrev-template
+           "eif"
+           (jdee-gen-read-template val))
+          (set-default sym val)))
 
 ;; (makunbound 'jdee-gen-cflow-while)
 (defcustom jdee-gen-cflow-while
@@ -3533,10 +3533,10 @@ and then space. Note that abbrev mode must be enabled. See
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (jdee-gen-define-abbrev-template
-	   "while"
-	   (jdee-gen-read-template val))
-	  (set-default sym val)))
+          (jdee-gen-define-abbrev-template
+           "while"
+           (jdee-gen-read-template val))
+          (set-default sym val)))
 
 (defcustom jdee-gen-cflow-for
   '(
@@ -3556,10 +3556,10 @@ and then space. Note that abbrev mode must be enabled. See
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (jdee-gen-define-abbrev-template
-	   "for"
-	   (jdee-gen-read-template val))
-	  (set-default sym val)))
+          (jdee-gen-define-abbrev-template
+           "for"
+           (jdee-gen-read-template val))
+          (set-default sym val)))
 
 (defcustom jdee-gen-cflow-for-i
   '(
@@ -3584,10 +3584,10 @@ Note: `tempo-interactive' must be set to a non-nil value to be prompted
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (jdee-gen-define-abbrev-template
-	   "fori"
-	   (jdee-gen-read-template val))
-	  (set-default sym val)))
+          (jdee-gen-define-abbrev-template
+           "fori"
+           (jdee-gen-read-template val))
+          (set-default sym val)))
 
 (defcustom jdee-gen-cflow-for-iter
   '(
@@ -3614,10 +3614,10 @@ Note: `tempo-interactive' must be set to a non-nil value to be prompted
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (jdee-gen-define-abbrev-template
-	   "foriter"
-	   (jdee-gen-read-template val))
-	  (set-default sym val)))
+          (jdee-gen-define-abbrev-template
+           "foriter"
+           (jdee-gen-read-template val))
+          (set-default sym val)))
 
 (defcustom jdee-gen-cflow-switch
   '(
@@ -3642,10 +3642,10 @@ and then space. Note that abbrev mode must be enabled. See
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (jdee-gen-define-abbrev-template
-	   "switch"
-	   (jdee-gen-read-template val))
-	  (set-default sym val)))
+          (jdee-gen-define-abbrev-template
+           "switch"
+           (jdee-gen-read-template val))
+          (set-default sym val)))
 
 (defcustom jdee-gen-cflow-case
   '(
@@ -3659,10 +3659,10 @@ and then space. Note that abbrev mode must be enabled. See
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (jdee-gen-define-abbrev-template
-	   "case"
-	   (jdee-gen-read-template val))
-	  (set-default sym val)))
+          (jdee-gen-define-abbrev-template
+           "case"
+           (jdee-gen-read-template val))
+          (set-default sym val)))
 
 ;; (makunbound 'jdee-gen-cflow-try-catch)
 (defcustom jdee-gen-cflow-try-catch
@@ -3689,7 +3689,7 @@ and then space. Note that abbrev mode must be enabled. See
     "'p'n"
     "\"}\""
     " (if jdee-gen-comments "
-    "	'(l \" // end of try-catch\"))"
+    "        '(l \" // end of try-catch\"))"
     "'>'n"
     )
   "Skeleton try-catch statement. To insert the statement at point, type try
@@ -3698,10 +3698,10 @@ and then space. Note that abbrev mode must be enabled. See
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (jdee-gen-define-abbrev-template
-	   "try"
-	   (jdee-gen-read-template val))
-	  (set-default sym val)))
+          (jdee-gen-define-abbrev-template
+           "try"
+           (jdee-gen-read-template val))
+          (set-default sym val)))
 
 (defcustom jdee-gen-cflow-catch
   '(
@@ -3721,10 +3721,10 @@ and then space. Note that abbrev mode must be enabled. See
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (jdee-gen-define-abbrev-template
-	   "catch"
-	   (jdee-gen-read-template val))
-	  (set-default sym val)))
+          (jdee-gen-define-abbrev-template
+           "catch"
+           (jdee-gen-read-template val))
+          (set-default sym val)))
 
 (defcustom jdee-gen-cflow-try-finally
   '(
@@ -3758,10 +3758,10 @@ tryf and then space. Note that abbrev mode must be enabled. See
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (jdee-gen-define-abbrev-template
-	   "tryf"
-	   (jdee-gen-read-template val))
-	  (set-default sym val)))
+          (jdee-gen-define-abbrev-template
+           "tryf"
+           (jdee-gen-read-template val))
+          (set-default sym val)))
 
 (defcustom jdee-gen-cflow-finally
   '(
@@ -3779,10 +3779,10 @@ and then space. Note that abbrev mode must be enabled. See
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (jdee-gen-define-abbrev-template
-	   "finally"
-	   (jdee-gen-read-template val))
-	  (set-default sym val)))
+          (jdee-gen-define-abbrev-template
+           "finally"
+           (jdee-gen-read-template val))
+          (set-default sym val)))
 
 (defcustom jdee-gen-log-member-template
   '(
@@ -3801,13 +3801,13 @@ command `jdee-gen-log-member', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-log-member
-	    (tempo-define-template
-	     "java-log-member"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Create a log member at the current point."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-log-member
+            (tempo-define-template
+             "java-log-member"
+             (jdee-gen-read-template val)
+             nil
+             "Create a log member at the current point."))
+          (set-default sym val)))
 
 (defcustom jdee-gen-log-statement-template
   '(
@@ -3834,13 +3834,13 @@ command `jdee-gen-log-statement', as a side-effect."
   :group 'jdee-gen
   :type '(repeat string)
   :set '(lambda (sym val)
-	  (defalias 'jdee-gen-log-statement
-	    (tempo-define-template
-	     "java-log-statement"
-	     (jdee-gen-read-template val)
-	     nil
-	     "Create an log statement method at the current point."))
-	  (set-default sym val)))
+          (defalias 'jdee-gen-log-statement
+            (tempo-define-template
+             "java-log-statement"
+             (jdee-gen-read-template val)
+             nil
+             "Create an log statement method at the current point."))
+          (set-default sym val)))
 
 (defun jdee-gen-abbrev-hook ()
   "Abbreviation hook. Inserts an abbreviation template.
@@ -3849,22 +3849,22 @@ This function does nothing, if point is in a comment or string.
 Returns t, if the template has been inserted, otherwise nil."
   (unless (jdee-parse-comment-or-quoted-p)
     (let* ((abbrev-start
-	    (or abbrev-start-location
-		(save-excursion (re-search-backward "\\<.*\\="))))
-	   (abbrev
-	    (buffer-substring-no-properties abbrev-start (point)))
-	   (template (assoc-string abbrev jdee-gen-abbrev-templates t)))
+            (or abbrev-start-location
+                (save-excursion (re-search-backward "\\<.*\\="))))
+           (abbrev
+            (buffer-substring-no-properties abbrev-start (point)))
+           (template (assoc-string abbrev jdee-gen-abbrev-templates t)))
       (if template
-	  (progn
-	    (delete-char (- (length abbrev)))
-	    ;; Following let avoids infinite expansion.
-	    ;; Infinite expansions could be caused by
-	    ;; (newline) in templates.
-	    ;; e.g. "else" (newline)
-	    (let (local-abbrev-table)
-	      (funcall (cdr template)))
-	    t) ; don't insert self-inserting input character that triggered the expansion.
-	(error "Template for abbreviation %s not found!" abbrev)))))
+          (progn
+            (delete-char (- (length abbrev)))
+            ;; Following let avoids infinite expansion.
+            ;; Infinite expansions could be caused by
+            ;; (newline) in templates.
+            ;; e.g. "else" (newline)
+            (let (local-abbrev-table)
+              (funcall (cdr template)))
+            t) ; don't insert self-inserting input character that triggered the expansion.
+        (error "Template for abbreviation %s not found!" abbrev)))))
 
 ;; The following enables the hook to control the treatment of the
 ;; self-inserting input character that triggered the expansion.
@@ -3873,13 +3873,13 @@ Returns t, if the template has been inserted, otherwise nil."
 (defun jdee-gen-load-abbrev-templates ()
   "Defines jdee-mode abbrevs for the control flow templates."
   (loop for template in jdee-gen-abbrev-templates do
-	(let ((abbrev (car template)))
-	  (define-abbrev
-	    local-abbrev-table
-	    abbrev
-	    t ;; Hack (see note below)
-	    'jdee-gen-abbrev-hook
-	    0))))
+        (let ((abbrev (car template)))
+          (define-abbrev
+            local-abbrev-table
+            abbrev
+            t ;; Hack (see note below)
+            'jdee-gen-abbrev-hook
+            0))))
 
 ;; Note: the previous function uses the following hack to address the
 ;; problem of preventing expansion of control flow abbreviations in
@@ -3899,35 +3899,35 @@ Returns t, if the template has been inserted, otherwise nil."
    (insert "public class Test {\n\n}")
    (backward-char 2)
    (loop for flags in '((t . t) (t . nil) (nil . t) (nil . nil)) do
-	 (let ((jdee-gen-k&r (car flags))
-	       (jdee-gen-comments (cdr flags)))
-	   (insert (format "/**** jdee-gen-comments: %S jdee-gen-k&r: %S ****/\n\n"
-			   jdee-gen-comments jdee-gen-k&r))
-	   (loop for abbrev in
-		 '(("if"      (clause . "true"))
-		   ("else")
-		   ("ife"     (clause . "true"))
-		   ("eif"     (clause . "true"))
-		   ("while"   (clause . "true"))
-		   ("for"     (clause . "int i = 0; i < 10; i++"))
-		   ("fori"    (var . "i") (upper-bound . "10"))
-		   ("foriter" (var . "iter") (coll . "list"))
-		   ("switch"  (clause . "digit") (first-value . "1"))
-		   ("case"    (value . "2"))
-		   ("try"     (clause . "Exception"))
-		   ("catch"   (clause . "Exception"))
-		   ("tryf"    (clause . "Exception"))
-		   ("finally"))
-		 do
-		 (let (insertations
-		       (abbrev-start-location (point)))
-		   (insert (car abbrev))
-		   (while (setq abbrev (cdr abbrev))
-		     (setq insertations (car abbrev))
-		     (tempo-save-named (car insertations) (cdr insertations)))
-		   (jdee-gen-abbrev-hook)
-		   (goto-char (- (point-max) 2))
-		   (insert "\n"))))))
+         (let ((jdee-gen-k&r (car flags))
+               (jdee-gen-comments (cdr flags)))
+           (insert (format "/**** jdee-gen-comments: %S jdee-gen-k&r: %S ****/\n\n"
+                           jdee-gen-comments jdee-gen-k&r))
+           (loop for abbrev in
+                 '(("if"      (clause . "true"))
+                   ("else")
+                   ("ife"     (clause . "true"))
+                   ("eif"     (clause . "true"))
+                   ("while"   (clause . "true"))
+                   ("for"     (clause . "int i = 0; i < 10; i++"))
+                   ("fori"    (var . "i") (upper-bound . "10"))
+                   ("foriter" (var . "iter") (coll . "list"))
+                   ("switch"  (clause . "digit") (first-value . "1"))
+                   ("case"    (value . "2"))
+                   ("try"     (clause . "Exception"))
+                   ("catch"   (clause . "Exception"))
+                   ("tryf"    (clause . "Exception"))
+                   ("finally"))
+                 do
+                 (let (insertations
+                       (abbrev-start-location (point)))
+                   (insert (car abbrev))
+                   (while (setq abbrev (cdr abbrev))
+                     (setq insertations (car abbrev))
+                     (tempo-save-named (car insertations) (cdr insertations)))
+                   (jdee-gen-abbrev-hook)
+                   (goto-char (- (point-max) 2))
+                   (insert "\n"))))))
 
 
 
@@ -3959,57 +3959,57 @@ BEG and END are modified so the region only contains complete lines."
 nil it is omitted. BEG and END are modified so the region only contains
 complete lines."
   (let ((to (make-marker))
-	indent-region-function)
+        indent-region-function)
     (set-marker to
-		(save-excursion
-		  (goto-char end)
-		  (if (and (bolp)
-			   (not (= beg end)))
-		      (point)
-		    (end-of-line)
-		    (1+ (point)))))
+                (save-excursion
+                  (goto-char end)
+                  (if (and (bolp)
+                           (not (= beg end)))
+                      (point)
+                    (end-of-line)
+                    (1+ (point)))))
     (goto-char beg)
     (beginning-of-line)
     (insert expr1)
     (if (string= expr1 "if")
-	(insert (concat jdee-gen-conditional-padding-1
-			"(" jdee-gen-conditional-padding-2 ")")))
+        (insert (concat jdee-gen-conditional-padding-1
+                        "(" jdee-gen-conditional-padding-2 ")")))
     (if jdee-gen-k&r
-	(insert " ")
+        (insert " ")
       (insert "\n"))
     (insert "{\n")
     (if jdee-gen-k&r
-	(forward-char -1)
+        (forward-char -1)
       (forward-char -4))
     (indent-for-tab-command)
     (indent-region (point) to nil)
     (goto-char to)
     (insert "}")
     (if expr2
-	(progn
-	  (if jdee-gen-k&r
-	      (insert jdee-gen-conditional-padding-3)
-	    (insert "\n"))
-	  (if (string= expr2 "catch")
-	      (insert (concat expr2 jdee-gen-conditional-padding-1
-			      "(" jdee-gen-conditional-padding-2 " e"
-			      jdee-gen-conditional-padding-2 ")"))
-	    (insert expr2))
-	  (if jdee-gen-k&r
-	      (insert jdee-gen-conditional-padding-3)
-	    (insert "\n"))
-	  (insert "{\n}")
-	  (if jdee-gen-comments
-	      (insert " // end of " expr1
-		      (if expr2
-			  (concat "-" expr2))))))
+        (progn
+          (if jdee-gen-k&r
+              (insert jdee-gen-conditional-padding-3)
+            (insert "\n"))
+          (if (string= expr2 "catch")
+              (insert (concat expr2 jdee-gen-conditional-padding-1
+                              "(" jdee-gen-conditional-padding-2 " e"
+                              jdee-gen-conditional-padding-2 ")"))
+            (insert expr2))
+          (if jdee-gen-k&r
+              (insert jdee-gen-conditional-padding-3)
+            (insert "\n"))
+          (insert "{\n}")
+          (if jdee-gen-comments
+              (insert " // end of " expr1
+                      (if expr2
+                          (concat "-" expr2))))))
     (insert "\n")
     (indent-region (marker-position to) (point) nil)
     (goto-char to)
     (if (string= expr1 "if")
-	(search-backward (concat "(" jdee-gen-conditional-padding-2 ")")))
+        (search-backward (concat "(" jdee-gen-conditional-padding-2 ")")))
     (if (string= expr2 "catch")
-	(search-forward "("))))
+        (search-forward "("))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -4027,7 +4027,7 @@ time to enable or disable eelctric return mode."
   :group 'jdee-gen
   :type 'boolean
   :set '(lambda (sym val)
-	  (if (featurep 'jdee)
+          (if (featurep 'jdee)
               (mapc
                (lambda (buf)
                  (with-current-buffer buf
@@ -4036,8 +4036,8 @@ time to enable or disable eelctric return mode."
                          (define-key (current-local-map) key 'jdee-electric-return)
                        (local-unset-key key)))))
                (jdee-get-project-source-buffers)))
-	  (setq jdee-electric-return-mode val)
-	  (set-default sym val)))
+          (setq jdee-electric-return-mode val)
+          (set-default sym val)))
 
 (defcustom jdee-newline-function  'newline-and-indent
   "Indent command that `jdee-electric-return' calls.  Functions
@@ -4055,7 +4055,7 @@ So if before
 you had:
 
    pubic void function () {
-			   ^
+                           ^
 You now have:
 
    pubic void function () {
@@ -4075,17 +4075,17 @@ After:
    } ^"
   (interactive)
   (if (or (eq (point) (point-min))
-	  (save-excursion
-	    (backward-char)
-	    (not (looking-at "{}?$"))))
+          (save-excursion
+            (backward-char)
+            (not (looking-at "{}?$"))))
       (newline-and-indent)
     ;; else
     (progn
       (newline-and-indent)
       (newline-and-indent)
       (when (not (looking-at "}"))
-	(insert "}")
-	(c-indent-command))
+        (insert "}")
+        (c-indent-command))
       (forward-line -1)
       (c-indent-command))))
 
@@ -4094,9 +4094,9 @@ After:
   (interactive)
   (if  ;; the current line ends at an open brace.
        (and
-	(save-excursion
-	  (re-search-backward "{\\s-*" (line-beginning-position) t))
-	(looking-at "}?\\s-*$"))
+        (save-excursion
+          (re-search-backward "{\\s-*" (line-beginning-position) t))
+        (looking-at "}?\\s-*$"))
       (jdee-gen-embrace)
     (call-interactively jdee-newline-function)))
 
@@ -4113,9 +4113,9 @@ by rebinding the Return key to its original binding."
   (interactive)
   (when (boundp 'jdee-mode-map)
     (let ((key (car (read-from-string "[return]"))))
-	   (if jdee-electric-return-mode
-	       (local-unset-key key)
-	     (define-key (current-local-map) key 'jdee-electric-return))))
+           (if jdee-electric-return-mode
+               (local-unset-key key)
+             (define-key (current-local-map) key 'jdee-electric-return))))
   (setq jdee-electric-return-mode (not jdee-electric-return-mode))
   (if jdee-electric-return-mode
       (message "electric return mode on")

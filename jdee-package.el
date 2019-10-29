@@ -138,10 +138,10 @@ The first one which has a non nil value will be used by jdee-package."
 That is to say the first non-nil value found in the variables given by
 `jdee-package-search-classpath-variables'."
   (let ((search-in jdee-package-search-classpath-variables)
-	(classpath))
+        (classpath))
     (while (and search-in (not classpath))
       (setq classpath (symbol-value (car search-in))
-	    search-in (cdr search-in)))
+            search-in (cdr search-in)))
     classpath))
 
 (defun jdee-package-get-directories-in-classpath ()
@@ -149,36 +149,36 @@ That is to say the first non-nil value found in the variables given by
   (cl-mapcan
    (lambda (path)
        (if (or jdee-resolve-relative-paths-p
-	      (not   (string= path "."))) ; "." is ignored in classpath
-	   (let ((path (jdee-normalize-path path)))
-	     (if (file-directory-p path)
-		 (list (file-name-as-directory path))))))
+              (not   (string= path "."))) ; "." is ignored in classpath
+           (let ((path (jdee-normalize-path path)))
+             (if (file-directory-p path)
+                 (list (file-name-as-directory path))))))
    (jdee-package-get-classpath)))
 
 
 (defun jdee-package-search-package-directories ()
   "Return a list of package directory candidates or nil if not found."
   (let ((dir (jdee-normalize-path default-directory))
-	;; case-insensitive for Windows
-	(case-fold-search (eq system-type 'windows-nt)))
+        ;; case-insensitive for Windows
+        (case-fold-search (eq system-type 'windows-nt)))
     (cl-mapcan
      (lambda (root)
-	 (let ((root (regexp-quote root)))
-	   (message "Seaching %S in %S..." root dir)
-	   (and (string-match root dir)
-		(list (substring dir (match-end 0))))))
+         (let ((root (regexp-quote root)))
+           (message "Seaching %S in %S..." root dir)
+           (and (string-match root dir)
+                (list (substring dir (match-end 0))))))
      (append (jdee-package-get-directories-in-classpath)
-	     (mapcar
-	      (lambda (p)
-		(file-name-as-directory p))
-	      (jdee-expand-wildcards-and-normalize jdee-sourcepath 'jdee-sourcepath))))))
+             (mapcar
+              (lambda (p)
+                (file-name-as-directory p))
+              (jdee-expand-wildcards-and-normalize jdee-sourcepath 'jdee-sourcepath))))))
 
 (defun jdee-package-best-package-candidate (candidates)
   "Return the best package directory candidate from CANDIDATES.
 The best is the shortest one that could be found."
   (car (sort candidates
-	     (lambda (dir1 dir2)
-		 (string-match (regexp-quote dir1) dir2)))))
+             (lambda (dir1 dir2)
+                 (string-match (regexp-quote dir1) dir2)))))
 
 (defun jdee-package-get-package-directory ()
   "Return the package directory, if found; otherwise,
@@ -206,10 +206,10 @@ Replace ?/ by ?. and remove extra ?/ at end."
 current buffer, if the package name can be determined; otherwise,
 an empty string."
   (let* (
-	 ;; The JDE always uses ?/ as directory separator so ensure
-	 ;; [X]Emacs uses the same one when running on Windows!
-	 (directory-sep-char ?/)
-	 (package-name (jdee-package-get-package-directory)))
+         ;; The JDE always uses ?/ as directory separator so ensure
+         ;; [X]Emacs uses the same one when running on Windows!
+         (directory-sep-char ?/)
+         (package-name (jdee-package-get-package-directory)))
     (cond
      ((string= package-name jdee-package-unknown-package-name)
       (message
@@ -220,8 +220,8 @@ an empty string."
       jdee-package-default-package-comment)
      (t
       (message "package %s;%s"
-	       (jdee-package-convert-directory-to-package package-name)
-	       jdee-package-package-comment)))))
+               (jdee-package-convert-directory-to-package package-name)
+               jdee-package-package-comment)))))
 
 ;;;###autoload
 (defun jdee-package-update ()
@@ -246,9 +246,9 @@ spuriously marking the buffer as modified.
       (goto-char (point-min))
       (if (re-search-forward jdee-package-package-regexp nil t)
           (unless (string-equal package (match-string 0))
-	        (replace-match package))
-	    (insert package)
-	    (newline)))))
+                (replace-match package))
+            (insert package)
+            (newline)))))
 
 ;; Register and initialize the customization variables defined
 ;; by this package.
