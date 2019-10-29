@@ -78,18 +78,18 @@ If a region is active, paste it into the stack trace buffer."
   (let ((buffer (or buffer (current-buffer))))
     (with-current-buffer buffer
       (let* ((active (region-active-p))
-	     (beg (if active (region-beginning)))
-	     (end (if active (region-end))))
-	(with-current-buffer (pop-to-buffer  "*JDEE Stack Trace*")
+             (beg (if active (region-beginning)))
+             (end (if active (region-end))))
+        (with-current-buffer (pop-to-buffer  "*JDEE Stack Trace*")
           (when clear (erase-buffer))
-	  (jdee-stacktrace-mode)
+          (jdee-stacktrace-mode)
           (make-local-variable 'jdee-sourcepath)
-	  (setq inhibit-read-only t)
-	  (when active
-	    (let ((start (point-max)))
-	      (goto-char start)
-	      (insert-buffer-substring buffer beg end)
-	      (goto-char start))))))))
+          (setq inhibit-read-only t)
+          (when active
+            (let ((start (point-max)))
+              (goto-char start)
+              (insert-buffer-substring buffer beg end)
+              (goto-char start))))))))
 
 (provide 'jdee-stacktrace)
 

@@ -273,7 +273,7 @@ to match and the complexity of each regexp."
   "Face name to use for javadocs (sans tags etc).")
 (defvar jdee-font-lock-modifier-face  'jdee-font-lock-modifier-face
   "Face name to use for modifiers.")
-(defvar jdee-font-lock-private-face	  'jdee-font-lock-private-face
+(defvar jdee-font-lock-private-face          'jdee-font-lock-private-face
   "Face name to use for private modifiers.")
 (defvar jdee-font-lock-protected-face 'jdee-font-lock-protected-face
   "Face name to use for protected modifiers.")
@@ -326,46 +326,46 @@ to match and the complexity of each regexp."
 (defconst jdee-font-lock-modifier-regexp
   (eval-when-compile
     (concat "\\<\\("
-	    (regexp-opt '("abstract"
-			  "const"
-			  "final"
-			  "native"
-			  ;;; removed after making each its own font -PaulL
-			  ;;"private"
-			  ;;"protected"
-			  ;;"public"
-			  "static"
-			  "strictfp"
-			  "synchronized"
-			  "transient"
-			  "volatile"
-			  ))
-	    "\\)\\>"))
+            (regexp-opt '("abstract"
+                          "const"
+                          "final"
+                          "native"
+                          ;;; removed after making each its own font -PaulL
+                          ;;"private"
+                          ;;"protected"
+                          ;;"public"
+                          "static"
+                          "strictfp"
+                          "synchronized"
+                          "transient"
+                          "volatile"
+                          ))
+            "\\)\\>"))
   "Regular expression to match Java modifiers.")
 
 (defconst jdee-font-lock-number-regexp
   (eval-when-compile
     ;; As of Java 7, underscores can appear anywhere _between_ digits
     (concat "\\("
-	    "\\<[0-9]\\([0-9_]*[0-9]\\)?[.][0-9]\\([0-9_]*[0-9]\\)?\\([eE][-+]?[0-9]\\([0-9_]*[0-9]\\)?\\)?[fFdD]?\\>"
-	    "\\|"
-	    "\\<[0-9]\\([0-9_]*[0-9]\\)?[.][eE][-+]?[0-9]\\([0-9_]*[0-9]\\)?[fFdD]?\\>"
-	    "\\|"
-	    "\\<[0-9]\\([0-9_]*[0-9]\\)?[.][fFdD]\\>"
-	    "\\|"
-	    "\\<[0-9]\\([0-9_]*[0-9]\\)?[.]"
-	    "\\|"
-	    "[.][0-9]\\([0-9_]*[0-9]\\)?\\([eE][-+]?[0-9]\\([0-9_]*[0-9]\\)?\\)?[fFdD]?\\>"
-	    "\\|"
-	    "\\<[0-9]\\([0-9_]*[0-9]\\)?[eE][-+]?[0-9]+[fFdD]?\\>"
-	    "\\|"
-	    "\\<0[xX][0-9a-fA-F]\\([0-9a-fA-F_]*[0-9a-fA-F]\\)?[lL]?\\>"
-	    "\\|"
-	    "\\<0[bB][01]\\([01_]*[01]\\)?[lL]?\\>" ; Binary literal, introduced in Java 7
-	    "\\|"
-	    "\\<[0-9]\\([0-9_]*[0-9]\\)?+[lLfFdD]?\\>"
-	    "\\)"
-	    ))
+            "\\<[0-9]\\([0-9_]*[0-9]\\)?[.][0-9]\\([0-9_]*[0-9]\\)?\\([eE][-+]?[0-9]\\([0-9_]*[0-9]\\)?\\)?[fFdD]?\\>"
+            "\\|"
+            "\\<[0-9]\\([0-9_]*[0-9]\\)?[.][eE][-+]?[0-9]\\([0-9_]*[0-9]\\)?[fFdD]?\\>"
+            "\\|"
+            "\\<[0-9]\\([0-9_]*[0-9]\\)?[.][fFdD]\\>"
+            "\\|"
+            "\\<[0-9]\\([0-9_]*[0-9]\\)?[.]"
+            "\\|"
+            "[.][0-9]\\([0-9_]*[0-9]\\)?\\([eE][-+]?[0-9]\\([0-9_]*[0-9]\\)?\\)?[fFdD]?\\>"
+            "\\|"
+            "\\<[0-9]\\([0-9_]*[0-9]\\)?[eE][-+]?[0-9]+[fFdD]?\\>"
+            "\\|"
+            "\\<0[xX][0-9a-fA-F]\\([0-9a-fA-F_]*[0-9a-fA-F]\\)?[lL]?\\>"
+            "\\|"
+            "\\<0[bB][01]\\([01_]*[01]\\)?[lL]?\\>" ; Binary literal, introduced in Java 7
+            "\\|"
+            "\\<[0-9]\\([0-9_]*[0-9]\\)?+[lLfFdD]?\\>"
+            "\\)"
+            ))
   "Regular expression to match Java numbers.")
 
 (defconst jdee-font-lock-operator-regexp
@@ -375,8 +375,8 @@ to match and the complexity of each regexp."
 (defconst jdee-font-lock-capital-id-regexp
   (eval-when-compile
     (concat "\\(\\b[" jdee-font-lock-capital-letter
-	    "]+[" jdee-font-lock-capital-letter-or-digit
-	    "]*\\b\\)"))
+            "]+[" jdee-font-lock-capital-letter-or-digit
+            "]*\\b\\)"))
   "Regular expression to match capitalised identifiers.")
 
 ;;;;
@@ -389,16 +389,16 @@ to match and the complexity of each regexp."
 The string between <TAG> and </TAG> is the second parenthesized
 expression in the returned regexp.  ALIASES are other names for TAG."
     (let* ((tag-re (mapconcat
-		    #'(lambda (tag)
-			(mapconcat #'(lambda (c)
-				       (format "[%c%c]"
-					       (upcase c)
-					       (downcase c)))
-				   tag
-				   ""))
-		    (cons tag aliases)
-		    "\\|"))
-	   (hit-re "\\(.\\|[\r\n]\\)*?"))
+                    #'(lambda (tag)
+                        (mapconcat #'(lambda (c)
+                                       (format "[%c%c]"
+                                               (upcase c)
+                                               (downcase c)))
+                                   tag
+                                   ""))
+                    (cons tag aliases)
+                    "\\|"))
+           (hit-re "\\(.\\|[\r\n]\\)*?"))
       (format "<\\(%s\\)>\\(%s\\)</\\(%s\\)>" tag-re hit-re tag-re)
       )))
 
@@ -409,22 +409,22 @@ expression in the returned regexp.  ALIASES are other names for TAG."
 (defmacro jdee-font-lock-at-comment (pos)
   "Return non-nil if POS is in a comment."
   `(memq (get-text-property ,pos 'face)
-	 jdee-font-lock-comment-faces))
+         jdee-font-lock-comment-faces))
 
 (defsubst jdee-font-lock-search-in-comment (regexp end)
   "Search forward from point for regular expression REGEXP.
 Ensure matching occurs in a java comment.  Buffer position END bounds
 the search.  The match found must not extend after that position."
   (let ((here (point))
-	ok b p)
+        ok b p)
     (while (and (not ok)
-		(setq p (re-search-forward regexp end t)))
+                (setq p (re-search-forward regexp end t)))
       (setq b (match-beginning 0))
       (setq ok (and (jdee-font-lock-at-comment b)
-		    (< p (next-single-property-change
-			  b 'face nil (point-max))))))
+                    (< p (next-single-property-change
+                          b 'face nil (point-max))))))
     (if ok
-	(point)
+        (point)
       (goto-char here)
       nil)))
 
@@ -434,17 +434,17 @@ Ensure matching occurs in a javadoc comment.  Buffer position END
 bounds the search.  The match found must not extend after that
 position."
   (let ((here (point))
-	b c ok md p)
+        b c ok md p)
     (while (and (not ok) (setq p (re-search-forward regexp end t)))
       (setq b  (match-beginning 0)
-	    md (match-data)
-	    ok (and (re-search-backward "^\\s-*\\(/[*][*]\\)" nil t)
-		    (jdee-font-lock-at-comment
-		     (goto-char (setq c (match-beginning 1))))
-		    (forward-comment 1)
-		    (< p (point))
-		    (>= b c)
-		    (setq here p)))
+            md (match-data)
+            ok (and (re-search-backward "^\\s-*\\(/[*][*]\\)" nil t)
+                    (jdee-font-lock-at-comment
+                     (goto-char (setq c (match-beginning 1))))
+                    (forward-comment 1)
+                    (< p (point))
+                    (>= b c)
+                    (setq here p)))
       (goto-char p))
     (set-match-data md)
     (goto-char here)
@@ -479,7 +479,7 @@ Limit search to END position."
   `(
     ;; Fontify javadoc tags (including non official ones)
     (,(concat "^[ \t]*\\(/\\*\\*\\|\\*?\\)[ \t]*"
-	      "\\(@[" jdee-font-lock-letter-or-digit "]+\\)")
+              "\\(@[" jdee-font-lock-letter-or-digit "]+\\)")
      2 jdee-font-lock-doc-tag-face t)
     ;; Fontify @param variable name
     ("^[ \t]*\\(/\\*\\*\\|\\*?\\)[ \t]*@param\\>[ \t]*\\(\\sw+\\)?"
@@ -497,8 +497,8 @@ Limit search to END position."
      (2 jdee-font-lock-link-face t))
     ;; Fontify @see reference
     (,(concat "^[ \t]*\\(/\\*\\*\\|\\*?\\)[ \t]*"
-	      "@see\\>[ \t]*"
-	      "\\([.#" jdee-font-lock-letter-or-digit "]+\\)")
+              "@see\\>[ \t]*"
+              "\\([.#" jdee-font-lock-letter-or-digit "]+\\)")
      2 jdee-font-lock-code-face t)
     ;; Fontify the text of a HREF anchor
     ("<[Aa]\\s-+[Hh][Rr][Ee][Ff][^>]*>\\([^>]+\\)</[Aa]>"
@@ -528,11 +528,11 @@ That is those with \"@\" in their matcher regexp."
   (let (kw matcher)
     (while keywords
       (setq matcher  (car keywords)
-	    keywords (cdr keywords))
+            keywords (cdr keywords))
       (if (not (and (consp matcher)
-		    (stringp (car matcher))
-		    (string-match "@" (car matcher))))
-	  (setq kw (cons matcher kw))))
+                    (stringp (car matcher))
+                    (string-match "@" (car matcher))))
+          (setq kw (cons matcher kw))))
     (nreverse kw)))
 
 (defconst jdee-font-lock-html-ahref-keyword
@@ -551,8 +551,8 @@ A new keyword is pushed into `jdee-font-lock-html-keywords'."
     `(progn
        (add-to-list 'jdee-font-lock-html-keywords '(,matcher 2 ,face t))
        (defun ,matcher (end)
-	 (jdee-font-lock-search-in-javadoc
-	  ,(jdee-font-lock-html-tag-regexp tag) end)))))
+         (jdee-font-lock-search-in-javadoc
+          ,(jdee-font-lock-html-tag-regexp tag) end)))))
 
 (jdee-font-lock-def-html-keyword "b" jdee-font-lock-bold-face)
 (jdee-font-lock-def-html-keyword "strong" jdee-font-lock-bold-face)
@@ -568,7 +568,7 @@ Limit search to END position."
   (jdee-font-lock-search-in-javadoc
    (eval-when-compile
      (concat "^[ \t]*\\(/\\*\\*\\|\\*?\\)[ \t]*"
-	     "\\(@[" jdee-font-lock-letter-or-digit "]+\\)"))
+             "\\(@[" jdee-font-lock-letter-or-digit "]+\\)"))
    end))
 
 (defconst jdee-font-lock-javadoc-tag-keyword
@@ -607,8 +607,8 @@ Limit search to END position."
   (jdee-font-lock-search-in-javadoc
    (eval-when-compile
      (concat "^[ \t]*\\(/\\*\\*\\|\\*?\\)[ \t]*"
-	     "@see\\>[ \t]*"
-	     "\\([.#" jdee-font-lock-letter-or-digit "]+\\)"))
+             "@see\\>[ \t]*"
+             "\\([.#" jdee-font-lock-letter-or-digit "]+\\)"))
    end))
 
 (defconst jdee-font-lock-javadoc-see-ref-keyword
@@ -659,8 +659,8 @@ keywords by entering the command:
 \\[universal-argument] \\[jdee-font-lock-setup-keywords]."
   :group 'jdee-project
   :type '(choice :tag "Names"
-		 (const :tag "No" nil)
-		 (file  :tag "In file" :format "%t\n%v")))
+                 (const :tag "No" nil)
+                 (file  :tag "In file" :format "%t\n%v")))
 
 (defcustom jdee-font-lock-api-name-filter nil
   "*Function used to filter a name."
@@ -670,7 +670,7 @@ keywords by entering the command:
 (defconst jdee-font-lock-api-entry-regexp
   (eval-when-compile
     (concat "^[" jdee-font-lock-letter "]"
-	    "[" jdee-font-lock-letter-or-digit "]+$"))
+            "[" jdee-font-lock-letter-or-digit "]+$"))
   "Regexp to match a valid entry in `jdee-font-lock-api-file'.")
 
 (defconst jdee-font-lock-api-entry-match 0
@@ -682,16 +682,16 @@ If optional FILTER function is non-nil it is called for each name
 found and must return non-nil to include it in the result list."
   (let (k kl)
     (if (and jdee-font-lock-api-file
-	     (file-readable-p jdee-font-lock-api-file))
-	(with-temp-buffer
-	  (erase-buffer)
-	  (insert-file-contents jdee-font-lock-api-file)
-	  (goto-char (point-min))
-	  (while (re-search-forward jdee-font-lock-api-entry-regexp nil t)
-	    (setq k (match-string jdee-font-lock-api-entry-match))
-	    ;; Allow filtering of names
-	    (if (or (null filter) (funcall filter k))
-		(setq kl (cons k kl))))))
+             (file-readable-p jdee-font-lock-api-file))
+        (with-temp-buffer
+          (erase-buffer)
+          (insert-file-contents jdee-font-lock-api-file)
+          (goto-char (point-min))
+          (while (re-search-forward jdee-font-lock-api-entry-regexp nil t)
+            (setq k (match-string jdee-font-lock-api-entry-match))
+            ;; Allow filtering of names
+            (if (or (null filter) (funcall filter k))
+                (setq kl (cons k kl))))))
     kl))
 
 (defun jdee-font-lock-api-split-list (l n)
@@ -700,17 +700,17 @@ If L is nil return nil.  If N is less than 1 all elements will be in
 one sub list."
   (if l
       (if (<= n 0)
-	  (list l)
-	(let (split-list sub-list i)
-	  (while l
-	    (setq i 0 sub-list nil)
-	    (while (and l (< i n))
-	      (setq sub-list (cons (car l) sub-list)
-		    i        (1+ i)
-		    l        (cdr l)))
-	    (if sub-list
-		(setq split-list (cons sub-list split-list))))
-	  split-list))))
+          (list l)
+        (let (split-list sub-list i)
+          (while l
+            (setq i 0 sub-list nil)
+            (while (and l (< i n))
+              (setq sub-list (cons (car l) sub-list)
+                    i        (1+ i)
+                    l        (cdr l)))
+            (if sub-list
+                (setq split-list (cons sub-list split-list))))
+          split-list))))
 
 (defun jdee-font-lock-api-build-regexps (max-matches)
   "Build regular expressions matching names to fontify.
@@ -718,14 +718,14 @@ MAX-MATCHES is the maximum number of names that one regular expression
 will match.  If MAX-MATCHES is less than 1 one regular expression will
 match all the names."
   (let ((max-specpdl-size 2000)) ;; Prevent errors in `regexp-opt'
-				 ;; when processing long string listes
+                                 ;; when processing long string listes
     (mapcar (function
-	     (lambda (k)
-	       (concat "\\<" (regexp-opt k t) "\\>")))
-	    (jdee-font-lock-api-split-list
-	     (jdee-font-lock-api-names
-	      jdee-font-lock-api-name-filter)
-	     max-matches))))
+             (lambda (k)
+               (concat "\\<" (regexp-opt k t) "\\>")))
+            (jdee-font-lock-api-split-list
+             (jdee-font-lock-api-names
+              jdee-font-lock-api-name-filter)
+             max-matches))))
 
 (defvar jdee-font-lock-api-cache nil
   "Cache of regular expressions matching names to fontify..")
@@ -736,8 +736,8 @@ There is a different cache file for each major version of (X)Emacs
 because of incompatible regular expressions returned by `regexp-opt'."
   (and jdee-font-lock-api-file
        (format "%s.emacs-%d.apicache"
-	       jdee-font-lock-api-file
-	       emacs-major-version)))
+               jdee-font-lock-api-file
+               emacs-major-version)))
 
 (defconst jdee-font-lock-api-cache-file-header
   ";;; Regular expressions matching names to fontify.
@@ -769,51 +769,51 @@ is created."
      ;; A cache file exists
      ((file-readable-p cache)
       (if (file-newer-than-file-p jdee-font-lock-api-file cache)
-	  (progn
-	    (message
-	     "jdee-font-lock: names file %s newer than cache file %s"
-	     jdee-font-lock-api-file cache)
-	    ;; The api file has been modified since the cache was
-	    ;; created, so clear the cache to rebuild
-	    (setq jdee-font-lock-api-cache nil))
-	;; Try to load the existing cache if needed
-	(or jdee-font-lock-api-cache
-	    (condition-case nil
-		(load-file cache)
-	      ;; If load fails clear the cache to rebuild
-	      (error
-	       (setq jdee-font-lock-api-cache nil)))))))
+          (progn
+            (message
+             "jdee-font-lock: names file %s newer than cache file %s"
+             jdee-font-lock-api-file cache)
+            ;; The api file has been modified since the cache was
+            ;; created, so clear the cache to rebuild
+            (setq jdee-font-lock-api-cache nil))
+        ;; Try to load the existing cache if needed
+        (or jdee-font-lock-api-cache
+            (condition-case nil
+                (load-file cache)
+              ;; If load fails clear the cache to rebuild
+              (error
+               (setq jdee-font-lock-api-cache nil)))))))
 
     (or jdee-font-lock-api-cache
-	(not cache)
-	;; Build a new cache if it is empty and available
-	(progn
-	  (message "jdee-font-lock: building names cache...")
-	  (when (setq jdee-font-lock-api-cache
-		      (jdee-font-lock-api-build-regexps
-		       jdee-font-lock-max-names-by-regexp))
-	    ;; Save regexps in cache
-	    (with-current-buffer (find-file-noselect cache)
-	      (erase-buffer)
-	      (insert
-	       (format jdee-font-lock-api-cache-file-header
-		       (current-time-string))
-	       (format "(setq jdee-font-lock-api-cache '%S)"
-		       jdee-font-lock-api-cache))
-	      (save-buffer)
-	      (kill-buffer (current-buffer))))
-	  (message "jdee-font-lock: building names cache...%s"
-		   (if jdee-font-lock-api-cache "done" "empty"))))
-	  jdee-font-lock-api-cache))
+        (not cache)
+        ;; Build a new cache if it is empty and available
+        (progn
+          (message "jdee-font-lock: building names cache...")
+          (when (setq jdee-font-lock-api-cache
+                      (jdee-font-lock-api-build-regexps
+                       jdee-font-lock-max-names-by-regexp))
+            ;; Save regexps in cache
+            (with-current-buffer (find-file-noselect cache)
+              (erase-buffer)
+              (insert
+               (format jdee-font-lock-api-cache-file-header
+                       (current-time-string))
+               (format "(setq jdee-font-lock-api-cache '%S)"
+                       jdee-font-lock-api-cache))
+              (save-buffer)
+              (kill-buffer (current-buffer))))
+          (message "jdee-font-lock: building names cache...%s"
+                   (if jdee-font-lock-api-cache "done" "empty"))))
+          jdee-font-lock-api-cache))
 
 (defun jdee-font-lock-api-keywords (&optional rebuild)
   "Return a list of font lock keywords for user's defined names.
 If optional REBUILD flag is non-nil create a new cache of regular
 expressions."
   (mapcar (function
-	   (lambda (k)
-	     (cons k 'jdee-font-lock-api-face)))
-	  (jdee-font-lock-api-regexps rebuild)))
+           (lambda (k)
+             (cons k 'jdee-font-lock-api-face)))
+          (jdee-font-lock-api-regexps rebuild)))
 
 ;;;;
 ;;;; Font lock setup.
@@ -827,12 +827,12 @@ expressions."
   (dolist (b (buffer-list))
     (when (buffer-live-p b)
       (with-current-buffer b
-	(when (and font-lock-mode
-		   (memq major-mode '(java-mode jdee-mode)))
-	  (message "JDEE refontify buffer %s..." b)
-	  (font-lock-mode -1)
-	  (font-lock-mode 1)
-	  (message "JDEE refontify  buffer %s...done" b))))))
+        (when (and font-lock-mode
+                   (memq major-mode '(java-mode jdee-mode)))
+          (message "JDEE refontify buffer %s..." b)
+          (font-lock-mode -1)
+          (font-lock-mode 1)
+          (message "JDEE refontify  buffer %s...done" b))))))
 
 (defun jdee-font-lock-keywords (&optional rebuild)
   "JDEE's extra level font lock keywords.
@@ -845,74 +845,74 @@ expressions."
        java-font-lock-keywords-3
        ;; Fontify user's defined names
        (mapcar #'(lambda (e)
-		   (list
-		    (c-make-font-lock-search-function
-		     (car e)
-		     (list 0 (cdr e) t))))
-	       (jdee-font-lock-api-keywords rebuild))
+                   (list
+                    (c-make-font-lock-search-function
+                     (car e)
+                     (list 0 (cdr e) t))))
+               (jdee-font-lock-api-keywords rebuild))
        (list
-	;; Fontify modifiers.
-	`(,(c-make-font-lock-search-function
-	    jdee-font-lock-modifier-regexp
-	    '(0 jdee-font-lock-modifier-face t)))
-	`(,(c-make-font-lock-search-function
-	    "\\<\\(false\\|null\\|true\\)\\>"
-	    '(1 jdee-font-lock-constant-face t)))
-	;; Fontify default and assert as keywords
-	`(,(c-make-font-lock-search-function
-	    "\\<\\(default\\|assert\\)\\>"
-	    '(1 font-lock-keyword-face t)))
-	;; Fontify const and goto with warning face. These keywords are
-	;; reserved, even though they are not currently used.
-	`(,(c-make-font-lock-search-function
-	    "\\<\\(const\\|goto\\)\\>"
-	    '(1 font-lock-warning-face t)))
-	;; package and imports
-	`(,(c-make-font-lock-search-function
-	    "\\<\\(package\\|import\\(?:\\s-+static\\)?\\)\\s-+\\(\\(?:[a-z_$*][a-zA-Z0-9_$]*\\.?\\)*\\)"
-	    '(1 font-lock-keyword-face t)
-	    '(2 jdee-font-lock-package-face t)))
-	;; constructor
-	`(,(c-make-font-lock-search-function
-	    (concat
-	     "^\\s-*\\<\\(?:public\\|private\\|protected\\)\\>?\\s-*"
-	     "\\([" jdee-font-lock-capital-letter "]\\sw*\\)"
-	     "(.*?)")
-	    '(1 jdee-font-lock-constructor-face t)))
-	;; class names
-	`(,(c-make-font-lock-search-function
-	    "\\<\\(new\\|instanceof\\)\\>[ \t]+\\(\\sw+\\)"
-	    '(2 font-lock-type-face t)))
-
-	;; modifier protections
+        ;; Fontify modifiers.
         `(,(c-make-font-lock-search-function
-	    "\\<\\(private\\)\\>"
-	    '(1 jdee-font-lock-private-face t)))
-	`(,(c-make-font-lock-search-function
-	    "\\<\\(protected\\)\\>"
-	    '(1 jdee-font-lock-protected-face t)))
-	`(,(c-make-font-lock-search-function
-	    "\\<\\(public\\)\\>"
-	    '(1 jdee-font-lock-public-face t)))
-	;; Fontify numbers
-	`(,(c-make-font-lock-search-function
-	    jdee-font-lock-number-regexp
-	    '(0 jdee-font-lock-number-face t)))
-	;; Fontify operators
+            jdee-font-lock-modifier-regexp
+            '(0 jdee-font-lock-modifier-face t)))
+        `(,(c-make-font-lock-search-function
+            "\\<\\(false\\|null\\|true\\)\\>"
+            '(1 jdee-font-lock-constant-face t)))
+        ;; Fontify default and assert as keywords
+        `(,(c-make-font-lock-search-function
+            "\\<\\(default\\|assert\\)\\>"
+            '(1 font-lock-keyword-face t)))
+        ;; Fontify const and goto with warning face. These keywords are
+        ;; reserved, even though they are not currently used.
+        `(,(c-make-font-lock-search-function
+            "\\<\\(const\\|goto\\)\\>"
+            '(1 font-lock-warning-face t)))
+        ;; package and imports
+        `(,(c-make-font-lock-search-function
+            "\\<\\(package\\|import\\(?:\\s-+static\\)?\\)\\s-+\\(\\(?:[a-z_$*][a-zA-Z0-9_$]*\\.?\\)*\\)"
+            '(1 font-lock-keyword-face t)
+            '(2 jdee-font-lock-package-face t)))
+        ;; constructor
+        `(,(c-make-font-lock-search-function
+            (concat
+             "^\\s-*\\<\\(?:public\\|private\\|protected\\)\\>?\\s-*"
+             "\\([" jdee-font-lock-capital-letter "]\\sw*\\)"
+             "(.*?)")
+            '(1 jdee-font-lock-constructor-face t)))
+        ;; class names
+        `(,(c-make-font-lock-search-function
+            "\\<\\(new\\|instanceof\\)\\>[ \t]+\\(\\sw+\\)"
+            '(2 font-lock-type-face t)))
+
+        ;; modifier protections
+        `(,(c-make-font-lock-search-function
+            "\\<\\(private\\)\\>"
+            '(1 jdee-font-lock-private-face t)))
+        `(,(c-make-font-lock-search-function
+            "\\<\\(protected\\)\\>"
+            '(1 jdee-font-lock-protected-face t)))
+        `(,(c-make-font-lock-search-function
+            "\\<\\(public\\)\\>"
+            '(1 jdee-font-lock-public-face t)))
+        ;; Fontify numbers
+        `(,(c-make-font-lock-search-function
+            jdee-font-lock-number-regexp
+            '(0 jdee-font-lock-number-face t)))
+        ;; Fontify operators
 ;;;     `(,(c-make-font-lock-search-function
 ;;;         jdee-font-lock-operator-regexp
 ;;;         '(0 jdee-font-lock-operator-face t)))
-	;; Fontify capitalised identifiers as constant
-	`(,jdee-font-lock-capital-id-regexp
-	  1 jdee-font-lock-constant-face)
-	;; Fontify text between `' in comments
-	jdee-font-lock-quote-keyword
-	;; Fontify javadoc comments
-	'((lambda (limit)
-	    (c-font-lock-doc-comments
-		"/\\*\\*" limit
-	      jdee-font-lock-doc-comments)))
-	)
+        ;; Fontify capitalised identifiers as constant
+        `(,jdee-font-lock-capital-id-regexp
+          1 jdee-font-lock-constant-face)
+        ;; Fontify text between `' in comments
+        jdee-font-lock-quote-keyword
+        ;; Fontify javadoc comments
+        '((lambda (limit)
+            (c-font-lock-doc-comments
+                "/\\*\\*" limit
+              jdee-font-lock-doc-comments)))
+        )
        )
 
     ;; Through JDEE's own support
@@ -930,25 +930,25 @@ expressions."
       '("\\<\\(const\\|goto\\)\\>" (1 font-lock-warning-face))
       ;; Fontify modifiers.
       (cons jdee-font-lock-modifier-regexp
-	    'jdee-font-lock-modifier-face)
+            'jdee-font-lock-modifier-face)
       ;; Fontify package directives
       '("\\<\\(package\\)\\>\\s-+\\(\\sw+\\)"
-	(1 font-lock-keyword-face)
-	(2 jdee-font-lock-package-face nil t)
-	("\\=\\.\\(\\sw+\\)" nil nil
-	 (1 jdee-font-lock-package-face nil t)))
+        (1 font-lock-keyword-face)
+        (2 jdee-font-lock-package-face nil t)
+        ("\\=\\.\\(\\sw+\\)" nil nil
+         (1 jdee-font-lock-package-face nil t)))
       ;; Fontify import directives
       '("\\<\\(import\\)\\>\\s-+\\(\\sw+\\)"
-	(1 font-lock-keyword-face)
-	(2 (if (equal (char-after (match-end 0)) ?\.)
-	       jdee-font-lock-package-face
-	     font-lock-type-face))
-	("\\=\\.\\(\\*\\|\\sw+\\)" nil nil
-	 (1 (if (equal (char-after (match-end 0)) ?\.)
-		jdee-font-lock-package-face
-	      (if (equal (char-before (match-end 0)) ?\*)
-		  jdee-font-lock-number-face
-		font-lock-type-face)))))
+        (1 font-lock-keyword-face)
+        (2 (if (equal (char-after (match-end 0)) ?\.)
+               jdee-font-lock-package-face
+             font-lock-type-face))
+        ("\\=\\.\\(\\*\\|\\sw+\\)" nil nil
+         (1 (if (equal (char-after (match-end 0)) ?\.)
+                jdee-font-lock-package-face
+              (if (equal (char-before (match-end 0)) ?\*)
+                  jdee-font-lock-number-face
+                font-lock-type-face)))))
       ;; modifier protections
       '("\\<\\(private\\)\\>" (1 jdee-font-lock-private-face))
       '("\\<\\(protected\\)\\>" (1 jdee-font-lock-protected-face))
@@ -986,13 +986,13 @@ expressions."
      (list
       ;; Fontify numbers
       (cons jdee-font-lock-number-regexp
-	    'jdee-font-lock-number-face)
+            'jdee-font-lock-number-face)
       ;; Fontify operators
 ;;;      (cons jdee-font-lock-operator-regexp
 ;;;            'jdee-font-lock-operator-face)
       ;; Fontify capitalised identifiers as constant
       (cons jdee-font-lock-capital-id-regexp
-	    '(1 jdee-font-lock-constant-face))
+            '(1 jdee-font-lock-constant-face))
       ;; Fontify text between `' in comments
       jdee-font-lock-quote-keyword
       ;; Fontify javadoc tags (including non official ones)
@@ -1049,7 +1049,7 @@ expressions."
            nil nil ((?_ . "w") (?$ . "w") (?@ . "w")) nil
            (font-lock-mark-block-function . mark-defun))))
     (cons (append (car java-defaults) '(java-font-lock-keywords-4))
-	  (cdr java-defaults)))
+          (cdr java-defaults)))
   "Defaults for coloring Java keywords in jdee-mode. The defaults
 consist of the java-mode defaults plus `java-font-lock-keywords-4'.")
 
@@ -1068,7 +1068,7 @@ standard `java-mode'."
   (when jdee-use-font-lock
     ;; Setup `font-lock-defaults'
     (set (make-local-variable 'font-lock-defaults)
-	 jdee-font-lock-defaults)
+         jdee-font-lock-defaults)
     ;; Use the maximum decoration available
     (set (make-local-variable 'font-lock-maximum-decoration) t)
     ;; Handle multiline

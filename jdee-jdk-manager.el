@@ -34,36 +34,36 @@
   "Get the version of the Java VM on the system command path."
   (if (not jdee-java-version-cache)
       (let ((buf (get-buffer-create "java version"))
-	    proc)
-	(with-current-buffer buf
-	  (setq proc
-		(start-process
-		 "java version" buf "java" "-version"))
-	  (set-process-query-on-exit-flag proc nil)
-	  (accept-process-output proc 10)
-	  (goto-char (point-min))
+            proc)
+        (with-current-buffer buf
+          (setq proc
+                (start-process
+                 "java version" buf "java" "-version"))
+          (set-process-query-on-exit-flag proc nil)
+          (accept-process-output proc 10)
+          (goto-char (point-min))
           (re-search-forward "[1-9]\\([.][1-9]\\)?" (point-max) t)
-	  (setq jdee-java-version-cache (match-string 0)))
-	(kill-buffer buf)))
+          (setq jdee-java-version-cache (match-string 0)))
+        (kill-buffer buf)))
   jdee-java-version-cache)
 
 (defun jdee-java-version ()
   "Get the version of Java used by the JDEE."
   (interactive)
   (let ((java-version (if jdee-jdk (car jdee-jdk)
-			(getenv
-			 (nth 0 jdee-java-environment-variables)))))
+                        (getenv
+                         (nth 0 jdee-java-environment-variables)))))
     (if (not java-version)
-	(if jdee-java-version-cache
-	    (setq java-version jdee-java-version-cache)
-	  (if (jdee-backend-running-p)
-	      (progn
-		(setq jdee-java-version-cache
+        (if jdee-java-version-cache
+            (setq java-version jdee-java-version-cache)
+          (if (jdee-backend-running-p)
+              (progn
+                (setq jdee-java-version-cache
                       (jdee-backend-get-java-version))
-		(setq java-version jdee-java-version-cache))
-	    (setq java-version (jdee-java-version-via-java)))))
+                (setq java-version jdee-java-version-cache))
+            (setq java-version (jdee-java-version-via-java)))))
     (if (called-interactively-p 'interactive)
-	(message java-version)
+        (message java-version)
       java-version)))
 
 (defun jdee-java-major-version ()
@@ -93,23 +93,23 @@ by the current project."
 (defun jdee--jdk-set-dir-type (sym val)
   (if val
       (let ((type
-	     (list
-	      (quote radio-button-choice)
-	      )))
-	(loop for jdk in val do
-	      (setq
-	       type
-	       (append
-		type
-		(list (list (quote item) (car jdk))))))
-	(put 'jdee-jdk
-	     'custom-type
-	     (list (quote list) type))
-	(put 'jdee-jdk 'customized-value nil)
-	(put 'jdee-jdk
-	     'standard-value
-	     (list (list (quote list) (car (car val)))))
-	(customize-set-value 'jdee-jdk (list (car (car val)))))
+             (list
+              (quote radio-button-choice)
+              )))
+        (loop for jdk in val do
+              (setq
+               type
+               (append
+                type
+                (list (list (quote item) (car jdk))))))
+        (put 'jdee-jdk
+             'custom-type
+             (list (quote list) type))
+        (put 'jdee-jdk 'customized-value nil)
+        (put 'jdee-jdk
+             'standard-value
+             (list (list (quote list) (car (car val)))))
+        (customize-set-value 'jdee-jdk (list (car (car val)))))
     (progn
       (put 'jdee-jdk 'custom-type 'symbol)
       (put 'jdee-jdk 'standard-value nil)
@@ -123,12 +123,12 @@ by the current project."
   (let (dirs)
     (dolist (path paths dirs)
       (let ((all-files (ignore-errors (directory-files path t))))
-	(setq all-files (delete (concat path "/" ".") all-files))
-	(setq all-files (delete (concat path "/" "..") all-files))
-	(dolist (f all-files dirs)
-	  (when (and (file-directory-p f)
-		     (not (file-symlink-p f)))
-	    (setq dirs (cons f dirs))))))))
+        (setq all-files (delete (concat path "/" ".") all-files))
+        (setq all-files (delete (concat path "/" "..") all-files))
+        (dolist (f all-files dirs)
+          (when (and (file-directory-p f)
+                     (not (file-symlink-p f)))
+            (setq dirs (cons f dirs))))))))
 
 (defun jdee--jdk-p (path)
   "Return t if given `PATH' is path to JDK (has Java compiler)."
@@ -157,16 +157,16 @@ Mac OS X default."
   (let (version dir)
     (when (file-executable-p "/usr/libexec/java_home")
       (setq dir (substring (shell-command-to-string "/usr/libexec/java_home")
-			   0 -1))
+                           0 -1))
       (if (string-match "\\(1\\.[45678]\\)\\.[0-9]" dir)
-	  (setq version (match-string 1 dir))))
+          (setq version (match-string 1 dir))))
     (and version dir (list (cons version dir)))))
 
 (defun jdee--jdk-newest-first (jdks)
   "Sort `JDKS' ordering from newest to oldest or nil when empty."
   (sort jdks
-	(lambda (c1 c2) ; Compare only versions:
-	  (string< (first c2) (first c1)))))
+        (lambda (c1 c2) ; Compare only versions:
+          (string< (first c2) (first c1)))))
 
 (defun jdee--jdk-find-linux-jdk ()
   "Return a (VERSION . DIR) pair or nil when not found."
@@ -177,19 +177,19 @@ Mac OS X default."
 
     (dolist (dir (jdee--jdk-find-dirs '("/usr/lib/jvm" "/usr/lib64/jvm")))
       (let ((version (jdee--jdk-get-version dir)))
-	(when (and version (jdee--jdk-p dir))
-	  (setq jdks (cons (cons version dir) jdks)))))
+        (when (and version (jdee--jdk-p dir))
+          (setq jdks (cons (cons version dir) jdks)))))
 
     ;; On Linux use the default javac if it is installed.
     (let (version dir)
       (when (file-executable-p "/usr/bin/javac")
-	(let ((javac "/usr/bin/javac"))
-	  (while (file-symlink-p javac)
-	    (setq javac (file-symlink-p javac)))
-	  (setq dir (expand-file-name ".." (file-name-directory javac)))
-	  (setq version (jdee--jdk-get-version dir))))
+        (let ((javac "/usr/bin/javac"))
+          (while (file-symlink-p javac)
+            (setq javac (file-symlink-p javac)))
+          (setq dir (expand-file-name ".." (file-name-directory javac)))
+          (setq version (jdee--jdk-get-version dir))))
       (when (and version dir)
-	(setq jdks (cons (cons version dir) jdks))))
+        (setq jdks (cons (cons version dir) jdks))))
 
     ;; Path scan and /usr/bin/javac may resolve to the same values:
     (delete-dups jdks)
@@ -227,10 +227,10 @@ field. Setting this variable determines the choices offered by the
 first."
   :group 'jdee-project
   :type '(repeat
-	  (cons
-	   :tag "JDK"
-	   (string :tag "Version")
-	   (string :tag "Path")))
+          (cons
+           :tag "JDK"
+           (string :tag "Version")
+           (string :tag "Path")))
   :set 'jdee--jdk-set-dir-type)
 
 (defcustom jdee-java-environment-variables '("JAVA_VERSION" "JAVA_HOME")
@@ -240,14 +240,14 @@ If set, the `jdee-jdk' customization variable overrides the
 java enviroment variables."
   :group 'jdee-project
   :type '(list
-	  (string :tag "Java Version")
-	  (string :tag "Java Home")))
+          (string :tag "Java Version")
+          (string :tag "Java Home")))
 
 (defcustom jdee-jdk
   (if (and (null (getenv
-		  (nth 1
-		       jdee-java-environment-variables)))
-	   jdee-jdk-registry)
+                  (nth 1
+                       jdee-java-environment-variables)))
+           jdee-jdk-registry)
       (list (caar jdee-jdk-registry))
     nil)
   "Specifies the JDK version used to develop the current project.
@@ -292,46 +292,46 @@ function displays an error message."
    ;; make sure the directory exists
    (jdee-jdk
     (let* ((jdk-alias (car jdee-jdk))
-	   (registry-entry (assoc jdk-alias jdee-jdk-registry)))
+           (registry-entry (assoc jdk-alias jdee-jdk-registry)))
       (if (null registry-entry)
-	  (error (format
-		  "No mapping in the jdee-jdk-registry found for JDK version %s"
-		  jdk-alias))
-	;; check if directory exists. Originally this was only done if
-	;; the string was non-empty I'm not sure why, I have not
-	;; preserved that (shyamalprasad)
-	(let ((jdk-dir (substitute-in-file-name (cdr registry-entry))))
-	  (if (file-exists-p jdk-dir)
-	      jdk-dir
-	    (error (format "The path specified for JDK %s does not exist: %s"
-			   jdk-alias jdk-dir)))))))
+          (error (format
+                  "No mapping in the jdee-jdk-registry found for JDK version %s"
+                  jdk-alias))
+        ;; check if directory exists. Originally this was only done if
+        ;; the string was non-empty I'm not sure why, I have not
+        ;; preserved that (shyamalprasad)
+        (let ((jdk-dir (substitute-in-file-name (cdr registry-entry))))
+          (if (file-exists-p jdk-dir)
+              jdk-dir
+            (error (format "The path specified for JDK %s does not exist: %s"
+                           jdk-alias jdk-dir)))))))
 
    ;; otherwise use JAVA_HOME if set
    ((getenv (nth 1 jdee-java-environment-variables))
     (let ((jdk-dir (substitute-in-file-name
-		    (getenv (nth 1 jdee-java-environment-variables)))))
+                    (getenv (nth 1 jdee-java-environment-variables)))))
       (if (file-exists-p jdk-dir)
-	  jdk-dir
-	(error (format "The path specified by %s does not exist: %s"
-		       (nth 1 jdee-java-environment-variables) jdk-dir)))))
+          jdk-dir
+        (error (format "The path specified by %s does not exist: %s"
+                       (nth 1 jdee-java-environment-variables) jdk-dir)))))
 
    ;; otherwise, use Apple Java Policy on Mac OS X
    ((and (eq system-type 'darwin)
-	 (file-executable-p "/usr/libexec/java_home"))
+         (file-executable-p "/usr/libexec/java_home"))
     (substring (shell-command-to-string "/usr/libexec/java_home") 0 -1))
 
    ;; Otherwise default to java in $PATH
    (t
     (let* ((javac (executable-find "javac")))
       (if javac
-	  ;; follow symbolic links since gnu/linux systems might be
-	  ;; using /etc/alternatives to the final installation
-	  (let ((javac-symlink (file-symlink-p javac)))
-	    (while javac-symlink
-	      (setq javac javac-symlink)
-	      (setq javac-symlink (file-symlink-p javac)))
-	    (expand-file-name ".." (file-name-directory javac)))
-	(error "Cannot find the JDK directory.  See `jdee-jdk'"))))))
+          ;; follow symbolic links since gnu/linux systems might be
+          ;; using /etc/alternatives to the final installation
+          (let ((javac-symlink (file-symlink-p javac)))
+            (while javac-symlink
+              (setq javac javac-symlink)
+              (setq javac-symlink (file-symlink-p javac)))
+            (expand-file-name ".." (file-name-directory javac)))
+        (error "Cannot find the JDK directory.  See `jdee-jdk'"))))))
 
 (defun jdee-get-jdk-prog (progname)
   "Return the full path of the program `PROGNAME' passed in.
@@ -359,31 +359,31 @@ but if not, look in the environment's command path."
 Signals an error if it cannot find the jar."
   (let* ((jdk-dir (jdee-get-jdk-dir))
          (tools
-	  (expand-file-name
-	   (if (eq system-type 'darwin)
-	       (let ((classes-jar
-		      (cond
-		       ((file-exists-p
-			 (expand-file-name
-			  "Classes/classes.jar" jdk-dir))
-			"Classes/classes.jar")
-		       ((file-exists-p
-			 (expand-file-name
-			  "../Classes/classes.jar" jdk-dir))
-			"../Classes/classes.jar")
-		       ((file-exists-p
-			 (expand-file-name
-			  "bundle/Classes/classes.jar" jdk-dir))
-			"bundle/Classes/classes.jar")
-		       ;; starting with 1.7 (Oracle's JDK release) the
-		       ;; tools.jar location has become a little more
-		       ;; standardized
-		       (t "lib/tools.jar"))))
-		 classes-jar)
-	     "lib/tools.jar")
-	   jdk-dir)))
+          (expand-file-name
+           (if (eq system-type 'darwin)
+               (let ((classes-jar
+                      (cond
+                       ((file-exists-p
+                         (expand-file-name
+                          "Classes/classes.jar" jdk-dir))
+                        "Classes/classes.jar")
+                       ((file-exists-p
+                         (expand-file-name
+                          "../Classes/classes.jar" jdk-dir))
+                        "../Classes/classes.jar")
+                       ((file-exists-p
+                         (expand-file-name
+                          "bundle/Classes/classes.jar" jdk-dir))
+                        "bundle/Classes/classes.jar")
+                       ;; starting with 1.7 (Oracle's JDK release) the
+                       ;; tools.jar location has become a little more
+                       ;; standardized
+                       (t "lib/tools.jar"))))
+                 classes-jar)
+             "lib/tools.jar")
+           jdk-dir)))
     (if (file-exists-p tools)
-	tools
+        tools
       nil)))
 
 (provide 'jdee-jdk-manager)

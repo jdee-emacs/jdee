@@ -41,20 +41,20 @@ string replace, changes the buffer name, and changes the file name."
   (if (not (eql 'jdee-mode major-mode))
       (error "Not a Java source buffer."))
   (let* ((buf-name (buffer-name))
-	 (old-class-name
-	  (with-temp-buffer
-	    (insert buf-name)
-	    (goto-char (point-min))
-	    (if (re-search-forward "\\.java$" nil t)
-		(replace-match ""))
-	    (buffer-substring-no-properties (point-min) (point-max))))
-	 (old-class-regexp (regexp-quote old-class-name)))
+         (old-class-name
+          (with-temp-buffer
+            (insert buf-name)
+            (goto-char (point-min))
+            (if (re-search-forward "\\.java$" nil t)
+                (replace-match ""))
+            (buffer-substring-no-properties (point-min) (point-max))))
+         (old-class-regexp (regexp-quote old-class-name)))
     (save-some-buffers)
     (dired-rename-file (buffer-file-name) (concat new-class-name ".java") t)
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward old-class-regexp nil t)
-	(replace-match new-class-name)))))
+        (replace-match new-class-name)))))
 
 ;;;###autoload
 (defun jdee-replace-fully-qualified-class-at-point (class)

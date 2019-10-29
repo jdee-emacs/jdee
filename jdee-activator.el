@@ -45,19 +45,19 @@ If the activated buffer is a Java buffer, runs the
     (unless (equal curr-buff jdee-current-buffer)
       (setq jdee-current-buffer curr-buff)
       (if (eq major-mode 'jdee-mode)
-	  (condition-case err
-	      (run-hooks 'jdee-entering-java-buffer-hook)
-	    (error
-	     (message "jdee-entering-java-buffer-hook error: %s"
-		      (error-message-string err))))))))
+          (condition-case err
+              (run-hooks 'jdee-entering-java-buffer-hook)
+            (error
+             (message "jdee-entering-java-buffer-hook error: %s"
+                      (error-message-string err))))))))
 
 (defun jdee-monitor-post-command-hook ()
   "Check whether `post-command-hook' includes all hooks required by JDEE.
 If not, it adds the required hooks."
   (if (eq major-mode 'jdee-mode)
       (dolist (hook (list 'jdee-detect-java-buffer-activation))
-	(when (not (member hook post-command-hook))
-	  (add-hook 'post-command-hook hook)))))
+        (when (not (member hook post-command-hook))
+          (add-hook 'post-command-hook hook)))))
 
 (defun jdee-count-open-java-buffers ()
   "Return non-nil if any Java buffers are open."
@@ -68,7 +68,7 @@ If not, it adds the required hooks."
    (lambda (file-type buffer)
      (let ((file-name (buffer-file-name buffer)))
        (if file-name
-	   (save-match-data
+           (save-match-data
              (string-match file-type file-name)))))))
 
 (defun jdee-clean-up-after-jde ()
@@ -76,11 +76,11 @@ If not, it adds the required hooks."
 all Java source buffers have been closed."
   (if (eq major-mode 'jdee-mode)
       (unless  (> (jdee-count-open-java-buffers) 1)
-	(remove-hook 'post-command-hook 'jdee-detect-java-buffer-activation)
-	(when jdee-monitor-post-command-hook-timer
-	  (cancel-timer jdee-monitor-post-command-hook-timer)
-	  (setq jdee-monitor-post-command-hook-timer nil))
-	(remove-hook 'kill-buffer-hook 'jdee-clean-up-after-jde))))
+        (remove-hook 'post-command-hook 'jdee-detect-java-buffer-activation)
+        (when jdee-monitor-post-command-hook-timer
+          (cancel-timer jdee-monitor-post-command-hook-timer)
+          (setq jdee-monitor-post-command-hook-timer nil))
+        (remove-hook 'kill-buffer-hook 'jdee-clean-up-after-jde))))
 
 (defun jdee-activator-init ()
   "Setup jdee-mode activation and deactivation in Java buffers."

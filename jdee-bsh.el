@@ -79,24 +79,24 @@ use in testing the JDEE's java classes."
 
 (defclass jdee-bsh (bsh)
   ((bsh-cmd-dir      :initarg :bsh-cmd-dir
-		     :type string
-		     :documentation
-		     "Path of the BeanShell commmand directory.")
+                     :type string
+                     :documentation
+                     "Path of the BeanShell commmand directory.")
 
    (jdee-jar         :initarg :jdee-jar
-		    :type string
-		    :documentation
-		    "Path of the JDEE jar.")
+                    :type string
+                    :documentation
+                    "Path of the JDEE jar.")
 
    (jdee-classes-dir :initarg :jdee-classes-dir
-		    :type string
-		    :documentation
-		    "Path of the JDEE classes directory.")
+                    :type string
+                    :documentation
+                    "Path of the JDEE classes directory.")
 
    (the-bsh        :type jdee-bsh
-		   :allocation :class
-		   :documentation
-		   "The single instance of the JDEE's BeanShell."))
+                   :allocation :class
+                   :documentation
+                   "The single instance of the JDEE's BeanShell."))
   "Class of JDEE BeanShells. There is only one per Emacs session.")
 
 (defmethod initialize-instance ((this jdee-bsh) &rest fields)
@@ -122,21 +122,21 @@ use in testing the JDEE's java classes."
   "Sets the vm and classpath to the vm and classpath for the current project before
 the PRIMARY launch method is invoked."
   (let* ((project-ant-home
-	  ;; Code referring to jdee-ant variables uses symbols to
-	  ;; avoid causing compilation errors since jdee-ant is not required.
-	  (jdee-get-project 'jdee-ant-home jdee-current-project))
-	 (ant-home (if (and (boundp 'jdee-ant-home)
-			    (not (string= (symbol-value 'jdee-ant-home) "")))
-		       (symbol-value 'jdee-ant-home)     ;jdee-ant loaded
-		     (if (and project-ant-home
-			      (not (string= project-ant-home "")))
-			 project-ant-home ; jdee-ant not loaded but
-					; jdee-ant-home set in project
-					; file
-		       (getenv "ANT_HOME")))) ; jdee-ant-home not set in
-					; project file and not
-					; customized
-	 )
+          ;; Code referring to jdee-ant variables uses symbols to
+          ;; avoid causing compilation errors since jdee-ant is not required.
+          (jdee-get-project 'jdee-ant-home jdee-current-project))
+         (ant-home (if (and (boundp 'jdee-ant-home)
+                            (not (string= (symbol-value 'jdee-ant-home) "")))
+                       (symbol-value 'jdee-ant-home)     ;jdee-ant loaded
+                     (if (and project-ant-home
+                              (not (string= project-ant-home "")))
+                         project-ant-home ; jdee-ant not loaded but
+                                        ; jdee-ant-home set in project
+                                        ; file
+                       (getenv "ANT_HOME")))) ; jdee-ant-home not set in
+                                        ; project file and not
+                                        ; customized
+         )
 
     (oset this vm (oref (jdee-run-get-vm) :path))
     (oset this cp (delq
@@ -164,21 +164,21 @@ the PRIMARY launch method is invoked."
   "Read an expression as input guessing initial input at the current point."
   (if mark-active
       (progn
-	(setq java-bsh-read-java-expression-history
-	      (cons (buffer-substring (region-beginning)
-				      (region-end))
-		    java-bsh-read-java-expression-history))
-	(jdee-bsh-quote-expr (region-beginning) (region-end) t t))
+        (setq java-bsh-read-java-expression-history
+              (cons (buffer-substring (region-beginning)
+                                      (region-end))
+                    java-bsh-read-java-expression-history))
+        (jdee-bsh-quote-expr (region-beginning) (region-end) t t))
     (let ((bnd (if (eq major-mode 'jdee-mode)
-		   (bounds-of-thing-at-point 'java-expression)))
-	  initial)
+                   (bounds-of-thing-at-point 'java-expression)))
+          initial)
       (if bnd (setq initial (buffer-substring (car bnd) (cdr bnd))))
       (if (and initial
-	       (or (>= (length initial) 80)
-		   (save-match-data (string-match "\n" initial))))
-	  (setq initial nil))
+               (or (>= (length initial) 80)
+                   (save-match-data (string-match "\n" initial))))
+          (setq initial nil))
       (read-string "Expression: " initial
-		   'java-bsh-read-java-expression-history))))
+                   'java-bsh-read-java-expression-history))))
 
 (defvar jdee-jeval-debug nil
   "*Whether or not turn on debug logging.
@@ -200,22 +200,22 @@ for most things since unless `show()' was invoked and output
 prints out, Emacs has nothing to evaluate or report."
   (interactive (list (jdee-bsh-read-java-expression)))
   (cl-flet ((log
-	     (msg logtype)
-	     (when jdee-jeval-debug
-	       (with-current-buffer (get-buffer-create "*Bsh Debug Log*")
-		 (goto-char (point-max))
-		 (insert (format "%S<" logtype))
-		 (insert (if (stringp msg) msg (prin1-to-string msg)))
-		 (insert ">")
-		 (newline)))))
+             (msg logtype)
+             (when jdee-jeval-debug
+               (with-current-buffer (get-buffer-create "*Bsh Debug Log*")
+                 (goto-char (point-max))
+                 (insert (format "%S<" logtype))
+                 (insert (if (stringp msg) msg (prin1-to-string msg)))
+                 (insert ">")
+                 (newline)))))
     (let ((the-bsh (oref-default 'jdee-bsh the-bsh)))
       (when (not (bsh-running-p the-bsh))
-	(bsh-launch the-bsh)
-	(bsh-eval the-bsh (jdee-backend-create-prj-values-str)))
+        (bsh-launch the-bsh)
+        (bsh-eval the-bsh (jdee-backend-create-prj-values-str)))
       (when (not no-print-p)
-	(if (string= (substring java-statement -1) ";")
-	    (setq java-statement (substring java-statement 0 -1)))
-	(setq java-statement (format "\
+        (if (string= (substring java-statement -1) ";")
+            (setq java-statement (substring java-statement 0 -1)))
+        (setq java-statement (format "\
 {
   boolean _prevShowValue = this.interpreter.getShowResults();
   Object _retVal = null;
@@ -229,22 +229,22 @@ prints out, Emacs has nothing to evaluate or report."
 }" java-statement)))
       (log java-statement 'request)
       (let ((output (bsh-eval the-bsh java-statement eval-return))
-	    len)
-	(when (stringp output)
-	  (when (> (length output) 0)
-	    (setq len (length output))
-	    (if (eq ?\n (elt output (1- len)))
-		(setq output (substring output 0 (1- len)))))
-	  (if (= 0 (length output)) (setq output nil)))
-	(log output 'response)
-	(when (called-interactively-p 'interactive)
-	  (if output (kill-new output))
-	  (message (if output
-		       (concat "Copied `"
-			       (replace-regexp-in-string "%" "%%" output t t)
-			       "'")
-		     "No result")))
-	output))))
+            len)
+        (when (stringp output)
+          (when (> (length output) 0)
+            (setq len (length output))
+            (if (eq ?\n (elt output (1- len)))
+                (setq output (substring output 0 (1- len)))))
+          (if (= 0 (length output)) (setq output nil)))
+        (log output 'response)
+        (when (called-interactively-p 'interactive)
+          (if output (kill-new output))
+          (message (if output
+                       (concat "Copied `"
+                               (replace-regexp-in-string "%" "%%" output t t)
+                               "'")
+                     "No result")))
+        output))))
 
 (defun jdee-jeval-r (java-statement)
   "Uses the JDEE's instance of the BeanShell to
@@ -274,19 +274,19 @@ a file in the current directory:
  (jdee-bsh-compile-mode-eval \"jde.util.CompileServer.compile(\\\"Test.java\\\");\"
    \"Compile Test.java\" 'jdee-compile-finish-kill-buffer)"
   (let* ((buffer-obj (bsh-compilation-buffer "buffer"))
-	 (native-buf (oref buffer-obj buffer))
-	 (bufwin (display-buffer native-buf)))
+         (native-buf (oref buffer-obj buffer))
+         (bufwin (display-buffer native-buf)))
 
     (compilation-set-window-height bufwin)
 
     (save-some-buffers (not compilation-ask-about-save) nil)
 
     (if finish-fcn
-	(lexical-let ((finish finish-fcn))
-	  (setq compilation-finish-functions
-		(lambda (buf msg)
-		  (funcall finish buf msg)
-		  (setq compilation-finish-functions nil)))))
+        (lexical-let ((finish finish-fcn))
+          (setq compilation-finish-functions
+                (lambda (buf msg)
+                  (funcall finish buf msg)
+                  (setq compilation-finish-functions nil)))))
 
 
     (if compilation-process-setup-function
@@ -298,16 +298,16 @@ a file in the current directory:
     (with-current-buffer native-buf
 
       (if buffer-head
-	  (insert buffer-head)
-	(insert java-expr))
+          (insert buffer-head)
+        (insert java-expr))
 
       (insert "\n")
 
 
       (if (not (jdee-bsh-running-p))
-	  (progn
-	    (bsh-launch (oref-default 'jdee-bsh the-bsh))
-	    (bsh-eval (oref-default 'jdee-bsh the-bsh)
+          (progn
+            (bsh-launch (oref-default 'jdee-bsh the-bsh))
+            (bsh-eval (oref-default 'jdee-bsh the-bsh)
                       (jdee-backend-create-prj-values-str))))
 
       (bsh-buffer-eval
@@ -327,11 +327,11 @@ a file in the current directory:
   "Closes the existing beanshell process."
   (if (jdee-bsh-running-p)
       (let ((process (bsh-get-process (oref-default 'jdee-bsh the-bsh))))
-	(if (and
-	     (boundp 'jdee-ant-invocation-method) ;; ant package may not be loaded.
-	     (string= (car (symbol-value 'jdee-ant-invocation-method)) "Ant Server"))
-	    (process-send-string process "jde.util.JdeUtilities.exit();\n")
-	  (process-send-string process "exit();\n")))
+        (if (and
+             (boundp 'jdee-ant-invocation-method) ;; ant package may not be loaded.
+             (string= (car (symbol-value 'jdee-ant-invocation-method)) "Ant Server"))
+            (process-send-string process "jde.util.JdeUtilities.exit();\n")
+          (process-send-string process "exit();\n")))
     (message "The beanshell is not running")))
 
 
@@ -351,32 +351,32 @@ this syntax change.
 NO-QUOTE-WRAP-P, if non-nil, don't add double quotes around the whole statement."
   (interactive "r")
   (setq start (or start (point-min))
-	end (or end (point-max)))
+        end (or end (point-max)))
   (let ((expr (buffer-substring-no-properties start end))
-	(repls (append '(("\\" . "\\\\"))
-		       (if (not no-param-p)
-			   '(("\n" . "\\n"))))))
+        (repls (append '(("\\" . "\\\\"))
+                       (if (not no-param-p)
+                           '(("\n" . "\\n"))))))
     (save-match-data
       (if (not no-param-p)
-	  (setq expr (mapconcat #'identity (split-string expr "\"")
-				"\" + '\"' + \"")))
+          (setq expr (mapconcat #'identity (split-string expr "\"")
+                                "\" + '\"' + \"")))
       (setq expr (with-temp-buffer
-		   (insert expr)
-		   (dolist (repl repls)
-		     (goto-char (point-min))
-		     (while (search-forward (car repl) nil t)
-		       (replace-match (cdr repl) nil t)))
-		   (when (not no-quote-wrap-p)
-		     (goto-char (point-min))
-		     (insert "\"")
-		     (goto-char (point-max))
-		     (insert "\""))
-		   (buffer-substring (point-min) (point-max))))
+                   (insert expr)
+                   (dolist (repl repls)
+                     (goto-char (point-min))
+                     (while (search-forward (car repl) nil t)
+                       (replace-match (cdr repl) nil t)))
+                   (when (not no-quote-wrap-p)
+                     (goto-char (point-min))
+                     (insert "\"")
+                     (goto-char (point-max))
+                     (insert "\""))
+                   (buffer-substring (point-min) (point-max))))
       (when (called-interactively-p 'interactive)
-	(save-excursion
-	  (delete-region start end)
-	  (goto-char start)
-	  (insert expr)))
+        (save-excursion
+          (delete-region start end)
+          (goto-char start)
+          (insert expr)))
       expr)))
 
 (provide 'jdee-bsh)

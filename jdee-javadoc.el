@@ -47,30 +47,30 @@
 (eval-and-compile
   (or (require 'working nil t)
       (progn
-	(defvar working-message nil
-	  "Message stored when in a status loop.")
-	(defmacro working-status-forms (message donestr &rest forms)
-	  "Contain a block of code during which a working status is shown."
-	  (list 'let (list (list 'msg message) (list 'dstr donestr)
-			   '(ref1 0))
-		(cons 'progn forms)))
+        (defvar working-message nil
+          "Message stored when in a status loop.")
+        (defmacro working-status-forms (message donestr &rest forms)
+          "Contain a block of code during which a working status is shown."
+          (list 'let (list (list 'msg message) (list 'dstr donestr)
+                           '(ref1 0))
+                (cons 'progn forms)))
 
-	(defun working-status (&optional percent &rest args)
-	  "Called within the macro `working-status-forms', show the status."
-	  (message "%s%s" (apply 'format msg args)
-		   (if (eq percent t) (concat "... " dstr)
-		     (format "... %3d%%"
-			     (or percent
-				 (floor (* 100.0 (/ (float (point))
-						    (point-max)))))))))
+        (defun working-status (&optional percent &rest args)
+          "Called within the macro `working-status-forms', show the status."
+          (message "%s%s" (apply 'format msg args)
+                   (if (eq percent t) (concat "... " dstr)
+                     (format "... %3d%%"
+                             (or percent
+                                 (floor (* 100.0 (/ (float (point))
+                                                    (point-max)))))))))
 
-	(defun working-dynamic-status (&optional number &rest args)
-	  "Called within the macro `working-status-forms', show the status."
-	  (message "%s%s" (apply 'format msg args)
-		   (format "... %c" (aref [ ?- ?/ ?| ?\\ ] (% ref1 4))))
-	  (setq ref1 (1+ ref1)))
+        (defun working-dynamic-status (&optional number &rest args)
+          "Called within the macro `working-status-forms', show the status."
+          (message "%s%s" (apply 'format msg args)
+                   (format "... %c" (aref [ ?- ?/ ?| ?\\ ] (% ref1 4))))
+          (setq ref1 (1+ ref1)))
 
-	(put 'working-status-forms 'lisp-indent-function 2))))
+        (put 'working-status-forms 'lisp-indent-function 2))))
 
 ;;;; Customization
 ;;;; -------------
@@ -89,14 +89,14 @@ The template name is the `symbol-name' of SYM from which the
 VAL is the template value.  If VAL is a string it is converted to a
 list of template elements."
   (let* ((name (symbol-name sym))
-	 (template-name
-	  (if (string-match "\\(.*\\)-template$" name)
-	      (match-string 1 name)
-	    (error "Invalid template variable name: %S" name)))
-	 (template-val
-	  (if (stringp val)
-	      (car (read-from-string (format "(%s)" val)))
-	    val)))
+         (template-name
+          (if (string-match "\\(.*\\)-template$" name)
+              (match-string 1 name)
+            (error "Invalid template variable name: %S" name)))
+         (template-val
+          (if (stringp val)
+              (car (read-from-string (format "(%s)" val)))
+            val)))
     (tempo-define-template template-name template-val nil name)
     (set-default sym val)))
 
@@ -109,8 +109,8 @@ See `jdee-javadoc-autodoc-at-line' for usage.  Define the template
 variable `tempo-template-jdee-javadoc-describe-class'."
   :group 'jdee-javadoc
   :type '(choice :tag "Template form"
-		 (text :format "%t\n%v" :tag "String")
-		 (repeat :tag "Lisp Expressions" (sexp :tag "")))
+                 (text :format "%t\n%v" :tag "String")
+                 (repeat :tag "Lisp Expressions" (sexp :tag "")))
   :set 'jdee-javadoc-define-template)
 
 (defcustom jdee-javadoc-describe-interface-template
@@ -122,8 +122,8 @@ See `jdee-javadoc-autodoc-at-line' for usage.  Define the template
 variable `tempo-template-jdee-javadoc-describe-interface'."
   :group 'jdee-javadoc
   :type '(choice :tag "Template form"
-		 (text :format "%t\n%v" :tag "String")
-		 (repeat :tag "Lisp Expressions" (sexp :tag "")))
+                 (text :format "%t\n%v" :tag "String")
+                 (repeat :tag "Lisp Expressions" (sexp :tag "")))
   :set 'jdee-javadoc-define-template)
 
 (defcustom jdee-javadoc-describe-constructor-template
@@ -135,8 +135,8 @@ name).  See `jdee-javadoc-autodoc-at-line' for usage.  Define the
 template variable `tempo-template-jdee-javadoc-describe-constructor'."
   :group 'jdee-javadoc
   :type '(choice :tag "Template form"
-		 (text :format "%t\n%v" :tag "String")
-		 (repeat :tag "Lisp Expressions" (sexp :tag "")))
+                 (text :format "%t\n%v" :tag "String")
+                 (repeat :tag "Lisp Expressions" (sexp :tag "")))
   :set 'jdee-javadoc-define-template)
 
 (defcustom jdee-javadoc-describe-method-template
@@ -148,8 +148,8 @@ See `jdee-javadoc-autodoc-at-line' for usage.  Define the template
 variable `tempo-template-jdee-javadoc-describe-method'."
   :group 'jdee-javadoc
   :type '(choice :tag "Template form"
-		 (text :format "%t\n%v" :tag "String")
-		 (repeat :tag "Lisp Expressions" (sexp :tag "")))
+                 (text :format "%t\n%v" :tag "String")
+                 (repeat :tag "Lisp Expressions" (sexp :tag "")))
   :set 'jdee-javadoc-define-template)
 
 (defcustom jdee-javadoc-describe-field-template
@@ -164,8 +164,8 @@ See `jdee-javadoc-autodoc-at-line' for usage.  Define the template
 variable `tempo-template-jdee-javadoc-describe-field'."
   :group 'jdee-javadoc
   :type '(choice :tag "Template form"
-		 (text :format "%t\n%v" :tag "String")
-		 (repeat :tag "Lisp Expressions" (sexp :tag "")))
+                 (text :format "%t\n%v" :tag "String")
+                 (repeat :tag "Lisp Expressions" (sexp :tag "")))
   :set 'jdee-javadoc-define-template)
 
 (defcustom jdee-javadoc-param-tag-template
@@ -180,8 +180,8 @@ See `jdee-javadoc-autodoc-at-line' for usage.  Define the template
 variable `tempo-template-jdee-javadoc-param-tag'."
   :group 'jdee-javadoc
   :type '(choice :tag "Template form"
-		 (text :format "%t\n%v" :tag "String")
-		 (repeat :tag "Lisp Expressions" (sexp :tag "")))
+                 (text :format "%t\n%v" :tag "String")
+                 (repeat :tag "Lisp Expressions" (sexp :tag "")))
   :set 'jdee-javadoc-define-template)
 
 (defcustom jdee-javadoc-return-tag-template
@@ -194,8 +194,8 @@ See `jdee-javadoc-autodoc-at-line' for usage.  Define the template
 variable `tempo-template-jdee-javadoc-return-tag'."
   :group 'jdee-javadoc
   :type '(choice :tag "Template form"
-		 (text :format "%t\n%v" :tag "String")
-		 (repeat :tag "Lisp Expressions" (sexp :tag "")))
+                 (text :format "%t\n%v" :tag "String")
+                 (repeat :tag "Lisp Expressions" (sexp :tag "")))
   :set 'jdee-javadoc-define-template)
 
 (defcustom jdee-javadoc-exception-tag-template
@@ -208,8 +208,8 @@ See `jdee-javadoc-autodoc-at-line' for usage.  Define the template
 variable `tempo-template-jdee-javadoc-exception-tag'."
   :group 'jdee-javadoc
   :type '(choice :tag "Template form"
-		 (text :format "%t\n%v" :tag "String")
-		 (repeat :tag "Lisp Expressions" (sexp :tag "")))
+                 (text :format "%t\n%v" :tag "String")
+                 (repeat :tag "Lisp Expressions" (sexp :tag "")))
   :set 'jdee-javadoc-define-template)
 
 (defcustom jdee-javadoc-author-tag-template
@@ -221,8 +221,8 @@ See `jdee-javadoc-autodoc-at-line' for usage.  Define the template
 variable `tempo-template-jdee-javadoc-author-tag'."
   :group 'jdee-javadoc
   :type '(choice :tag "Template form"
-		 (text :format "%t\n%v" :tag "String")
-		 (repeat :tag "Lisp Expressions" (sexp :tag "")))
+                 (text :format "%t\n%v" :tag "String")
+                 (repeat :tag "Lisp Expressions" (sexp :tag "")))
   :set 'jdee-javadoc-define-template)
 
 (defcustom jdee-javadoc-version-tag-template
@@ -233,8 +233,8 @@ See `jdee-javadoc-autodoc-at-line' for usage.  Define the template
 variable `tempo-template-jdee-javadoc-version-tag'."
   :group 'jdee-javadoc
   :type '(choice :tag "Template form"
-		 (text :format "%t\n%v" :tag "String")
-		 (repeat :tag "Lisp Expressions" (sexp :tag "")))
+                 (text :format "%t\n%v" :tag "String")
+                 (repeat :tag "Lisp Expressions" (sexp :tag "")))
   :set 'jdee-javadoc-define-template)
 
 ;; (defcustom jdee-javadoc-see-tag-template
@@ -271,8 +271,8 @@ See `jdee-javadoc-autodoc-at-line' for usage.  Define the template
 variable `tempo-template-jdee-javadoc-end-block'."
   :group 'jdee-javadoc
   :type '(choice :tag "Template form"
-		 (text :format "%t\n%v" :tag "String")
-		 (repeat :tag "Lisp Expressions" (sexp :tag "")))
+                 (text :format "%t\n%v" :tag "String")
+                 (repeat :tag "Lisp Expressions" (sexp :tag "")))
   :set 'jdee-javadoc-define-template)
 
 ;;;; Utilities
@@ -306,7 +306,7 @@ See `working-dynamic-status' for meaning of ARGS."
     (while (< (point) end)
       (jdee-javadoc-dynamic-status)
       (or (and (bolp) (eolp))
-	  (jdee-javadoc-indent-line))
+          (jdee-javadoc-indent-line))
       (forward-line 1))
     (move-marker end nil)))
 
@@ -322,25 +322,25 @@ F receives optional ARGS after the current element of L."
 This number may be greater than the number of actual lines in the
 buffer if any wrap on the display due to their length."
   (let ((start (point-min))
-	(end   (point-max)))
+        (end   (point-max)))
     (if (= start end)
-	0
+        0
       (save-excursion
-	(save-restriction
-	  (widen)
-	  (narrow-to-region start end)
-	  (goto-char start)
-	  (vertical-motion (buffer-size)))))))
+        (save-restriction
+          (widen)
+          (narrow-to-region start end)
+          (goto-char start)
+          (vertical-motion (buffer-size)))))))
 
 (defun jdee-javadoc-adjust-window (window)
   "Adjust WINDOW height to fit its buffer contents."
   (save-selected-window
     (select-window window)
     (let ((height (window-height))
-	  (lines  (+ 3 (jdee-javadoc-window-lines))))
+          (lines  (+ 3 (jdee-javadoc-window-lines))))
       ;; ensure window will not be deleted if too small
       (if (< lines window-min-height)
-	  (setq lines window-min-height))
+          (setq lines window-min-height))
       (enlarge-window (- lines height)))))
 
 (defsubst jdee-javadoc-variable-name (name)
@@ -409,7 +409,7 @@ Useful to generate HTML code style."
 
 (defconst jdee-javadoc-end-tag-regexp
   (concat "\\(" jdee-javadoc-start-tag-regexp
-	  "\\|[ \n\r\t]*\\*/\\)")
+          "\\|[ \n\r\t]*\\*/\\)")
   "Regexp matching the end of a tag or description.")
 
 ;; Core comment parser
@@ -418,21 +418,21 @@ Useful to generate HTML code style."
   "Ensure DESC text begins with '\\n* ' and ends with '\\n*\\n'."
   (let ((i (string-match "[^ *\n\r\t]" desc)))
     (if i
-	(setq desc (concat "\n* " (substring desc i))))
+        (setq desc (concat "\n* " (substring desc i))))
     ;; TODO: ensure empty line at end
     desc))
 
 (defun jdee-javadoc-normalize-ref (val)
   "Strip any [* \\n\\r\\t] from VAL."
   (let* ((keep "[^* \n\r\t]+")
-	 (ref  "")
-	 (i    (string-match keep val))
-	 j)
+         (ref  "")
+         (i    (string-match keep val))
+         j)
     (while i
       (jdee-javadoc-dynamic-status)
       (setq j   (match-end 0)
-	    ref (concat ref (substring val i j))
-	    i   (string-match keep val j)))
+            ref (concat ref (substring val i j))
+            i   (string-match keep val j)))
     ref))
 
 (defun jdee-javadoc-parse-description (docstring)
@@ -440,19 +440,19 @@ Useful to generate HTML code style."
 The returned value has the form ((DESC)).  See also
 `jdee-javadoc-parse-tag-values'."
   (let ((matcher "/\\*\\*")
-	(i 0)
-	j tag-val)
+        (i 0)
+        j tag-val)
     (when (string-match matcher docstring)
       (jdee-javadoc-dynamic-status)
       (setq j (match-end 0))
       (setq i (string-match jdee-javadoc-end-tag-regexp docstring j))
       (setq tag-val (if i
-			(substring docstring j i)
-		      (substring docstring j)))
+                        (substring docstring j i)
+                      (substring docstring j)))
       ;; Ensure that a valid description exists
       (if (not (string-equal ""
-			     (jdee-javadoc-normalize-ref tag-val)))
-	  (list (list tag-val))))))
+                             (jdee-javadoc-normalize-ref tag-val)))
+          (list (list tag-val))))))
 
 (defun jdee-javadoc-parse-tag-values (docstring tag &optional with-key)
   "Return from DOCSTRING the list of TAG values or nil if not found.
@@ -461,22 +461,22 @@ is 'name VALUE-KEY is the first word of VALUE-STRING.  If optional
 WITH-KEY is 'ref VALUE-KEY is a normalized VALUE-STRING reference (see
 `jdee-javadoc-normalize-ref').  Otherwise VALUE-KEY is nil."
   (let ((matcher (concat jdee-javadoc-start-tag-regexp tag))
-	(i 0)
-	j tag-val key tag-list)
+        (i 0)
+        j tag-val key tag-list)
     (while (string-match matcher docstring i)
       (jdee-javadoc-dynamic-status)
       (setq j (match-end 0))
       (setq i (or (string-match
-		   jdee-javadoc-end-tag-regexp docstring j)
-		  (length docstring)))
+                   jdee-javadoc-end-tag-regexp docstring j)
+                  (length docstring)))
       (setq tag-val (substring docstring j i))
       (cond ((eq with-key 'name)
-	     (setq key (and (string-match
-			     "[* \n\r\t]*\\([^ \n\r\t]+\\)" tag-val)
-			    (jdee-javadoc-variable-name
-			     (match-string 1 tag-val)))))
-	    ((eq with-key 'ref)
-	     (setq key (jdee-javadoc-normalize-ref tag-val))))
+             (setq key (and (string-match
+                             "[* \n\r\t]*\\([^ \n\r\t]+\\)" tag-val)
+                            (jdee-javadoc-variable-name
+                             (match-string 1 tag-val)))))
+            ((eq with-key 'ref)
+             (setq key (jdee-javadoc-normalize-ref tag-val))))
       (setq tag-list (cons (cons tag-val key) tag-list)))
     (nreverse tag-list)))
 
@@ -485,22 +485,22 @@ WITH-KEY is 'ref VALUE-KEY is a normalized VALUE-STRING reference (see
 Documentation has the form (TAG VALUE-LIST).  See also
 `jdee-javadoc-parse-tag-values'."
   (cond ((string-equal tag jdee-javadoc-desc-tag)
-	 (jdee-javadoc-parse-description docstring))
-	((member tag semantic-java-doc-with-name-tags)
-	 (jdee-javadoc-parse-tag-values docstring tag 'name))
-	((member tag semantic-java-doc-with-ref-tags)
-	 (jdee-javadoc-parse-tag-values docstring tag 'ref))
-	(t
-	 (jdee-javadoc-parse-tag-values docstring tag))
-	))
+         (jdee-javadoc-parse-description docstring))
+        ((member tag semantic-java-doc-with-name-tags)
+         (jdee-javadoc-parse-tag-values docstring tag 'name))
+        ((member tag semantic-java-doc-with-ref-tags)
+         (jdee-javadoc-parse-tag-values docstring tag 'ref))
+        (t
+         (jdee-javadoc-parse-tag-values docstring tag))
+        ))
 
 (defun jdee-javadoc-parse-tag-list (docstring)
   "Return the list of tag found in DOCSTRING."
   (let* ((matcher (concat jdee-javadoc-start-tag-regexp
-			  "\\([^ \n\r\t]+\\)"))
-	 (depth (regexp-opt-depth matcher))
-	 (i (string-match matcher docstring))
-	 j tag-list)
+                          "\\([^ \n\r\t]+\\)"))
+         (depth (regexp-opt-depth matcher))
+         (i (string-match matcher docstring))
+         j tag-list)
     (while i
       (jdee-javadoc-dynamic-status)
       (setq tag-list (cons (match-string depth docstring) tag-list))
@@ -512,45 +512,45 @@ Documentation has the form (TAG VALUE-LIST).  See also
 Result has the following form: (DOCSTRING TAG-LIST TAG-VALUE-ALIST)."
   (if docstring
       (let (tag-list
-	    tag-alist l tag
-	    throws-assoc except-assoc merged-values)
-	(jdee-javadoc-status-forms "Parsing" "done"
-	  (jdee-javadoc-dynamic-status)
-	  (setq tag-list (jdee-javadoc-parse-tag-list docstring))
-	  (setq l (cons jdee-javadoc-desc-tag tag-list))
-	  (while l
-	    (jdee-javadoc-dynamic-status)
-	    (setq tag (car l))
-	    (if (assoc tag tag-alist)
-		nil                     ; tag already processed
-	      (setq tag-alist
-		    (cons (cons tag
-				(jdee-javadoc-parse-tag tag docstring))
-			  tag-alist)))
-	    (setq l (cdr l)))
-	  ;; The 'throws' and 'exception' tags are equivalent, so
-	  ;; their values are merged to allow access to 'exception'
-	  ;; tag using 'throws' and vice versa.
-	  (jdee-javadoc-dynamic-status)
-	  (setq throws-assoc (assoc "throws"    tag-alist))
-	  (jdee-javadoc-dynamic-status)
-	  (setq except-assoc (assoc "exception" tag-alist))
-	  (when (or throws-assoc except-assoc)
-	    (jdee-javadoc-dynamic-status)
-	    (setq merged-values (append (cdr throws-assoc)
-					(cdr except-assoc)))
-	    (jdee-javadoc-dynamic-status)
-	    (if throws-assoc
-		(setcdr throws-assoc merged-values)
-	      (setq tag-alist (cons (cons "throws"    merged-values)
-				    tag-alist)))
-	    (jdee-javadoc-dynamic-status)
-	    (if except-assoc
-		(setcdr except-assoc merged-values)
-	      (setq tag-alist (cons (cons "exception" merged-values)
-				    tag-alist))))
-	  (jdee-javadoc-dynamic-status t))
-	(list docstring tag-list tag-alist))))
+            tag-alist l tag
+            throws-assoc except-assoc merged-values)
+        (jdee-javadoc-status-forms "Parsing" "done"
+          (jdee-javadoc-dynamic-status)
+          (setq tag-list (jdee-javadoc-parse-tag-list docstring))
+          (setq l (cons jdee-javadoc-desc-tag tag-list))
+          (while l
+            (jdee-javadoc-dynamic-status)
+            (setq tag (car l))
+            (if (assoc tag tag-alist)
+                nil                     ; tag already processed
+              (setq tag-alist
+                    (cons (cons tag
+                                (jdee-javadoc-parse-tag tag docstring))
+                          tag-alist)))
+            (setq l (cdr l)))
+          ;; The 'throws' and 'exception' tags are equivalent, so
+          ;; their values are merged to allow access to 'exception'
+          ;; tag using 'throws' and vice versa.
+          (jdee-javadoc-dynamic-status)
+          (setq throws-assoc (assoc "throws"    tag-alist))
+          (jdee-javadoc-dynamic-status)
+          (setq except-assoc (assoc "exception" tag-alist))
+          (when (or throws-assoc except-assoc)
+            (jdee-javadoc-dynamic-status)
+            (setq merged-values (append (cdr throws-assoc)
+                                        (cdr except-assoc)))
+            (jdee-javadoc-dynamic-status)
+            (if throws-assoc
+                (setcdr throws-assoc merged-values)
+              (setq tag-alist (cons (cons "throws"    merged-values)
+                                    tag-alist)))
+            (jdee-javadoc-dynamic-status)
+            (if except-assoc
+                (setcdr except-assoc merged-values)
+              (setq tag-alist (cons (cons "exception" merged-values)
+                                    tag-alist))))
+          (jdee-javadoc-dynamic-status t))
+        (list docstring tag-list tag-alist))))
 
 ;; Handling of javadoc comment parsed tree
 ;;
@@ -570,34 +570,34 @@ Result has the following form: (DOCSTRING TAG-LIST TAG-VALUE-ALIST)."
   "Return from DOCTREE the list of TAG values.
 If optional NAME is non-nil return its specific value."
   (let ((doc (cdr
-	      (assoc
-	       tag
-	       (jdee-javadoc-doctree-tag-value-alist doctree)))))
+              (assoc
+               tag
+               (jdee-javadoc-doctree-tag-value-alist doctree)))))
     (and doc
-	 name
-	 (setq doc (rassoc name doc))
-	 (setq doc (list doc)))
+         name
+         (setq doc (rassoc name doc))
+         (setq doc (list doc)))
     doc))
 
 (defun jdee-javadoc-doctree-known-tag-list (doctree)
   "Return the list of known tags in DOCTREE .
 That is tags in `semantic-java-doc-line-tags'."
   (delq nil
-	(mapcar (function
-		 (lambda (tag)
-		   (and (member tag semantic-java-doc-line-tags)
-			tag)))
-		(jdee-javadoc-doctree-tag-list doctree))))
+        (mapcar (function
+                 (lambda (tag)
+                   (and (member tag semantic-java-doc-line-tags)
+                        tag)))
+                (jdee-javadoc-doctree-tag-list doctree))))
 
 (defun jdee-javadoc-doctree-unknown-tag-list (doctree)
   "Return the list of unknown tags in DOCTREE .
 That is tags not in `semantic-java-doc-line-tags'."
   (delq nil
-	(mapcar (function
-		 (lambda (tag)
-		   (and (not (member tag semantic-java-doc-line-tags))
-			tag)))
-		(jdee-javadoc-doctree-tag-list doctree))))
+        (mapcar (function
+                 (lambda (tag)
+                   (and (not (member tag semantic-java-doc-line-tags))
+                        tag)))
+                (jdee-javadoc-doctree-tag-list doctree))))
 
 ;;;; semantic tags stuff
 ;;;; ---------------------
@@ -611,38 +611,38 @@ That is tags not in `semantic-java-doc-line-tags'."
   "Replace TAG documentation with DOCSTRING.
 If DOCSTRING is nil just delete the existing documentation."
   (let* ((comment (semantic-documentation-for-tag tag 'flex))
-	 start end)
+         start end)
     (when comment
       (set-buffer (semantic-tag-buffer tag))
       (setq start (semantic-lex-token-start comment))
       (setq end   (semantic-lex-token-end   comment))
       (goto-char start)
       (save-excursion
-	(goto-char end)
-	(jdee-javadoc-skip-spaces-forward)
-	(delete-region start (point))
-	(when docstring
-	  (insert docstring)
-	  (jdee-javadoc-indent-documentation tag))))))
+        (goto-char end)
+        (jdee-javadoc-skip-spaces-forward)
+        (delete-region start (point))
+        (when docstring
+          (insert docstring)
+          (jdee-javadoc-indent-documentation tag))))))
 
 (defun jdee-javadoc-delete-documentation (tag &optional noconfirm)
   "Delete TAG documentation.
 Require confirmation if optional NOCONFIRM is non-nil.  Return non-nil
 if done."
   (if (or noconfirm
-	  (y-or-n-p (format "Delete '%s' previous documentation? "
-			    (semantic-tag-name tag))))
+          (y-or-n-p (format "Delete '%s' previous documentation? "
+                            (semantic-tag-name tag))))
       (progn
-	(jdee-javadoc-replace-documentation tag)
-	t)))
+        (jdee-javadoc-replace-documentation tag)
+        t)))
 
 (defun jdee-javadoc-recenter-documentation (tag &optional arg)
   "Center TAG documentation in window and redisplay frame.
 With ARG, put point on line ARG.  See also `recenter'."
   (let ((comment (semantic-documentation-for-tag tag 'flex))
-	start)
+        start)
     (if (not comment)
-	(setq start (semantic-tag-start tag))
+        (setq start (semantic-tag-start tag))
       (set-buffer (semantic-tag-buffer tag))
       (setq start (semantic-lex-token-start comment)))
     (goto-char start)
@@ -652,14 +652,14 @@ With ARG, put point on line ARG.  See also `recenter'."
   "Indent TAG documentation."
   (save-excursion
     (let ((comment (semantic-documentation-for-tag tag 'flex))
-	  start end)
+          start end)
       (when comment
-	(set-buffer (semantic-tag-buffer tag))
-	(setq start (semantic-lex-token-start comment))
-	(setq end   (semantic-lex-token-end   comment))
-	(goto-char end)
-	(jdee-javadoc-skip-spaces-forward)
-	(jdee-javadoc-indent-region start (point))))))
+        (set-buffer (semantic-tag-buffer tag))
+        (setq start (semantic-lex-token-start comment))
+        (setq end   (semantic-lex-token-end   comment))
+        (goto-char end)
+        (jdee-javadoc-skip-spaces-forward)
+        (jdee-javadoc-indent-region start (point))))))
 
 ;;;; Doc checker
 ;;;; -----------
@@ -683,16 +683,16 @@ Local to checker report buffer.")
   (list
    ;; References
    (list "`\\(.*\\)'"
-	 1 'font-lock-warning-face)
+         1 'font-lock-warning-face)
    ;; Javadoc tags
    (list "\\(@[^ \n\r\t]+\\)"
-	 1 (cond ((boundp 'jdee-font-lock-doc-tag-face)
-		  'jdee-font-lock-doc-tag-face)
-		 (t
-		  'font-lock-constant-face)))
+         1 (cond ((boundp 'jdee-font-lock-doc-tag-face)
+                  'jdee-font-lock-doc-tag-face)
+                 (t
+                  'font-lock-constant-face)))
    ;; Misc.
    (list "\\[\\([fnpq]\\)\\]"
-	 1 'font-lock-keyword-face)
+         1 'font-lock-keyword-face)
    )
   "Keywords used to highlight the checker report buffer.")
 
@@ -719,7 +719,7 @@ Local to checker report buffer.")
        paragraph-start)
   (set (make-local-variable 'font-lock-defaults)
        '((jdee-javadoc-checker-report-font-lock-keywords)
-	 t t ((?_ . "w"))))
+         t t ((?_ . "w"))))
   (use-local-map jdee-javadoc-checker-report-mode-map)
   (turn-on-font-lock))
 
@@ -727,7 +727,7 @@ Local to checker report buffer.")
   "Show the `jdee-javadoc-checker' REPORT for TAG."
   (let ((buffer (semantic-tag-buffer tag)))
     (with-current-buffer
-	(get-buffer-create jdee-javadoc-checker-report-buffer)
+        (get-buffer-create jdee-javadoc-checker-report-buffer)
       (setq buffer-read-only nil)
       (erase-buffer)
       (jdee-javadoc-checker-report-mode)
@@ -735,32 +735,32 @@ Local to checker report buffer.")
       (set (make-local-variable 'jdee-javadoc-checker-tag)  tag)
       (cond
        (report
-	(define-key (current-local-map) "f" 'jdee-javadoc-checker-fix)
-	(insert (car report))
-	(newline 2)
-	(mapc   (function
-		 (lambda (line)
-		   (let* ((from (point))
-			  (to (progn
-				(fill-region
-				 (point)
-				 (progn
-				   (insert "  " line)
-				   (newline)
-				   (point)))
-				(point))))
-		     (goto-char from)
-		     (delete-char 1)
-		     (insert-char ?\* 1)
-		     (goto-char to))))
-		(cdr report))
-	(newline)
-	(insert "[f]-try to fix  ")
-	)
+        (define-key (current-local-map) "f" 'jdee-javadoc-checker-fix)
+        (insert (car report))
+        (newline 2)
+        (mapc   (function
+                 (lambda (line)
+                   (let* ((from (point))
+                          (to (progn
+                                (fill-region
+                                 (point)
+                                 (progn
+                                   (insert "  " line)
+                                   (newline)
+                                   (point)))
+                                (point))))
+                     (goto-char from)
+                     (delete-char 1)
+                     (insert-char ?\* 1)
+                     (goto-char to))))
+                (cdr report))
+        (newline)
+        (insert "[f]-try to fix  ")
+        )
        (t
-	(define-key (current-local-map) "f" nil)
-	(insert "Documentation is up-to-date")
-	(newline 2)))
+        (define-key (current-local-map) "f" nil)
+        (insert "Documentation is up-to-date")
+        (newline 2)))
       (insert "[p]-check previous  [n]-check next  [q]-quit")
       (goto-char (point-min))
       (setq buffer-read-only t)
@@ -769,26 +769,26 @@ Local to checker report buffer.")
        (get-buffer-window (current-buffer)))
       (sit-for 0)
       (save-selected-window
-	(let ((window (get-buffer-window buffer)))
-	  (if (not window)
-	      nil
-	    (select-window window)
-	    (goto-char (semantic-tag-start tag))
-	    (jdee-javadoc-skip-spaces-forward)
-	    (when (looking-at "/\\*\\*")
-	      (forward-comment 1)
-	      (jdee-javadoc-skip-spaces-forward))
-	    (recenter -4))))
+        (let ((window (get-buffer-window buffer)))
+          (if (not window)
+              nil
+            (select-window window)
+            (goto-char (semantic-tag-start tag))
+            (jdee-javadoc-skip-spaces-forward)
+            (when (looking-at "/\\*\\*")
+              (forward-comment 1)
+              (jdee-javadoc-skip-spaces-forward))
+            (recenter -4))))
       (semantic-momentary-highlight-tag tag))))
 
 (defun jdee-javadoc-check-add-summary (report type name)
   "Add a summary to REPORT error list, using tag TYPE and NAME."
   (and (setq report (delq nil report))  ;; Clear empty entries
        (let* ((count (length report))
-	      (eword (if (= count 1) "error" "errors")))
-	 (cons (format "%s `%s' has %d documentation %s:"
-		       type name count eword)
-	       (nreverse report)))))
+              (eword (if (= count 1) "error" "errors")))
+         (cons (format "%s `%s' has %d documentation %s:"
+                       type name count eword)
+               (nreverse report)))))
 
 ;; Basic doc checkers
 ;;
@@ -799,7 +799,7 @@ Local to checker report buffer.")
     "Missing description"))
 
 (defun jdee-javadoc-check-required-tags (doctree allowed extra
-						&rest nocheck)
+                                                &rest nocheck)
   "Return a message if DOCTREE is missing a required tag.
 ALLOWED and EXTRA are respectively the listes of allowed tags and
 optional ones.  Optional arguments NOCHECK can be a listes of tags
@@ -807,21 +807,21 @@ that are not checked."
   (let (tag missing)
     (while allowed
       (setq tag     (car allowed)
-	    allowed (cdr allowed))
+            allowed (cdr allowed))
       (or (member tag extra)
-	  (member tag nocheck)
-	  (let ((ignored nocheck) ignore)
-	    (while (and (not ignore) ignored)
-	      (setq ignore  (member tag (car ignored))
-		    ignored (cdr ignored)))
-	    ignore)
+          (member tag nocheck)
+          (let ((ignored nocheck) ignore)
+            (while (and (not ignore) ignored)
+              (setq ignore  (member tag (car ignored))
+                    ignored (cdr ignored)))
+            ignore)
 ;;          (member tag semantic-java-doc-with-name-tags)
-	  (jdee-javadoc-doctree-tag doctree tag)
-	  (setq missing (cons tag missing))))
+          (jdee-javadoc-doctree-tag doctree tag)
+          (setq missing (cons tag missing))))
     (if missing
-	(concat "Missing tag"
-		(if (> (length missing) 1) "s @" " @")
-		(mapconcat 'identity missing ", @")))))
+        (concat "Missing tag"
+                (if (> (length missing) 1) "s @" " @")
+                (mapconcat 'identity missing ", @")))))
 
 (defun jdee-javadoc-check-suggest-tag-order (tag-list reference)
   "Return a list of tags in suggested order from TAG-LIST.
@@ -829,53 +829,53 @@ REFERENCE is the list of tags allowed."
   (let (otl utl)
     (while tag-list
       (if (member (car tag-list) semantic-java-doc-line-tags)
-	  (and (member (car tag-list) reference)
-	       (add-to-list 'otl (car tag-list)))
-	(add-to-list 'utl (car tag-list)))
+          (and (member (car tag-list) reference)
+               (add-to-list 'otl (car tag-list)))
+        (add-to-list 'utl (car tag-list)))
       (setq tag-list (cdr tag-list)))
     (append (sort otl #'semantic-java-doc-keyword-before-p)
-	    (nreverse utl))))
+            (nreverse utl))))
 
 (defun jdee-javadoc-check-tag-ordered (doctree reference)
   "Return a message if tags in DOCTREE are not correctly ordered.
 REFERENCE is the list of allowed tags in correct order.  See variable
 `semantic-java-doc-line-tags'."
   (let* ((tag-list (jdee-javadoc-doctree-tag-list doctree))
-	 (tag      (car tag-list))
-	 (l        (cdr tag-list))
-	 (ok       t))
+         (tag      (car tag-list))
+         (l        (cdr tag-list))
+         (ok       t))
     (while (and l ok)
       (jdee-javadoc-dynamic-status)
       (setq ok  (semantic-java-doc-keyword-before-p tag (car l))
-	    tag (car l)
-	    l   (cdr l)))
+            tag (car l)
+            l   (cdr l)))
     (if ok
-	nil
+        nil
       (concat "Recommended tag order is @"
-	      (mapconcat 'identity
-			 (jdee-javadoc-check-suggest-tag-order
-			  tag-list reference)
-			 ", @")))))
+              (mapconcat 'identity
+                         (jdee-javadoc-check-suggest-tag-order
+                          tag-list reference)
+                         ", @")))))
 
 (defun jdee-javadoc-check-tag-allowed (doctree allowed)
   "Return a message if some tags in DOCTREE are not in ALLOWED.
 Third party tags (not in `semantic-java-doc-line-tags') are allways
 allowed."
   (let ((invalids
-	 (delq nil
-	       (mapcar
-		(function
-		 (lambda (tag)
-		   (jdee-javadoc-dynamic-status)
-		   (and (member tag semantic-java-doc-line-tags)
-			(not (member tag allowed))
-			tag)))
-		(jdee-javadoc-doctree-tag-list doctree)))))
+         (delq nil
+               (mapcar
+                (function
+                 (lambda (tag)
+                   (jdee-javadoc-dynamic-status)
+                   (and (member tag semantic-java-doc-line-tags)
+                        (not (member tag allowed))
+                        tag)))
+                (jdee-javadoc-doctree-tag-list doctree)))))
     (if (not invalids)
-	nil
+        nil
       (concat "Invalid tag"
-	      (if (> (length invalids) 1) "s @" " @")
-	      (mapconcat 'identity invalids ", @")))))
+              (if (> (length invalids) 1) "s @" " @")
+              (mapconcat 'identity invalids ", @")))))
 
 ;; Tag based doc checkers
 ;;
@@ -884,41 +884,41 @@ allowed."
 DOCTREE is the current doctree of TAG.  Return a non-nil report if
 errors were found."
   (let ((name (semantic-tag-name tag))
-	(type (semantic-tag-type tag))
-	(main (jdee-javadoc-checker-main-type-p tag))
-	report)
+        (type (semantic-tag-type tag))
+        (main (jdee-javadoc-checker-main-type-p tag))
+        report)
     ;; Check for missing description
     (jdee-javadoc-dynamic-status)
     (setq report
-	  (cons
-	   (jdee-javadoc-check-description doctree)
-	   report))
+          (cons
+           (jdee-javadoc-check-description doctree)
+           report))
     ;; Check for missing tags
     (jdee-javadoc-dynamic-status)
     (setq report
-	  (cons
-	   (jdee-javadoc-check-required-tags
-	    doctree semantic-java-doc-type-tags
-	    semantic-java-doc-extra-type-tags
-	    (if main
-		nil
-	      ;; Don't check these tags if internal type.
-	      '("author" "version" "since")))
-	   report))
+          (cons
+           (jdee-javadoc-check-required-tags
+            doctree semantic-java-doc-type-tags
+            semantic-java-doc-extra-type-tags
+            (if main
+                nil
+              ;; Don't check these tags if internal type.
+              '("author" "version" "since")))
+           report))
     ;; Check for incorrect tag order
     (jdee-javadoc-dynamic-status)
     (setq report
-	  (cons
-	   (jdee-javadoc-check-tag-ordered
-	    doctree semantic-java-doc-type-tags)
-	   report))
+          (cons
+           (jdee-javadoc-check-tag-ordered
+            doctree semantic-java-doc-type-tags)
+           report))
     ;; Check for invalid tags
     (jdee-javadoc-dynamic-status)
     (setq report
-	  (cons
-	   (jdee-javadoc-check-tag-allowed
-	    doctree semantic-java-doc-type-tags)
-	   report))
+          (cons
+           (jdee-javadoc-check-tag-allowed
+            doctree semantic-java-doc-type-tags)
+           report))
     ;; Setup the error summary
     (jdee-javadoc-dynamic-status)
     (jdee-javadoc-check-add-summary report type name)))
@@ -928,35 +928,35 @@ errors were found."
 DOCTREE is the current doctree of TAG.  Return a non-nil report if
 errors were found."
   (let ((name (semantic-tag-name tag))
-	report)
+        report)
     ;; Check for missing description
     (jdee-javadoc-dynamic-status)
     (setq report
-	  (cons
-	   (jdee-javadoc-check-description doctree)
-	   report))
+          (cons
+           (jdee-javadoc-check-description doctree)
+           report))
     ;; Check for missing tags
     (jdee-javadoc-dynamic-status)
     (setq report
-	  (cons
-	   (jdee-javadoc-check-required-tags
-	    doctree semantic-java-doc-variable-tags
-	    semantic-java-doc-extra-variable-tags)
-	   report))
+          (cons
+           (jdee-javadoc-check-required-tags
+            doctree semantic-java-doc-variable-tags
+            semantic-java-doc-extra-variable-tags)
+           report))
     ;; Check for incorrect tag order
     (jdee-javadoc-dynamic-status)
     (setq report
-	  (cons
-	   (jdee-javadoc-check-tag-ordered
-	    doctree semantic-java-doc-variable-tags)
-	   report))
+          (cons
+           (jdee-javadoc-check-tag-ordered
+            doctree semantic-java-doc-variable-tags)
+           report))
     ;; Check for invalid tags
     (jdee-javadoc-dynamic-status)
     (setq report
-	  (cons
-	   (jdee-javadoc-check-tag-allowed
-	    doctree semantic-java-doc-variable-tags)
-	   report))
+          (cons
+           (jdee-javadoc-check-tag-allowed
+            doctree semantic-java-doc-variable-tags)
+           report))
     ;; Setup the error summary
     (jdee-javadoc-dynamic-status)
     (jdee-javadoc-check-add-summary report "variable" name)))
@@ -966,40 +966,40 @@ errors were found."
 DOCTREE is the current doctree of TAG.  Return a non-nil report if
 errors were found."
   (let ((name   (semantic-tag-name               tag))
-	(type   (semantic-tag-type               tag))
-	(args   (semantic-tag-function-arguments      tag))
-	(throws (semantic-tag-function-throws    tag))
-	report items item)
+        (type   (semantic-tag-type               tag))
+        (args   (semantic-tag-function-arguments      tag))
+        (throws (semantic-tag-function-throws    tag))
+        report items item)
     ;; Check for missing description
     (jdee-javadoc-dynamic-status)
     (setq report
-	  (cons
-	   (jdee-javadoc-check-description doctree)
-	   report))
+          (cons
+           (jdee-javadoc-check-description doctree)
+           report))
     ;; Check for missing tags
     (jdee-javadoc-dynamic-status)
     (setq report
-	  (cons
-	   (jdee-javadoc-check-required-tags
-	    doctree semantic-java-doc-function-tags
-	    semantic-java-doc-extra-function-tags
-	    ;; Don't check return, param and exception/throws tags.
-	    '("return") semantic-java-doc-with-name-tags)
-	   report))
+          (cons
+           (jdee-javadoc-check-required-tags
+            doctree semantic-java-doc-function-tags
+            semantic-java-doc-extra-function-tags
+            ;; Don't check return, param and exception/throws tags.
+            '("return") semantic-java-doc-with-name-tags)
+           report))
     ;; Check for missing @param tags
     (setq items nil)
     (while args
       (jdee-javadoc-dynamic-status)
       (if (semantic-tag-p (car args))
-	  (progn
-	    (setq item (jdee-javadoc-variable-name
-			(semantic-tag-name (car args))))
-	    (setq items (cons item items))
-	    (or (jdee-javadoc-doctree-tag doctree "param" item)
-		(setq report
-		      (cons
-		       (format "Missing @param tag for `%s'" item)
-		       report)))))
+          (progn
+            (setq item (jdee-javadoc-variable-name
+                        (semantic-tag-name (car args))))
+            (setq items (cons item items))
+            (or (jdee-javadoc-doctree-tag doctree "param" item)
+                (setq report
+                      (cons
+                       (format "Missing @param tag for `%s'" item)
+                       report)))))
       (setq args (cdr args)))
     ;; Check for extra @param tags
     (setq args (jdee-javadoc-doctree-tag doctree "param"))
@@ -1007,8 +1007,8 @@ errors were found."
       (jdee-javadoc-dynamic-status)
       (setq item (jdee-javadoc-variable-name (cdr (car args))))
       (or (member item items)
-	  (setq report (cons (format "Invalid @param tag `%s'" item)
-			     report)))
+          (setq report (cons (format "Invalid @param tag `%s'" item)
+                             report)))
       (setq args (cdr args)))
     ;; Check for missing @exception tags
     (setq items nil)
@@ -1018,75 +1018,75 @@ errors were found."
       (setq items (cons item items))
       (setq throws (cdr throws))
       (or (jdee-javadoc-doctree-tag doctree "exception" item)
-	  (setq report
-		(cons
-		 (format "Missing @exception tag for `%s'" item)
-		 report))))
+          (setq report
+                (cons
+                 (format "Missing @exception tag for `%s'" item)
+                 report))))
     ;; Check for extra @exception tags
     (setq args (jdee-javadoc-doctree-tag doctree "exception"))
     (while args
       (jdee-javadoc-dynamic-status)
       (setq item (cdr (car args)))
       (or (member item items)
-	  (and jdee-javadoc-check-undeclared-exception-flag
-	       (jdee-javadoc-implicit-exception-p item))
-	  (setq report
-		(cons
-		 (format
-		  "Extra @exception tag `%s' (maybe not an error)"
-		  item)
-		 report)))
+          (and jdee-javadoc-check-undeclared-exception-flag
+               (jdee-javadoc-implicit-exception-p item))
+          (setq report
+                (cons
+                 (format
+                  "Extra @exception tag `%s' (maybe not an error)"
+                  item)
+                 report)))
       (setq args (cdr args)))
     ;; Check for missing or extra @return tag
     (setq item (jdee-javadoc-doctree-tag doctree "return"))
     (jdee-javadoc-dynamic-status)
     (cond ((and (not type) item)
-	   (setq report (cons "Invalid @return tag for constructor"
-			      report)))
-	  ((and type (string-equal type "void") item)
-	   (setq report (cons "Invalid @return tag for void method"
-			      report)))
-	  ((and type (not (string-equal type "void")) (not item))
-	   (setq report (cons "Missing @return tag"
-			      report))))
+           (setq report (cons "Invalid @return tag for constructor"
+                              report)))
+          ((and type (string-equal type "void") item)
+           (setq report (cons "Invalid @return tag for void method"
+                              report)))
+          ((and type (not (string-equal type "void")) (not item))
+           (setq report (cons "Missing @return tag"
+                              report))))
     ;; Check for incorrect tag order
     (jdee-javadoc-dynamic-status)
     (setq report
-	  (cons
-	   (jdee-javadoc-check-tag-ordered
-	    doctree semantic-java-doc-function-tags)
-	   report))
+          (cons
+           (jdee-javadoc-check-tag-ordered
+            doctree semantic-java-doc-function-tags)
+           report))
     ;; Check for invalid tags
     (jdee-javadoc-dynamic-status)
     (setq report
-	  (cons
-	   (jdee-javadoc-check-tag-allowed
-	    doctree semantic-java-doc-function-tags)
-	   report))
+          (cons
+           (jdee-javadoc-check-tag-allowed
+            doctree semantic-java-doc-function-tags)
+           report))
     ;; Setup the error summary
     (jdee-javadoc-dynamic-status)
     (jdee-javadoc-check-add-summary report
-				   (if type "method" "constructor")
-				   name)))
+                                   (if type "method" "constructor")
+                                   name)))
 
 (defun jdee-javadoc-checker (tag &optional noreport)
   "Call the javadoc checker associated to TAG.
 If optional NOREPORT is non-nil does not show error report.  Return a
 non-nil report if errors were found."
   (let* ((type    (semantic-tag-class tag))
-	 (checker (intern (format "jdee-javadoc-check-%s" type))))
+         (checker (intern (format "jdee-javadoc-check-%s" type))))
     (or (fboundp checker)
-	(error "No checker found to process '%S' tag" type))
+        (error "No checker found to process '%S' tag" type))
     (goto-char (semantic-tag-start tag))
     (recenter 1)
     (let (doctree report)
       (jdee-javadoc-status-forms "Checking" "done"
-	(jdee-javadoc-dynamic-status)
-	(setq doctree (jdee-javadoc-tag-doctree tag))
-	(setq report  (funcall checker tag doctree))
-	(or noreport
-	    (jdee-javadoc-checker-show-report report tag))
-	(jdee-javadoc-dynamic-status t))
+        (jdee-javadoc-dynamic-status)
+        (setq doctree (jdee-javadoc-tag-doctree tag))
+        (setq report  (funcall checker tag doctree))
+        (or noreport
+            (jdee-javadoc-checker-show-report report tag))
+        (jdee-javadoc-dynamic-status t))
       report)))
 
 (defcustom jdee-javadoc-checker-level 'protected
@@ -1097,16 +1097,16 @@ options.  That is:
 
 - - public    - check only public classes and members.
 - - protected - check only protected and public classes and
-		members.  This is the default.
+                members.  This is the default.
 - - package   - check only package, protected, and public classes
-		and members.
+                and members.
 - - private   - check all classes and members."
   :group 'jdee-javadoc
   :type  '(choice :tag "level"
-		  (const :tag "public"    public)
-		  (const :tag "protected" protected)
-		  (const :tag "package"   package)
-		  (const :tag "private"   private)))
+                  (const :tag "public"    public)
+                  (const :tag "protected" protected)
+                  (const :tag "package"   package)
+                  (const :tag "private"   private)))
 
 (defconst jdee-javadoc-access-level-weights
   '((public    . 8)
@@ -1126,38 +1126,38 @@ That is 'public 'package 'protected or 'private.  If TAG is included
 in other ones its access level is the lowest one found in the
 hierarchy."
   (let ((deps (semantic-find-tag-by-overlay
-	       (semantic-tag-start tag)
-	       (semantic-tag-buffer tag)))
-	last-type tag categ modifiers levels)
+               (semantic-tag-start tag)
+               (semantic-tag-buffer tag)))
+        last-type tag categ modifiers levels)
     (while deps
       (setq tag (car deps))
       (setq deps  (cdr deps))
       (setq categ (semantic-tag-class tag))
       (setq modifiers
-	    (cond
-	     ((eq categ 'type)
-	      (setq last-type (semantic-tag-type tag))
-	      (semantic-tag-modifiers tag))
-	     ((eq categ 'function)
-	      (if (string-equal last-type "interface")
-		  (list "public") ;; interface members are always public
-		(semantic-tag-modifiers tag)))
-	     ((eq categ 'variable)
-	      (if (string-equal last-type "interface")
-		  (list "public") ;; interface members are always public
-		(semantic-tag-modifiers tag)))
-	     (t ;; must never occurs
-	      (error "Invalid %s tag" categ))))
+            (cond
+             ((eq categ 'type)
+              (setq last-type (semantic-tag-type tag))
+              (semantic-tag-modifiers tag))
+             ((eq categ 'function)
+              (if (string-equal last-type "interface")
+                  (list "public") ;; interface members are always public
+                (semantic-tag-modifiers tag)))
+             ((eq categ 'variable)
+              (if (string-equal last-type "interface")
+                  (list "public") ;; interface members are always public
+                (semantic-tag-modifiers tag)))
+             (t ;; must never occurs
+              (error "Invalid %s tag" categ))))
       (setq levels
-	    (cons (cond ((member "public" modifiers)
-			 'public)
-			((member "protected" modifiers)
-			 'protected)
-			((member "private" modifiers)
-			 'private)
-			(t
-			 'package))
-		  levels)))
+            (cons (cond ((member "public" modifiers)
+                         'public)
+                        ((member "protected" modifiers)
+                         'protected)
+                        ((member "private" modifiers)
+                         'private)
+                        (t
+                         'package))
+                  levels)))
     (car (sort levels 'jdee-javadoc-access-level-lower-p))))
 
 (defun jdee-javadoc-checker-at-level-p (tag)
@@ -1168,10 +1168,10 @@ specified by `jdee-javadoc-checker-level'.  TAG category must be
   (let ((level (or jdee-javadoc-checker-level 'protected)))
     ;; if level is 'private check all
     (or (eq level 'private)
-	;; else check if tag access level >= checker level
-	(not (jdee-javadoc-access-level-lower-p
-	      (jdee-javadoc-tag-access-level tag)
-	      level)))))
+        ;; else check if tag access level >= checker level
+        (not (jdee-javadoc-access-level-lower-p
+              (jdee-javadoc-tag-access-level tag)
+              level)))))
 
 (defun jdee-javadoc-checker-main-type-p (&optional tag)
   "Return non-nil if TAG is a main type one.
@@ -1179,10 +1179,10 @@ That is not an internal class or interface."
   (setq tag (or tag (semantic-current-tag)))
   (and (eq (semantic-tag-class tag) 'type)
        (memq tag (semantic-brute-find-tag-by-class
-		    'type (current-buffer)))))
+                    'type (current-buffer)))))
 
 (defun jdee-javadoc-checker-do-find-previous-tag (tags &optional
-							  tag prev)
+                                                          tag prev)
   "Visit TAGS and return the tag before TAG.
 PREV is the last tag visited or nil at start.  If TAG is nil
 return the last tag found.  Return only a 'type 'function or
@@ -1193,25 +1193,25 @@ return the last tag found.  Return only a 'type 'function or
       (setq tags  (cdr tags))
       (setq categ   (semantic-tag-class current))
       (if (memq categ '(type function variable))
-	  (cond
-	   ((null tag)
-	    (if (null tags)
-		(throw 'found prev)))
-	   ((>= (semantic-tag-start current)
-		(semantic-tag-start tag))
-	    (throw 'found prev))
-	   (t
-	    (setq prev
-		  (if (eq categ 'type)
-		      (jdee-javadoc-checker-do-find-previous-tag
-		       (semantic-tag-type-members current)
-		       tag current)
-		    current))))
-	))
+          (cond
+           ((null tag)
+            (if (null tags)
+                (throw 'found prev)))
+           ((>= (semantic-tag-start current)
+                (semantic-tag-start tag))
+            (throw 'found prev))
+           (t
+            (setq prev
+                  (if (eq categ 'type)
+                      (jdee-javadoc-checker-do-find-previous-tag
+                       (semantic-tag-type-members current)
+                       tag current)
+                    current))))
+        ))
     prev))
 
 (defun jdee-javadoc-checker-find-previous-tag (tags
-						&optional tag)
+                                                &optional tag)
   "Visit TAGS and return the tag before TAG.
 If TAG is nil return the last tag found.  Return only a 'type
 'function or 'variable tag."
@@ -1227,14 +1227,14 @@ If TAG is nil return the first tag found.  Return only a 'type
       (setq current (car tags))
       (setq categ   (semantic-tag-class current))
       (if (memq categ '(type function variable))
-	  (if (or (null tag)
-		  (> (semantic-tag-start current)
-		     (semantic-tag-start tag)))
-	      (setq next current)
-	    (if (eq categ 'type)
-		(setq next (jdee-javadoc-checker-find-next-tag
-			    (semantic-tag-type-members current)
-			    tag)))))
+          (if (or (null tag)
+                  (> (semantic-tag-start current)
+                     (semantic-tag-start tag)))
+              (setq next current)
+            (if (eq categ 'type)
+                (setq next (jdee-javadoc-checker-find-next-tag
+                            (semantic-tag-type-members current)
+                            tag)))))
       (setq tags (cdr tags)))
     next))
 
@@ -1243,48 +1243,48 @@ If TAG is nil return the first tag found.  Return only a 'type
 Start checking before TAG if non-nil or at the last tag found."
   (pop-to-buffer buffer)
   (let* ((tags (semantic-fetch-tags))
-	 (prev   (jdee-javadoc-checker-find-previous-tag
-		  tags tag))
-	 (report (and prev
-		      (jdee-javadoc-checker-at-level-p prev)
-		      (jdee-javadoc-checker prev t))))
+         (prev   (jdee-javadoc-checker-find-previous-tag
+                  tags tag))
+         (report (and prev
+                      (jdee-javadoc-checker-at-level-p prev)
+                      (jdee-javadoc-checker prev t))))
     (while (and prev (not report))
       (setq prev   (jdee-javadoc-checker-find-previous-tag
-		    tags prev))
+                    tags prev))
       (setq report (and prev
-			(jdee-javadoc-checker-at-level-p prev)
-			(jdee-javadoc-checker prev t))))
+                        (jdee-javadoc-checker-at-level-p prev)
+                        (jdee-javadoc-checker prev t))))
     (if report
-	(jdee-javadoc-checker-show-report report prev)
+        (jdee-javadoc-checker-show-report report prev)
       (if tag
-	  (if (y-or-n-p "No more doc error found.  Quit? ")
-	      (jdee-javadoc-checker-quit)
-	    (jdee-javadoc-checker tag))
-	(message "No doc errors found")
-	(jdee-javadoc-checker-quit)))))
+          (if (y-or-n-p "No more doc error found.  Quit? ")
+              (jdee-javadoc-checker-quit)
+            (jdee-javadoc-checker tag))
+        (message "No doc errors found")
+        (jdee-javadoc-checker-quit)))))
 
 (defun jdee-javadoc-checker-next-tag (buffer &optional tag)
   "Report the next tag in BUFFER with documentation errors.
 Start checking after TAG if non-nil or at the first tag found."
   (pop-to-buffer buffer)
   (let* ((tags (semantic-fetch-tags))
-	 (next   (jdee-javadoc-checker-find-next-tag tags tag))
-	 (report (and next
-		      (jdee-javadoc-checker-at-level-p next)
-		      (jdee-javadoc-checker next t))))
+         (next   (jdee-javadoc-checker-find-next-tag tags tag))
+         (report (and next
+                      (jdee-javadoc-checker-at-level-p next)
+                      (jdee-javadoc-checker next t))))
     (while (and next (not report))
       (setq next   (jdee-javadoc-checker-find-next-tag tags next))
       (setq report (and next
-			(jdee-javadoc-checker-at-level-p next)
-			(jdee-javadoc-checker next t))))
+                        (jdee-javadoc-checker-at-level-p next)
+                        (jdee-javadoc-checker next t))))
     (if report
-	(jdee-javadoc-checker-show-report report next)
+        (jdee-javadoc-checker-show-report report next)
       (if tag
-	  (if (y-or-n-p "No more doc error found.  Quit? ")
-	      (jdee-javadoc-checker-quit)
-	    (jdee-javadoc-checker tag))
-	(message "No doc errors found")
-	(jdee-javadoc-checker-quit)))))
+          (if (y-or-n-p "No more doc error found.  Quit? ")
+              (jdee-javadoc-checker-quit)
+            (jdee-javadoc-checker tag))
+        (message "No doc errors found")
+        (jdee-javadoc-checker-quit)))))
 
 ;;;; Doc generator
 ;;;; -------------
@@ -1296,11 +1296,11 @@ If *NAME* value is nil *TEXTS* are inserted if non-nil.  If *NAME* and
 The name of variables local to this function are enclosed between
 \"*\" to avoid conflicts with variables used in templates."
   (cond ((and *name* (symbolp *name*) (symbol-value *name*))
-	 (tempo-insert-template *name* nil)
-	 (newline))
-	(*texts*
-	 (apply #'insert *texts*)
-	 (newline))))
+         (tempo-insert-template *name* nil)
+         (newline))
+        (*texts*
+         (apply #'insert *texts*)
+         (newline))))
 
 ;; Basic generators
 ;;
@@ -1322,12 +1322,12 @@ The name of variables local to this function are enclosed between
 (defun jdee-javadoc-insert-previous-description (doctree)
   "Insert a javadoc description if it already exists in DOCTREE."
   (let ((previous (jdee-javadoc-doctree-tag
-		   doctree jdee-javadoc-desc-tag)))
+                   doctree jdee-javadoc-desc-tag)))
     (if previous
-	(jdee-javadoc-insert
-	 nil
-	 "/**"
-	 (jdee-javadoc-normalize-description (car (car previous)))))
+        (jdee-javadoc-insert
+         nil
+         "/**"
+         (jdee-javadoc-normalize-description (car (car previous)))))
     previous))
 
 (defun jdee-javadoc-insert-previous-tag (doctree tag &optional key)
@@ -1335,12 +1335,12 @@ The name of variables local to this function are enclosed between
 If optional KEY is non-nil insert its specific value."
   (let ((previous (jdee-javadoc-doctree-tag doctree tag key)))
     (if previous
-	(jdee-javadoc-map
-	 (function
-	  (lambda (item)
-	    (jdee-javadoc-dynamic-status)
-	    (jdee-javadoc-insert nil "* @" tag (car item))))
-	 previous))
+        (jdee-javadoc-map
+         (function
+          (lambda (item)
+            (jdee-javadoc-dynamic-status)
+            (jdee-javadoc-insert nil "* @" tag (car item))))
+         previous))
     previous))
 
 (defun jdee-javadoc-insert-unknown-tags (doctree)
@@ -1393,9 +1393,9 @@ If tag already exists in DOCTREE keep it, else insert a new default
 one using parameter TYPE and NAME."
   (or (jdee-javadoc-insert-previous-tag doctree "param" name)
       (and type (not (string= type ""))
-	   name (not (string= name ""))
-	   (jdee-javadoc-insert
-	    'tempo-template-jdee-javadoc-param-tag))))
+           name (not (string= name ""))
+           (jdee-javadoc-insert
+            'tempo-template-jdee-javadoc-param-tag))))
 
 (defun jdee-javadoc-insert-exception-tag (doctree types)
   "Insert javadoc @exception tags.
@@ -1406,9 +1406,9 @@ one for each exception in TYPES."
     (lambda (type)
       (jdee-javadoc-dynamic-status)
       (or (jdee-javadoc-insert-previous-tag doctree "exception" type)
-	  (and type (not (string= type ""))
-	       (jdee-javadoc-insert
-		'tempo-template-jdee-javadoc-exception-tag)))))
+          (and type (not (string= type ""))
+               (jdee-javadoc-insert
+                'tempo-template-jdee-javadoc-exception-tag)))))
    types)
   ;; Keep extra exception tags (maybe not invalid tags)
   (jdee-javadoc-map
@@ -1417,10 +1417,10 @@ one for each exception in TYPES."
       (jdee-javadoc-dynamic-status)
       (setq type (cdr type))
       (or (member type types)
-	  (if (or (not jdee-javadoc-check-undeclared-exception-flag)
-		  (jdee-javadoc-implicit-exception-p type))
-	      (jdee-javadoc-insert-previous-tag
-	       doctree "exception" type)))))
+          (if (or (not jdee-javadoc-check-undeclared-exception-flag)
+                  (jdee-javadoc-implicit-exception-p type))
+              (jdee-javadoc-insert-previous-tag
+               doctree "exception" type)))))
    (jdee-javadoc-doctree-tag doctree "exception")))
 
 (defun jdee-javadoc-insert-return-tag (doctree type)
@@ -1429,8 +1429,8 @@ If tag already exists in DOCTREE keep it, else insert a new default
 one using return TYPE."
   (and type (not (string= type "void"))
        (or (jdee-javadoc-insert-previous-tag doctree "return")
-	   (jdee-javadoc-insert
-	    'tempo-template-jdee-javadoc-return-tag))))
+           (jdee-javadoc-insert
+            'tempo-template-jdee-javadoc-return-tag))))
 
 (defun jdee-javadoc-insert-field-desc (doctree modifiers type name)
   "Insert a field description.
@@ -1451,10 +1451,10 @@ default constructor description."
       nil
     (jdee-javadoc-insert-start-block)
     (if (and name (not (string= name "")))
-	(jdee-javadoc-insert
-	 (if (and type (not (string= type "")))
-	     'tempo-template-jdee-javadoc-describe-method
-	   'tempo-template-jdee-javadoc-describe-constructor)))
+        (jdee-javadoc-insert
+         (if (and type (not (string= type "")))
+             'tempo-template-jdee-javadoc-describe-method
+           'tempo-template-jdee-javadoc-describe-constructor)))
     (jdee-javadoc-insert-empty-line)))
 
 (defun jdee-javadoc-insert-class-desc (doctree name)
@@ -1481,7 +1481,7 @@ default one using interface NAME."
 ;; Main generators
 ;;
 (defun jdee-javadoc-type-doc (modifiers type name parents main
-				       &optional doctree)
+                                       &optional doctree)
   "Document a class or interface using MODIFIERS TYPE NAME PARENTS.
 If MAIN is non-nil this is a main class or interface (not internal).
 If description and tags already exist in DOCTREE keep them."
@@ -1500,9 +1500,9 @@ If description and tags already exist in DOCTREE keep them."
   ;; Keep extra optional tags if they already exist
   (jdee-javadoc-dynamic-status)
   (jdee-javadoc-map (function
-		    (lambda (tag)
-		      (jdee-javadoc-insert-previous-tag doctree tag)))
-		   semantic-java-doc-extra-type-tags)
+                    (lambda (tag)
+                      (jdee-javadoc-insert-previous-tag doctree tag)))
+                   semantic-java-doc-extra-type-tags)
   ;; Keep unknown (not Sun's) tags
   (jdee-javadoc-insert-unknown-tags doctree)
   ;; The end of comment block
@@ -1510,16 +1510,16 @@ If description and tags already exist in DOCTREE keep them."
   (jdee-javadoc-insert-end-block t))
 
 (defun jdee-javadoc-variable-doc (modifiers type name
-					   &optional doctree)
+                                           &optional doctree)
   "Document a field using MODIFIERS TYPE NAME.
 If description and tags already exist in DOCTREE keep them."
   ;; description
   (jdee-javadoc-insert-field-desc doctree modifiers type name)
   ;; Keep extra optional tags if they already exist
   (jdee-javadoc-map (function
-		    (lambda (tag)
-		      (jdee-javadoc-insert-previous-tag doctree tag)))
-		   semantic-java-doc-extra-variable-tags)
+                    (lambda (tag)
+                      (jdee-javadoc-insert-previous-tag doctree tag)))
+                   semantic-java-doc-extra-variable-tags)
   ;; Keep unknown (not Sun's) tags
   (jdee-javadoc-insert-unknown-tags doctree)
   ;; The end of comment block
@@ -1532,14 +1532,14 @@ If tags already exist in DOCTREE keep them."
    (function
     (lambda (tag)
       (if (semantic-tag-p tag)      ; because TAGS can be (nil)
-	  (let ((modifiers (semantic-tag-modifiers tag))
-		(type      (semantic-tag-type               tag))
-		(name      (semantic-tag-name               tag)))
-	    (jdee-javadoc-insert-param-tag doctree type name)))))
+          (let ((modifiers (semantic-tag-modifiers tag))
+                (type      (semantic-tag-type               tag))
+                (name      (semantic-tag-name               tag)))
+            (jdee-javadoc-insert-param-tag doctree type name)))))
    tags))
 
 (defun jdee-javadoc-function-doc (modifiers type name args throws
-					   &optional doctree)
+                                           &optional doctree)
   "Document a function using MODIFIERS TYPE NAME ARGS THROWS.
 If description and tags already exist in DOCTREE keep them."
   ;; description
@@ -1552,9 +1552,9 @@ If description and tags already exist in DOCTREE keep them."
   (jdee-javadoc-insert-exception-tag doctree throws)
   ;; Keep extra optional tags if they already exist
   (jdee-javadoc-map (function
-		    (lambda (tag)
-		      (jdee-javadoc-insert-previous-tag doctree tag)))
-		   semantic-java-doc-extra-function-tags)
+                    (lambda (tag)
+                      (jdee-javadoc-insert-previous-tag doctree tag)))
+                   semantic-java-doc-extra-function-tags)
   ;; Keep unknown (not Sun's) tags
   (jdee-javadoc-insert-unknown-tags doctree)
   ;; The end of comment block
@@ -1566,10 +1566,10 @@ If description and tags already exist in DOCTREE keep them."
   "Document a 'type' (class or interface) TAG.
 DOCTREE is the current doctree of TAG."
   (let ((modifiers  (semantic-tag-modifiers tag))
-	(type       (semantic-tag-type               tag))
-	(name       (semantic-tag-name               tag))
-	(parents    (semantic-tag-type-superclasses  tag))
-	(main       (jdee-javadoc-checker-main-type-p tag)))
+        (type       (semantic-tag-type               tag))
+        (name       (semantic-tag-name               tag))
+        (parents    (semantic-tag-type-superclasses  tag))
+        (main       (jdee-javadoc-checker-main-type-p tag)))
     (jdee-javadoc-dynamic-status)
     (jdee-javadoc-type-doc modifiers type name parents main doctree)))
 
@@ -1577,8 +1577,8 @@ DOCTREE is the current doctree of TAG."
   "Document a 'variable' (field) TAG.
 DOCTREE is the current doctree of TAG."
   (let ((modifiers  (semantic-tag-modifiers tag))
-	(type       (semantic-tag-type               tag))
-	(name       (semantic-tag-name               tag)))
+        (type       (semantic-tag-type               tag))
+        (name       (semantic-tag-name               tag)))
     (jdee-javadoc-dynamic-status)
     (jdee-javadoc-variable-doc modifiers type name doctree)))
 
@@ -1586,10 +1586,10 @@ DOCTREE is the current doctree of TAG."
   "Document a 'function' (method or constructor) TAG.
 DOCTREE is the current doctree of TAG."
   (let ((modifiers  (semantic-tag-modifiers tag))
-	(type       (semantic-tag-type               tag))
-	(name       (semantic-tag-name               tag))
-	(args       (semantic-tag-function-arguments tag))
-	(throws     (semantic-tag-function-throws    tag)))
+        (type       (semantic-tag-type               tag))
+        (name       (semantic-tag-name               tag))
+        (args       (semantic-tag-function-arguments tag))
+        (throws     (semantic-tag-function-throws    tag)))
     (jdee-javadoc-dynamic-status)
     (jdee-javadoc-function-doc
      modifiers type name args throws doctree)))
@@ -1599,32 +1599,32 @@ DOCTREE is the current doctree of TAG."
 Require confirmation to delete existing documentation if optional
 NOCONFIRM is non-nil."
   (let* ((type      (semantic-tag-class tag))
-	 (generator (intern (format "jdee-javadoc-%s" type)))
-	 (checker   (intern (format "jdee-javadoc-check-%s" type))))
+         (generator (intern (format "jdee-javadoc-%s" type)))
+         (checker   (intern (format "jdee-javadoc-check-%s" type))))
     (or (fboundp generator)
-	(error "No generator found to process '%S' tag" type))
+        (error "No generator found to process '%S' tag" type))
     (goto-char (semantic-tag-start tag))
     (let ((report t) doctree)
       (jdee-javadoc-status-forms "Updating" "done"
-	(jdee-javadoc-dynamic-status)
-	(setq doctree (jdee-javadoc-tag-doctree tag))
-	(if (and (fboundp checker)
-		 (not (funcall checker tag doctree)))
-	    (setq report nil)
-	  (let ((seas semantic-edits-are-safe))
-	    (make-local-variable 'semantic-edits-are-safe)
-	    (unwind-protect
-		(progn
-		  (setq semantic-edits-are-safe t)
-		  (when (or (not doctree)
-			    (jdee-javadoc-delete-documentation
-			     tag noconfirm))
-		    (funcall generator tag doctree)
-		    (jdee-javadoc-indent-documentation tag)))
-	      (setq semantic-edits-are-safe seas))))
-	(jdee-javadoc-dynamic-status t))
+        (jdee-javadoc-dynamic-status)
+        (setq doctree (jdee-javadoc-tag-doctree tag))
+        (if (and (fboundp checker)
+                 (not (funcall checker tag doctree)))
+            (setq report nil)
+          (let ((seas semantic-edits-are-safe))
+            (make-local-variable 'semantic-edits-are-safe)
+            (unwind-protect
+                (progn
+                  (setq semantic-edits-are-safe t)
+                  (when (or (not doctree)
+                            (jdee-javadoc-delete-documentation
+                             tag noconfirm))
+                    (funcall generator tag doctree)
+                    (jdee-javadoc-indent-documentation tag)))
+              (setq semantic-edits-are-safe seas))))
+        (jdee-javadoc-dynamic-status t))
       (or report
-	  (message "Documentation is up-to-date")))))
+          (message "Documentation is up-to-date")))))
 
 ;;;; Misc command auxiliaries
 ;;;; ------------------------
@@ -1635,10 +1635,10 @@ NOCONFIRM is non-nil."
     ;; Preserve current tags when the lexer fails (when there is an
     ;; unclosed block or an unterminated string for example).
     (let ((semantic-flex-unterminated-syntax-end-function
-	   #'(lambda (syntax &rest ignore)
-	       (throw 'jdee-javadoc-flex-error syntax))))
+           #'(lambda (syntax &rest ignore)
+               (throw 'jdee-javadoc-flex-error syntax))))
       (catch 'jdee-javadoc-flex-error
-	(semantic-fetch-tags))))
+        (semantic-fetch-tags))))
   (save-excursion
     ;; Move the point to the first non-blank character found.  Skip
     ;; spaces, tabs and newlines.
@@ -1661,21 +1661,21 @@ See also variable `jdee-javadoc-checkdoc-excursion'."
   "Save window configuration and point.
 See also function `jdee-javadoc-checkdoc-restore-excursion'."
   (setq jdee-javadoc-checkdoc-excursion
-	(vector (current-window-configuration)
-		(point))))
+        (vector (current-window-configuration)
+                (point))))
 
 (defun jdee-javadoc-checkdoc-restore-excursion ()
   "Restore window configuration and point.
 See also function `jdee-javadoc-checkdoc-save-excursion'."
   (let ((ex jdee-javadoc-checkdoc-excursion))
     (and (vectorp ex)
-	 (window-configuration-p (aref ex 0))
-	 (integer-or-marker-p    (aref ex 1))
-	 (condition-case nil
-	     (progn
-	       (set-window-configuration (aref ex 0))
-	       (goto-char                (aref ex 1)))
-	   (error nil)))
+         (window-configuration-p (aref ex 0))
+         (integer-or-marker-p    (aref ex 1))
+         (condition-case nil
+             (progn
+               (set-window-configuration (aref ex 0))
+               (goto-char                (aref ex 1)))
+           (error nil)))
     (jdee-javadoc-checkdoc-clear-excursion)))
 
 ;;;; Commands
@@ -1687,7 +1687,7 @@ See also function `jdee-javadoc-checkdoc-save-excursion'."
   (interactive)
   (and (eq major-mode 'jdee-javadoc-checker-report-mode)
        (jdee-javadoc-checker-previous-tag
-	jdee-javadoc-checker-buffer jdee-javadoc-checker-tag)))
+        jdee-javadoc-checker-buffer jdee-javadoc-checker-tag)))
 
 ;;;###autoload
 (defun jdee-javadoc-checker-next ()
@@ -1695,7 +1695,7 @@ See also function `jdee-javadoc-checkdoc-save-excursion'."
   (interactive)
   (and (eq major-mode 'jdee-javadoc-checker-report-mode)
        (jdee-javadoc-checker-next-tag jdee-javadoc-checker-buffer
-				       jdee-javadoc-checker-tag)))
+                                       jdee-javadoc-checker-tag)))
 ;;;###autoload
 (defun jdee-javadoc-checker-fix ()
   "Fix documentation of checked tag.
@@ -1703,14 +1703,14 @@ Used in `jdee-javadoc-checker-report-mode'."
   (interactive)
   (and (eq major-mode 'jdee-javadoc-checker-report-mode)
        (let ((tag  jdee-javadoc-checker-tag)
-	     (buffer jdee-javadoc-checker-buffer))
-	 (when (and tag buffer)
-	   (pop-to-buffer buffer)
-	   (goto-char (semantic-tag-start tag))
-	   ;; do the fix (THE POINT STAY AT TAG START POSITION)
-	   (jdee-javadoc-generator tag t)
-	   ;; recheck the tag
-	   (jdee-javadoc-checker tag)))))
+             (buffer jdee-javadoc-checker-buffer))
+         (when (and tag buffer)
+           (pop-to-buffer buffer)
+           (goto-char (semantic-tag-start tag))
+           ;; do the fix (THE POINT STAY AT TAG START POSITION)
+           (jdee-javadoc-generator tag t)
+           ;; recheck the tag
+           (jdee-javadoc-checker tag)))))
 
 ;;;###autoload
 (defun jdee-javadoc-checker-quit ()
@@ -1719,7 +1719,7 @@ Used in `jdee-javadoc-checker-report-mode'."
   (interactive)
   (let ((buffer (get-buffer jdee-javadoc-checker-report-buffer)))
     (if (bufferp buffer)
-	(kill-buffer buffer))
+        (kill-buffer buffer))
     (jdee-javadoc-checkdoc-restore-excursion)))
 
 ;;;###autoload
@@ -1833,7 +1833,7 @@ See also the `jdee-javadoc-field-type', `jdee-javadoc-a' and
       (error "Major mode must be 'jdee-mode'"))
   (let ((found (jdee-javadoc-nonterminal-at-line)))
     (if found
-	(jdee-javadoc-generator found)
+        (jdee-javadoc-generator found)
       (error "No tag found at point"))))
 
 ;;;###autoload
@@ -1846,7 +1846,7 @@ This uses `jdee-javadoc-nonterminal-at-line' to find declarations."
   (jdee-assert-source-buffer)
   (let ((found (jdee-javadoc-nonterminal-at-line)))
     (if (not found)
-	(error "No tag found at point")
+        (error "No tag found at point")
       (jdee-javadoc-delete-documentation found current-prefix-arg))))
 
 ;;;###autoload
@@ -1862,7 +1862,7 @@ LINE OF THE CLASS OR METHOD DECLARATION.  IF NOT RESULT IS UNCERTAIN."
   (jdee-assert-source-buffer)
   (let ((found (jdee-javadoc-nonterminal-at-line)))
     (if (not found)
-	(error "No tag found at point")
+        (error "No tag found at point")
       (jdee-javadoc-checkdoc-save-excursion)
       (jdee-javadoc-checker found))))
 
@@ -1889,18 +1889,18 @@ Report the next tag with documentation errors."
 START, the start position in the buffer.
 END, the end position in the buffer."
   (interactive (if mark-active
-		   (list (region-beginning) (region-end))
-		 (list (point-min) (point-max))))
+                   (list (region-beginning) (region-end))
+                 (list (point-min) (point-max))))
   (save-excursion
     (save-restriction
       (narrow-to-region start end)
       (goto-char (point-min))
       (while (re-search-forward
-	      "^\\([ \t]*\\/\\*\\(?:.\\|[.\n]\\)*?\\*\\/[ \t]*\n\\)"
-	      nil t)
-	(replace-match ""))
+              "^\\([ \t]*\\/\\*\\(?:.\\|[.\n]\\)*?\\*\\/[ \t]*\n\\)"
+              nil t)
+        (replace-match ""))
       (while (re-search-forward "^[ \t]*\\/\\/.*\n" nil t)
-	(replace-match "")))))
+        (replace-match "")))))
 
 ;;;###autoload
 (defun jdee-javadoc-enable-menu-p ()
@@ -1908,23 +1908,23 @@ END, the end position in the buffer."
 That is point is on the first line of a class, method, or field
 definition."
   (let ((p (save-excursion (beginning-of-line) (point)))
-	(tag-at-line (jdee-javadoc-nonterminal-at-line))
-	start end)
+        (tag-at-line (jdee-javadoc-nonterminal-at-line))
+        start end)
     (and tag-at-line
-	 (memq (semantic-tag-class tag-at-line)
-	       '(function type variable))
-	 (save-excursion
-	   (setq start
-		 (progn
-		   (goto-char (semantic-tag-start tag-at-line))
-		   (beginning-of-line)
-		   (point)))
-	   (setq end (or (re-search-forward "[;={]")
-			 (progn
-			   (goto-char p)
-			   (end-of-line)
-			   (point))))
-	   (and (>= p start) (<= p end))))))
+         (memq (semantic-tag-class tag-at-line)
+               '(function type variable))
+         (save-excursion
+           (setq start
+                 (progn
+                   (goto-char (semantic-tag-start tag-at-line))
+                   (beginning-of-line)
+                   (point)))
+           (setq end (or (re-search-forward "[;={]")
+                         (progn
+                           (goto-char p)
+                           (end-of-line)
+                           (point))))
+           (and (>= p start) (<= p end))))))
 
 ;; Register and initialize the customization variables defined
 ;; by this package.

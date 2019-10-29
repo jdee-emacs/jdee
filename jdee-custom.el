@@ -46,8 +46,8 @@ restoring it to the state of a variable that has never been customized."
   '(("Save in JDEE Project File" jdee-custom-variable-set
      (lambda (widget)
        (and
-	(eq (widget-get widget :custom-state) 'modified)
-	(string-match "^jdee-" (symbol-name (widget-value widget))))))
+        (eq (widget-get widget :custom-state) 'modified)
+        (string-match "^jdee-" (symbol-name (widget-value widget))))))
     ("Set for Current Session" custom-variable-set
      (lambda (widget)
        (eq (widget-get widget :custom-state) 'modified)))
@@ -57,18 +57,18 @@ restoring it to the state of a variable that has never been customized."
     ("Reset to Current" custom-redraw
      (lambda (widget)
        (and (default-boundp (widget-value widget))
-	    (memq (widget-get widget :custom-state) '(modified changed)))))
+            (memq (widget-get widget :custom-state) '(modified changed)))))
     ("Reset to Saved" custom-variable-reset-saved
      (lambda (widget)
        (and (or (get (widget-value widget) 'saved-value)
-		(get (widget-value widget) 'saved-variable-comment))
-	    (memq (widget-get widget :custom-state)
-		  '(modified set changed rogue)))))
+                (get (widget-value widget) 'saved-variable-comment))
+            (memq (widget-get widget :custom-state)
+                  '(modified set changed rogue)))))
     ("Erase Customization" jdee-custom-variable-reset-standard
      (lambda (widget)
        (and (get (widget-value widget) 'standard-value)
-	    (memq (widget-get widget :custom-state)
-		  '(modified set changed saved rogue)))))
+            (memq (widget-get widget :custom-state)
+                  '(modified set changed saved rogue)))))
     ("---" ignore ignore)
     ("Add Comment" custom-comment-show custom-comment-invisible-p)
     ("---" ignore ignore)
@@ -95,14 +95,14 @@ Optional EVENT is the location for the menu."
       (custom-variable-state-set widget))
     (custom-redraw-magic widget)
     (let* ((completion-ignore-case t)
-	   (answer (widget-choose (concat "Operation on "
-					  (custom-unlispify-tag-name
-					   (widget-get widget :value)))
-				  (custom-menu-filter jdee-custom-variable-menu
-						      widget)
-				  event)))
+           (answer (widget-choose (concat "Operation on "
+                                          (custom-unlispify-tag-name
+                                           (widget-get widget :value)))
+                                  (custom-menu-filter jdee-custom-variable-menu
+                                                      widget)
+                                  event)))
       (if answer
-	  (funcall answer widget)))))
+          (funcall answer widget)))))
 
 
 (define-widget 'jdee-custom-variable 'custom
@@ -132,18 +132,18 @@ Optional EVENT is the location for the menu."
   (unless (get symbol 'custom-type)
     (error "Variable %s cannot be customized" symbol))
   (custom-buffer-create (list (list symbol 'jdee-custom-variable))
-			(format "*Customize Option: %s*"
-				(custom-unlispify-tag-name symbol))))
+                        (format "*Customize Option: %s*"
+                                (custom-unlispify-tag-name symbol))))
 
 
 (defun jdee-custom-adjust-group (group)
   (let ((symbol-specs (get group 'custom-group)))
     (dolist (spec symbol-specs)
       (let ((symbol (nth 0 spec))
-	    (symbol-type (nth 1 spec)))
-	(if (eq symbol-type 'custom-group)
-	    (jdee-custom-adjust-group symbol)
-	  (setcdr spec (list 'jdee-custom-variable)))))))
+            (symbol-type (nth 1 spec)))
+        (if (eq symbol-type 'custom-group)
+            (jdee-custom-adjust-group symbol)
+          (setcdr spec (list 'jdee-custom-variable)))))))
 
 (defun jdee-custom-adjust-groups ()
   "Change the symbol type in the symbol spec lists for all

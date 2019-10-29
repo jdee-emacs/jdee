@@ -39,7 +39,7 @@
 
 (defvar jdee-project-menu-definition
   (list "JDEEPrj"
-	["New"   jdee-project-create-project t])
+        ["New"   jdee-project-create-project t])
   "Defines the JDEE project menu.")
 
 (defvar jdee-project-keymap (make-sparse-keymap)
@@ -193,14 +193,14 @@ PATH-TYPE is either `global classpath' for `jdee-global-classpath' or
   (interactive
    (list (completing-read "Path: " '("global classpath" "source path") nil t)))
   (let ((user-home (expand-file-name "~/"))
-	path-name path desc)
+        path-name path desc)
     (if (equal "source path" path-type)
-	(setq path-name "Source Path"
+        (setq path-name "Source Path"
               path jdee-sourcepath)
       (setq path-name "Global Classpath"
             path jdee-global-classpath))
     (with-current-buffer
-	(or buf (get-buffer-create (format "*JDEE %s*" path-name)))
+        (or buf (get-buffer-create (format "*JDEE %s*" path-name)))
       (setq truncate-lines t)
       (erase-buffer)
       (insert (format "%s:
@@ -209,11 +209,11 @@ f:      file
 blank:  path doesn't exist
 --------------------------\n" path-name))
       (dolist (file path)
-	(setq desc (cond ((file-directory-p file) "d")
-			 ((file-exists-p file) "f")
-			 (t " ")))
-	(setq file (replace-regexp-in-string "~/" user-home file nil t))
-	(insert (format "[%s]  %s\n" desc file)))
+        (setq desc (cond ((file-directory-p file) "d")
+                         ((file-exists-p file) "f")
+                         (t " ")))
+        (setq file (replace-regexp-in-string "~/" user-home file nil t))
+        (insert (format "[%s]  %s\n" desc file)))
       (goto-char (point-min))
       (unless buf (pop-to-buffer (current-buffer))))))
 

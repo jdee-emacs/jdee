@@ -89,20 +89,20 @@ list of arguments entered in the minibuffer."
 (defun jdee-make-make-command (more-args)
   "Constructs the java compile command as: jdee-compiler + options + buffer file name."
   (concat jdee-make-program " " jdee-make-args
-	  (if (not (string= more-args ""))
-	      (concat " " more-args))
-	  " "))
+          (if (not (string= more-args ""))
+              (concat " " more-args))
+          " "))
 
 (defun jdee-make-find-build-file (dir)
   "Find the next Makefile upwards in the directory tree from DIR.
 Returns nil if it cannot find a project file in DIR or an ascendmake directory."
   (let ((file (cl-find "Makefile"
-		       (directory-files dir) :test 'string=)))
+                       (directory-files dir) :test 'string=)))
 
     (if file
-	(setq file (expand-file-name file dir))
+        (setq file (expand-file-name file dir))
       (if (not (jdee-root-dir-p dir))
-	  (setq file (jdee-make-find-build-file (concat dir "../")))))
+          (setq file (jdee-make-find-build-file (concat dir "../")))))
 
     file))
 
@@ -125,19 +125,19 @@ enter to the make program along with the arguments specified by
     (setq jdee-interactive-make-args ""))
 
   (let ((make-command
-	 (jdee-make-make-command
-	  jdee-interactive-make-args))
-	(save-default-directory default-directory)
-	(default-directory
-	  (if (string= jdee-make-working-directory "")
-	      (if jdee-make-enable-find
-		  (let ((jdee-make-buildfile
-			 (jdee-make-find-build-file default-directory)))
-		    (if jdee-make-buildfile
-			(file-name-directory jdee-make-buildfile)
-		      default-directory))
-		default-directory)
-	    (jdee-normalize-path 'jdee-make-working-directory))))
+         (jdee-make-make-command
+          jdee-interactive-make-args))
+        (save-default-directory default-directory)
+        (default-directory
+          (if (string= jdee-make-working-directory "")
+              (if jdee-make-enable-find
+                  (let ((jdee-make-buildfile
+                         (jdee-make-find-build-file default-directory)))
+                    (if jdee-make-buildfile
+                        (file-name-directory jdee-make-buildfile)
+                      default-directory))
+                default-directory)
+            (jdee-normalize-path 'jdee-make-working-directory))))
 
 
     ;; Force save-some-buffers to use the minibuffer
@@ -147,13 +147,13 @@ enter to the make program along with the arguments specified by
     ;; which seems not to be supported--at least on
     ;; the PC.
     (if (eq system-type 'windows-nt)
-	(let ((temp last-nonmenu-event))
-	  ;; The next line makes emacs think that jdee-make
-	  ;; was invoked from the minibuffer, even when it
-	  ;; is actually invoked from the menu-bar.
-	  (setq last-nonmenu-event t)
-	  (save-some-buffers (not compilation-ask-about-save) nil)
-	  (setq last-nonmenu-event temp))
+        (let ((temp last-nonmenu-event))
+          ;; The next line makes emacs think that jdee-make
+          ;; was invoked from the minibuffer, even when it
+          ;; is actually invoked from the menu-bar.
+          (setq last-nonmenu-event t)
+          (save-some-buffers (not compilation-ask-about-save) nil)
+          (setq last-nonmenu-event temp))
       (save-some-buffers (not compilation-ask-about-save) nil))
 
     (setq compilation-finish-functions

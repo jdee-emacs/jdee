@@ -119,10 +119,10 @@ be an interactive function that can be called by
   :group 'jdee-project
   :safe (lambda (val) (member val '(jdee-make jdee-ant-build jdee-maven-build)))
   :type '(radio
-	  (const :tag "Make" jdee-make)
-	  (const :tag "Ant" jdee-ant-build)
-	  (const :tag "Maven" jdee-maven-build)
-	  (function :tag "Custom function" identity)))
+          (const :tag "Make" jdee-make)
+          (const :tag "Ant" jdee-ant-build)
+          (const :tag "Maven" jdee-maven-build)
+          (function :tag "Custom function" identity)))
 
 ;;(makunbound 'jdee-debugger)
 (defcustom jdee-debugger (list "jdb")
@@ -133,23 +133,23 @@ are using JDK 1.2.2 or later and want to use the the old (e.g., pre-JPDA)
 version of jdb instead of the new (JPDA-based) version of jdb."
   :group 'jdee-project
   :type '(list
-	  (radio-button-choice
+          (radio-button-choice
            (item "jdb")
            (item "old jdb")))
   :set '(lambda (sym val)
-	  (mapc
-	   (lambda (buff)
-	     (save-excursion
-	       (set-buffer buff)
-	       (if (string= (car val) "JDEbug")
-		   (progn
-		     (jdee-jdb-minor-mode -1)
-		     (jdee-bug-minor-mode 1))
-		 (progn
-		   (jdee-jdb-minor-mode 1)
-		   (jdee-bug-minor-mode -1)))))
-	   (jdee-get-java-source-buffers))
-	  (set-default sym val)))
+          (mapc
+           (lambda (buff)
+             (save-excursion
+               (set-buffer buff)
+               (if (string= (car val) "JDEbug")
+                   (progn
+                     (jdee-jdb-minor-mode -1)
+                     (jdee-bug-minor-mode 1))
+                 (progn
+                   (jdee-jdb-minor-mode 1)
+                   (jdee-bug-minor-mode -1)))))
+           (jdee-get-java-source-buffers))
+          (set-default sym val)))
 
 (defun jdee-show-run-options ()
   "Show the JDEE Run Options panel."
@@ -200,83 +200,83 @@ This command invokes the function defined by `jdee-build-function'."
   (interactive)
   (condition-case err
       (progn
-	(jdee-check-versions)
+        (jdee-check-versions)
         (require 'jdee-plugins)
 
-	(add-to-list 'semantic-new-buffer-setup-functions
-		     '(jdee-mode . jdee-parse-semantic-default-setup))
+        (add-to-list 'semantic-new-buffer-setup-functions
+                     '(jdee-mode . jdee-parse-semantic-default-setup))
 
-	(java-mode)
-	(if (get 'java-mode 'special)
-	    (put 'jdee-mode 'special t))
-	(setq major-mode 'jdee-mode)
-	(setq mode-name "JDEE")
-	(derived-mode-set-keymap 'jdee-mode)
-	(derived-mode-set-syntax-table 'jdee-mode)
-	(derived-mode-set-abbrev-table 'jdee-mode)
+        (java-mode)
+        (if (get 'java-mode 'special)
+            (put 'jdee-mode 'special t))
+        (setq major-mode 'jdee-mode)
+        (setq mode-name "JDEE")
+        (derived-mode-set-keymap 'jdee-mode)
+        (derived-mode-set-syntax-table 'jdee-mode)
+        (derived-mode-set-abbrev-table 'jdee-mode)
 
-	;; Define buffer-local variables.
-	(make-local-variable 'jdee-project-name)
-	(make-local-variable 'jdee-run-applet-document)
+        ;; Define buffer-local variables.
+        (make-local-variable 'jdee-project-name)
+        (make-local-variable 'jdee-run-applet-document)
 
-	(setq jdee-current-project
-	      (or (jdee-find-project-file default-directory)
-		  "")) ;; Avoid setting startup values twice!
+        (setq jdee-current-project
+              (or (jdee-find-project-file default-directory)
+                  "")) ;; Avoid setting startup values twice!
 
-	(setq jdee-buffer-project-file jdee-current-project)
+        (setq jdee-buffer-project-file jdee-current-project)
 
-	;; Load the project file for this buffer. The project file
-	;; defines JDEE options for a project.
-	(if (and (not (jdee-debugger-running-p)) jdee-project-context-switching-enabled-p)
-	    (jdee-load-project-file))
+        ;; Load the project file for this buffer. The project file
+        ;; defines JDEE options for a project.
+        (if (and (not (jdee-debugger-running-p)) jdee-project-context-switching-enabled-p)
+            (jdee-load-project-file))
 
         (jdee-activator-init)
 
         ;; Define underscore as a word constituent. This is needed
-	;; to support coding styles the begin fields with an underscore.
-	(modify-syntax-entry ?_ "w")
+        ;; to support coding styles the begin fields with an underscore.
+        (modify-syntax-entry ?_ "w")
 
-	(when jdee-enable-abbrev-mode
-	  ;; Define abbreviations.
-	  (jdee-init-abbrev-table)
-	  (abbrev-mode 1))
+        (when jdee-enable-abbrev-mode
+          ;; Define abbreviations.
+          (jdee-init-abbrev-table)
+          (abbrev-mode 1))
 
-	;; Reset the key bindings in case jdee-mode-keymap
-	;; was not bound at startup.
-	(custom-initialize-reset 'jdee-key-bindings nil)
+        ;; Reset the key bindings in case jdee-mode-keymap
+        ;; was not bound at startup.
+        (custom-initialize-reset 'jdee-key-bindings nil)
 
-	(make-local-variable 'mode-line-format)
-	(setq mode-line-format jdee-mode-line-format)
+        (make-local-variable 'mode-line-format)
+        (setq mode-line-format jdee-mode-line-format)
 
-	;; When looking for a tag that has multiple matches
-	;; in the TAGS file, prefer (find first) the
-	;; occurrence in the _current_ buffer.
-	;; Contributed by Charles Rich, Mitsubishi Electric Research Laboratories,
-	;; Cambridge, MA>
-	(when (boundp 'tags-table-format-functions)
-	  (make-local-variable 'tags-table-format-functions)
-	  (add-hook 'tags-table-format-functions 'jdee-etags-recognize-tags-table nil t))
+        ;; When looking for a tag that has multiple matches
+        ;; in the TAGS file, prefer (find first) the
+        ;; occurrence in the _current_ buffer.
+        ;; Contributed by Charles Rich, Mitsubishi Electric Research Laboratories,
+        ;; Cambridge, MA>
+        (when (boundp 'tags-table-format-functions)
+          (make-local-variable 'tags-table-format-functions)
+          (add-hook 'tags-table-format-functions 'jdee-etags-recognize-tags-table nil t))
 
-	(when (not jdee-launch-beanshell-on-demand-p)
+        (when (not jdee-launch-beanshell-on-demand-p)
           (jdee-backend-launch))
 
-	(jdee-project-update-backend)
+        (jdee-project-update-backend)
 
-	(wisent-java-default-setup)
-	(semantic-mode 1)
+        (wisent-java-default-setup)
+        (semantic-mode 1)
 
-	;; Install debug menu.
-	(if (string= (car jdee-debugger) "JDEbug")
-	    (jdee-bug-minor-mode 1)
-	  (jdee-jdb-minor-mode 1))
+        ;; Install debug menu.
+        (if (string= (car jdee-debugger) "JDEbug")
+            (jdee-bug-minor-mode 1)
+          (jdee-jdb-minor-mode 1))
 
-	(when (boundp 'jdee-mode-map)
-	  (let ((key (car (read-from-string "[return]"))))
+        (when (boundp 'jdee-mode-map)
+          (let ((key (car (read-from-string "[return]"))))
             (if jdee-electric-return-mode
                 (define-key (current-local-map) key 'jdee-electric-return))))
 
-	;; Set up indentation of Java annotations.
-	(jdee-annotations-setup)
+        ;; Set up indentation of Java annotations.
+        (jdee-annotations-setup)
 
         ;; Setup flycheck mode
         (when (and (featurep 'flycheck)
@@ -284,9 +284,9 @@ This command invokes the function defined by `jdee-build-function'."
           (require 'jdee-flycheck)
           (jdee-flycheck-mode))
 
-	;; The next form must be the last executed
-	;; by jdee-mode.
-	(derived-mode-run-hooks 'jdee-mode))
+        ;; The next form must be the last executed
+        ;; by jdee-mode.
+        (derived-mode-run-hooks 'jdee-mode))
     (error
      (message "%s" (error-message-string err)))))
 
@@ -298,23 +298,23 @@ This command invokes the function defined by `jdee-build-function'."
 
 (defcustom jdee-menu-definition
   (list "JDEE"
-	["Compile"           jdee-compile t]
-	;; ["Run App"           jdee-run (not (jdee-run-application-running-p))]
-	["Run App"           jdee-run t]
-	["Run Unit Test"     jdee-test-unittest t]
-	["Debug App"         jdee-debug t]
-	"-"
-	;;["-"                 ignore nil]
-	["Run Applet"        jdee-run-menu-run-applet t]
-	["Debug Applet"      jdee-debug-applet t]
-	"-"
-	["Build"             jdee-build t]
-	(list "Find"
-	      ["Expression"    jdee-find
+        ["Compile"           jdee-compile t]
+        ;; ["Run App"           jdee-run (not (jdee-run-application-running-p))]
+        ["Run App"           jdee-run t]
+        ["Run Unit Test"     jdee-test-unittest t]
+        ["Debug App"         jdee-debug t]
+        "-"
+        ;;["-"                 ignore nil]
+        ["Run Applet"        jdee-run-menu-run-applet t]
+        ["Debug Applet"      jdee-debug-applet t]
+        "-"
+        ["Build"             jdee-build t]
+        (list "Find"
+              ["Expression"    jdee-find
                (and
                 (jdee-find-get-find-exec)
                 (jdee-find-get-grep-exec))]
-	      ["Expression..."  jdee-find-dlg
+              ["Expression..."  jdee-find-dlg
                (and
                 (jdee-find-get-find-exec)
                 (jdee-find-get-grep-exec))]
@@ -322,134 +322,134 @@ This command invokes the function defined by `jdee-build-function'."
               ["Class"  jdee-show-class-source t]
               ["Super Class"  jdee-show-superclass-source t]
               ["Interface"  jdee-show-interface-source t]
-	      )
-	(list "Interpreter"
-	      ["Start"         jdee-backend-run t]
-	      ["Exit"          jdee-backend-exit t]
-	      "-"
-	      ["Help"          jdee-help-beanshell t]
               )
-	(list "Documentation"
-	      ["Add"             jdee-javadoc-autodoc-at-line (jdee-javadoc-enable-menu-p)]
-	      ["Remove"          jdee-javadoc-remdoc-at-line (jdee-javadoc-enable-menu-p)]
-	      ["Check This"      jdee-javadoc-checkdoc-at-line (jdee-javadoc-enable-menu-p)]
-	      ["Check All"           jdee-javadoc-checkdoc t]
-	      ["Generate All"        jdee-javadoc-make t]
-	      ["Generate Buffer"     jdee-javadoc-make-buffer t]
-	      "-"
-	      ["Javadoc Reference"     jdee-javadoc-browse-tool-doc t]
-	      "-"
-	      [ "Create HTML"    jdee-htmlize-code t]
+        (list "Interpreter"
+              ["Start"         jdee-backend-run t]
+              ["Exit"          jdee-backend-exit t]
+              "-"
+              ["Help"          jdee-help-beanshell t]
               )
-	"-"
-	(list "Code Generation"
-	      (list "Templates"
-		    ["Get/Set Pair..."  jdee-gen-get-set t]
-		    ["Println..."       jdee-gen-println t]
-		    (list "Listener"
-			  ["Action"          jdee-gen-action-listener t]
-			  ["Change"          jdee-gen-change-listener t]
-			  ["Window"          jdee-gen-window-listener t]
-			  ["Mouse"           jdee-gen-mouse-listener t]
-			  )
-		    ["Other..."        jdee-gen-code t]
-		    )
-	      (list "Import"
-		    ["Class..."                jdee-import-find-and-import t]
-		    ["All"                     jdee-import-all t]
-		    ["All Unique"              jdee-import-all-unique t]
-		    "-"
-		    ["Expand Package Imports"  jdee-import-expand-imports t]
-		    ["Collapse Class Imports"  jdee-import-collapse-imports t]
-		    ["Delete Unneeded"         jdee-import-kill-extra-imports t]
-		    ["Organize Imports"        jdee-import-organize t]
-		    ["Show Unimported Classes" jdee-import-all-show t]
-		    )
-	      (list "Wizards"
-		    ["Override Method"             jdee-wiz-override-method t]
-		    ["Implement Interface..."      jdee-wiz-implement-interface t]
-		    ["Generate Get/Set Methods"    jdee-wiz-get-set-methods t]
-		    ["Generate toString Method"    jdee-wiz-tostring t]
-		    ["Update Package Statement"    jdee-package-update t]
-		    ["Implement Event Source..."   jdee-wiz-implement-event-source t]
-		    ["Extend Abstract Class..."    jdee-wiz-extend-abstract-class t]
-		    ["Delegate Methods..."         jdee-wiz-delegate t]
-		    "-"
-		    ["Update Class List"   jdee-project-update-class-list t]
-		    )
-	      (list "Modes"
-		    (vector "Abbrev"
-			    'jdee-abbrev-mode
-			    :enable t
-			    :style 'toggle
-			    :selected 'jdee-enable-abbrev-mode)
-		    (vector "Electric Return"
-			    'jdee-electric-return-mode
-			    :enable t
-			    :style 'toggle
-			    :selected 'jdee-electric-return-mode)
+        (list "Documentation"
+              ["Add"             jdee-javadoc-autodoc-at-line (jdee-javadoc-enable-menu-p)]
+              ["Remove"          jdee-javadoc-remdoc-at-line (jdee-javadoc-enable-menu-p)]
+              ["Check This"      jdee-javadoc-checkdoc-at-line (jdee-javadoc-enable-menu-p)]
+              ["Check All"           jdee-javadoc-checkdoc t]
+              ["Generate All"        jdee-javadoc-make t]
+              ["Generate Buffer"     jdee-javadoc-make-buffer t]
+              "-"
+              ["Javadoc Reference"     jdee-javadoc-browse-tool-doc t]
+              "-"
+              [ "Create HTML"    jdee-htmlize-code t]
+              )
+        "-"
+        (list "Code Generation"
+              (list "Templates"
+                    ["Get/Set Pair..."  jdee-gen-get-set t]
+                    ["Println..."       jdee-gen-println t]
+                    (list "Listener"
+                          ["Action"          jdee-gen-action-listener t]
+                          ["Change"          jdee-gen-change-listener t]
+                          ["Window"          jdee-gen-window-listener t]
+                          ["Mouse"           jdee-gen-mouse-listener t]
+                          )
+                    ["Other..."        jdee-gen-code t]
+                    )
+              (list "Import"
+                    ["Class..."                jdee-import-find-and-import t]
+                    ["All"                     jdee-import-all t]
+                    ["All Unique"              jdee-import-all-unique t]
+                    "-"
+                    ["Expand Package Imports"  jdee-import-expand-imports t]
+                    ["Collapse Class Imports"  jdee-import-collapse-imports t]
+                    ["Delete Unneeded"         jdee-import-kill-extra-imports t]
+                    ["Organize Imports"        jdee-import-organize t]
+                    ["Show Unimported Classes" jdee-import-all-show t]
+                    )
+              (list "Wizards"
+                    ["Override Method"             jdee-wiz-override-method t]
+                    ["Implement Interface..."      jdee-wiz-implement-interface t]
+                    ["Generate Get/Set Methods"    jdee-wiz-get-set-methods t]
+                    ["Generate toString Method"    jdee-wiz-tostring t]
+                    ["Update Package Statement"    jdee-package-update t]
+                    ["Implement Event Source..."   jdee-wiz-implement-event-source t]
+                    ["Extend Abstract Class..."    jdee-wiz-extend-abstract-class t]
+                    ["Delegate Methods..."         jdee-wiz-delegate t]
+                    "-"
+                    ["Update Class List"   jdee-project-update-class-list t]
+                    )
+              (list "Modes"
+                    (vector "Abbrev"
+                            'jdee-abbrev-mode
+                            :enable t
+                            :style 'toggle
+                            :selected 'jdee-enable-abbrev-mode)
+                    (vector "Electric Return"
+                            'jdee-electric-return-mode
+                            :enable t
+                            :style 'toggle
+                            :selected 'jdee-electric-return-mode)
                     ))
-	(list "Browse"
-	      ["Source Files"          jdee-show-speedbar t]
-	      ["Class at Point"        jdee-browse-class-at-point t]
-	      ["Copy Fully Qualified Class Name"        jdee-parse-fqn-to-kill-ring t]
+        (list "Browse"
+              ["Source Files"          jdee-show-speedbar t]
+              ["Class at Point"        jdee-browse-class-at-point t]
+              ["Copy Fully Qualified Class Name"        jdee-parse-fqn-to-kill-ring t]
               ["Stack Trace Buffer"        jdee-stacktrace-buffer t]
               ["Location of Class"         jdee-archive-which t]
               )
-	["Check Style"  jdee-checkstyle]
-	(list "Project"
-	      (vector "Auto Switch"
-		      'jdee-toggle-project-switching
-		      :enable t
-		      :style 'toggle
-		      :selected 'jdee-project-context-switching-enabled-p)
-	      (list "Options"
-		    ["General"         jdee-show-project-options t]
-		    ["Compile"         jdee-compile-show-options-buffer t]
-		    ["Run"             jdee-show-run-options t]
-		    ["Debug"           jdee-show-debug-options t]
-		    ["Goto Exception"  jdee-exception-goto t]
-		    ["Autocode"        jdee-show-autocode-options t]
-		    ["Javadoc"         jdee-javadoc-customize t]
-		    ["Make"            jdee-make-show-options t]
-		    ["Ant"             jdee-ant-show-options t]
-		    ["Complete"        jdee-show-complete-options t]
-		    ["JUnit"           jdee-junit-show-options t]
-		    ["Wiz"             jdee-show-wiz-options t]
-		    )
-	      (list "Project File"
-		    ["Create New" jdee-create-new-project t]
-		    ["Save"     jdee-save-project t]
-		    ["Load"     jdee-load-project-file t]
-		    ["Load All" jdee-load-all-project-files t]
-		    ;; FIXME: need edit, show
-		    )
-	      )
-	(list "Refactor"
-	      [ "Rename Class" jdee-rename-class t]
-	      [ "Fully Qualify Class" jdee-replace-fully-qualified-class-at-point t]
-	      )
-	(list "Help"
-	      ["JDEE Users Guide"      jdee-help-show-jdee-doc t]
-	      ["JDK"                   jdee-help-browse-jdk-doc t]
-	      ["JDEE Key Bindings"     jdee-keys t]
-	      "-"
-	      ["Class..."              jdee-help-class t]
-	      ["Class Member..."       jdee-help-class-member t]
-	      ["Symbol at Point"       jdee-help-symbol t]
-	      "-"
-	      ["Submit problem report" jdee-submit-problem-report t]
-	      "-"
-	      (concat "JDEE " jdee-version)
-	      )
-	)
+        ["Check Style"  jdee-checkstyle]
+        (list "Project"
+              (vector "Auto Switch"
+                      'jdee-toggle-project-switching
+                      :enable t
+                      :style 'toggle
+                      :selected 'jdee-project-context-switching-enabled-p)
+              (list "Options"
+                    ["General"         jdee-show-project-options t]
+                    ["Compile"         jdee-compile-show-options-buffer t]
+                    ["Run"             jdee-show-run-options t]
+                    ["Debug"           jdee-show-debug-options t]
+                    ["Goto Exception"  jdee-exception-goto t]
+                    ["Autocode"        jdee-show-autocode-options t]
+                    ["Javadoc"         jdee-javadoc-customize t]
+                    ["Make"            jdee-make-show-options t]
+                    ["Ant"             jdee-ant-show-options t]
+                    ["Complete"        jdee-show-complete-options t]
+                    ["JUnit"           jdee-junit-show-options t]
+                    ["Wiz"             jdee-show-wiz-options t]
+                    )
+              (list "Project File"
+                    ["Create New" jdee-create-new-project t]
+                    ["Save"     jdee-save-project t]
+                    ["Load"     jdee-load-project-file t]
+                    ["Load All" jdee-load-all-project-files t]
+                    ;; FIXME: need edit, show
+                    )
+              )
+        (list "Refactor"
+              [ "Rename Class" jdee-rename-class t]
+              [ "Fully Qualify Class" jdee-replace-fully-qualified-class-at-point t]
+              )
+        (list "Help"
+              ["JDEE Users Guide"      jdee-help-show-jdee-doc t]
+              ["JDK"                   jdee-help-browse-jdk-doc t]
+              ["JDEE Key Bindings"     jdee-keys t]
+              "-"
+              ["Class..."              jdee-help-class t]
+              ["Class Member..."       jdee-help-class-member t]
+              ["Symbol at Point"       jdee-help-symbol t]
+              "-"
+              ["Submit problem report" jdee-submit-problem-report t]
+              "-"
+              (concat "JDEE " jdee-version)
+              )
+        )
   "The JDEE main menu."
   :group 'jdee-project
   :type 'sexp
   :set '(lambda (sym val)
-	  (set-default sym val)
+          (set-default sym val)
           ;; Define JDEE menu for FSF Emacs.
-	  (easy-menu-define jdee-menu
+          (easy-menu-define jdee-menu
             jdee-mode-map
             "Menu for JDEE."
             val)))
@@ -476,8 +476,8 @@ This command invokes the function defined by `jdee-build-function'."
   :group 'jdee-project
   :type 'sexp
   :set '(lambda (sym val)
-	  (set-default sym val)
-	  (let* ((menu (if (fboundp 'easy-menu-create-menu)
+          (set-default sym val)
+          (let* ((menu (if (fboundp 'easy-menu-create-menu)
                            (easy-menu-create-menu
                             (car val) (cdr val))))
                  (menu-name (car val)))

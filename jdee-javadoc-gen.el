@@ -57,13 +57,13 @@
   -private will show all classes and members"
   :group 'jdee-javadoc
   :type '(list
-	  (radio-button-choice
-	   :format "%t \n%v"
-	   :tag "Select the detail level switch you want:"
-	   (const "-public")
-	   (const "-protected")
-	   (const "-package")
-	   (const "-private"))))
+          (radio-button-choice
+           :format "%t \n%v"
+           :tag "Select the detail level switch you want:"
+           (const "-public")
+           (const "-protected")
+           (const "-package")
+           (const "-private"))))
 
 (defcustom jdee-javadoc-gen-packages nil
   "Specifies which packages or files javadoc should be run on.
@@ -99,9 +99,9 @@ into the javadoc command line."
    from which javadoc is run."
   :group 'jdee-javadoc
   :type '(repeat
-	  (cons :tag "Remote URL and directory holding package-list for that URL"
-		(string :tag "URL")
-		(string :tag "Path"))))
+          (cons :tag "Remote URL and directory holding package-list for that URL"
+                (string :tag "URL")
+                (string :tag "Path"))))
 
 (defcustom jdee-javadoc-gen-group nil
   "Specifies groups of packages with a group heading and package pattern.
@@ -110,9 +110,9 @@ into the javadoc command line."
    packages by separating the package names by a semicolon."
   :group 'jdee-javadoc
   :type '(repeat
-	  (cons :tag "Package group name and contents"
-		(string :tag "Heading")
-		(string :tag "Package Pattern"))))
+          (cons :tag "Package group name and contents"
+                (string :tag "Heading")
+                (string :tag "Package Pattern"))))
 
 (defcustom jdee-javadoc-gen-doc-title ""
   "Specifies the title to be placed near the top of the overview summary file."
@@ -238,9 +238,9 @@ into the javadoc command line."
 
 (defclass jdee-javadoc-maker (efc-compiler)
   ((make-packages-p  :initarg :make-packages-p
-		     :type boolean
-		     :initform t
-		     :documentation "Nonnil generates doc for packages."))
+                     :type boolean
+                     :initform t
+                     :documentation "Nonnil generates doc for packages."))
   "Class of Javadoc generators.")
 
 (defmethod initialize-instance ((this jdee-javadoc-maker) &rest fields)
@@ -254,14 +254,14 @@ into the javadoc command line."
    (lambda (buf msg)
      (message msg)
      (if (and
-	  jdee-javadoc-display-doc
-	  (string-match "finished" msg))
-	 (browse-url-of-file
-	  (expand-file-name
-	   "index.html"
-	   (jdee-normalize-path
-	    jdee-javadoc-gen-destination-directory
-	    'jdee-javadoc-gen-destination-directory))))))
+          jdee-javadoc-display-doc
+          (string-match "finished" msg))
+         (browse-url-of-file
+          (expand-file-name
+           "index.html"
+           (jdee-normalize-path
+            jdee-javadoc-gen-destination-directory
+            'jdee-javadoc-gen-destination-directory))))))
 
   (oset
    this
@@ -272,283 +272,283 @@ into the javadoc command line."
   "Get the arguments to pass to the javadoc process as specified
 by the jdee-javadoc-gen variables."
   (let* ((destination-directory
-	  (jdee-normalize-path
-	   jdee-javadoc-gen-destination-directory
-	   'jdee-javadoc-gen-destination-directory))
-	 (args
-	  (list
-	   "-d" destination-directory
-	   (car jdee-javadoc-gen-detail-switch))))
+          (jdee-normalize-path
+           jdee-javadoc-gen-destination-directory
+           'jdee-javadoc-gen-destination-directory))
+         (args
+          (list
+           "-d" destination-directory
+           (car jdee-javadoc-gen-detail-switch))))
 
     (if (not (file-exists-p destination-directory))
-	(make-directory destination-directory))
+        (make-directory destination-directory))
 
     ;;Insert online links
     (if jdee-javadoc-gen-link-online
-	(setq args
-	      (append
-	       args
-	       (cl-mapcan
-		(lambda (link)  (list "-link" link))
-		jdee-javadoc-gen-link-URL))))
+        (setq args
+              (append
+               args
+               (cl-mapcan
+                (lambda (link)  (list "-link" link))
+                jdee-javadoc-gen-link-URL))))
 
     ;;Insert offline links
     (if jdee-javadoc-gen-link-offline
-	(setq args
-	      (append
-	       args
-	       (cl-mapcan
-		(lambda (link)
-		  (list "-linkoffline" (car  link) (cdr link)))
-		jdee-javadoc-gen-link-offline))))
+        (setq args
+              (append
+               args
+               (cl-mapcan
+                (lambda (link)
+                  (list "-linkoffline" (car  link) (cdr link)))
+                jdee-javadoc-gen-link-offline))))
 
     ;;Insert -group
     (if jdee-javadoc-gen-group
-	(setq args
-	      (append
-	       args
-	       (cl-mapcan
-		(lambda (group)
-		  (list "-group" (car group) (cdr group)))
-		jdee-javadoc-gen-group))))
+        (setq args
+              (append
+               args
+               (cl-mapcan
+                (lambda (group)
+                  (list "-group" (car group) (cdr group)))
+                jdee-javadoc-gen-group))))
 
 
      ;; Insert classpath
     (if jdee-global-classpath
-	(setq args
-	      (append
-	       args
-	       (list
-		"-classpath"
-		(jdee-build-classpath
-		 (jdee-get-global-classpath)
-		 'jdee-global-classpath)))))
+        (setq args
+              (append
+               args
+               (list
+                "-classpath"
+                (jdee-build-classpath
+                 (jdee-get-global-classpath)
+                 'jdee-global-classpath)))))
 
 
     ;; Insert sourcepath
     (if jdee-sourcepath
-	(setq args
-	      (append
-	       args
-	       (list
-		"-sourcepath"
-		(jdee-build-classpath
-		 (jdee-expand-wildcards-and-normalize jdee-sourcepath 'jdee-sourcepath))))))
+        (setq args
+              (append
+               args
+               (list
+                "-sourcepath"
+                (jdee-build-classpath
+                 (jdee-expand-wildcards-and-normalize jdee-sourcepath 'jdee-sourcepath))))))
 
 
     ;; Insert bootclasspath
     (if jdee-compile-option-bootclasspath
-	(setq args
-	      (append
-	       args
-	       (list
-		"-bootclasspath"
-	       (jdee-build-classpath
-		jdee-compile-option-bootclasspath
-		'jdee-compile-option-bootclasspath)))))
+        (setq args
+              (append
+               args
+               (list
+                "-bootclasspath"
+               (jdee-build-classpath
+                jdee-compile-option-bootclasspath
+                'jdee-compile-option-bootclasspath)))))
 
     ;; Insert extdirs
     (if jdee-compile-option-extdirs
-	(setq args
-	      (append
-	       args
-	       (list
-		"-extdirs"
-	       (jdee-build-classpath
-		jdee-compile-option-extdirs
-		'jdee-compile-option-extdirs)))))
+        (setq args
+              (append
+               args
+               (list
+                "-extdirs"
+               (jdee-build-classpath
+                jdee-compile-option-extdirs
+                'jdee-compile-option-extdirs)))))
 
     ;; Insert windowtitle
     (if (not (equal "" jdee-javadoc-gen-window-title))
-	(setq args
-	      (append
-	       args
-	       (list
-		"-windowtitle"
-		jdee-javadoc-gen-window-title))))
+        (setq args
+              (append
+               args
+               (list
+                "-windowtitle"
+                jdee-javadoc-gen-window-title))))
 
     ;; Insert doctitle
     (if (not (equal "" jdee-javadoc-gen-doc-title))
-	(setq args
-	      (append
-	       args
-	       (list
-		"-doctitle"
-		jdee-javadoc-gen-doc-title))))
+        (setq args
+              (append
+               args
+               (list
+                "-doctitle"
+                jdee-javadoc-gen-doc-title))))
 
     ;; Insert header
     (if (not (equal "" jdee-javadoc-gen-header))
-	(setq args
-	      (append
-	       args
-	       (list
-		"-header"
-		jdee-javadoc-gen-header))))
+        (setq args
+              (append
+               args
+               (list
+                "-header"
+                jdee-javadoc-gen-header))))
 
     ;; Insert footer
     (if (not (equal "" jdee-javadoc-gen-footer))
-	(setq args
-	      (append
-	       args
-	       (list
-		"-footer"
-		jdee-javadoc-gen-footer))))
+        (setq args
+              (append
+               args
+               (list
+                "-footer"
+                jdee-javadoc-gen-footer))))
 
     ;; Insert bottom
     (if (not (equal "" jdee-javadoc-gen-bottom))
-	(setq args
-	      (append
-	       args
-	       (list
-		"-bottom"
-		jdee-javadoc-gen-bottom))))
+        (setq args
+              (append
+               args
+               (list
+                "-bottom"
+                jdee-javadoc-gen-bottom))))
 
     ;; Insert helpfile
     (if (not (equal "" jdee-javadoc-gen-helpfile))
-	(setq args
-	      (append
-	       args
-	       (list
-	       "-helpfile"
-	       (jdee-normalize-path 'jdee-javadoc-gen-helpfile)))))
+        (setq args
+              (append
+               args
+               (list
+               "-helpfile"
+               (jdee-normalize-path 'jdee-javadoc-gen-helpfile)))))
 
     ;; Insert stylesheet
     (if (not (equal "" jdee-javadoc-gen-stylesheetfile))
-	(setq args
-	      (append
-	       args
-	       (list
-		"-stylesheetfile"
-		(jdee-normalize-path 'jdee-javadoc-gen-stylesheetfile)))))
+        (setq args
+              (append
+               args
+               (list
+                "-stylesheetfile"
+                (jdee-normalize-path 'jdee-javadoc-gen-stylesheetfile)))))
 
     ;; Insert -overview
     (if (not (equal "" jdee-javadoc-gen-overview))
-	(setq args
-	      (append
-	       args
-	       (list
-		"-overview"
-		jdee-javadoc-gen-overview))))
+        (setq args
+              (append
+               args
+               (list
+                "-overview"
+                jdee-javadoc-gen-overview))))
 
     ;; Insert -doclet
     (if (not (equal "" jdee-javadoc-gen-doclet))
-	(setq args
-	      (append
-	       args
-	       (list
-		"-doclet"
-		jdee-javadoc-gen-doclet))))
+        (setq args
+              (append
+               args
+               (list
+                "-doclet"
+                jdee-javadoc-gen-doclet))))
 
     ;; Insert -docletpath
     (if jdee-javadoc-gen-docletpath
-	(setq args
-	      (append
-	       args
-	       (list
-		"-docletpath"
-	       (jdee-build-classpath
-		jdee-javadoc-gen-docletpath
-		'jdee-javadoc-gen-docletpath)))))
+        (setq args
+              (append
+               args
+               (list
+                "-docletpath"
+               (jdee-build-classpath
+                jdee-javadoc-gen-docletpath
+                'jdee-javadoc-gen-docletpath)))))
 
     ;; Inser -use
     (if jdee-javadoc-gen-use
-	(setq args
-	      (append
-	       args
-	       (list "-use"))))
+        (setq args
+              (append
+               args
+               (list "-use"))))
 
     ;;Insert -author
     (if jdee-javadoc-gen-author
-	(setq args
-	      (append
-	       args
-	       (list "-author"))))
+        (setq args
+              (append
+               args
+               (list "-author"))))
 
     ;;Insert -version
     (if jdee-javadoc-gen-version
-	(setq args
-	      (append
-	       args
-	       (list "-version"))))
+        (setq args
+              (append
+               args
+               (list "-version"))))
 
     ;;Insert -splitindex
     (if jdee-javadoc-gen-split-index
-	(setq args
-	      (append
-	       args
-	       (list "-splitindex"))))
+        (setq args
+              (append
+               args
+               (list "-splitindex"))))
 
     ;;Insert -nodeprecated
     (if jdee-javadoc-gen-nodeprecated
-	(setq args
-	      (append
-	       args
-	       (list "-nodeprecated"))))
+        (setq args
+              (append
+               args
+               (list "-nodeprecated"))))
 
     ;;Insert -nodeprecatedlist
     (if jdee-javadoc-gen-nodeprecatedlist
-	(setq args
-	      (append
-	       args
-	       (list "-nodeprecatedlist"))))
+        (setq args
+              (append
+               args
+               (list "-nodeprecatedlist"))))
 
     ;;Insert -notree
     (if jdee-javadoc-gen-notree
-	(setq args
-	      (append
-	       args
-	       (list "-notree"))))
+        (setq args
+              (append
+               args
+               (list "-notree"))))
 
     ;;Insert -noindex
     (if jdee-javadoc-gen-noindex
-	(setq args
-	      (append
-	       args
-	       (list "-noindex"))))
+        (setq args
+              (append
+               args
+               (list "-noindex"))))
 
     ;;Insert -nohelp
     (if jdee-javadoc-gen-nohelp
-	(setq args
-	      (append
-	       args
-	       (list "-nohelp"))))
+        (setq args
+              (append
+               args
+               (list "-nohelp"))))
 
     ;;Insert -nonavbar
     (if jdee-javadoc-gen-nonavbar
-	(setq args
-	      (append
-	       args
-	       (list "-nonavbar"))))
+        (setq args
+              (append
+               args
+               (list "-nonavbar"))))
 
     ;;Insert -serialwarn
     (if jdee-javadoc-gen-serialwarn
-	(setq args
-	      (append
-	       args
-	       (list  "-serialwarn"))))
+        (setq args
+              (append
+               args
+               (list  "-serialwarn"))))
 
     ;;Insert -verbose
     (if jdee-javadoc-gen-verbose
-	(setq args
-	      (append
-	       args
-	       (list  "-verbose"))))
+        (setq args
+              (append
+               args
+               (list  "-verbose"))))
 
     ;;Insert other tags
     (if jdee-javadoc-gen-args
-	(setq args
-	      (append
-	       args
-	       jdee-javadoc-gen-args)))
+        (setq args
+              (append
+               args
+               jdee-javadoc-gen-args)))
 
     ;;Insert packages/files
     (if (and (oref this make-packages-p) jdee-javadoc-gen-packages)
-	(setq args
-	      (append
-	       args
-	       (mapcar
-		(lambda (packagename) packagename)
-		jdee-javadoc-gen-packages)))
+        (setq args
+              (append
+               args
+               (mapcar
+                (lambda (packagename) packagename)
+                jdee-javadoc-gen-packages)))
       (setq
        args
        (append args (list (buffer-file-name)))))))
@@ -573,9 +573,9 @@ buffer. If `jdee-javadoc-display-doc' is nonnil, this command displays
 the generated documentation in a browser."
   (save-some-buffers)
   (let ((generator
-	 (jdee-javadoc-maker
-	  "javadoc generator"
-	  :make-packages-p make-packages-p)))
+         (jdee-javadoc-maker
+          "javadoc generator"
+          :make-packages-p make-packages-p)))
     (exec generator)))
 
 
@@ -619,11 +619,11 @@ browser."
   "Displays the documentation for the javadoc tool in a browser."
   (interactive)
   (let* ((jdk-url (jdee-jdhelper-jdk-url jdee-jdhelper-singleton))
-	 (javadoc-url
-	  (concat
-	   (substring jdk-url 0 (string-match "index" jdk-url))
-	   (if (eq system-type 'windows-nt) "tooldocs/windows/" "tooldocs/solaris/")
-	   "javadoc.html")))
+         (javadoc-url
+          (concat
+           (substring jdk-url 0 (string-match "index" jdk-url))
+           (if (eq system-type 'windows-nt) "tooldocs/windows/" "tooldocs/solaris/")
+           "javadoc.html")))
     (browse-url javadoc-url)))
 
 

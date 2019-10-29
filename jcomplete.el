@@ -57,16 +57,16 @@ resulting list. It impliciyly adds the java.lang.* package."
     (goto-char (point-min))
     (let (lst first second)
       (while (not (null
-		   (re-search-forward "import[ \t\n\r]+\\(\\([a-zA-Z0-9]+[.]\\)+\\)\\([*]\\|[a-zA-Z0-9]+\\)" nil t) ))
-	(setq first (match-string 1))
-	(setq second (match-string 3))
-	(if (string= "*" second)
-	    (setq lst (append lst
-			      (list (list first second))))
-	  (setq lst (append (list (list first second))
-			    lst))))
+                   (re-search-forward "import[ \t\n\r]+\\(\\([a-zA-Z0-9]+[.]\\)+\\)\\([*]\\|[a-zA-Z0-9]+\\)" nil t) ))
+        (setq first (match-string 1))
+        (setq second (match-string 3))
+        (if (string= "*" second)
+            (setq lst (append lst
+                              (list (list first second))))
+          (setq lst (append (list (list first second))
+                            lst))))
       (if (not (member "java.lang.*" lst))
-	  (setq lst (append lst (list (list "java.lang." "*")))))
+          (setq lst (append lst (list (list "java.lang." "*")))))
       lst)))
 
 (defun prf2-valid-java-declaration-at (point varname)
@@ -87,15 +87,15 @@ name, it just returns the type as it is declared."
 (save-excursion
     (let (found res pos orgpt resname)
       (while (and (not found)
-		  (search-backward name nil t))
-	(setq pos (point))
-	(backward-word 1)
-	(setq resname (prf2-valid-java-declaration-at (point) name))
-	(goto-char pos)
-	(forward-char -1)
-	(if (not (null resname))
-	    (progn (setq res resname)
-		   (setq found t))))
+                  (search-backward name nil t))
+        (setq pos (point))
+        (backward-word 1)
+        (setq resname (prf2-valid-java-declaration-at (point) name))
+        (goto-char pos)
+        (forward-char -1)
+        (if (not (null resname))
+            (progn (setq res resname)
+                   (setq found t))))
     res)))
 
 (defun prf2-filter-fqn (importlist)
@@ -105,8 +105,8 @@ so that it can stops at the first package import (with a star `*' at
 the end of the declaration)."
   (if (not (null importlist))
       (if (string= "*" (car (cdr (car importlist))))
-	  importlist
-	(prf2-filter-fqn (cdr importlist)))))
+          importlist
+        (prf2-filter-fqn (cdr importlist)))))
 
 
 
@@ -123,11 +123,11 @@ packages otherwise."
       (setq fullname (concat (car tmp) name))
       (cond
        ((string= "*" shortname)
-	(setq result importlist))
+        (setq result importlist))
        ((string= name shortname)
-	(setq result fullname))
+        (setq result fullname))
        (t
-	(setq importlist (cdr importlist)))))
+        (setq importlist (cdr importlist)))))
     result))
 
 (defun prf2-get-classinfo (name)
@@ -137,11 +137,11 @@ possible completion, and the cdr gives additional informations on the
 car."
   (let ((guessed (prf2-guess-type-of name)) result)
     (if (stringp guessed)
-	(setq result (jdee-backend-get-class-info guessed))
+        (setq result (jdee-backend-get-class-info guessed))
       (if (not (null name))
-	  (setq result (jdee-backend-get-class-info-for-import name guessed))))
+          (setq result (jdee-backend-get-class-info-for-import name guessed))))
     (if (not (null result))
-	(eval (read result))
+        (eval (read result))
       nil)))
 
 (defun prf2-java-variable-at-point ()
@@ -150,36 +150,36 @@ A '.' is  part of a name."
   (interactive)
   (save-excursion
     (let (start varname curcar found
-		(original-point (point))
-		intermediate-point beg-point)
+                (original-point (point))
+                intermediate-point beg-point)
       (setq curcar (char-before))
       (while (null found)
-	(cond
-	 ((or (and (>= curcar ?a) (<= curcar ?z))
+        (cond
+         ((or (and (>= curcar ?a) (<= curcar ?z))
               (and (>= curcar ?A) (<= curcar ?Z))
               (member curcar '(?_)))
-	  (forward-char -1))
-	 ((eq ?. curcar)
-	  (setq found (point)))
-	 (t
-	  (setq found t)))
-	(setq curcar (char-before)))
+          (forward-char -1))
+         ((eq ?. curcar)
+          (setq found (point)))
+         (t
+          (setq found t)))
+        (setq curcar (char-before)))
       ;;
       (setq intermediate-point (point))
       (if (not (eq t found))
-	  (progn
-	    (setq curcar (char-before))
-	    (while (or (and (>= curcar ?a) (<= curcar ?z))
-		       (and (>= curcar ?A) (<= curcar ?Z))
-		       (member curcar '(?. ?_)))
-	      (forward-char -1)
-	      (setq curcar (char-before)))
-	    (setq beg-point (point))
-	    (set-marker prf2-current-beginning intermediate-point)
-	    (set-marker prf2-current-end original-point)
-	    (list (buffer-substring beg-point (- intermediate-point 1))
-		  (buffer-substring intermediate-point original-point)))
-	nil))))
+          (progn
+            (setq curcar (char-before))
+            (while (or (and (>= curcar ?a) (<= curcar ?z))
+                       (and (>= curcar ?A) (<= curcar ?Z))
+                       (member curcar '(?. ?_)))
+              (forward-char -1)
+              (setq curcar (char-before)))
+            (setq beg-point (point))
+            (set-marker prf2-current-beginning intermediate-point)
+            (set-marker prf2-current-end original-point)
+            (list (buffer-substring beg-point (- intermediate-point 1))
+                  (buffer-substring intermediate-point original-point)))
+        nil))))
 
 (defun prf2-build-completion-list (classinfo)
   "Build a completion list from the CLASSINFO list, as returned by the
@@ -194,9 +194,9 @@ jdee-backend-get-class-info function."
     (setq tmp (nth 2 classinfo))
     (while (not (null tmp))
       (setq result (append (list (list (concat (car (car tmp))"(")
-				       (prf2-build-information-for-completion (car tmp))
-				       ;; (car tmp)
-				       )) result))
+                                       (prf2-build-information-for-completion (car tmp))
+                                       ;; (car tmp)
+                                       )) result))
       (setq tmp (cdr tmp)))
     result))
 
@@ -207,7 +207,7 @@ jdee-backend-get-class-info function."
       (setq result (concat result (car lst)))
       (setq lst (cdr lst))
       (if (not (null lst))
-	  (setq result (concat result ", "))))
+          (setq result (concat result ", "))))
     (setq result (concat result ")"))
     result))
 
@@ -216,12 +216,12 @@ jdee-backend-get-class-info function."
   (let (elem)
     (setq prf2-current-list-index (+ 1 prf2-current-list-index))
     (if (>= prf2-current-list-index (length prf2-current-list))
-	(setq prf2-current-list-index 0))
+        (setq prf2-current-list-index 0))
     (setq elem (nth prf2-current-list-index prf2-current-list))
     (if (not (null (car elem)))
-	(progn
-	  (delete-region prf2-current-beginning prf2-current-end)
-	  (insert (car elem))))
+        (progn
+          (delete-region prf2-current-beginning prf2-current-end)
+          (insert (car elem))))
     (set-marker prf2-current-end (+ (marker-position prf2-current-beginning) (length (car elem))))
     (message (car (cdr elem)))
   ;;  (goto-char (marker-position prf2-current-end))
@@ -231,7 +231,7 @@ jdee-backend-get-class-info function."
   (let ((result nil))
     (while (not (null lst))
       (if (equal 0 (string-match pat (car (car lst))))
-	  (setq result (append (list (car lst)) result)))
+          (setq result (append (list (car lst)) result)))
       (setq lst (cdr lst)))
     result))
 
@@ -239,29 +239,29 @@ jdee-backend-get-class-info function."
 "Smart-complete the method at point."
   (interactive)
     (if (and
-	 (not (null prf2-current-list))
-	 (markerp prf2-current-beginning)
-	 (markerp prf2-current-end)
-	 (marker-position prf2-current-beginning)
-	 (marker-position prf2-current-end)
-	 (>= (point) (marker-position prf2-current-beginning))
-	 (<= (point) (marker-position prf2-current-end))
-	 (eq last-command this-command))
-	(progn
-	  (prf2-complete-cycle))
+         (not (null prf2-current-list))
+         (markerp prf2-current-beginning)
+         (markerp prf2-current-end)
+         (marker-position prf2-current-beginning)
+         (marker-position prf2-current-end)
+         (>= (point) (marker-position prf2-current-beginning))
+         (<= (point) (marker-position prf2-current-end))
+         (eq last-command this-command))
+        (progn
+          (prf2-complete-cycle))
       (let* ((pair (prf2-java-variable-at-point))
-	     txt classinfo fulllist
-	     )
-	(if (not (null pair))
-	    (progn
-	      (setq classinfo (prf2-get-classinfo (prf2-declared-type-of (car pair))))
-	      (setq fulllist (prf2-build-completion-list classinfo))
-	      (setq prf2-current-list (prf2-all-completions (car (cdr pair)) fulllist))
-	      (setq prf2-current-list-index -1)
-	      (prf2-complete-cycle))
-	  (progn
-	    (setq prf2-current-list nil)
-	    (message "No completion at this point."))))))
+             txt classinfo fulllist
+             )
+        (if (not (null pair))
+            (progn
+              (setq classinfo (prf2-get-classinfo (prf2-declared-type-of (car pair))))
+              (setq fulllist (prf2-build-completion-list classinfo))
+              (setq prf2-current-list (prf2-all-completions (car (cdr pair)) fulllist))
+              (setq prf2-current-list-index -1)
+              (prf2-complete-cycle))
+          (progn
+            (setq prf2-current-list nil)
+            (message "No completion at this point."))))))
 
 
 ;;

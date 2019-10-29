@@ -42,27 +42,27 @@ Should be run when Semantic is ready to parse, that is, via
      ;; Since Semantic 2.0beta2
      ((boundp 'global-semantic-idle-scheduler-mode)
       (or global-semantic-idle-scheduler-mode
-	  (semantic-idle-scheduler-mode 1)))
+          (semantic-idle-scheduler-mode 1)))
      (t
       ;; Default to JDEE's auto-parse
       (add-hook 'semantic-change-hooks
-		'jdee-parse-buffer-changed-hook t t))))
+                'jdee-parse-buffer-changed-hook t t))))
 
   ;; Track full reparses
   (add-hook 'semantic-after-toplevel-cache-change-hook
-	    'jdee-parse-update-after-parse nil t)
+            'jdee-parse-update-after-parse nil t)
 
   ;; Track partial reparses
   (add-hook 'semantic-after-partial-cache-change-hook
-	    'jdee-parse-update-after-partial-parse nil t)
+            'jdee-parse-update-after-partial-parse nil t)
 
   ;; imenu & speedbar setup
   (jdee-imenu-setup)
 
   (if (and jdee-which-method-mode
-	   (not jdee-which-method-idle-timer))
+           (not jdee-which-method-idle-timer))
       (setq jdee-which-method-idle-timer
-	    (run-with-idle-timer .25 t 'jdee-which-method-update)))
+            (run-with-idle-timer .25 t 'jdee-which-method-update)))
 
   ;; initial parsing of the current buffer
   (semantic-fetch-tags))

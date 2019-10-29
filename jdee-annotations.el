@@ -41,12 +41,12 @@
   "Find the offset entry for SYMBOL and add OFFSET at the front of the list.
 See `c-set-offset' for a description of OFFSET and SYMBOL."
   (let ((old-offset (cdr-safe (or (assq symbol c-offsets-alist)
-				  (assq symbol (get 'c-offsets-alist
-						      'c-stylevar-fallback))))))
+                                  (assq symbol (get 'c-offsets-alist
+                                                      'c-stylevar-fallback))))))
     (if old-offset
-	(if (listp old-offset)
-	    (c-set-offset symbol (cons offset old-offset))
-	  (c-set-offset symbol (list offset old-offset)))
+        (if (listp old-offset)
+            (c-set-offset symbol (cons offset old-offset))
+          (c-set-offset symbol (list offset old-offset)))
       (c-set-offset symbol offset))))
 
 (defun jdee-annotations-setup ()
@@ -70,15 +70,15 @@ during this traversal, this function only sees whitespaces
 followed by either a '@' or a '(' then it returns t."
   (save-excursion
     (condition-case err ;; return nil if  any errors are thrown by forward-sexp
-	(let* ((lim (1- (c-point 'bol)))
-	       (throws (catch 'notAnno
-		     (goto-char (cdr langelem))
-		     (while (< (point) lim)
-		       (if (not (looking-at "\\(\\s \\|\n\\)*\\(@\\|(\\)"))
-			   (throw 'notAnno t))
-		       (forward-sexp 1)))))
-	  (if (not throws)
-	      t)))))
+        (let* ((lim (1- (c-point 'bol)))
+               (throws (catch 'notAnno
+                     (goto-char (cdr langelem))
+                     (while (< (point) lim)
+                       (if (not (looking-at "\\(\\s \\|\n\\)*\\(@\\|(\\)"))
+                           (throw 'notAnno t))
+                       (forward-sexp 1)))))
+          (if (not throws)
+              t)))))
 
 (defun c-no-indent-after-java-annotations (langelem)
   "If preceeded by java annotations, indent this line the same as the previous.
@@ -131,12 +131,12 @@ Works with arglist-intro.
 
 Indents as
 @RequestForEnhancement(
-    id	     = 2868724,
+    id             = 2868724,
 ...
 
 instead of
 @RequestForEnhancement(
-		       id	     = 2868724,
+                       id             = 2868724,
 ...
 
 Argument LANGELEM The language element being indented."
