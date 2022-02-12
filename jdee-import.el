@@ -409,7 +409,7 @@ inserts the selected import in the buffer."
     (deactivate-mark)
     (if exclude
         (setq new-imports (jdee-import-exclude-imports new-imports)))
-    (loop for new-import in new-imports do
+    (loop-for-each new-import in new-imports do
           (when (> (length new-import) 0) ;; added to avoid insert empty import statements.
             (insert (concat "import " new-import ";\n"))
             (message "Imported %s" new-import)))

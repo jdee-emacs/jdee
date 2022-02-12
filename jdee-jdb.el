@@ -716,7 +716,7 @@ expression at poing")
 (defmethod jdee-jdb-set-breakpoint-listener ((this jdee-jdb-breakpoint-listener) output)
   "Listens for set breakpoint messages."
   (let ((msgs (split-string output "\n")))
-    (loop for msg in msgs do
+    (loop-for-each msg in msgs do
           (if (and (string-match
                     "^.*Set .*breakpoint \\(.*\\):\\([0-9]+\\)"
                     msg)

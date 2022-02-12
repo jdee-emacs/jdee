@@ -168,7 +168,7 @@ a list of matching files or directories which are interpolated into the sourcepa
   "Get all the files in DIR, and any subdirectories of DIR, whose
 names match INCLUDE-REGEXP."
   (let (files)
-    (loop for file in (directory-files dir) do
+    (loop-for-each file in (directory-files dir) do
           (if (not (member file '("." "..")))
               (let ((file (concat dir "/" file)))
                 (if (file-directory-p file)
@@ -189,7 +189,7 @@ root names match EXCLUDE-REGEXPS. Return the files normalized against SYMBOL."
       (let ((file-name
              (file-name-nondirectory file-path)))
         (catch 'match
-          (loop for regexp in exclude-regexps do
+          (loop-for-each regexp in exclude-regexps do
                 (if (string-match regexp file-name)
                     (throw 'match t))))))
     (jdee-directory-files-recurs dir include-regexp))))

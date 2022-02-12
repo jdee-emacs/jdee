@@ -560,7 +560,7 @@ to the active face."
 (defun jdee-db-set-all-breakpoints-specified ()
   "Changes the face of all breakpoints to `jdee-db-spec-breakpoint-face'
 and sets the status of all breakpoints to `specified'."
-  (loop for bp-assoc in jdee-db-breakpoints do
+  (loop-for-each bp-assoc in jdee-db-breakpoints do
         (let* ((bp (cdr bp-assoc))
                (marker (oref bp marker)))
           (oset bp status 'specified)
@@ -691,7 +691,7 @@ particular breakpoint and to select breakpoints to be clear."
                 (jdee-db-find-breakpoint-by-id assoc-x))
               jdee-db-bp-list))
             (jdee-db-exec-cmd debugger bp-cmd))
-        (loop for bp-assoc in jdee-db-bp-list do
+        (loop-for-each bp-assoc in jdee-db-bp-list do
               (let ((bp (jdee-db-find-breakpoint-by-id bp-assoc)))
                 (jdee-db-delete-breakpoint bp))))))
 
@@ -728,7 +728,7 @@ particular breakpoint and to select breakpoints to be clear."
 in the current buffer to nil."
  (when (eq major-mode 'jdee-mode)
    (let ((file (buffer-file-name)))
-     (loop for bp-assoc in jdee-db-breakpoints do
+     (loop-for-each bp-assoc in jdee-db-breakpoints do
            (let ((bp (cdr bp-assoc)))
              (when (string= (oref bp file) file)
                (oset bp line (jdee-db-breakpoint-get-line bp))
@@ -740,7 +740,7 @@ in the current buffer to nil."
   "Highlights all breakpoints in the current buffer if not
 already highlighted."
   (save-excursion
-    (loop for bp-assoc in jdee-db-breakpoints do
+    (loop-for-each bp-assoc in jdee-db-breakpoints do
           (let* ((bp (cdr bp-assoc))
                  (file (buffer-file-name))
                  (line (oref bp line))
@@ -1203,7 +1203,7 @@ ready to accept the next command."
         (response output)
         (last-cmd (oref this last-cmd)))
 
-    (loop for listener in listeners do
+    (loop-for-each listener in listeners do
           (setq output
                 (jdee-db-listener-filter-output listener output)))
 
@@ -1917,7 +1917,7 @@ in the current buffer."
               (lambda (assoc-x) (cdr assoc-x))
               jdee-db-breakpoints))
             (jdee-db-exec-cmd debugger bp-cmd))
-        (loop for bp-assoc in jdee-db-breakpoints do
+        (loop-for-each bp-assoc in jdee-db-breakpoints do
               (let ((bp (cdr bp-assoc)))
                 (jdee-db-delete-breakpoint bp))))))
 

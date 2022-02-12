@@ -1045,7 +1045,7 @@ to a debugger."
      ((listp jdee-run-option-enable-assertions)
       (if (car jdee-run-option-enable-assertions)
           (setq args '("-ea:...")))
-      (loop for location in (cdr jdee-run-option-enable-assertions) do
+      (loop-for-each location in (cdr jdee-run-option-enable-assertions) do
             (let ((type (car location))
                   (name (cdr location)))
               (if (string= type "package")
@@ -1072,7 +1072,7 @@ to a debugger."
      ((listp jdee-run-option-disable-assertions)
       (if (car jdee-run-option-disable-assertions)
           (setq args '("-da:...")))
-      (loop for location in (cdr jdee-run-option-disable-assertions) do
+      (loop-for-each location in (cdr jdee-run-option-disable-assertions) do
             (let ((type (car location))
                   (name (cdr location)))
               (if (string= type "package")
