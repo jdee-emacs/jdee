@@ -3872,7 +3872,7 @@ Returns t, if the template has been inserted, otherwise nil."
 
 (defun jdee-gen-load-abbrev-templates ()
   "Defines jdee-mode abbrevs for the control flow templates."
-  (loop for template in jdee-gen-abbrev-templates do
+  (loop-for-each template in jdee-gen-abbrev-templates do
         (let ((abbrev (car template)))
           (define-abbrev
             local-abbrev-table
@@ -3898,12 +3898,12 @@ Returns t, if the template has been inserted, otherwise nil."
    (erase-buffer)
    (insert "public class Test {\n\n}")
    (backward-char 2)
-   (loop for flags in '((t . t) (t . nil) (nil . t) (nil . nil)) do
+   (loop-for-each flags in '((t . t) (t . nil) (nil . t) (nil . nil)) do
          (let ((jdee-gen-k&r (car flags))
                (jdee-gen-comments (cdr flags)))
            (insert (format "/**** jdee-gen-comments: %S jdee-gen-k&r: %S ****/\n\n"
                            jdee-gen-comments jdee-gen-k&r))
-           (loop for abbrev in
+           (loop-for-each abbrev in
                  '(("if"      (clause . "true"))
                    ("else")
                    ("ife"     (clause . "true"))

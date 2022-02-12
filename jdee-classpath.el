@@ -60,7 +60,7 @@ zip files in those directories, excepting those specified by
 existing paths are already normalized."
   (if jdee-expand-classpath-p
       (let (paths)
-        (loop for path in classpath do
+        (loop-for-each path in classpath do
               (if (and
                    (file-exists-p path)
                    (file-directory-p path)

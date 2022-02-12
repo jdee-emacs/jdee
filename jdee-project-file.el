@@ -146,7 +146,7 @@ Emacs startup values."
     (if prj-files
         (progn
           (jdee-set-variables-init-value)
-          (loop for file in prj-files do
+          (loop-for-each file in prj-files do
             (setq jdee-loading-project-file file)
             (jdee-log-msg "jdee-load-project-file: Loading %s" file)
             ;; reset project file version

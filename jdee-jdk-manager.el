@@ -96,7 +96,7 @@ by the current project."
              (list
               (quote radio-button-choice)
               )))
-        (loop for jdk in val do
+        (loop-for-each jdk in val do
               (setq
                type
                (append

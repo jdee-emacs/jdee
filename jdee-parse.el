@@ -954,11 +954,11 @@ otherwise nil."
          (class-methods    (semantic-brute-find-tag-by-class 'function class-parts)))
 
     ;; Is point in a method of a subclass of this class?
-    (loop for subclass in class-subclasses do
+    (loop-for-each subclass in class-subclasses do
           (jdee-parse--search-class subclass pos))
 
     ;; Is point in any of the methods of this class?
-    (loop for method in class-methods do
+    (loop-for-each method in class-methods do
           (let* ((method-name  (semantic-tag-name method))
                  (method-start (semantic-tag-start method))
                  (method-end   (semantic-tag-end method)))
@@ -975,7 +975,7 @@ in a method; otherwise, nil."
          (tokens (semantic-fetch-tags))
          (classes (semantic-brute-find-tag-by-class 'type tokens)))
     (catch 'found
-      (loop for class in classes
+      (loop-for-each class in classes
             do (jdee-parse--search-class class pos)))))
 
 (defclass jdee-parse-method-map (jdee-avl-tree)
@@ -995,11 +995,11 @@ in a method; otherwise, nil."
          (class-methods    (semantic-brute-find-tag-by-class 'function class-parts)))
 
     ;; Add methods of subclasses
-    (loop for subclass in class-subclasses do
+    (loop-for-each subclass in class-subclasses do
           (jdee-parse--add-methods method-map subclass))
 
     ;; Add methods of this class?
-    (loop for method in class-methods do
+    (loop-for-each method in class-methods do
           (let* ((method-name  (semantic-tag-name method))
                  (method-start (semantic-tag-start method))
                  (method-end   (semantic-tag-end method)))
@@ -1019,7 +1019,7 @@ in a method; otherwise, nil."
 
   (let* ((tokens (semantic-fetch-tags))
          (classes (semantic-brute-find-tag-by-class 'type tokens)))
-    (loop for class in classes do
+    (loop-for-each class in classes do
           (jdee-parse--add-methods this class))))
 
 (defmethod jdee-parse-method-map-get-method-at ((this jdee-parse-method-map) &optional pos)

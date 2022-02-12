@@ -116,7 +116,7 @@ This function loads jdee-PLUGIN.el."
   "Get the plugin directories and jar files to include in the Beanshell classpath."
   (let ((plugins (oref-default 'jdee-plugin plugins))
         classpath)
-    (loop for plugin in plugins do
+    (loop-for-each plugin in plugins do
           (setq classpath (append classpath (oref plugin bsh-cp))))
     classpath))
 
@@ -141,7 +141,7 @@ jar program is on the system path."
           (insert "JDEE Plugin Installation Log")
           (pop-to-buffer buf)
           (cd jdee-plugins-directory)
-          (loop for zip-file in zip-files do
+          (loop-for-each zip-file in zip-files do
                 (let ((result
                        (shell-command-to-string
                         (concat "jar xvf " zip-file))))

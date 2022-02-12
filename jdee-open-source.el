@@ -436,7 +436,7 @@ If CLASS is found in an archive, set both
                 ".java"))
          (package (jdee-parse-get-package-from-name outer-class)))
     (catch 'found
-      (loop for path in (jdee-expand-wildcards-and-normalize jdee-sourcepath 'jdee-sourcepath) do
+      (loop-for-each path in (jdee-expand-wildcards-and-normalize jdee-sourcepath 'jdee-sourcepath) do
             (let* ((pkg-path (subst-char-in-string ?. ?/ package))
                    (pkg-dir (expand-file-name pkg-path path))
                    (file-path (expand-file-name file pkg-dir)))
